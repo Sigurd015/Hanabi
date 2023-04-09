@@ -5,8 +5,16 @@
     <ClInclude Include="src\Engine\Application.h" />
     <ClInclude Include="src\Engine\Core.h" />
     <ClInclude Include="src\Engine\EntryPoint.h" />
+    <ClInclude Include="src\Engine\Log.h" />
+    <ClInclude Include="src\Engine\Events\Event.h" />
+    <ClInclude Include="src\hnbpch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Application.cpp" />
+    <ClCompile Include="src\Engine\Log.cpp" />
+    <ClCompile Include="src\Engine\Events\KeyEvent.h" />
+    <ClCompile Include="src\Engine\Events\MouseEvent.h" />
+    <ClCompile Include="src\Engine\Events\ApplicationEvent.h" />
+    <ClCompile Include="src\hnbpch.cpp" />
   </ItemGroup>
 </Project>
