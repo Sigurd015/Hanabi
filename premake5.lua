@@ -1,6 +1,8 @@
 workspace "Hanabi"
 	architecture "x64"
 
+	startproject "Sandbox"
+
 	configurations
 	{
 		"Debug",
@@ -10,7 +12,10 @@ workspace "Hanabi"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-startproject "Sandbox"
+IncludeDir = {}
+IncludeDir["GLFW"] = "Hanabi/vendor/GLFW/include"
+
+include "Hanabi/vendor/GLFW"
 
 project "Hanabi"
 	location "Hanabi"
@@ -33,8 +38,15 @@ project "Hanabi"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.GLFW}"
 	}
 
+	links 
+	{ 
+		"GLFW",
+		"opengl32.lib"
+	}
+	
 	filter "system:windows"
 		cppdialect "C++17"
 		staticruntime "On"
