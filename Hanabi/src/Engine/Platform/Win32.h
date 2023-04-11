@@ -12,7 +12,7 @@ namespace Hanabi
 		void OnUpdate() override;
 		inline unsigned int GetWidth() const override { return m_Data.Width; }
 		inline unsigned int GetHeight() const override { return m_Data.Height; }
-		inline void SetEventCallBack(const EventCallBackFn& callback) override { m_Data.EventCallBack = callback; }
+		inline void SetEventCallback(const EventCallBackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
 	private:
@@ -26,7 +26,7 @@ namespace Hanabi
 			unsigned int Width, Height;
 			bool VSync;
 
-			EventCallBackFn EventCallBack;
+			EventCallBackFn EventCallback;
 		};
 		WindowData m_Data;
 	};
