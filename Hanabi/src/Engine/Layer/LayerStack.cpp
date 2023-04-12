@@ -1,5 +1,6 @@
 #include "hnbpch.h"
 #include "LayerStack.h"
+
 namespace Hanabi
 {
 	LayerStack::LayerStack()

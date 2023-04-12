@@ -14,8 +14,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "Hanabi/vendor/GLFW/include"
+IncludeDir["Glad"] = "Hanabi/vendor/Glad/include"
 
 include "Hanabi/vendor/GLFW"
+include "Hanabi/vendor/Glad"
 
 project "Hanabi"
 	location "Hanabi"
@@ -38,12 +40,14 @@ project "Hanabi"
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 	}
 
 	links 
 	{ 
 		"GLFW",
+		"Glad",
 		"opengl32.lib"
 	}
 	
@@ -55,7 +59,8 @@ project "Hanabi"
 		defines
 		{
 			"HNB_PLATFORM_WINDOWS",
-			"HNB_BUILD_DLL"
+			"HNB_BUILD_DLL",
+			"GLFW_INCLUDE_NONE"
 		}
 
 		postbuildcommands
