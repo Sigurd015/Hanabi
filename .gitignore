@@ -4,3 +4,4 @@ build/
 *.filters
 *.vcxproj
 *.sln
+Sandbox/imgui.ini

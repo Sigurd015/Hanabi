@@ -1,6 +1,5 @@
 workspace "Hanabi"
 	architecture "x64"
-
 	startproject "Sandbox"
 
 	configurations
@@ -10,22 +9,29 @@ workspace "Hanabi"
 		"Dist"
 	}
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+outputdir = "%{wks.location}/build/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+intdir = "%{wks.location}/build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "Hanabi/vendor/GLFW/include"
 IncludeDir["Glad"] = "Hanabi/vendor/Glad/include"
+IncludeDir["ImGui"] = "Hanabi/vendor/imgui"
 
-include "Hanabi/vendor/GLFW"
-include "Hanabi/vendor/Glad"
+group "Dependencies"
+	include "Hanabi/vendor/GLFW"
+	include "Hanabi/vendor/Glad"
+	include "Hanabi/vendor/imgui"
+
+group ""
 
 project "Hanabi"
 	location "Hanabi"
 	kind "SharedLib"
 	language "C++"
+	staticruntime "off"
 
-	targetdir ("build/" .. outputdir .. "/%{prj.name}")
-	objdir ("build/int/" .. outputdir .. "/%{prj.name}")
+	targetdir (outputdir .. "/%{prj.name}")
+	objdir (intdir .. "/%{prj.name}")
 
 	pchheader "hnbpch.h"
 	pchsource "Hanabi/src/hnbpch.cpp"
@@ -41,19 +47,20 @@ project "Hanabi"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}"
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.ImGui}"
 	}
 
 	links 
 	{ 
 		"GLFW",
 		"Glad",
-		"opengl32.lib"
+		"opengl32.lib",
+		"ImGui"
 	}
 	
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -65,31 +72,32 @@ project "Hanabi"
 
 		postbuildcommands
 		{
-			("{COPY} %{cfg.buildtarget.relpath} ../build/" .. outputdir .. "/Sandbox")
+			("{COPY} %{cfg.buildtarget.relpath} \"" .. outputdir .. "/Sandbox/\"")
 		}
 
 	filter "configurations:Debug"
 		defines "HNB_DEBUG"
-		buildoptions "/MDd"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HNB_RELEASE"
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "HNB_DIST"
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
 project "Sandbox"
 	location "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
+	staticruntime "off"
 
-	targetdir ("build/" .. outputdir .. "/%{prj.name}")
-	objdir ("build/int/" .. outputdir .. "/%{prj.name}")
+	targetdir (outputdir .. "/%{prj.name}")
+	objdir (intdir .. "/%{prj.name}")
 
 	files
 	{
@@ -110,7 +118,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		cppdialect "C++17"
-		staticruntime "On"
 		systemversion "latest"
 
 		defines
@@ -120,15 +127,15 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "HNB_DEBUG"
-		buildoptions "/MDd"
+		runtime "Debug"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "HNB_RELEASE"
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "HNB_DIST"
-		buildoptions "/MD"
+		runtime "Release"
 		optimize "On"

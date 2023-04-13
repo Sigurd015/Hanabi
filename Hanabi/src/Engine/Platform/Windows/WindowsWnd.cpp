@@ -3,7 +3,7 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 namespace Hanabi
 {
@@ -113,6 +113,14 @@ namespace Hanabi
 					break;
 				}
 				}
+			});
+
+		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
+			{
+				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+				KeyTypedEvent event(keycode);
+				data.EventCallback(event);
 			});
 
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
