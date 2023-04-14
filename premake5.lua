@@ -13,9 +13,11 @@ outputdir = "%{wks.location}/build/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architect
 intdir = "%{wks.location}/build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
+IncludeDir["spdlog"] = "Hanabi/vendor/spdlog/include"
 IncludeDir["GLFW"] = "Hanabi/vendor/GLFW/include"
 IncludeDir["Glad"] = "Hanabi/vendor/Glad/include"
 IncludeDir["ImGui"] = "Hanabi/vendor/imgui"
+IncludeDir["glm"] = "Hanabi/vendor/glm"
 
 group "Dependencies"
 	include "Hanabi/vendor/GLFW"
@@ -45,10 +47,11 @@ project "Hanabi"
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include",
+		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.ImGui}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}"
 	}
 
 	links 
@@ -107,8 +110,9 @@ project "Sandbox"
 
 	includedirs
 	{
-		"Hanabi/vendor/spdlog/include",
-		"Hanabi/src"
+		"Hanabi/src",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.glm}"
 	}
 
 	links

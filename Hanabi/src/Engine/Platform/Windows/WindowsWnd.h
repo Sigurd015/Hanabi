@@ -15,6 +15,7 @@ namespace Hanabi
 		inline void SetEventCallback(const EventCallBackFn& callback) override { m_Data.EventCallback = callback; }
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
+		inline void* GetNativeWindow() const override { return m_Window; }
 
 	private:
 		virtual void Init(const WindowProps& props);

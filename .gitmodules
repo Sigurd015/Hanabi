@@ -7,3 +7,6 @@
 [submodule "Hanabi/vendor/imgui"]
 	path = Hanabi/vendor/imgui
 	url = https://github.com/Sigurd015/imgui
+[submodule "Hanabi/vendor/glm"]
+	path = Hanabi/vendor/glm
+	url = https://github.com/g-truc/glm
