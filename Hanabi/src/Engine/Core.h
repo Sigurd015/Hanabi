@@ -1,11 +1,15 @@
 #pragma once
 
 #ifdef HNB_PLATFORM_WINDOWS
+#if HNB_DYNAMIC_LINK
 	#ifdef HNB_BUILD_DLL
 		#define HNB_API __declspec(dllexport)
 	#else
 		#define HNB_API __declspec(dllimport)
 	#endif
+#else
+	#define HNB_API
+#endif
 #else
 	#error Only supports windows for now!
 #endif 
