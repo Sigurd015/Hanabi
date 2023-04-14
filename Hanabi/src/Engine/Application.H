@@ -3,6 +3,7 @@
 #include "Events/ApplicationEvent.h"
 #include "Platform/Window.h"
 #include "Layer/LayerStack.h"
+#include "Engine/Layer/Imgui/ImGuiLayer.h"
 
 namespace Hanabi
 {
@@ -21,6 +22,7 @@ namespace Hanabi
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 		std::unique_ptr<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 		static Application* s_Instance;

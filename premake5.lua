@@ -58,8 +58,8 @@ project "Hanabi"
 	{ 
 		"GLFW",
 		"Glad",
-		"opengl32.lib",
-		"ImGui"
+		"ImGui",
+		"opengl32.lib"
 	}
 	
 	filter "system:windows"
@@ -111,6 +111,7 @@ project "Sandbox"
 	includedirs
 	{
 		"Hanabi/src",
+		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}"
 	}

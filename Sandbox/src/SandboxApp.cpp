@@ -1,4 +1,5 @@
 #include <Hanabi.h>
+#include "imgui.h"
 
 class ExampleLayer : public Hanabi::Layer
 {
@@ -22,6 +23,13 @@ public:
 			HNB_TRACE("{0}[{1}]", (char)e.GetKeyCode(), e.GetKeyCode());
 		}
 	}
+
+	virtual void OnImGuiRender() override
+	{
+	/*	ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();*/
+	}
 };
 
 class Sandbox :public Hanabi::Application
@@ -30,7 +38,6 @@ public:
 	Sandbox()
 	{
 		PushLayer(new ExampleLayer());
-		PushOverlay(new Hanabi::ImGuiLayer());
 	}
 	~Sandbox()
 	{

@@ -13,6 +13,7 @@ namespace Hanabi
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
 		virtual void OnEvent(Event& evnet) {}
+		virtual void OnImGuiRender() {}
 		inline const std::string& GetName()const { return m_DebugName; }
 	protected:
 		std::string m_DebugName;
