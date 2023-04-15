@@ -30,9 +30,6 @@ namespace Hanabi
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 		static Application* s_Instance;
-
-		std::shared_ptr<Shader> m_Shader;
-		std::shared_ptr<VertexArray> m_VertexArray;
 	};
 
 	Application* CreateApplication();
