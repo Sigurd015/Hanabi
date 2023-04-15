@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Platform/Window.h"
+#include "Engine/Renderer/RenderingContext.h"
 #include <GLFW/glfw3.h>
 
 namespace Hanabi
@@ -21,7 +22,7 @@ namespace Hanabi
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 		GLFWwindow* m_Window;
-
+		RenderingContext* m_Context;
 		struct WindowData
 		{
 			std::string Title;
