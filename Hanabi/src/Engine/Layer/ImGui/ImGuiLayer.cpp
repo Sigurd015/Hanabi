@@ -5,7 +5,7 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-#include "Engine/Application.h"
+#include "Engine/Core/Application.h"
 
 //Temp
 #include <GLFW/glfw3.h>
@@ -57,10 +57,7 @@ namespace Hanabi
 	}
 
 	void ImGuiLayer::OnImGuiRender()
-	{
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
-	}
+	{}
 
 	void ImGuiLayer::Begin()
 	{

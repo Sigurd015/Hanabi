@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include <Engine/Log.h>
+#include <Engine/Core/Log.h>
 
 #ifdef HNB_PLATFORM_WINDOWS
 #include <Windows.h>

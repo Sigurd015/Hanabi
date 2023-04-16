@@ -1,13 +1,9 @@
 #pragma once
-#include "Core.h"
-#include "Events/ApplicationEvent.h"
-#include "Platform/Window.h"
-#include "Layer/LayerStack.h"
-#include "Layer/Imgui/ImGuiLayer.h"
-#include "Renderer/Shader.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/Buffer.h"
-#include "Renderer/VertexArray.h"
+#include "Engine/Core.h"
+#include "Engine/Events/ApplicationEvent.h"
+#include "Engine/Platform/Window.h"
+#include "Engine/Layer/LayerStack.h"
+#include "Engine/Layer/Imgui/ImGuiLayer.h"
 
 namespace Hanabi
 {
@@ -25,11 +21,12 @@ namespace Hanabi
 		inline static Application& Get() { return *s_Instance; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
-		std::unique_ptr<Window> m_Window;
+		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 		LayerStack m_LayerStack;
 		static Application* s_Instance;
+		float m_LastFrameTime = 0.0f;
 	};
 
 	Application* CreateApplication();

@@ -1,6 +1,6 @@
 #include "hnbpch.h"
 #include "WindowsInput.h"
-#include "Engine/Application.H"
+#include "Engine/Core/Application.H"
 #include <GLFW/glfw3.h>
 
 namespace Hanabi
