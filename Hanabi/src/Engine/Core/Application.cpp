@@ -1,5 +1,6 @@
 #include "hnbpch.h"
 #include "Application.h"
+#include "Engine/Renderer/Renderer.h"
 #include <glfw/glfw3.h>
 
 namespace Hanabi
@@ -15,6 +16,8 @@ namespace Hanabi
 
 		m_Window = Scope<Window>(Window::Create());
 		m_Window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+
+		Renderer::Init();
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);

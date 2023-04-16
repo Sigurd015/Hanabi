@@ -1,14 +1,16 @@
 #include <Hanabi.h>
 #include "imgui.h"
 #include <glm/ext/matrix_transform.hpp>
-#include "../../Hanabi/vendor/GLFW/include/GLFW/glfw3.h"
 #include <glm/gtc/type_ptr.hpp>
 
 class ExampleLayer : public Hanabi::Layer
 {
 public:
 	Hanabi::Ref<Hanabi::Shader> m_Shader;
+	Hanabi::Ref<Hanabi::Shader> m_SquareShader;
 	Hanabi::Ref<Hanabi::VertexArray> m_VertexArray;
+	Hanabi::Ref<Hanabi::VertexArray> m_SquareVA;
+	Hanabi::Ref<Hanabi::Texture2D> m_SquareTexture,m_LogoTexture;
 	Hanabi::Camera2D m_Camera;
 	glm::vec3 m_CameraPosition;
 	float m_CameraMoveSpeed = 5.0f;
@@ -26,45 +28,83 @@ public:
 		};
 		unsigned int indices[6] = { 0, 1, 2,0,2,3 };
 		//VertexArray
-		m_VertexArray.reset(Hanabi::VertexArray::Create());
+		m_VertexArray = Hanabi::VertexArray::Create();
 		m_VertexArray->Bind();
 		//VertexBuffer
-		Hanabi::Ref<Hanabi::VertexBuffer> vertexBuffer;
-		vertexBuffer.reset(Hanabi::VertexBuffer::Create(vertices, sizeof(vertices)));
+		Hanabi::Ref<Hanabi::VertexBuffer> vertexBuffer = Hanabi::VertexBuffer::Create(vertices, sizeof(vertices));
 		vertexBuffer->SetLayout({
 			{ Hanabi::ShaderDataType::Float3, "a_Position" } });
 		m_VertexArray->AddVertexBuffer(vertexBuffer);
 		//IndexBuffer
-		Hanabi::Ref<Hanabi::IndexBuffer> indexBuffer;
-		indexBuffer.reset(Hanabi::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-		m_VertexArray->SetIndexBuffer(indexBuffer);
+		m_VertexArray->SetIndexBuffer(Hanabi::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+
+		float squareVertices[5 * 4] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
+		};
+		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
+		//VertexArray
+		m_SquareVA = Hanabi::VertexArray::Create();
+		m_SquareVA->Bind();
+		//VertexBuffer
+		Hanabi::Ref<Hanabi::VertexBuffer> squareVB = Hanabi::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
+		squareVB->SetLayout({
+			{ Hanabi::ShaderDataType::Float3, "a_Position" },
+			{ Hanabi::ShaderDataType::Float2, "a_TexCoord" }
+			});
+		m_SquareVA->AddVertexBuffer(squareVB);
+		//IndexBuffer
+		m_SquareVA->SetIndexBuffer(Hanabi::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 
 		std::string vertexSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) in vec3 a_Position;
-			
+			#version 330 core		
+			layout(location = 0) in vec3 a_Position;		
             uniform mat4 u_ViewProjection;
             uniform mat4 u_Transform;
-
 			void main()
 			{
 				gl_Position = u_ViewProjection*u_Transform*vec4(a_Position, 1.0);	
 			}
 		)";
 		std::string fragmentSrc = R"(
-			#version 330 core
-			
-			layout(location = 0) out vec4 color;
-			
+			#version 330 core		
+			layout(location = 0) out vec4 color;	
             uniform vec3 u_Color;
-
 			void main()
 			{
 				color = vec4(u_Color, 1.0);
 			}
 		)";
-		m_Shader.reset(Hanabi::Shader::Create(vertexSrc, fragmentSrc));
+
+		std::string squareVS = R"(
+			#version 330 core		
+			layout(location = 0) in vec3 a_Position;
+			layout(location = 1) in vec2 a_TexCoord;
+            uniform mat4 u_ViewProjection;
+            out vec2 v_TexCoord;		
+            void main()
+			{
+                v_TexCoord = a_TexCoord;
+				gl_Position = u_ViewProjection*vec4(a_Position, 1.0);	
+			}
+		)";
+		std::string squareFS = R"(
+			#version 330 core		
+			layout(location = 0) out vec4 color;		
+            uniform sampler2D u_Texture;
+            in vec2 v_TexCoord;
+			void main()
+			{
+				color = texture(u_Texture, v_TexCoord);
+			}
+		)";
+
+		m_SquareShader = Hanabi::Shader::Create(squareVS, squareFS);
+		m_Shader = Hanabi::Shader::Create(vertexSrc, fragmentSrc);
+		m_SquareTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
+		m_LogoTexture= Hanabi::Texture2D::Create("assets/textures/ChernoLogo.png");
 	}
 
 	void OnUpdate(Hanabi::Timestep ts) override
@@ -102,7 +142,13 @@ public:
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
 				Hanabi::Renderer::Submit(m_Shader, m_VertexArray, transform);
 			}
-		}
+		}	
+		m_SquareShader->Bind();
+		m_SquareShader->SetUniform("u_Texture", 0);
+		m_SquareTexture->Bind();
+		Hanabi::Renderer::Submit(m_SquareShader, m_SquareVA, glm::mat4(1.0f));
+		m_LogoTexture->Bind();
+		Hanabi::Renderer::Submit(m_SquareShader, m_SquareVA, glm::mat4(1.0f));
 
 		Hanabi::Renderer::EndScene();
 	}
@@ -121,7 +167,7 @@ public:
 	virtual void OnImGuiRender() override
 	{
 		ImGui::Begin("Settings");
-		ImGui::ColorEdit3("Color",glm::value_ptr(m_Color));
+		ImGui::ColorEdit3("Color", glm::value_ptr(m_Color));
 		ImGui::End();
 	}
 };

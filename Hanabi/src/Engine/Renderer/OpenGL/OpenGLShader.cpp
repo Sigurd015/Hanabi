@@ -124,11 +124,6 @@ namespace Hanabi
 		glUseProgram(0);
 	}
 
-	void OpenGLShader::SetValue(const std::string& name, glm::vec3 value)
-	{
-		UploadUniformFloat3(name, value);
-	}
-
 	GLint OpenGLShader::GetUniformLocation(const std::string& name) const
 	{
 		if (m_UniformLocationCache.find(name) != m_UniformLocationCache.end())
@@ -137,6 +132,27 @@ namespace Hanabi
 		GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 		m_UniformLocationCache[name] = location;
 		return location;
+	}
+
+	void OpenGLShader::SetUniform(const std::string& name, const glm::vec3& value)
+	{
+		UploadUniformFloat3(name, value);
+	}
+
+	void OpenGLShader::SetUniform(const std::string& name, const glm::mat4& value)
+	{
+		UploadUniformMat4(name, value);
+	}
+
+	void OpenGLShader::SetUniform(const std::string& name, const int& value)
+	{
+		UploadUniformInt(name, value);
+	}
+
+	void OpenGLShader::UploadUniformInt(const std::string& name, const int& value)
+	{
+		GLint location = GetUniformLocation(name);
+		glUniform1i(location, value);
 	}
 
 	void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& matrix)

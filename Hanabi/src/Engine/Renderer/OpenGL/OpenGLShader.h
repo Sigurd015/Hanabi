@@ -13,7 +13,10 @@ namespace Hanabi
 		~OpenGLShader();
 		void Bind() const override;
 		void Unbind() const override;
-		void SetValue(const std::string& name, glm::vec3 value) override;
+		void SetUniform(const std::string& name, const glm::vec3& value) override;
+		void SetUniform(const std::string& name, const glm::mat4& value) override;
+		void SetUniform(const std::string& name, const int& value) override;
+		void UploadUniformInt(const std::string& name, const int& value);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& value);
 		void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
 	private:

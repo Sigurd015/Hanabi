@@ -9,6 +9,11 @@ workspace "Hanabi"
 		"Dist"
 	}
 
+	flags
+	{
+		"MultiProcessorCompile"
+	}
+
 outputdir = "%{wks.location}/build/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 intdir = "%{wks.location}/build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -18,6 +23,7 @@ IncludeDir["GLFW"] = "Hanabi/vendor/GLFW/include"
 IncludeDir["Glad"] = "Hanabi/vendor/Glad/include"
 IncludeDir["ImGui"] = "Hanabi/vendor/imgui"
 IncludeDir["glm"] = "Hanabi/vendor/glm"
+IncludeDir["stb_image"] = "Hanabi/vendor/stb_image"
 
 group "Dependencies"
 	include "Hanabi/vendor/GLFW"
@@ -44,7 +50,9 @@ project "Hanabi"
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
 		"%{prj.name}/vendor/glm/glm/**.hpp",
-		"%{prj.name}/vendor/glm/glm/**.inl"
+		"%{prj.name}/vendor/glm/glm/**.inl",
+		"%{prj.name}/vendor/stb_image/**.h",
+		"%{prj.name}/vendor/stb_image/**.cpp"
 	}
 
 	defines
@@ -59,7 +67,8 @@ project "Hanabi"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.stb_image}"
 	}
 
 	links 

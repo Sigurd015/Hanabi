@@ -5,3 +5,4 @@ build/
 *.vcxproj
 *.sln
 Sandbox/imgui.ini
+Sandbox/assets/
