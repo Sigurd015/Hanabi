@@ -3,16 +3,19 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
+// TODO: REMOVE!
+typedef unsigned int GLenum;
 
 namespace Hanabi
 {
 	class OpenGLShader :public Shader
 	{
 	public:
-		OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc);
+		OpenGLShader(const std::string& filepath);
 		~OpenGLShader();
 		void Bind() const override;
 		void Unbind() const override;
+		const std::string& GetName() const override { return m_Name; }
 		void SetUniform(const std::string& name, const glm::vec3& value) override;
 		void SetUniform(const std::string& name, const glm::mat4& value) override;
 		void SetUniform(const std::string& name, const int& value) override;
@@ -20,9 +23,13 @@ namespace Hanabi
 		void UploadUniformMat4(const std::string& name, const glm::mat4& value);
 		void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
 	private:
+		std::string ReadFile(const std::string& filepath);
+		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
+		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
 		GLint GetUniformLocation(const std::string& name) const;
 		uint32_t m_RendererID;
 		mutable	std::unordered_map<std::string, GLint> m_UniformLocationCache;
+		std::string m_Name;
 	};
 
 }

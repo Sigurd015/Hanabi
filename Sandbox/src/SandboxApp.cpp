@@ -6,11 +6,12 @@
 class ExampleLayer : public Hanabi::Layer
 {
 public:
+	Hanabi::ShaderLibrary m_ShaderLibrary;
 	Hanabi::Ref<Hanabi::Shader> m_Shader;
 	Hanabi::Ref<Hanabi::Shader> m_SquareShader;
 	Hanabi::Ref<Hanabi::VertexArray> m_VertexArray;
 	Hanabi::Ref<Hanabi::VertexArray> m_SquareVA;
-	Hanabi::Ref<Hanabi::Texture2D> m_SquareTexture,m_LogoTexture;
+	Hanabi::Ref<Hanabi::Texture2D> m_SquareTexture, m_LogoTexture;
 	Hanabi::Camera2D m_Camera;
 	glm::vec3 m_CameraPosition;
 	float m_CameraMoveSpeed = 5.0f;
@@ -58,53 +59,12 @@ public:
 		//IndexBuffer
 		m_SquareVA->SetIndexBuffer(Hanabi::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 
-		std::string vertexSrc = R"(
-			#version 330 core		
-			layout(location = 0) in vec3 a_Position;		
-            uniform mat4 u_ViewProjection;
-            uniform mat4 u_Transform;
-			void main()
-			{
-				gl_Position = u_ViewProjection*u_Transform*vec4(a_Position, 1.0);	
-			}
-		)";
-		std::string fragmentSrc = R"(
-			#version 330 core		
-			layout(location = 0) out vec4 color;	
-            uniform vec3 u_Color;
-			void main()
-			{
-				color = vec4(u_Color, 1.0);
-			}
-		)";
-
-		std::string squareVS = R"(
-			#version 330 core		
-			layout(location = 0) in vec3 a_Position;
-			layout(location = 1) in vec2 a_TexCoord;
-            uniform mat4 u_ViewProjection;
-            out vec2 v_TexCoord;		
-            void main()
-			{
-                v_TexCoord = a_TexCoord;
-				gl_Position = u_ViewProjection*vec4(a_Position, 1.0);	
-			}
-		)";
-		std::string squareFS = R"(
-			#version 330 core		
-			layout(location = 0) out vec4 color;		
-            uniform sampler2D u_Texture;
-            in vec2 v_TexCoord;
-			void main()
-			{
-				color = texture(u_Texture, v_TexCoord);
-			}
-		)";
-
-		m_SquareShader = Hanabi::Shader::Create(squareVS, squareFS);
-		m_Shader = Hanabi::Shader::Create(vertexSrc, fragmentSrc);
+		m_SquareShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
+		m_Shader = m_ShaderLibrary.Load("assets/shaders/Color.glsl");
 		m_SquareTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
-		m_LogoTexture= Hanabi::Texture2D::Create("assets/textures/ChernoLogo.png");
+		m_LogoTexture = Hanabi::Texture2D::Create("assets/textures/ChernoLogo.png");
+		m_ShaderLibrary.Get("Texture")->Bind();
+		m_ShaderLibrary.Get("Texture")->SetUniform("u_Texture", 0);
 	}
 
 	void OnUpdate(Hanabi::Timestep ts) override
@@ -132,7 +92,7 @@ public:
 
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
-		m_Shader->Bind();
+		m_ShaderLibrary.Get("Color")->Bind();
 		m_Shader->SetUniform("u_Color", m_Color);
 		for (int y = 0; y < 20; y++)
 		{
@@ -142,9 +102,8 @@ public:
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
 				Hanabi::Renderer::Submit(m_Shader, m_VertexArray, transform);
 			}
-		}	
-		m_SquareShader->Bind();
-		m_SquareShader->SetUniform("u_Texture", 0);
+		}
+		m_ShaderLibrary.Get("Texture")->Bind();
 		m_SquareTexture->Bind();
 		Hanabi::Renderer::Submit(m_SquareShader, m_SquareVA, glm::mat4(1.0f));
 		m_LogoTexture->Bind();
