@@ -3,8 +3,6 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
-// TODO: REMOVE!
-typedef unsigned int GLenum;
 
 namespace Hanabi
 {
@@ -16,12 +14,17 @@ namespace Hanabi
 		void Bind() const override;
 		void Unbind() const override;
 		const std::string& GetName() const override { return m_Name; }
-		void SetUniform(const std::string& name, const glm::vec3& value) override;
-		void SetUniform(const std::string& name, const glm::mat4& value) override;
 		void SetUniform(const std::string& name, const int& value) override;
+		void SetUniform(const std::string& name, const glm::vec2& value) override;
+		void SetUniform(const std::string& name, const glm::vec3& value) override;
+		void SetUniform(const std::string& name, const glm::vec4& value) override;
+		void SetUniform(const std::string& name, const glm::mat4& value) override;
 		void UploadUniformInt(const std::string& name, const int& value);
+		void UploadUniformVec2(const std::string& name, const glm::vec2& value);
+		void UploadUniformVec3(const std::string& name, const glm::vec3& value);
+		void UploadUniformVec4(const std::string& name, const glm::vec4& value);
 		void UploadUniformMat4(const std::string& name, const glm::mat4& value);
-		void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
+
 	private:
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);

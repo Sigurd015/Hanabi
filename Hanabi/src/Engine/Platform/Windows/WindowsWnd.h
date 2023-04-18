@@ -22,7 +22,7 @@ namespace Hanabi
 		virtual void Init(const WindowProps& props);
 		virtual void Shutdown();
 		GLFWwindow* m_Window;
-		RenderingContext* m_Context;
+		Scope<RenderingContext> m_Context;
 		struct WindowData
 		{
 			std::string Title;

@@ -20,6 +20,7 @@ namespace Hanabi
 	{
 	public:
 		Camera2D(float left, float right, float bottom, float top);
+		void SetProjection(float left, float right, float bottom, float top);
 		const glm::vec3& GetPosition() const override { return m_Position; }
 		void SetPosition(const glm::vec3& position) override { m_Position = position; RecalculateViewMatrix(); }
 		float GetRotation() const override { return m_Rotation; }
@@ -27,6 +28,7 @@ namespace Hanabi
 		const glm::mat4& GetProjectionMatrix() const override { return m_ProjectionMatrix; }
 		const glm::mat4& GetViewMatrix() const override { return m_ViewMatrix; }
 		const glm::mat4& GetViewProjectionMatrix() const override { return m_ViewProjectionMatrix; }
+
 	private:
 		void RecalculateViewMatrix();
 		glm::mat4 m_ProjectionMatrix;

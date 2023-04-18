@@ -84,7 +84,6 @@ project "Hanabi"
 
 		defines
 		{
-			"HNB_PLATFORM_WINDOWS",
 			"HNB_BUILD_DLL",
 			"GLFW_INCLUDE_NONE"
 		}
@@ -135,11 +134,6 @@ project "Sandbox"
 
 	filter "system:windows"
 		systemversion "latest"
-
-		defines
-		{
-			"HNB_PLATFORM_WINDOWS"
-		}
 
 	filter "configurations:Debug"
 		defines "HNB_DEBUG"

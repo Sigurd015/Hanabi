@@ -2,24 +2,22 @@
 #include "imgui.h"
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "Engine/EntryPoint.h"
+#include <Engine/Input/CameraController.h>
 
-class ExampleLayer : public Hanabi::Layer
+class ExampleLayer3D : public Hanabi::Layer
 {
 public:
 	Hanabi::ShaderLibrary m_ShaderLibrary;
-	Hanabi::Ref<Hanabi::Shader> m_Shader;
-	Hanabi::Ref<Hanabi::Shader> m_SquareShader;
 	Hanabi::Ref<Hanabi::VertexArray> m_VertexArray;
-	Hanabi::Ref<Hanabi::VertexArray> m_SquareVA;
-	Hanabi::Ref<Hanabi::Texture2D> m_SquareTexture, m_LogoTexture;
-	Hanabi::Camera2D m_Camera;
-	glm::vec3 m_CameraPosition;
-	float m_CameraMoveSpeed = 5.0f;
-	float m_CameraRotation = 0.0f;
-	float m_CameraRotationSpeed = 180.0f;
+	Hanabi::CameraController2D m_CameraController;
+
 	glm::vec3 m_Color = { 0.2f, 0.3f, 0.8f };
 
-	ExampleLayer() : Layer("Example"), m_Camera(-1.6f, 1.6f, -0.9f, 0.9f), m_CameraPosition(0.0f)
+	ExampleLayer3D() : Layer("ExampleLayer3D"), m_CameraController(1920.0f / 1080.0f)
+	{}
+
+	void OnAttach()override
 	{
 		float vertices[3 * 4] = {
 			-0.5f, -0.5f, 0.0f,
@@ -27,10 +25,9 @@ public:
 			 0.5f,  0.5f, 0.0f,
 			-0.5f,  0.5f, 0.0f
 		};
-		unsigned int indices[6] = { 0, 1, 2,0,2,3 };
+		uint32_t indices[6] = { 0, 1, 2, 0, 2, 3 };
 		//VertexArray
 		m_VertexArray = Hanabi::VertexArray::Create();
-		m_VertexArray->Bind();
 		//VertexBuffer
 		Hanabi::Ref<Hanabi::VertexBuffer> vertexBuffer = Hanabi::VertexBuffer::Create(vertices, sizeof(vertices));
 		vertexBuffer->SetLayout({
@@ -39,81 +36,39 @@ public:
 		//IndexBuffer
 		m_VertexArray->SetIndexBuffer(Hanabi::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 
-		float squareVertices[5 * 4] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f
-		};
-		uint32_t squareIndices[6] = { 0, 1, 2, 2, 3, 0 };
-		//VertexArray
-		m_SquareVA = Hanabi::VertexArray::Create();
-		m_SquareVA->Bind();
-		//VertexBuffer
-		Hanabi::Ref<Hanabi::VertexBuffer> squareVB = Hanabi::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
-		squareVB->SetLayout({
-			{ Hanabi::ShaderDataType::Float3, "a_Position" },
-			{ Hanabi::ShaderDataType::Float2, "a_TexCoord" }
-			});
-		m_SquareVA->AddVertexBuffer(squareVB);
-		//IndexBuffer
-		m_SquareVA->SetIndexBuffer(Hanabi::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-
-		m_SquareShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
-		m_Shader = m_ShaderLibrary.Load("assets/shaders/Color.glsl");
-		m_SquareTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
-		m_LogoTexture = Hanabi::Texture2D::Create("assets/textures/ChernoLogo.png");
-		m_ShaderLibrary.Get("Texture")->Bind();
-		m_ShaderLibrary.Get("Texture")->SetUniform("u_Texture", 0);
+		m_ShaderLibrary.Load("assets/shaders/Color.glsl");
 	}
 
 	void OnUpdate(Hanabi::Timestep ts) override
 	{
-		if (Hanabi::Input::IsKeyPressed(HNB_KEY_A))
-			m_CameraPosition.x -= m_CameraMoveSpeed * ts;
-		else if (Hanabi::Input::IsKeyPressed(HNB_KEY_D))
-			m_CameraPosition.x += m_CameraMoveSpeed * ts;
-		if (Hanabi::Input::IsKeyPressed(HNB_KEY_W))
-			m_CameraPosition.y += m_CameraMoveSpeed * ts;
-		else if (Hanabi::Input::IsKeyPressed(HNB_KEY_S))
-			m_CameraPosition.y -= m_CameraMoveSpeed * ts;
-		if (Hanabi::Input::IsKeyPressed(HNB_KEY_Q))
-			m_CameraRotation += m_CameraRotationSpeed * ts;
-		if (Hanabi::Input::IsKeyPressed(HNB_KEY_E))
-			m_CameraRotation -= m_CameraRotationSpeed * ts;
-
-		m_Camera.SetPosition(m_CameraPosition);
-		m_Camera.SetRotation(m_CameraRotation);
+		m_CameraController.OnUpdate(ts);
 
 		Hanabi::RenderCommand::SetClearColor({ 0.3f, 0.3f, 0.3f, 1 });
 		Hanabi::RenderCommand::Clear();
 
-		Hanabi::Renderer::BeginScene(m_Camera);
+		Hanabi::Renderer::BeginScene(m_CameraController.GetCamera());
 
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
 		m_ShaderLibrary.Get("Color")->Bind();
-		m_Shader->SetUniform("u_Color", m_Color);
+		m_ShaderLibrary.Get("Color")->SetUniform("u_Color", m_Color);
+		m_VertexArray->Bind();
 		for (int y = 0; y < 20; y++)
 		{
 			for (int x = 0; x < 20; x++)
 			{
 				glm::vec3 pos(x * 0.11f, y * 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), pos) * scale;
-				Hanabi::Renderer::Submit(m_Shader, m_VertexArray, transform);
+				Hanabi::Renderer::Submit(m_ShaderLibrary.Get("Color"), m_VertexArray, transform);
 			}
 		}
-		m_ShaderLibrary.Get("Texture")->Bind();
-		m_SquareTexture->Bind();
-		Hanabi::Renderer::Submit(m_SquareShader, m_SquareVA, glm::mat4(1.0f));
-		m_LogoTexture->Bind();
-		Hanabi::Renderer::Submit(m_SquareShader, m_SquareVA, glm::mat4(1.0f));
 
 		Hanabi::Renderer::EndScene();
 	}
 
 	void OnEvent(Hanabi::Event& event) override
 	{
+		m_CameraController.OnEvent(event);
 		if (event.GetEventType() == Hanabi::EventType::KeyPressed)
 		{
 			Hanabi::KeyPressedEvent& e = (Hanabi::KeyPressedEvent&)event;
@@ -129,6 +84,51 @@ public:
 		ImGui::ColorEdit3("Color", glm::value_ptr(m_Color));
 		ImGui::End();
 	}
+
+	void OnDetach() override
+	{}
+};
+
+class ExampleLayer2D : public Hanabi::Layer
+{
+public:
+	Hanabi::CameraController2D m_CameraController;
+	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f,1.0f };
+
+	ExampleLayer2D() : Layer("ExampleLayer3D"), m_CameraController(1920.0f / 1080.0f)
+	{}
+
+	void ExampleLayer2D::OnAttach()
+	{}
+
+	void ExampleLayer2D::OnDetach()
+	{}
+
+	void ExampleLayer2D::OnUpdate(Hanabi::Timestep ts)
+	{
+		// Update
+		m_CameraController.OnUpdate(ts);
+
+		// Render
+		Hanabi::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Hanabi::RenderCommand::Clear();
+
+		Hanabi::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.0f, 0.0f }, m_SquareColor);
+		Hanabi::Renderer2D::EndScene();
+	}
+
+	void ExampleLayer2D::OnImGuiRender()
+	{
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+		ImGui::End();
+	}
+
+	void ExampleLayer2D::OnEvent(Hanabi::Event& e)
+	{
+		m_CameraController.OnEvent(e);
+	}
 };
 
 class Sandbox :public Hanabi::Application
@@ -136,7 +136,8 @@ class Sandbox :public Hanabi::Application
 public:
 	Sandbox()
 	{
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer3D());
+		PushLayer(new ExampleLayer2D());
 	}
 	~Sandbox()
 	{

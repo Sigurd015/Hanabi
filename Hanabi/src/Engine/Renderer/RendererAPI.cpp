@@ -15,7 +15,7 @@ namespace Hanabi
 {
 	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 
-	RendererAPI* RenderCommand::s_RendererAPI = new OpenGLRendererAPI();
+	Scope<RendererAPI> RenderCommand::s_RendererAPI = CreateScope<OpenGLRendererAPI>();
 
 	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	{
