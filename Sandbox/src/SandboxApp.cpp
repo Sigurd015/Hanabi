@@ -92,6 +92,7 @@ public:
 class ExampleLayer2D : public Hanabi::Layer
 {
 public:
+	Hanabi::Ref<Hanabi::Texture2D> m_CheckerboardTexture;
 	Hanabi::CameraController2D m_CameraController;
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f,1.0f };
 
@@ -99,7 +100,9 @@ public:
 	{}
 
 	void ExampleLayer2D::OnAttach()
-	{}
+	{
+		m_CheckerboardTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
+	}
 
 	void ExampleLayer2D::OnDetach()
 	{}
@@ -114,7 +117,11 @@ public:
 		Hanabi::RenderCommand::Clear();
 
 		Hanabi::Renderer2D::BeginScene(m_CameraController.GetCamera());
-		Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 0.0f, 0.0f }, m_SquareColor);
+		Hanabi::Renderer2D::DrawQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, 95.0f, m_SquareColor);
+		Hanabi::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, 0, m_SquareColor);
+		Hanabi::Renderer2D::DrawQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, 45.0f, m_SquareColor);
+		Hanabi::Renderer2D::DrawQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, 15.0f, m_SquareColor);
+		Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 10.0f, 10.0f }, 0, m_CheckerboardTexture);
 		Hanabi::Renderer2D::EndScene();
 	}
 
