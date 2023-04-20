@@ -1,10 +1,10 @@
 #pragma once
 #include "hnbpch.h"
-#include "Event.h"
+#include "Engine/Events/Event.h"
 
 namespace Hanabi
 {
-	class HNB_API KeyEvent :public Event
+	class KeyEvent :public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
@@ -14,7 +14,7 @@ namespace Hanabi
 		int m_KeyCode;
 	};
 
-	class HNB_API KeyPressedEvent :public KeyEvent
+	class KeyPressedEvent :public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode, int repeatCount) :KeyEvent(keycode), m_RepeatCount(repeatCount) {}
@@ -30,7 +30,7 @@ namespace Hanabi
 		int m_RepeatCount;
 	};
 
-	class HNB_API KeyReleasedEvent :public KeyEvent
+	class KeyReleasedEvent :public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode) :KeyEvent(keycode) {}
@@ -43,7 +43,7 @@ namespace Hanabi
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class HNB_API KeyTypedEvent :public KeyEvent
+	class  KeyTypedEvent :public KeyEvent
 	{
 	public:
 		KeyTypedEvent(int keycode) :KeyEvent(keycode) {}

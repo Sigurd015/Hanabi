@@ -1,13 +1,13 @@
 #pragma once
 #include "hnbpch.h"
-#include "Event.h"
+#include "Engine/Events/Event.h"
 
 namespace Hanabi
 {
-	class HNB_API WindowResizeEvent : public Event
+	class WindowResizeEvent : public Event
 	{
 	public:
-		WindowResizeEvent(unsigned int width, unsigned int height): m_Width(width), m_Height(height){}
+		WindowResizeEvent(unsigned int width, unsigned int height) : m_Width(width), m_Height(height) {}
 		inline unsigned int GetWidth() const { return m_Width; }
 		inline unsigned int GetHeight() const { return m_Height; }
 		std::string ToString() const override
@@ -17,40 +17,40 @@ namespace Hanabi
 			return ss.str();
 		}
 		EVENT_CLASS_TYPE(WindowResize)
-		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	private:
 		unsigned int m_Width, m_Height;
 	};
 
-	class HNB_API WindowCloseEvent : public Event
+	class WindowCloseEvent : public Event
 	{
 	public:
-		WindowCloseEvent() {}
+		WindowCloseEvent() = default;
 		EVENT_CLASS_TYPE(WindowClose)
-		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class HNB_API AppTickEvent : public Event
+	class AppTickEvent : public Event
 	{
 	public:
-		AppTickEvent() {}
+		AppTickEvent() = default;
 		EVENT_CLASS_TYPE(AppTick)
-		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class HNB_API AppUpdateEvent : public Event
+	class AppUpdateEvent : public Event
 	{
 	public:
-		AppUpdateEvent() {}
+		AppUpdateEvent() = default;
 		EVENT_CLASS_TYPE(AppUpdate)
-		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 
-	class HNB_API AppRenderEvent : public Event
+	class AppRenderEvent : public Event
 	{
 	public:
-		AppRenderEvent() {}
+		AppRenderEvent() = default;
 		EVENT_CLASS_TYPE(AppRender)
-		EVENT_CLASS_CATEGORY(EventCategoryApplication)
+			EVENT_CLASS_CATEGORY(EventCategoryApplication)
 	};
 }

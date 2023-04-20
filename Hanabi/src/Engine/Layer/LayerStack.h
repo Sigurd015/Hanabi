@@ -1,14 +1,14 @@
 #pragma once
 #include "Engine/Core.h"
-#include "Layer.h"
+#include "Engine/Layer/Layer.h"
 #include <vector>
 
 namespace Hanabi
 {
-	class HNB_API LayerStack
+	class LayerStack
 	{
 	public:
-		LayerStack();
+		LayerStack() = default;
 		~LayerStack();
 
 		void PushLayer(Layer* layer);

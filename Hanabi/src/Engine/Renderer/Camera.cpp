@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "Camera.h"
+#include "Engine/Renderer/Camera.h"
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 

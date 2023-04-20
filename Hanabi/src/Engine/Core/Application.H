@@ -7,11 +7,11 @@
 
 namespace Hanabi
 {
-	class HNB_API Application
+	class  Application
 	{
 	public:
 		Application();
-		virtual ~Application() = default;
+		virtual ~Application();
 		void Run();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);

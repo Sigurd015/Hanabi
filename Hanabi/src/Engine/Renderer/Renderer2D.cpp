@@ -1,8 +1,8 @@
 #include "hnbpch.h"
-#include "Renderer2D.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "RenderCommand.h"
+#include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Core.h"
 #include <glm/ext/matrix_transform.hpp>
 
@@ -11,8 +11,8 @@ namespace Hanabi
 	struct Renderer2DStorage
 	{
 		Ref<VertexArray> QuadVertexArray;
-		Ref<Shader> FlatColorShader;
-		Ref<Shader> TextureShader;
+		Ref<Shader> Shader;
+		Ref<Texture2D> WhiteTexture;
 	};
 	static Renderer2DStorage* s_Data;
 
@@ -39,11 +39,13 @@ namespace Hanabi
 		//IndexBuffer
 		s_Data->QuadVertexArray->SetIndexBuffer(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 
-		s_Data->FlatColorShader = Shader::Create("assets/shaders/FlatColor.glsl");
+		s_Data->WhiteTexture = Texture2D::Create(1, 1);
+		uint32_t whiteTextureData = 0xffffffff;
+		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-		s_Data->TextureShader = Shader::Create("assets/shaders/Texture.glsl");
-		s_Data->TextureShader->Bind();
-		s_Data->TextureShader->SetUniform("u_Texture", 0);
+		s_Data->Shader = Shader::Create("assets/shaders/Texture.glsl");
+		s_Data->Shader->Bind();
+		s_Data->Shader->SetUniform("u_Texture", 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -53,11 +55,8 @@ namespace Hanabi
 
 	void Renderer2D::BeginScene(const Camera& camera)
 	{
-		s_Data->FlatColorShader->Bind();
-		s_Data->FlatColorShader->SetUniform("u_ViewProjection", camera.GetViewProjectionMatrix());
-
-		s_Data->TextureShader->Bind();
-		s_Data->TextureShader->SetUniform("u_ViewProjection", camera.GetViewProjectionMatrix());
+		s_Data->Shader->Bind();
+		s_Data->Shader->SetUniform("u_ViewProjection", camera.GetViewProjectionMatrix());
 	}
 
 	void Renderer2D::EndScene()
@@ -70,10 +69,12 @@ namespace Hanabi
 
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float angle, const glm::vec4& color)
 	{
-		s_Data->FlatColorShader->SetUniform("u_Color", color);
+		s_Data->Shader->SetUniform("u_Color", color);
+
+		s_Data->WhiteTexture->Bind();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0, 0, 1.0f)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		s_Data->FlatColorShader->SetUniform("u_Transform", transform);
+		s_Data->Shader->SetUniform("u_Transform", transform);
 
 		s_Data->QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
@@ -84,13 +85,14 @@ namespace Hanabi
 	}
 	void Renderer2D::DrawQuad(const glm::vec3& position, const glm::vec2& size, const float angle, const Ref<Texture2D>& texture)
 	{
-		s_Data->TextureShader->SetUniform("u_Texture", 0);
+		s_Data->Shader->SetUniform("u_Texture", 0);
+		s_Data->Shader->SetUniform("u_Color", glm::vec4(1.0f));
+
+		texture->Bind();
 
 		glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::rotate(glm::mat4(1.0f), glm::radians(angle), glm::vec3(0, 0, 1.0f)) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
-		s_Data->TextureShader->SetUniform("u_Transform", transform);
-		
-		texture->Bind();
-		
+		s_Data->Shader->SetUniform("u_Transform", transform);
+
 		s_Data->QuadVertexArray->Bind();
 		RenderCommand::DrawIndexed(s_Data->QuadVertexArray);
 	}

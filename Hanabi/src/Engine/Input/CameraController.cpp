@@ -1,7 +1,7 @@
 #include "hnbpch.h"
-#include "CameraController.h"
-#include "KeyCodes.h"
-#include "Input.h"
+#include "Engine/Input/CameraController.h"
+#include "Engine/Input/KeyCodes.h"
+#include "Engine/Input/Input.h"
 
 namespace Hanabi
 {

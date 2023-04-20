@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "OpenGLVertexArray.h"
+#include "Engine/Renderer/OpenGL/OpenGLVertexArray.h"
 #include <glad/glad.h>
 
 namespace Hanabi
@@ -8,17 +8,17 @@ namespace Hanabi
 	{
 		switch (type)
 		{
-		case Hanabi::ShaderDataType::Float:    return GL_FLOAT;
-		case Hanabi::ShaderDataType::Float2:   return GL_FLOAT;
-		case Hanabi::ShaderDataType::Float3:   return GL_FLOAT;
-		case Hanabi::ShaderDataType::Float4:   return GL_FLOAT;
-		case Hanabi::ShaderDataType::Mat3:     return GL_FLOAT;
-		case Hanabi::ShaderDataType::Mat4:     return GL_FLOAT;
-		case Hanabi::ShaderDataType::Int:      return GL_INT;
-		case Hanabi::ShaderDataType::Int2:     return GL_INT;
-		case Hanabi::ShaderDataType::Int3:     return GL_INT;
-		case Hanabi::ShaderDataType::Int4:     return GL_INT;
-		case Hanabi::ShaderDataType::Bool:     return GL_BOOL;
+		case ShaderDataType::Float:    return GL_FLOAT;
+		case ShaderDataType::Float2:   return GL_FLOAT;
+		case ShaderDataType::Float3:   return GL_FLOAT;
+		case ShaderDataType::Float4:   return GL_FLOAT;
+		case ShaderDataType::Mat3:     return GL_FLOAT;
+		case ShaderDataType::Mat4:     return GL_FLOAT;
+		case ShaderDataType::Int:      return GL_INT;
+		case ShaderDataType::Int2:     return GL_INT;
+		case ShaderDataType::Int3:     return GL_INT;
+		case ShaderDataType::Int4:     return GL_INT;
+		case ShaderDataType::Bool:     return GL_BOOL;
 		}
 		HNB_CORE_ASSERT(false, "Unknown ShaderDataType!");
 		return 0;

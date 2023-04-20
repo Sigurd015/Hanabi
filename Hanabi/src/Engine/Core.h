@@ -42,22 +42,6 @@
 #error "Unknown platform!"
 #endif // End of platform detection
 
-
-// DLL support
-#ifdef HNB_PLATFORM_WINDOWS
-#if HNB_DYNAMIC_LINK
-	#ifdef HNB_BUILD_DLL
-		#define HNB_API __declspec(dllexport)
-	#else
-		#define HNB_API __declspec(dllimport)
-	#endif
-#else
-	#define HNB_API
-#endif
-#else
-	#error Only supports windows for now!
-#endif 
-
 #ifdef HNB_DEBUG
 #define HNB_ENABLE_ASSERTS
 #endif
@@ -73,7 +57,6 @@
 #define BIT(x) (1<<x)
 
 #define HNB_BIND_EVENT_FN(fn) std::bind(&fn, this, std::placeholders::_1)
-
 
 namespace Hanabi
 {

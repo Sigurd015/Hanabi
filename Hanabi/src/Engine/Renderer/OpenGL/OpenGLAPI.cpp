@@ -1,5 +1,6 @@
 #include "hnbpch.h"
-#include "OpenGLAPI.h"
+#include "Engine/Renderer/OpenGL/OpenGLAPI.h"
+
 #include <glad/glad.h>
 
 namespace Hanabi
@@ -30,5 +31,6 @@ namespace Hanabi
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray)
 	{
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }

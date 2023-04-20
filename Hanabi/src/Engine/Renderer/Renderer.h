@@ -1,8 +1,8 @@
 #pragma once
-#include "RenderCommand.h"
-#include "RendererAPI.h"
-#include "Camera.h"
-#include "Shader.h"
+#include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/RendererAPI.h"
+#include "Engine/Renderer/Camera.h"
+#include "Engine/Renderer/Shader.h"
 
 namespace Hanabi
 {
@@ -10,6 +10,7 @@ namespace Hanabi
 	{
 	public:
 		static void Init();
+		static void Shutdown();
 		static void OnWindowResize(uint32_t width, uint32_t height);
 		static void BeginScene(Camera& camera);
 		static void EndScene();

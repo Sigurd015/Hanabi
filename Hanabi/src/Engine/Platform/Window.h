@@ -14,7 +14,7 @@ namespace Hanabi
 		WindowProps(const std::string& title = "Hanabi Engine", unsigned int width = 1920, unsigned int height = 1080) :Title(title), Width(width), Height(height) {}
 	};
 
-	class HNB_API Window
+	class Window
 	{
 	public:
 		using EventCallBackFn = std::function<void(Event&)>;
@@ -27,6 +27,6 @@ namespace Hanabi
 		virtual void SetVSync(bool enable) = 0;
 		virtual bool IsVSync() const = 0;
 		virtual void* GetNativeWindow() const = 0;
-		static Window* Create(const WindowProps& props = WindowProps());
+		static Scope<Window> Create(const WindowProps& props = WindowProps());
 	};
 }

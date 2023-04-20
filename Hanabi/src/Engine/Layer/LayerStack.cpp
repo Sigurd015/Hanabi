@@ -1,11 +1,8 @@
 #include "hnbpch.h"
-#include "LayerStack.h"
+#include "Engine/Layer/LayerStack.h"
 
 namespace Hanabi
 {
-	LayerStack::LayerStack()
-	{}
-
 	LayerStack::~LayerStack()
 	{
 		for (Layer* layer : m_Layers)

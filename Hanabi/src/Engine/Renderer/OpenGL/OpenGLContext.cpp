@@ -1,7 +1,7 @@
 #include "hnbpch.h"
+#include "Engine/Renderer/OpenGL/OpenGLContext.h"
 
 #include <glad/glad.h>
-#include "OpenGLContext.h"
 
 namespace Hanabi
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "Camera.h"
+#include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Texture.h"
 
 namespace Hanabi

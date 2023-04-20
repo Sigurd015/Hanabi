@@ -6,14 +6,13 @@
 
 namespace Hanabi
 {
-	class HNB_API ImGuiLayer : public Layer
+	class ImGuiLayer : public Layer
 	{
 	public:
 		ImGuiLayer();
 		~ImGuiLayer() = default;
 		void OnAttach() override;
 		void OnDetach() override;
-		void OnImGuiRender() override;
 		void Begin();
 		void End();
 	private:

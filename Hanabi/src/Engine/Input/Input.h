@@ -4,7 +4,7 @@
 
 namespace Hanabi
 {
-	class HNB_API Input
+	class Input
 	{
 	public:
 		Input(const Input&) = delete;
