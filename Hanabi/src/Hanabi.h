@@ -12,7 +12,7 @@
 // ---Input---------------------
 #include "Engine/Input/Input.h"
 #include "Engine/Input/KeyCodes.h"
-#include "Engine/Input/MouseButtonCodes.h"
+#include "Engine/Input/MouseCodes.h"
 #include "Engine/Input/CameraController.h"
 
 // ---Renderer---------------------

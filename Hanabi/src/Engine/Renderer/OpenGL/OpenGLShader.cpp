@@ -174,9 +174,14 @@ namespace Hanabi
 		return location;
 	}
 
-	void OpenGLShader::SetUniform(const std::string& name, const int& value)
+	void OpenGLShader::SetUniform(const std::string& name, int value)
 	{
 		UploadUniformInt(name, value);
+	}
+
+	void OpenGLShader::SetUniform(const std::string& name, float value)
+	{
+		UploadUniformFloat(name, value);
 	}
 	void OpenGLShader::SetUniform(const std::string& name, const glm::vec2& value)
 	{
@@ -194,10 +199,15 @@ namespace Hanabi
 	{
 		UploadUniformMat4(name, value);
 	}
-	void OpenGLShader::UploadUniformInt(const std::string& name, const int& value)
+	void OpenGLShader::UploadUniformInt(const std::string& name, int value)
 	{
 		GLint location = GetUniformLocation(name);
 		glUniform1i(location, value);
+	}
+	void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
+	{
+		GLint location = GetUniformLocation(name);
+		glUniform1f(location, value);
 	}
 	void OpenGLShader::UploadUniformVec2(const std::string& name, const glm::vec2& value)
 	{

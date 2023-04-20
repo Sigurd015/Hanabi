@@ -5,6 +5,8 @@
 #include "Engine/Layer/LayerStack.h"
 #include "Engine/Layer/Imgui/ImGuiLayer.h"
 
+int main(int argc, char** argv);
+
 namespace Hanabi
 {
 	class  Application
@@ -12,14 +14,13 @@ namespace Hanabi
 	public:
 		Application();
 		virtual ~Application();
-		void Run();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
-
 		inline Window& GetWindow() { return *m_Window; }
 		inline static Application& Get() { return *s_Instance; }
 	private:
+		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 		Scope<Window> m_Window;
@@ -29,6 +30,7 @@ namespace Hanabi
 		LayerStack m_LayerStack;
 		static Application* s_Instance;
 		float m_LastFrameTime = 0.0f;
+		friend int ::main(int argc, char** argv);
 	};
 
 	Application* CreateApplication();

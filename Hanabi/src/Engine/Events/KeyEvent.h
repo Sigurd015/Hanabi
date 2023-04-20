@@ -1,23 +1,25 @@
 #pragma once
 #include "hnbpch.h"
 #include "Engine/Events/Event.h"
+#include "Engine/Input/Input.h"
+#include "Engine/Input/KeyCodes.h"
 
 namespace Hanabi
 {
 	class KeyEvent :public Event
 	{
 	public:
-		inline int GetKeyCode() const { return m_KeyCode; }
+		inline KeyCode GetKeyCode() const { return m_KeyCode; }
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
-		KeyEvent(int keycode) :m_KeyCode(keycode) {}
-		int m_KeyCode;
+		KeyEvent(KeyCode keycode) : m_KeyCode(keycode) {}
+		KeyCode m_KeyCode;
 	};
 
 	class KeyPressedEvent :public KeyEvent
 	{
 	public:
-		KeyPressedEvent(int keycode, int repeatCount) :KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+		KeyPressedEvent(KeyCode keycode, int repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount) {}
 		inline int GetRepeatCount() const { return m_RepeatCount; }
 		std::string ToString()const override
 		{
@@ -33,7 +35,7 @@ namespace Hanabi
 	class KeyReleasedEvent :public KeyEvent
 	{
 	public:
-		KeyReleasedEvent(int keycode) :KeyEvent(keycode) {}
+		KeyReleasedEvent(KeyCode keycode) : KeyEvent(keycode) {}
 		std::string ToString() const override
 		{
 			std::stringstream ss;
@@ -46,7 +48,7 @@ namespace Hanabi
 	class  KeyTypedEvent :public KeyEvent
 	{
 	public:
-		KeyTypedEvent(int keycode) :KeyEvent(keycode) {}
+		KeyTypedEvent(KeyCode keycode) : KeyEvent(keycode) {}
 		std::string ToString() const override
 		{
 			std::stringstream ss;
