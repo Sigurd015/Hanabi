@@ -10,9 +10,9 @@ namespace Hanabi
 	{
 	public:
 		Input(const Input&) = delete;
-		inline static bool IsKeyPressed(KeyCode key) { return s_Instance->IsKeyPressedImpl(key); }
-		inline static bool IsMouseButtonPressed(MouseCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }
-		inline static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
+		static bool IsKeyPressed(KeyCode key) { return s_Instance->IsKeyPressedImpl(key); }
+		static bool IsMouseButtonPressed(MouseCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }
+		static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
 		Input& operator=(const Input&) = delete;
 		static Scope<Input> Create();
 	protected:

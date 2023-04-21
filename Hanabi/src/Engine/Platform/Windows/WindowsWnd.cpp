@@ -57,9 +57,8 @@ namespace Hanabi
 
 		if (s_GLFWWindowCount == 0)
 		{
-			HNB_CORE_INFO("Initializing GLFW");
 			int success = glfwInit();
-			HNB_CORE_ASSERT(success, "Could not intialize GLFW!");
+			HNB_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 

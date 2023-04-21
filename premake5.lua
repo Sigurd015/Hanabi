@@ -57,7 +57,8 @@ project "Hanabi"
 
 	defines
 	{
-		"_CRT_SECURE_NO_WARNINGS"
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
 	}
 
 	includedirs
@@ -81,12 +82,6 @@ project "Hanabi"
 	
 	filter "system:windows"
 		systemversion "latest"
-
-		defines
-		{
-			"HNB_BUILD_DLL",
-			"GLFW_INCLUDE_NONE"
-		}
 
 	filter "configurations:Debug"
 		defines "HNB_DEBUG"

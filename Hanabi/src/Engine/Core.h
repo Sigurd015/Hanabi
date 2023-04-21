@@ -43,12 +43,22 @@
 #endif // End of platform detection
 
 #ifdef HNB_DEBUG
+#if defined(HNB_PLATFORM_WINDOWS)
+#define HNB_DEBUGBREAK() __debugbreak()
+#elif defined(HNB_PLATFORM_LINUX)
+#include <signal.h>
+#define HNB_DEBUGBREAK() raise(SIGTRAP)
+#else
+#error "Platform doesn't support debugbreak yet!"
+#endif
 #define HNB_ENABLE_ASSERTS
+#else
+#define HNB_DEBUGBREAK()
 #endif
 
 #ifdef HNB_ENABLE_ASSERTS
-#define HNB_ASSERT(x, ...) { if(!(x)) { HNB_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
-#define HNB_CORE_ASSERT(x, ...) { if(!(x)) { HNB_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } }
+#define HNB_ASSERT(x, ...) { if(!(x)) { HNB_ERROR("Assertion Failed: {0}", __VA_ARGS__); HNB_DEBUGBREAK(); } }
+#define HNB_CORE_ASSERT(x, ...) { if(!(x)) { HNB_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); HNB_DEBUGBREAK(); } }
 #else
 #define HNB_ASSERT(x, ...)
 #define HNB_CORE_ASSERT(x, ...)

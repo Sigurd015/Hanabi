@@ -15,12 +15,14 @@ namespace Hanabi
 		void Unbind() const override;
 		const std::string& GetName() const override { return m_Name; }
 		void SetUniform(const std::string& name, int value) override;
+		void SetUniform(const std::string& name, int* values, uint32_t count) override;
 		void SetUniform(const std::string& name, float value) override;
 		void SetUniform(const std::string& name, const glm::vec2& value) override;
 		void SetUniform(const std::string& name, const glm::vec3& value) override;
 		void SetUniform(const std::string& name, const glm::vec4& value) override;
 		void SetUniform(const std::string& name, const glm::mat4& value) override;
 		void UploadUniformInt(const std::string& name, int value);
+		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
 		void UploadUniformFloat(const std::string& name, float value);
 		void UploadUniformVec2(const std::string& name, const glm::vec2& value);
 		void UploadUniformVec3(const std::string& name, const glm::vec3& value);

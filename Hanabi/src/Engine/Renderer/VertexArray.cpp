@@ -1,19 +1,17 @@
 #include "hnbpch.h"
+#include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/RendererAPI.h"
-#include "Engine/Renderer/OpenGL/OpenGLAPI.h"
+#include "Engine/Renderer/OpenGL/OpenGLVertexArray.h"
 
 namespace Hanabi
 {
-	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
-
-	Scope<RendererAPI> RendererAPI::Create()
+	Ref<VertexArray> VertexArray::Create()
 	{
-		switch (s_API)
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLRendererAPI>();
+		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexArray>();
 		}
-
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}

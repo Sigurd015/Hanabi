@@ -15,7 +15,7 @@ namespace Hanabi
 		virtual void OnUpdate(Timestep ts) {}
 		virtual void OnEvent(Event& evnet) {}
 		virtual void OnImGuiRender() {}
-		inline const std::string& GetName()const { return m_DebugName; }
+		const std::string& GetName()const { return m_DebugName; }
 	protected:
 		std::string m_DebugName;
 	};

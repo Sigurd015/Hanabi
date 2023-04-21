@@ -107,18 +107,32 @@ public:
 		m_CameraController.OnUpdate(ts);
 
 		// Render
+		Hanabi::Renderer2D::ResetStats();
 		Hanabi::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Hanabi::RenderCommand::Clear();
+
+		static float rotation = 0.0f;
+		rotation += ts * 10.0f;
 
 		Hanabi::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		{
 			HNB_PROFILE_SCOPE("Renderer Draw");
 
-			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, 95.0f, m_SquareColor);
+			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, 1 * rotation, m_SquareColor);
 			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, 0, m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, 45.0f, m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, 15.0f, m_SquareColor);
-			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.f);
+			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, 1.3f * rotation, m_SquareColor);
+			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, -1 * rotation, m_SquareColor);
+			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f ,-0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
+			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
+
+			for (float y = -5.0f; y < 5.0f; y += 0.5f)
+			{
+				for (float x = -5.0f; x < 5.0f; x += 0.5f)
+				{
+					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+					Hanabi::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
+				}
+			}
 		}
 		Hanabi::Renderer2D::EndScene();
 	}
@@ -127,6 +141,12 @@ public:
 	{
 		ImGui::Begin("Settings");
 		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+		auto stats = Hanabi::Renderer2D::GetStats();
+		ImGui::Text("Renderer2D Stats:");
+		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+		ImGui::Text("Quads: %d", stats.QuadCount);
+		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 		ImGui::End();
 	}
 

@@ -36,7 +36,7 @@ namespace Hanabi
 		virtual const char* GetName() const = 0;
 		virtual int GetCategoryFlags() const = 0;
 		virtual std::string ToString() const { return GetName(); }
-		inline bool IsInCategory(EventCategory category)
+		bool IsInCategory(EventCategory category)
 		{
 			return GetCategoryFlags() & category;
 		}
@@ -46,7 +46,7 @@ namespace Hanabi
 	{
 	public:
 		EventDispatcher(Event& event) :m_Event(event) {}
-		template<typename T,typename F>
+		template<typename T, typename F>
 		bool Dispatch(const F& func)
 		{
 			if (m_Event.GetEventType() == T::GetStaticType())
