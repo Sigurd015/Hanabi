@@ -86,6 +86,8 @@ class ExampleLayer2D : public Hanabi::Layer
 {
 public:
 	Hanabi::Ref<Hanabi::Texture2D> m_CheckerboardTexture;
+	Hanabi::Ref<Hanabi::Texture2D> m_BaseTexture;
+	Hanabi::Ref<Hanabi::SubTexture2D> m_SubTexture;
 	Hanabi::CameraController2D m_CameraController;
 	glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f,1.0f };
 
@@ -95,6 +97,8 @@ public:
 	void ExampleLayer2D::OnAttach()
 	{
 		m_CheckerboardTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
+		m_BaseTexture = Hanabi::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
+		m_SubTexture = Hanabi::SubTexture2D::CreateFromCoords(m_BaseTexture, glm::vec2(7,6), glm::vec2(128, 128));
 	}
 
 	void ExampleLayer2D::OnDetach()
@@ -112,27 +116,29 @@ public:
 		Hanabi::RenderCommand::Clear();
 
 		static float rotation = 0.0f;
-		rotation += ts * 10.0f;
+		rotation += ts * 45.0f;
 
 		Hanabi::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		{
 			HNB_PROFILE_SCOPE("Renderer Draw");
 
-			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, 1 * rotation, m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, 0, m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, 1.3f * rotation, m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, -1 * rotation, m_SquareColor);
-			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f ,-0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
-			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
+			//Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, glm::radians(1 * rotation), m_SquareColor);
+			//Hanabi::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, m_SquareColor);
+			//Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(1.3f * rotation), m_SquareColor);
+			//Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(-1 * rotation), m_SquareColor);
+			//Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f ,-0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
 
-			for (float y = -5.0f; y < 5.0f; y += 0.5f)
+			//Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
+
+			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SubTexture);
+			/*for (float y = -5.0f; y < 5.0f; y += 0.5f)
 			{
 				for (float x = -5.0f; x < 5.0f; x += 0.5f)
 				{
 					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
 					Hanabi::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
 				}
-			}
+			}*/
 		}
 		Hanabi::Renderer2D::EndScene();
 	}

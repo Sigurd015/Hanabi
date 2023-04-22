@@ -20,6 +20,7 @@
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/Texture.h"
+#include "Engine/Renderer/SubTexture2D.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
