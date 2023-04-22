@@ -15,10 +15,10 @@ namespace Hanabi
 		HNB_INFO("Texcoords 2:{0},{1}", m_TexCoords[2].x, m_TexCoords[2].y);
 		HNB_INFO("Texcoords 3:{0},{1}", m_TexCoords[3].x, m_TexCoords[3].y);
 	}
-	Ref<SubTexture2D> SubTexture2D::CreateFromCoords(Ref<Texture2D> texture, glm::vec2& coords, glm::vec2& spriteSize)
+	Ref<SubTexture2D> SubTexture2D::CreateFromCoords(Ref<Texture2D> texture, glm::vec2& coords, glm::vec2& cellSize, glm::vec2& spriteSize)
 	{
-		glm::vec2 min((coords.x * spriteSize.x) / texture->GetWidth(), (coords.y * spriteSize.y) / texture->GetHeight());
-		glm::vec2 max(((coords.x + 1) * spriteSize.x) / texture->GetWidth(), ((coords.y + 1) * spriteSize.y) / texture->GetHeight());
+		glm::vec2 min((coords.x * cellSize.x) / texture->GetWidth(), (coords.y * cellSize.y) / texture->GetHeight());
+		glm::vec2 max(((coords.x + spriteSize.x) * cellSize.x) / texture->GetWidth(), ((coords.y + spriteSize.y) * cellSize.y) / texture->GetHeight());
 		return CreateRef<SubTexture2D>(texture, min, max);
 	}
 }

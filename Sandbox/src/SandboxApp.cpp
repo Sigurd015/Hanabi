@@ -98,7 +98,7 @@ public:
 	{
 		m_CheckerboardTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
 		m_BaseTexture = Hanabi::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
-		m_SubTexture = Hanabi::SubTexture2D::CreateFromCoords(m_BaseTexture, glm::vec2(7,6), glm::vec2(128, 128));
+		m_SubTexture = Hanabi::SubTexture2D::CreateFromCoords(m_BaseTexture, glm::vec2(1, 1), glm::vec2(128, 128));
 	}
 
 	void ExampleLayer2D::OnDetach()
