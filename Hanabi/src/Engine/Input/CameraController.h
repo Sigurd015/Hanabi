@@ -24,6 +24,7 @@ namespace Hanabi
 		~CameraController2D() = default;
 		void OnUpdate(Timestep ts) override;
 		void OnEvent(Event& e) override;
+		void OnResize(float width, float height);
 		Camera& GetCamera() override { return m_Camera; }
 		const Camera& GetCamera() const override { return m_Camera; }
 		float GetZoomLevel() const { return m_ZoomLevel; }

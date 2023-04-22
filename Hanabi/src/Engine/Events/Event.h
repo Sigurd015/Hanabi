@@ -1,6 +1,6 @@
 #pragma once
 #include "hnbpch.h"
-#include "Engine/Core.h"
+#include "Engine/Base.h"
 
 namespace Hanabi
 {

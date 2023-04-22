@@ -1,23 +1,10 @@
 #include "hnbpch.h"
 #include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/RendererAPI.h"
-#include "Engine/Renderer/OpenGL/OpenGLShader.h"
-#include "Engine/Core.h"
+#include "Engine/Base.h"
 #include <unordered_map>
 
 namespace Hanabi
 {
-	Ref<Shader> Shader::Create(const std::string& filepath)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
-		}
-		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
 	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
 	{
 		HNB_CORE_ASSERT(!Exists(name), "Shader already exists!");

@@ -26,16 +26,3 @@ namespace Hanabi
 		return os;
 	}
 }
-
-#define HNB_MOUSE_BUTTON_0      ::Hanabi::Mouse::Button0
-#define HNB_MOUSE_BUTTON_1      ::Hanabi::Mouse::Button1
-#define HNB_MOUSE_BUTTON_2      ::Hanabi::Mouse::Button2
-#define HNB_MOUSE_BUTTON_3      ::Hanabi::Mouse::Button3
-#define HNB_MOUSE_BUTTON_4      ::Hanabi::Mouse::Button4
-#define HNB_MOUSE_BUTTON_5      ::Hanabi::Mouse::Button5
-#define HNB_MOUSE_BUTTON_6      ::Hanabi::Mouse::Button6
-#define HNB_MOUSE_BUTTON_7      ::Hanabi::Mouse::Button7
-#define HNB_MOUSE_BUTTON_LAST   ::Hanabi::Mouse::ButtonLast
-#define HNB_MOUSE_BUTTON_LEFT   ::Hanabi::Mouse::ButtonLeft
-#define HNB_MOUSE_BUTTON_RIGHT  ::Hanabi::Mouse::ButtonRight
-#define HNB_MOUSE_BUTTON_MIDDLE ::Hanabi::Mouse::ButtonMiddle

@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "Engine/Core.h"
+#include "Engine/Base.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
 #include <glfw/glfw3.h>
@@ -8,12 +8,12 @@ namespace Hanabi
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const std::string& name)
 	{
 		HNB_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = Window::Create();
+		m_Window = Window::Create(WindowProps(name));
 		m_Window->SetEventCallback(HNB_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
@@ -74,6 +74,11 @@ namespace Hanabi
 
 			m_Window->OnUpdate();
 		}
+	}
+
+	void Application::Close()
+	{
+		m_Running = false;
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)

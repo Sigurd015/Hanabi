@@ -98,7 +98,7 @@ public:
 	{
 		m_CheckerboardTexture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
 		m_BaseTexture = Hanabi::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
-		m_SubTexture = Hanabi::SubTexture2D::CreateFromCoords(m_BaseTexture, glm::vec2(1, 1), glm::vec2(128, 128));
+		m_SubTexture = Hanabi::SubTexture2D::CreateFromCoords(m_BaseTexture, glm::vec2(1, 1), glm::vec2(128, 128), glm::vec2(1, 2));
 	}
 
 	void ExampleLayer2D::OnDetach()
@@ -106,7 +106,6 @@ public:
 
 	void ExampleLayer2D::OnUpdate(Hanabi::Timestep ts)
 	{
-		HNB_PROFILE_FUNCTION();
 		// Update
 		m_CameraController.OnUpdate(ts);
 
@@ -120,25 +119,23 @@ public:
 
 		Hanabi::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		{
-			HNB_PROFILE_SCOPE("Renderer Draw");
+			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, glm::radians(1 * rotation), m_SquareColor);
+			Hanabi::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, m_SquareColor);
+			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(1.3f * rotation), m_SquareColor);
+			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(-1 * rotation), m_SquareColor);
+			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
 
-			//Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, glm::radians(1 * rotation), m_SquareColor);
-			//Hanabi::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, m_SquareColor);
-			//Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(1.3f * rotation), m_SquareColor);
-			//Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(-1 * rotation), m_SquareColor);
-			//Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f ,-0.1f }, { 10.0f, 10.0f }, m_CheckerboardTexture, 10.0f);
+			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
 
-			//Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
-
-			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SubTexture);
-			/*for (float y = -5.0f; y < 5.0f; y += 0.5f)
+			Hanabi::Renderer2D::DrawQuad({ 1.5f, 1.5f ,1.0f }, { 1.0f, 2.0f }, m_SubTexture);
+			for (float y = -5.0f; y < 5.0f; y += 0.5f)
 			{
 				for (float x = -5.0f; x < 5.0f; x += 0.5f)
 				{
 					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-					Hanabi::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
+					Hanabi::Renderer2D::DrawQuad({ x, y ,1.0f }, { 0.45f, 0.45f }, color);
 				}
-			}*/
+			}
 		}
 		Hanabi::Renderer2D::EndScene();
 	}
@@ -146,34 +143,29 @@ public:
 	void ExampleLayer2D::OnImGuiRender()
 	{
 		ImGui::Begin("Settings");
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+
 		auto stats = Hanabi::Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+
 		ImGui::End();
 	}
 
 	void ExampleLayer2D::OnEvent(Hanabi::Event& event)
 	{
 		m_CameraController.OnEvent(event);
-
-		if (event.GetEventType() == Hanabi::EventType::KeyPressed)
-		{
-			Hanabi::KeyPressedEvent& e = (Hanabi::KeyPressedEvent&)event;
-			if (e.GetKeyCode() == HNB_KEY_TAB)
-				HNB_TRACE("Tab key is pressed (event)!");
-			HNB_TRACE("{0}[{1}]", (char)e.GetKeyCode(), e.GetKeyCode());
-		}
 	}
 };
 
 class Sandbox :public Hanabi::Application
 {
 public:
-	Sandbox()
+	Sandbox() :Hanabi::Application("SandBox")
 	{
 		//PushLayer(new ExampleLayer3D());
 		PushLayer(new ExampleLayer2D());

@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Core.h"
+#include "Engine/Base.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Platform/Window.h"
 #include "Engine/Layer/LayerStack.h"
@@ -12,13 +12,15 @@ namespace Hanabi
 	class  Application
 	{
 	public:
-		Application();
+		Application(const std::string& name);
 		virtual ~Application();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
+		void Close();
 		Window& GetWindow() { return *m_Window; }
 		static Application& Get() { return *s_Instance; }
+		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 	private:
 		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);

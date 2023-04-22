@@ -8,13 +8,10 @@
 
 namespace Hanabi
 {
-
 	using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
-
 	struct ProfileResult
 	{
 		std::string Name;
-
 		FloatingPointMicroseconds Start;
 		std::chrono::microseconds ElapsedTime;
 		std::thread::id ThreadID;
@@ -32,9 +29,7 @@ namespace Hanabi
 		InstrumentationSession* m_CurrentSession;
 		std::ofstream m_OutputStream;
 	public:
-		Instrumentor()
-			: m_CurrentSession(nullptr)
-		{}
+		Instrumentor() : m_CurrentSession(nullptr) {}
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 		{
@@ -134,8 +129,7 @@ namespace Hanabi
 	class InstrumentationTimer
 	{
 	public:
-		InstrumentationTimer(const char* name)
-			: m_Name(name), m_Stopped(false)
+		InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false)
 		{
 			m_StartTimepoint = std::chrono::steady_clock::now();
 		}
@@ -164,7 +158,6 @@ namespace Hanabi
 
 	namespace InstrumentorUtils
 	{
-
 		template <size_t N>
 		struct ChangeResult
 		{

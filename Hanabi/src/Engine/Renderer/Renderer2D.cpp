@@ -3,7 +3,7 @@
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/RenderCommand.h"
-#include "Engine/Core.h"
+#include "Engine/Base.h"
 #include <glm/ext/matrix_transform.hpp>
 
 namespace Hanabi
@@ -35,8 +35,16 @@ namespace Hanabi
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 1;
 
-		glm::vec4 QuadVertexPositions[4];
-		glm::vec2 QuadTexCoord[4];
+		glm::vec4 QuadVertexPositions[4] =
+		{ { -0.5f, -0.5f, 0.0f, 1.0f },
+		  {  0.5f, -0.5f, 0.0f, 1.0f },
+		  {  0.5f,  0.5f, 0.0f, 1.0f },
+		  { -0.5f,  0.5f, 0.0f, 1.0f } };
+		glm::vec2 QuadTexCoord[4] =
+		{ { 0.0f, 0.0f },
+		  { 1.0f, 0.0f },
+		  { 1.0f, 1.0f },
+		  { 0.0f, 1.0f } };
 
 		Renderer2D::Statistics Stats;
 	};
@@ -48,16 +56,6 @@ namespace Hanabi
 	{
 
 		s_Data.QuadVertexArray = VertexArray::Create();
-
-		s_Data.QuadVertexPositions[0] = { -0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[1] = { 0.5f, -0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[2] = { 0.5f,  0.5f, 0.0f, 1.0f };
-		s_Data.QuadVertexPositions[3] = { -0.5f,  0.5f, 0.0f, 1.0f };
-
-		s_Data.QuadTexCoord[0] = { 0.0f, 0.0f };
-		s_Data.QuadTexCoord[1] = { 1.0f, 0.0f };
-		s_Data.QuadTexCoord[2] = { 1.0f, 1.0f };
-		s_Data.QuadTexCoord[3] = { 0.0f, 1.0f };
 
 		//VertexBuffer
 		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
