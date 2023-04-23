@@ -23,9 +23,9 @@ namespace Hanabi
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginScene(Camera& camera)
+	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
-		s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+		s_SceneData->ViewProjectionMatrix = camera.GetProjection() * glm::inverse(transform);
 	}
 
 	void Renderer::EndScene()

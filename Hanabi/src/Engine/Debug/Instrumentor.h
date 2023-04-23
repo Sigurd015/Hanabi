@@ -1,4 +1,5 @@
 #pragma once
+
 #include <algorithm>
 #include <chrono>
 #include <fstream>
@@ -12,24 +13,20 @@ namespace Hanabi
 	struct ProfileResult
 	{
 		std::string Name;
+
 		FloatingPointMicroseconds Start;
 		std::chrono::microseconds ElapsedTime;
 		std::thread::id ThreadID;
 	};
-
 	struct InstrumentationSession
 	{
 		std::string Name;
 	};
-
 	class Instrumentor
 	{
-	private:
-		std::mutex m_Mutex;
-		InstrumentationSession* m_CurrentSession;
-		std::ofstream m_OutputStream;
 	public:
-		Instrumentor() : m_CurrentSession(nullptr) {}
+		Instrumentor(const Instrumentor&) = delete;
+		Instrumentor(Instrumentor&&) = delete;
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
 		{
@@ -96,8 +93,9 @@ namespace Hanabi
 			static Instrumentor instance;
 			return instance;
 		}
-
 	private:
+		Instrumentor() : m_CurrentSession(nullptr) {}
+		~Instrumentor() { EndSession(); }
 
 		void WriteHeader()
 		{
@@ -123,17 +121,16 @@ namespace Hanabi
 				m_CurrentSession = nullptr;
 			}
 		}
-
+	private:
+		std::mutex m_Mutex;
+		InstrumentationSession* m_CurrentSession;
+		std::ofstream m_OutputStream;
 	};
 
 	class InstrumentationTimer
 	{
 	public:
-		InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false)
-		{
-			m_StartTimepoint = std::chrono::steady_clock::now();
-		}
-
+		InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) { m_StartTimepoint = std::chrono::steady_clock::now(); }
 		~InstrumentationTimer()
 		{
 			if (!m_Stopped)
@@ -211,8 +208,10 @@ namespace Hanabi
 
 #define HNB_PROFILE_BEGIN_SESSION(name, filepath) ::Hanabi::Instrumentor::Get().BeginSession(name, filepath)
 #define HNB_PROFILE_END_SESSION() ::Hanabi::Instrumentor::Get().EndSession()
-#define HNB_PROFILE_SCOPE(name) constexpr auto fixedName = ::Hanabi::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-									::Hanabi::InstrumentationTimer timer##__LINE__(fixedName.Data)
+#define HNB_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Hanabi::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+											   ::Hanabi::InstrumentationTimer timer##line(fixedName##line.Data)
+#define HNB_PROFILE_SCOPE_LINE(name, line) HNB_PROFILE_SCOPE_LINE2(name, line)
+#define HNB_PROFILE_SCOPE(name) HNB_PROFILE_SCOPE_LINE(name, __LINE__)
 #define HNB_PROFILE_FUNCTION() HNB_PROFILE_SCOPE(HNB_FUNC_SIG)
 #else
 #define HNB_PROFILE_BEGIN_SESSION(name, filepath)

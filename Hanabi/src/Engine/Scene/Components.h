@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Renderer/Camera.h"
 #include <glm/glm.hpp>
 
 namespace Hanabi
@@ -21,6 +22,16 @@ namespace Hanabi
 		TransformComponent(const glm::mat4& transform) : Transform(transform) {}
 		operator glm::mat4& () { return Transform; }
 		operator const glm::mat4& () const { return Transform; }
+	};
+
+	struct CameraComponent
+	{
+		Camera Camera;
+		bool Primary = true; // TODO: think about moving to Scene
+
+		CameraComponent() = default;
+		CameraComponent(const CameraComponent&) = default;
+		CameraComponent(const glm::mat4& projection) : Camera(projection) {}
 	};
 
 	struct SpriteRendererComponent

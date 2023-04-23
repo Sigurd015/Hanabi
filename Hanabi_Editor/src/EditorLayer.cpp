@@ -1,5 +1,6 @@
 #include "EditorLayer.h"
 #include "imgui.h"
+#include "Engine/Scene/Components.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -20,6 +21,14 @@ namespace Hanabi
 		auto square = m_ActiveScene->CreateEntity("Green Square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
 		m_SquareEntity = square;
+
+		m_MainCamera = m_ActiveScene->CreateEntity("Camera Entity");
+		m_MainCamera.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+
+		m_TestCamera = m_ActiveScene->CreateEntity("Clip-Space Entity");
+		auto& cc = m_TestCamera.AddComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+		cc.Primary = false;
+
 	}
 
 	void EditorLayer::OnDetach()
@@ -43,12 +52,8 @@ namespace Hanabi
 		m_Framebuffer->Bind();
 		RenderCommand::SetClearColor({ 0.3f, 0.3f, 0.3f, 1 });
 		RenderCommand::Clear();
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-
 		// Update scene
 		m_ActiveScene->OnUpdate(ts);
-
-		Renderer2D::EndScene();
 		m_Framebuffer->Unbind();
 	}
 
@@ -131,6 +136,15 @@ namespace Hanabi
 			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
 			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
 			ImGui::Separator();
+		}
+
+		ImGui::DragFloat3("Camera Transform",
+			glm::value_ptr(m_MainCamera.GetComponent<TransformComponent>().Transform[3]));
+
+		if (ImGui::Checkbox("Camera A", &m_PrimaryCamera))
+		{
+			m_MainCamera.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
+			m_TestCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
 		}
 
 		ImGui::End();

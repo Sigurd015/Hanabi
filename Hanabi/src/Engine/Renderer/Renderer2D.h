@@ -10,7 +10,7 @@ namespace Hanabi
 	public:
 		static void Init();
 		static void Shutdown();
-		static void BeginScene(const Camera& camera);
+		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void EndScene();
 		static void Flush();
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
