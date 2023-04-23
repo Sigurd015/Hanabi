@@ -24,6 +24,7 @@ IncludeDir["Glad"] = "Hanabi/vendor/Glad/include"
 IncludeDir["ImGui"] = "Hanabi/vendor/imgui"
 IncludeDir["glm"] = "Hanabi/vendor/glm"
 IncludeDir["stb_image"] = "Hanabi/vendor/stb_image"
+IncludeDir["entt"] = "Hanabi/vendor/entt"
 
 group "Dependencies"
 	include "Hanabi/vendor/GLFW"
@@ -69,7 +70,8 @@ project "Hanabi"
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}"
+		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.entt}"
 	}
 
 	links 
@@ -124,7 +126,8 @@ project "Hanabi_Editor"
 		"Hanabi/src",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 	
 	links
@@ -176,7 +179,8 @@ project "Sandbox"
 		"Hanabi/src",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.glm}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.entt}"
 	}
 
 	links

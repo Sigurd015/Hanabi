@@ -5,7 +5,7 @@
 
 namespace Hanabi
 {
-	EditorLayer::EditorLayer(): Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f), m_SquareColor({ 0.2f, 0.3f, 0.8f, 1.0f })
+	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
 	{}
 
 	void EditorLayer::OnAttach()
@@ -14,6 +14,12 @@ namespace Hanabi
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
+
+		m_ActiveScene = CreateRef<Scene>();
+		// Entity
+		auto square = m_ActiveScene->CreateEntity("Green Square");
+		square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+		m_SquareEntity = square;
 	}
 
 	void EditorLayer::OnDetach()
@@ -21,39 +27,29 @@ namespace Hanabi
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
+		// Resize
+		if (Hanabi::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+		}
 		// Update
 		if (m_ViewportFocused)
 			m_CameraController.OnUpdate(ts);
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
-		RenderCommand::SetClearColor({ 0.2f, 0.2f, 0.2f, 1 });
+		RenderCommand::SetClearColor({ 0.3f, 0.3f, 0.3f, 1 });
 		RenderCommand::Clear();
+		Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-		static float rotation = 0.0f;
-		rotation += ts * 45.0f;
+		// Update scene
+		m_ActiveScene->OnUpdate(ts);
 
-		Hanabi::Renderer2D::BeginScene(m_CameraController.GetCamera());
-		{
-			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, 1.0f }, { 0.5f, 0.5f }, glm::radians(1 * rotation), m_SquareColor);
-			Hanabi::Renderer2D::DrawQuad({ 1.0f, 1.0f }, { 1.5f, 1.5f }, m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ -1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(1.3f * rotation), m_SquareColor);
-			Hanabi::Renderer2D::DrawRotatedQuad({ 1.0f, -1.0f }, { 1.0f, 1.0f }, glm::radians(-1 * rotation), m_SquareColor);
-
-			Hanabi::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
-
-			for (float y = -5.0f; y < 5.0f; y += 0.5f)
-			{
-				for (float x = -5.0f; x < 5.0f; x += 0.5f)
-				{
-					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-					Hanabi::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-				}
-			}
-		}
 		Renderer2D::EndScene();
 		m_Framebuffer->Unbind();
-
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -118,14 +114,24 @@ namespace Hanabi
 		}
 
 		ImGui::Begin("Settings");
+
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+		
+		if (m_SquareEntity)
+		{
+			ImGui::Separator();
+			auto& tag = m_SquareEntity.GetComponent<TagComponent>().Tag;
+			ImGui::Text("%s", tag.c_str());
 
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+			auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
+			ImGui::ColorEdit4("Square Color", glm::value_ptr(squareColor));
+			ImGui::Separator();
+		}
 
 		ImGui::End();
 

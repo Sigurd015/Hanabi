@@ -25,3 +25,7 @@
 #include "Engine/Renderer/Buffer.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Camera.h"
+
+// ---Scene---------------------
+#include "Engine/Scene/Scene.h"
+#include "Engine/Scene/Components.h"
