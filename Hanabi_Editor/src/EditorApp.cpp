@@ -2,7 +2,6 @@
 #include "EditorLayer.h"
 #include "imgui.h"
 #include "Engine/EntryPoint.h"
-#include <Engine/Input/CameraController.h>
 
 namespace Hanabi
 {

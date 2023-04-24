@@ -15,7 +15,6 @@ namespace Hanabi
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 	private:
-		CameraController2D m_CameraController;
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 

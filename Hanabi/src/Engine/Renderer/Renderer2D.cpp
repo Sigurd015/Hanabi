@@ -179,26 +179,7 @@ namespace Hanabi
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			FlushAndReset();
 
-		float texIndex = 0.0f;
-		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
-		{
-			if (*s_Data.TextureSlots[i].get() == *texture.get())
-			{
-				texIndex = (float)i;
-				break;
-			}
-		}
-
-		if (texIndex == 0.0f)
-		{
-			if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
-				FlushAndReset();
-			texIndex = (float)s_Data.TextureSlotIndex;
-			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-			s_Data.TextureSlotIndex++;
-		}
-
-		SetQuadVertex(transform, tintColor, s_Data.QuadTexCoord, texIndex, tilingFactor);
+		SetQuadVertex(transform, tintColor, s_Data.QuadTexCoord, GetTextureID(texture), tilingFactor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, float tilingFactor, const glm::vec4& tintColor)
@@ -206,9 +187,15 @@ namespace Hanabi
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			FlushAndReset();
 
-		float texIndex = 0.0f;
 		const glm::vec2* quadTexCoord = subTexture->GetTexCoords();
 		const Ref<Texture2D> texture = subTexture->GetTexture();
+
+		SetQuadVertex(transform, tintColor, quadTexCoord, GetTextureID(texture), tilingFactor);
+	}
+
+	float Renderer2D::GetTextureID(const Ref<Texture2D>& texture)
+	{
+		float texIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
 			if (*s_Data.TextureSlots[i].get() == *texture.get())
@@ -226,8 +213,7 @@ namespace Hanabi
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;
 		}
-
-		SetQuadVertex(transform, tintColor, quadTexCoord, texIndex, tilingFactor);
+		return texIndex;
 	}
 
 	void Renderer2D::SetQuadVertex(const glm::mat4& transform, const glm::vec4& color, const glm::vec2* texCoord, float texIndex, float tilingFactor)

@@ -26,6 +26,7 @@ namespace Hanabi
 		static void ResetStats();
 		static Statistics GetStats();
 	private:
+		static float GetTextureID(const Ref<Texture2D>& texture);
 		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color, const glm::vec2* texCoord, float texIndex, float tilingFactor);
 		static void FlushAndReset();
 	};

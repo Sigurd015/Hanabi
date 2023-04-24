@@ -6,7 +6,7 @@
 
 namespace Hanabi
 {
-	EditorLayer::EditorLayer() : Layer("EditorLayer"), m_CameraController(1280.0f / 720.0f)
+	EditorLayer::EditorLayer() : Layer("EditorLayer")
 	{}
 
 	void EditorLayer::OnAttach()
@@ -19,16 +19,42 @@ namespace Hanabi
 		m_ActiveScene = CreateRef<Scene>();
 		// Entity
 		auto square = m_ActiveScene->CreateEntity("Green Square");
-		square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.0f, 1.0f});
+		square.AddComponent<SpriteRendererComponent>(glm::vec4{ 0.0f, 1.0f, 0.0f, 1.0f });
 		m_SquareEntity = square;
 
 		m_MainCamera = m_ActiveScene->CreateEntity("Camera Entity");
-		m_MainCamera.AddComponent<CameraComponent>(glm::ortho(-16.0f, 16.0f, -9.0f, 9.0f, -1.0f, 1.0f));
+		m_MainCamera.AddComponent<CameraComponent>();
 
 		m_TestCamera = m_ActiveScene->CreateEntity("Clip-Space Entity");
-		auto& cc = m_TestCamera.AddComponent<CameraComponent>(glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f));
+		auto& cc = m_TestCamera.AddComponent<CameraComponent>();
 		cc.Primary = false;
 
+		class CameraController : public ScriptableEntity
+		{
+		public:
+			void OnCreate()
+			{}
+
+			void OnDestroy()
+			{}
+
+			void OnUpdate(Timestep ts)
+			{
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				float speed = 5.0f;
+
+				if (Input::IsKeyPressed(KeyCode::A))
+					transform[3][0] -= speed * ts;
+				if (Input::IsKeyPressed(KeyCode::D))
+					transform[3][0] += speed * ts;
+				if (Input::IsKeyPressed(KeyCode::W))
+					transform[3][1] += speed * ts;
+				if (Input::IsKeyPressed(KeyCode::S))
+					transform[3][1] -= speed * ts;
+			}
+		};
+
+		m_MainCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 	}
 
 	void EditorLayer::OnDetach()
@@ -42,11 +68,8 @@ namespace Hanabi
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
 			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
-		// Update
-		if (m_ViewportFocused)
-			m_CameraController.OnUpdate(ts);
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
@@ -111,7 +134,8 @@ namespace Hanabi
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				if (ImGui::MenuItem("Exit"))
+					Application::Get().Close();
 				ImGui::EndMenu();
 			}
 
@@ -126,7 +150,7 @@ namespace Hanabi
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-		
+
 		if (m_SquareEntity)
 		{
 			ImGui::Separator();
@@ -146,6 +170,11 @@ namespace Hanabi
 			m_MainCamera.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
 			m_TestCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
 		}
+
+		auto& camera = m_TestCamera.GetComponent<CameraComponent>().Camera;
+		float orthoSize = camera.GetOrthographicSize();
+		if (ImGui::DragFloat("Second Camera Ortho Size", &orthoSize))
+			camera.SetOrthographicSize(orthoSize);
 
 		ImGui::End();
 
@@ -169,6 +198,6 @@ namespace Hanabi
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		m_CameraController.OnEvent(e);
+
 	}
 }

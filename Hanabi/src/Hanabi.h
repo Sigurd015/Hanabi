@@ -13,7 +13,6 @@
 #include "Engine/Input/Input.h"
 #include "Engine/Input/KeyCodes.h"
 #include "Engine/Input/MouseCodes.h"
-#include "Engine/Input/CameraController.h"
 
 // ---Renderer---------------------
 #include "Engine/Renderer/Renderer.h"
@@ -29,3 +28,4 @@
 // ---Scene---------------------
 #include "Engine/Scene/Scene.h"
 #include "Engine/Scene/Components.h"
+#include "Engine/Scene/ScriptableEntity.h"
