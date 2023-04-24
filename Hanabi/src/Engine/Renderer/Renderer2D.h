@@ -20,14 +20,15 @@ namespace Hanabi
 		{
 			uint32_t DrawCalls = 0;
 			uint32_t QuadCount = 0;
-			uint32_t GetTotalVertexCount() { return QuadCount * 4; }
-			uint32_t GetTotalIndexCount() { return QuadCount * 6; }
+			uint32_t GetTotalVertexCount() const { return QuadCount * 4; }
+			uint32_t GetTotalIndexCount() const { return QuadCount * 6; }
 		};
 		static void ResetStats();
 		static Statistics GetStats();
 	private:
 		static float GetTextureID(const Ref<Texture2D>& texture);
 		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color, const glm::vec2* texCoord, float texIndex, float tilingFactor);
-		static void FlushAndReset();
+		static void StartBatch();
+		static void NextBatch();
 	};
 }

@@ -115,18 +115,20 @@ namespace Hanabi
 		s_Data.TextureShader->Bind();
 		s_Data.TextureShader->SetUniform("u_ViewProjection", viewProj);
 
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		StartBatch();
 	}
 
 	void Renderer2D::EndScene()
 	{
-		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
-		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
-
 		Flush();
+	}
+
+	void Renderer2D::StartBatch()
+	{
+		s_Data.QuadIndexCount = 0;
+		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
+
+		s_Data.TextureSlotIndex = 1;
 	}
 
 	void Renderer2D::Flush()
@@ -134,6 +136,8 @@ namespace Hanabi
 		if (s_Data.QuadIndexCount == 0)
 			return; // Nothing to draw
 
+		uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase);
+		s_Data.QuadVertexBuffer->SetData(s_Data.QuadVertexBufferBase, dataSize);
 		// Bind textures
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			s_Data.TextureSlots[i]->Bind(i);
@@ -143,14 +147,10 @@ namespace Hanabi
 		s_Data.Stats.DrawCalls++;
 	}
 
-	void Renderer2D::FlushAndReset()
+	void Renderer2D::NextBatch()
 	{
-		EndScene();
-
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-		s_Data.TextureSlotIndex = 1;
+		Flush();
+		StartBatch();
 	}
 
 	void Renderer2D::ResetStats()
@@ -166,7 +166,7 @@ namespace Hanabi
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+			NextBatch();
 
 		const float texIndex = 0.0f; // White Texture
 		const float tilingFactor = 1.0f;
@@ -177,7 +177,7 @@ namespace Hanabi
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+			NextBatch();
 
 		SetQuadVertex(transform, tintColor, s_Data.QuadTexCoord, GetTextureID(texture), tilingFactor);
 	}
@@ -185,7 +185,7 @@ namespace Hanabi
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, float tilingFactor, const glm::vec4& tintColor)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-			FlushAndReset();
+			NextBatch();
 
 		const glm::vec2* quadTexCoord = subTexture->GetTexCoords();
 		const Ref<Texture2D> texture = subTexture->GetTexture();
@@ -198,7 +198,7 @@ namespace Hanabi
 		float texIndex = 0.0f;
 		for (uint32_t i = 1; i < s_Data.TextureSlotIndex; i++)
 		{
-			if (*s_Data.TextureSlots[i].get() == *texture.get())
+			if (*s_Data.TextureSlots[i] == *texture)
 			{
 				texIndex = (float)i;
 				break;
@@ -208,7 +208,7 @@ namespace Hanabi
 		if (texIndex == 0.0f)
 		{
 			if (s_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
-				FlushAndReset();
+				NextBatch();
 			texIndex = (float)s_Data.TextureSlotIndex;
 			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
 			s_Data.TextureSlotIndex++;

@@ -1,6 +1,7 @@
 #pragma once
 #include "Hanabi.h"
 #include "Engine/Renderer/Framebuffer.h"
+#include "Engine/Scene/Panel/SceneHierarchyPanel.h"
 
 namespace Hanabi
 {
@@ -17,13 +18,9 @@ namespace Hanabi
 	private:
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
-
-		// Temp
-		Entity m_MainCamera;
-		Entity m_TestCamera;
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 		bool m_PrimaryCamera = true;
 		Ref<Scene> m_ActiveScene;
-		Entity m_SquareEntity;
 		Ref<Framebuffer> m_Framebuffer;
 	};
 }
