@@ -31,7 +31,7 @@ namespace Hanabi
 			m_SelectionContext = {};
 
 		// Right-click on blank space
-		if (ImGui::BeginPopupContextWindow(0, 1))
+		if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))//TODO:Should be calling like BeginPopupContextWindow(0, 1, flase),dont know why cant
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
 				m_Context->CreateEntity("Empty Entity");
@@ -60,11 +60,14 @@ namespace Hanabi
 			m_SelectionContext = entity;
 		}
 
-		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
 			if (ImGui::MenuItem("Delete Entity"))
-				entityDeleted = true;
+			{
+				m_Context->DestroyEntity(entity);
+				if (m_SelectionContext == entity)
+					m_SelectionContext = {};
+			}
 
 			ImGui::EndPopup();
 		}
@@ -76,13 +79,6 @@ namespace Hanabi
 			if (opened)
 				ImGui::TreePop();
 			ImGui::TreePop();
-		}
-
-		if (entityDeleted)
-		{
-			m_Context->DestroyEntity(entity);
-			if (m_SelectionContext == entity)
-				m_SelectionContext = {};
 		}
 	}
 
