@@ -3,7 +3,6 @@
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/RenderCommand.h"
-#include "Engine/Base.h"
 #include <glm/ext/matrix_transform.hpp>
 
 namespace Hanabi

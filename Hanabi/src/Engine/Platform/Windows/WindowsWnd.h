@@ -1,4 +1,6 @@
 #pragma once
+
+#ifdef HNB_PLATFORM_WINDOWS
 #include "Engine/Platform/Window.h"
 #include "Engine/Renderer/RenderingContext.h"
 #include <GLFW/glfw3.h>
@@ -34,3 +36,4 @@ namespace Hanabi
 		WindowData m_Data;
 	};
 }
+#endif

@@ -1,4 +1,6 @@
 #include "hnbpch.h"
+
+#ifdef HNB_PLATFORM_WINDOWS
 #include "WindowsWnd.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/KeyEvent.h"
@@ -9,6 +11,11 @@
 
 namespace Hanabi
 {
+	Scope<Window> Window::Create(const WindowProps& props)
+	{
+		return CreateScope<WindowsWnd>(props);
+	}
+
 	static bool s_GLFWInitialized = false;
 	static uint8_t s_GLFWWindowCount = 0;
 
@@ -172,5 +179,5 @@ namespace Hanabi
 			glfwTerminate();
 		}
 	}
-
 }
+#endif

@@ -6,6 +6,5 @@ build/
 *.sln
 Sandbox/imgui.ini
 Sandbox/assets/
-Hanabi_Editor/assets/
 *.log
 *.json
