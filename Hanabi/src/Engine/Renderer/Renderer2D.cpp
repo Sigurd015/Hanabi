@@ -117,6 +117,16 @@ namespace Hanabi
 		StartBatch();
 	}
 
+	void Renderer2D::BeginScene(const EditorCamera& camera)
+	{
+		glm::mat4 viewProj = camera.GetViewProjection();
+
+		s_Data.TextureShader->Bind();
+		s_Data.TextureShader->SetUniform("u_ViewProjection", viewProj);
+
+		StartBatch();
+	}
+
 	void Renderer2D::EndScene()
 	{
 		Flush();

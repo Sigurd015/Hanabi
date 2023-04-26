@@ -1,5 +1,6 @@
 #pragma once
 #include "Hanabi.h"
+#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Scene/Panel/SceneHierarchyPanel.h"
 
@@ -21,6 +22,8 @@ namespace Hanabi
 		void OpenScene();
 		void SaveSceneAs();
 
+		EditorCamera m_EditorCamera;
+		int m_GizmoType = -1;
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		SceneHierarchyPanel m_SceneHierarchyPanel;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/Camera.h"
+#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/SubTexture2D.h"
 
@@ -11,6 +12,7 @@ namespace Hanabi
 		static void Init();
 		static void Shutdown();
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
+		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 		static void Flush();
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
