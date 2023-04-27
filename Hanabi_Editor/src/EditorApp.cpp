@@ -5,15 +5,15 @@
 
 namespace Hanabi
 {
-	class HazelEditor : public Application
+	class HanabiEditor : public Application
 	{
 	public:
-		HazelEditor(): Application("Hazel Editor")
+		HanabiEditor(): Application("Hanabi Editor")
 		{
 			PushLayer(new EditorLayer());
 		}
 
-		~HazelEditor()
+		~HanabiEditor()
 		{}
 	};
 
@@ -21,5 +21,5 @@ namespace Hanabi
 
 Hanabi::Application* CreateApplication()
 {
-	return new Hanabi::HazelEditor();
+	return new Hanabi::HanabiEditor();
 }
