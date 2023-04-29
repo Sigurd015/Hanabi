@@ -1,14 +1,23 @@
 #pragma once
+#include "Engine/Core/UUID.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Scene/SceneCamera.h"
-#include "Engine/Scene/ScriptableEntity.h"
 #include "Engine/Renderer/Texture.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
 namespace Hanabi
 {
+	struct IDComponent
+	{
+		UUID ID;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+	};
+
 	struct TagComponent
 	{
 		std::string Tag;
@@ -58,6 +67,9 @@ namespace Hanabi
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color) : Color(color) {}
 	};
+
+	// Forward declaration
+	class ScriptableEntity;
 
 	struct NativeScriptComponent
 	{

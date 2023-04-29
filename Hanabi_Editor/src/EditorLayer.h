@@ -25,7 +25,10 @@ namespace Hanabi
 		void NewScene();
 		void OpenScene(const std::filesystem::path& path);
 		void OpenScene();
+		void SaveScene();
 		void SaveSceneAs();
+		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
+		void OnDuplicateEntity();
 
 		// UI Panels
 		void UI_Toolbar();
@@ -46,6 +49,8 @@ namespace Hanabi
 		glm::vec2 m_ViewportBounds[2];
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
+		Ref<Scene> m_EditorScene;
+		std::filesystem::path m_EditorScenePath;
 		bool m_PrimaryCamera = true;
 		Ref<Scene> m_ActiveScene;
 		Ref<Framebuffer> m_Framebuffer;
