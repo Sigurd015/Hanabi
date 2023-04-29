@@ -9,10 +9,22 @@ int main(int argc, char** argv);
 
 namespace Hanabi
 {
+	struct ApplicationCommandLineArgs
+	{
+		int Count = 0;
+		char** Args = nullptr;
+
+		const char* operator[](int index) const
+		{
+			HNB_CORE_ASSERT(index < Count);
+			return Args[index];
+		}
+	};
 	class  Application
 	{
 	public:
-		Application(const std::string& name);
+		Application(const std::string& name = "Hanabi App", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
+		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
 		virtual ~Application();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
@@ -25,6 +37,7 @@ namespace Hanabi
 		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
+		ApplicationCommandLineArgs m_CommandLineArgs;
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
@@ -35,5 +48,5 @@ namespace Hanabi
 		friend int ::main(int argc, char** argv);
 	};
 
-	Application* CreateApplication();
+	Application* CreateApplication(ApplicationCommandLineArgs args);
 }

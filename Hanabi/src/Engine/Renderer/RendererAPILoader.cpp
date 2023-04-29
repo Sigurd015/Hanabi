@@ -14,6 +14,8 @@
 #include "Engine/Renderer/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Renderer/OpenGL/OpenGLFramebuffer.h"
+#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/OpenGL/OpenGLUniformBuffer.h"
 
 namespace Hanabi
 {
@@ -127,6 +129,18 @@ namespace Hanabi
 		{
 		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLFramebuffer>(spec);
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

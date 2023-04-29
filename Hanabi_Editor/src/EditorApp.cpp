@@ -8,7 +8,7 @@ namespace Hanabi
 	class HanabiEditor : public Application
 	{
 	public:
-		HanabiEditor(): Application("Hanabi Editor")
+		HanabiEditor(ApplicationCommandLineArgs args) : Application("Hanabi Editor", args)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -19,7 +19,7 @@ namespace Hanabi
 
 }
 
-Hanabi::Application* CreateApplication()
+Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 {
-	return new Hanabi::HanabiEditor();
+	return new Hanabi::HanabiEditor(args);
 }

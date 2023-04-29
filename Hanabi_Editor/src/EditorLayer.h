@@ -3,6 +3,7 @@
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Scene/Panel/SceneHierarchyPanel.h"
+#include "Engine/Scene/Panel/ContentBrowserPanel.h"
 
 namespace Hanabi
 {
@@ -17,6 +18,9 @@ namespace Hanabi
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 	private:
+		void UI_MenuBar();
+		void UI_StatesPanel();
+		void UI_Viewport();
 		bool OnKeyPressed(KeyPressedEvent& e);
 		void NewScene();
 		void OpenScene();
@@ -29,6 +33,7 @@ namespace Hanabi
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		glm::vec2 m_ViewportBounds[2];
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 		bool m_PrimaryCamera = true;
 		Ref<Scene> m_ActiveScene;
 		Ref<Framebuffer> m_Framebuffer;

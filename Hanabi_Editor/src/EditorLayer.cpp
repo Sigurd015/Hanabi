@@ -24,6 +24,14 @@ namespace Hanabi
 
 		m_ActiveScene = CreateRef<Scene>();
 
+		auto commandLineArgs = Application::Get().GetCommandLineArgs();
+		if (commandLineArgs.Count > 1)
+		{
+			auto sceneFilePath = commandLineArgs[1];
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(sceneFilePath);
+		}
+
 		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
@@ -124,6 +132,26 @@ namespace Hanabi
 		}
 		style.WindowMinSize.x = minWinSizeX;
 
+		UI_MenuBar();
+		m_SceneHierarchyPanel.OnImGuiRender();
+		m_ContentBrowserPanel.OnImGuiRender();
+		UI_StatesPanel();
+		UI_Viewport();
+
+		ImGui::End();
+	}
+
+	void EditorLayer::OnEvent(Event& e)
+	{
+		m_EditorCamera.OnEvent(e);
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+	}
+
+	void EditorLayer::UI_MenuBar()
+	{
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -147,9 +175,10 @@ namespace Hanabi
 
 			ImGui::EndMenuBar();
 		}
+	}
 
-		m_SceneHierarchyPanel.OnImGuiRender();
-
+	void EditorLayer::UI_StatesPanel()
+	{
 		ImGui::Begin("Stats");
 
 		auto stats = Renderer2D::GetStats();
@@ -160,6 +189,10 @@ namespace Hanabi
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 		ImGui::End();
 
+	}
+
+	void EditorLayer::UI_Viewport()
+	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
 
@@ -225,17 +258,6 @@ namespace Hanabi
 
 		ImGui::End();
 		ImGui::PopStyleVar();
-
-		ImGui::End();
-	}
-
-	void EditorLayer::OnEvent(Event& e)
-	{
-		m_EditorCamera.OnEvent(e);
-
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<KeyPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -305,25 +327,25 @@ namespace Hanabi
 
 	void EditorLayer::OpenScene()
 	{
-		std::optional<std::string> filepath = FileDialogs::OpenFile("hanabi Scene (*.hanabi)\0*.hanabi\0");
-		if (filepath)
+		std::string filepath = FileDialogs::OpenFile("Scenes (*.scene)\0*.scene\0");
+		if (!filepath.empty())
 		{
 			m_ActiveScene = CreateRef<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(*filepath);
+			serializer.Deserialize(filepath);
 		}
 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
-		std::optional<std::string> filepath = FileDialogs::SaveFile("hanabi Scene (*.hanabi)\0*.hanabi\0");
-		if (filepath)
+		std::string filepath = FileDialogs::SaveFile("Scenes (*.scene)\0*.scene\0");
+		if (!filepath.empty())
 		{
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(*filepath);
+			serializer.Serialize(filepath);
 		}
 	}
 }
