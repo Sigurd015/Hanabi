@@ -2,8 +2,8 @@
 #include "Hanabi.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Framebuffer.h"
-#include "Engine/Scene/Panel/SceneHierarchyPanel.h"
-#include "Engine/Scene/Panel/ContentBrowserPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 namespace Hanabi
 {
@@ -18,14 +18,26 @@ namespace Hanabi
 		virtual void OnImGuiRender() override;
 		void OnEvent(Event& e) override;
 	private:
+		void OnScenePlay();
+		void OnSceneStop();
+		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+		void NewScene();
+		void OpenScene(const std::filesystem::path& path);
+		void OpenScene();
+		void SaveSceneAs();
+
+		// UI Panels
+		void UI_Toolbar();
 		void UI_MenuBar();
 		void UI_StatesPanel();
 		void UI_Viewport();
-		bool OnKeyPressed(KeyPressedEvent& e);
-		void NewScene();
-		void OpenScene();
-		void SaveSceneAs();
-		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+
+		enum class SceneState
+		{
+			Edit = 0, Play = 1
+		};
+		SceneState m_SceneState = SceneState::Edit;
 
 		EditorCamera m_EditorCamera;
 		int m_GizmoType = -1;
@@ -38,5 +50,7 @@ namespace Hanabi
 		Ref<Scene> m_ActiveScene;
 		Ref<Framebuffer> m_Framebuffer;
 		Entity m_HoveredEntity;
+		// Editor resources
+		Ref<Texture2D> m_IconPlay, m_IconStop;
 	};
 }

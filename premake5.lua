@@ -27,11 +27,13 @@ IncludeDir["stb_image"] = "%{wks.location}/Hanabi/vendor/stb_image"
 IncludeDir["entt"] = "%{wks.location}/Hanabi/vendor/entt"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Hanabi/vendor/yaml_cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Hanabi/vendor/ImGuizmo"
+IncludeDir["Box2D"] = "%{wks.location}/Hanabi/vendor/box2D/include"
 
 group "Dependencies"
 	include "Hanabi/vendor/GLFW"
 	include "Hanabi/vendor/Glad"
 	include "Hanabi/vendor/imgui"
+	include "Hanabi/vendor/Box2D"
 	include "Hanabi/vendor/yaml_cpp"
 
 group ""
@@ -79,6 +81,7 @@ project "Hanabi"
 		"%{IncludeDir.stb_image}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
+		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.ImGuizmo}"
 	}
 
@@ -88,6 +91,7 @@ project "Hanabi"
 		"Glad",
 		"ImGui",
 		"yaml_cpp",
+		"Box2D",
 		"opengl32.lib"
 	}
 	

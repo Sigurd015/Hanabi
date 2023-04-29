@@ -11,6 +11,9 @@
 
 namespace Hanabi
 {
+	//TODO
+	extern const std::filesystem::path g_AssetPath;
+
 	EditorLayer::EditorLayer() : Layer("EditorLayer")
 	{}
 
@@ -35,6 +38,9 @@ namespace Hanabi
 		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_IconPlay = Texture2D::Create("assets/Icons/PlayButton.png");
+		m_IconStop = Texture2D::Create("assets/Icons/StopButton.png");
 	}
 
 	void EditorLayer::OnDetach()
@@ -52,7 +58,6 @@ namespace Hanabi
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
-		m_EditorCamera.OnUpdate(ts);
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
@@ -63,7 +68,20 @@ namespace Hanabi
 		m_Framebuffer->ClearAttachment(1, -1);
 
 		// Update scene
-		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+		switch (m_SceneState)
+		{
+		case SceneState::Edit:
+		{
+			m_EditorCamera.OnUpdate(ts);
+			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+			break;
+		}
+		case SceneState::Play:
+		{
+			m_ActiveScene->OnUpdateRuntime(ts);
+			break;
+		}
+		}
 
 		ImVec2 mousePos = ImGui::GetMousePos();
 		mousePos.x -= m_ViewportBounds[0].x;
@@ -137,7 +155,7 @@ namespace Hanabi
 		m_ContentBrowserPanel.OnImGuiRender();
 		UI_StatesPanel();
 		UI_Viewport();
-
+		UI_Toolbar();
 		ImGui::End();
 	}
 
@@ -177,6 +195,34 @@ namespace Hanabi
 		}
 	}
 
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+		{
+			if (m_SceneState == SceneState::Edit)
+				OnScenePlay();
+			else if (m_SceneState == SceneState::Play)
+				OnSceneStop();
+		}
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+		ImGui::End();
+	}
+
 	void EditorLayer::UI_StatesPanel()
 	{
 		ImGui::Begin("Stats");
@@ -211,6 +257,16 @@ namespace Hanabi
 		auto viewportOffset = ImGui::GetWindowPos();
 		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
 		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(std::filesystem::path(g_AssetPath) / path);
+			}
+			ImGui::EndDragDropTarget();
+		}
 
 		// Gizmos
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -329,13 +385,24 @@ namespace Hanabi
 	{
 		std::string filepath = FileDialogs::OpenFile("Scenes (*.scene)\0*.scene\0");
 		if (!filepath.empty())
+			OpenScene(filepath);
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if (path.extension().string() != ".scene")
 		{
-			m_ActiveScene = CreateRef<Scene>();
+			HNB_WARN("Could not load {0} - not a scene file", path.filename().string());
+			return;
+		}
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		SceneSerializer serializer(newScene);
+		if (serializer.Deserialize(path.string()))
+		{
+			m_ActiveScene = newScene;
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filepath);
 		}
 	}
 
@@ -347,5 +414,18 @@ namespace Hanabi
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(filepath);
 		}
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+		m_ActiveScene->OnRuntimeStart();
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
+		m_ActiveScene->OnRuntimeStop();
+
 	}
 }

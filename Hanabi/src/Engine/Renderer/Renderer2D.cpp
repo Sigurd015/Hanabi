@@ -3,6 +3,7 @@
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/UniformBuffer.h"
 #include <glm/ext/matrix_transform.hpp>
 
 namespace Hanabi
@@ -12,7 +13,7 @@ namespace Hanabi
 		glm::vec3 Position;
 		glm::vec4 Color;
 		glm::vec2 TexCoord;
-		float TexIndex;
+		int TexIndex;
 		float TilingFactor;
 
 		// Editor-only
@@ -49,6 +50,13 @@ namespace Hanabi
 		  { 0.0f, 1.0f } };
 
 		Renderer2D::Statistics Stats;
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjection;
+		};
+		CameraData CameraBuffer;
+		Ref<UniformBuffer> CameraUniformBuffer;
 	};
 	static Renderer2DData s_Data;
 
@@ -56,7 +64,6 @@ namespace Hanabi
 
 	void Renderer2D::Init()
 	{
-
 		s_Data.QuadVertexArray = VertexArray::Create();
 
 		//VertexBuffer
@@ -65,7 +72,7 @@ namespace Hanabi
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float, "a_TexIndex" },
+			{ ShaderDataType::Int, "a_TexIndex" },
 			{ ShaderDataType::Float, "a_TilingFactor" },
 			{ ShaderDataType::Int,    "a_EntityID" }
 			});
@@ -93,17 +100,12 @@ namespace Hanabi
 		uint32_t whiteTextureData = 0xffffffff;
 		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-		int32_t samplers[s_Data.MaxTextureSlots];
-		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
-			samplers[i] = i;
-
-
 		s_Data.TextureShader = Shader::Create("assets/shaders/Texture.glsl");
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetUniform("u_Textures", samplers, s_Data.MaxTextureSlots);
 
 		// Set WhiteTexture slots to 0
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
+
+		s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -113,20 +115,16 @@ namespace Hanabi
 
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
-		glm::mat4 viewProj = camera.GetProjection() * glm::inverse(transform);
-
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetUniform("u_ViewProjection", viewProj);
+		s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
 
 	void Renderer2D::BeginScene(const EditorCamera& camera)
 	{
-		glm::mat4 viewProj = camera.GetViewProjection();
-
-		s_Data.TextureShader->Bind();
-		s_Data.TextureShader->SetUniform("u_ViewProjection", viewProj);
+		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
+		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -155,6 +153,7 @@ namespace Hanabi
 		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 			s_Data.TextureSlots[i]->Bind(i);
 
+		s_Data.TextureShader->Bind();
 		RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
 
 		s_Data.Stats.DrawCalls++;
@@ -187,7 +186,7 @@ namespace Hanabi
 		SetQuadVertex(transform, color, entityID, s_Data.QuadTexCoord, texIndex, tilingFactor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int entityID, float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
@@ -195,7 +194,7 @@ namespace Hanabi
 		SetQuadVertex(transform, tintColor, entityID, s_Data.QuadTexCoord, GetTextureID(texture), tilingFactor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, int entityID, float tilingFactor, const glm::vec4& tintColor)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();

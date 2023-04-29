@@ -16,8 +16,8 @@ namespace Hanabi
 		static void EndScene();
 		static void Flush();
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, int entityID = -1, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
-		static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, int entityID = -1, float tilingFactor = 1.0f, const glm::vec4& tintColor = glm::vec4(1.0f));
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
+		static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
 		struct Statistics
 		{
 			uint32_t DrawCalls = 0;

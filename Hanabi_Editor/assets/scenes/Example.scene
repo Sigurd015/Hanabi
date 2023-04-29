@@ -4,20 +4,40 @@ Entities:
     TagComponent:
       Tag: Green
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [0.00057221204, 3.80260801, -0.00439453125]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SpriteRendererComponent:
       Color: [0.356597096, 0.876447856, 0.213189989, 1]
+    Rigidbody2DComponent:
+      BodyType: Dynamic
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 12837192831273
     TagComponent:
       Tag: Blue
     TransformComponent:
-      Translation: [-6.0999999, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Translation: [-0.0173330307, 0, 0]
+      Rotation: [-0.0169533156, -0.0804194212, -0.425303608]
+      Scale: [7.9349618, 0.999999881, 1]
     SpriteRendererComponent:
       Color: [0.98455596, 0.144452229, 0.144452229, 1]
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [0.5, 0.5]
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
   - Entity: 12837192831273
     TagComponent:
       Tag: Camera
