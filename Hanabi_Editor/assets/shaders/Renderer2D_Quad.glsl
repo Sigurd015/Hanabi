@@ -1,3 +1,7 @@
+//--------------------------
+// Renderer2D Quad Shader
+// --------------------------
+
 #type:vertex
 #version 450 core
 
@@ -38,8 +42,8 @@ void main()
 #type:fragment
 #version 450 core
 
-layout(location = 0) out vec4 color;
-layout(location = 1) out int entityID;
+layout(location = 0) out vec4 o_Color;
+layout(location = 1) out int o_EntityID;
 
 struct VertexOutput
 {
@@ -56,6 +60,11 @@ layout (binding = 0) uniform sampler2D u_Textures[32];
 
 void main()
 {
-	color = texture(u_Textures[v_TexIndex], Input.TexCoord * Input.TilingFactor) * Input.Color;
-	entityID = v_EntityID;
+	vec4 texColor = texture(u_Textures[v_TexIndex], Input.TexCoord * Input.TilingFactor) * Input.Color;
+
+	if (texColor.a == 0.0)
+		discard;
+	
+	o_Color = texColor;
+	o_EntityID = v_EntityID;
 }

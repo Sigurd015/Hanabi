@@ -72,7 +72,7 @@ namespace Hanabi
 
 	bool OpenGLTexture2D::operator==(const Texture& other) const
 	{
-		return m_RendererID == ((OpenGLTexture2D&)other).m_RendererID;
+		return m_RendererID == other.GetRendererID();
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const

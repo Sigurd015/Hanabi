@@ -187,6 +187,11 @@ namespace Hanabi
 			{
 				auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
 				out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+				if (spriteRendererComponent.Texture)
+					out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.Texture->GetPath();
+
+				out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
+
 			});
 
 		SerializeComponent<Rigidbody2DComponent>("Rigidbody2DComponent", entity, out, [&]()
@@ -196,7 +201,7 @@ namespace Hanabi
 				out << YAML::Key << "FixedRotation" << YAML::Value << rb2dComponent.FixedRotation;
 			});
 
-		SerializeComponent<Rigidbody2DComponent>("BoxCollider2DComponent", entity, out, [&]()
+		SerializeComponent<BoxCollider2DComponent>("BoxCollider2DComponent", entity, out, [&]()
 			{
 				auto& bc2dComponent = entity.GetComponent<BoxCollider2DComponent>();
 				out << YAML::Key << "Offset" << YAML::Value << bc2dComponent.Offset;
@@ -205,6 +210,25 @@ namespace Hanabi
 				out << YAML::Key << "Friction" << YAML::Value << bc2dComponent.Friction;
 				out << YAML::Key << "Restitution" << YAML::Value << bc2dComponent.Restitution;
 				out << YAML::Key << "RestitutionThreshold" << YAML::Value << bc2dComponent.RestitutionThreshold;
+			});
+
+		SerializeComponent<CircleRendererComponent>("CircleRendererComponent", entity, out, [&]()
+			{
+				auto& circleRendererComponent = entity.GetComponent<CircleRendererComponent>();
+				out << YAML::Key << "Color" << YAML::Value << circleRendererComponent.Color;
+				out << YAML::Key << "Thickness" << YAML::Value << circleRendererComponent.Thickness;
+				out << YAML::Key << "Fade" << YAML::Value << circleRendererComponent.Fade;
+			});
+
+		SerializeComponent<CircleCollider2DComponent>("CircleCollider2DComponent", entity, out, [&]()
+			{
+				auto& cc2dComponent = entity.GetComponent<CircleCollider2DComponent>();
+				out << YAML::Key << "Offset" << YAML::Value << cc2dComponent.Offset;
+				out << YAML::Key << "Radius" << YAML::Value << cc2dComponent.Radius;
+				out << YAML::Key << "Density" << YAML::Value << cc2dComponent.Density;
+				out << YAML::Key << "Friction" << YAML::Value << cc2dComponent.Friction;
+				out << YAML::Key << "Restitution" << YAML::Value << cc2dComponent.Restitution;
+				out << YAML::Key << "RestitutionThreshold" << YAML::Value << cc2dComponent.RestitutionThreshold;
 			});
 
 		out << YAML::EndMap; // Entity
@@ -246,6 +270,7 @@ namespace Hanabi
 		}
 		catch (YAML::ParserException e)
 		{
+			HNB_CORE_ERROR("Failed to load .hazel file '{0}'\n     {1}", filepath, e.what());
 			return false;
 		}
 		if (!data["Scene"])
@@ -305,6 +330,20 @@ namespace Hanabi
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+					if (spriteRendererComponent["TexturePath"])
+						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+
+					if (spriteRendererComponent["TilingFactor"])
+						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+				}
+
+				auto circleRendererComponent = entity["CircleRendererComponent"];
+				if (circleRendererComponent)
+				{
+					auto& crc = deserializedEntity.AddComponent<CircleRendererComponent>();
+					crc.Color = circleRendererComponent["Color"].as<glm::vec4>();
+					crc.Thickness = circleRendererComponent["Thickness"].as<float>();
+					crc.Fade = circleRendererComponent["Fade"].as<float>();
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];
@@ -325,6 +364,18 @@ namespace Hanabi
 					bc2d.Friction = boxCollider2DComponent["Friction"].as<float>();
 					bc2d.Restitution = boxCollider2DComponent["Restitution"].as<float>();
 					bc2d.RestitutionThreshold = boxCollider2DComponent["RestitutionThreshold"].as<float>();
+				}
+
+				auto circleCollider2DComponent = entity["CircleCollider2DComponent"];
+				if (circleCollider2DComponent)
+				{
+					auto& cc2d = deserializedEntity.AddComponent<CircleCollider2DComponent>();
+					cc2d.Offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
+					cc2d.Radius = circleCollider2DComponent["Radius"].as<float>();
+					cc2d.Density = circleCollider2DComponent["Density"].as<float>();
+					cc2d.Friction = circleCollider2DComponent["Friction"].as<float>();
+					cc2d.Restitution = circleCollider2DComponent["Restitution"].as<float>();
+					cc2d.RestitutionThreshold = circleCollider2DComponent["RestitutionThreshold"].as<float>();
 				}
 			}
 		}

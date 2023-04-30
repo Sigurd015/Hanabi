@@ -18,7 +18,7 @@ public:
 class Sandbox :public Hanabi::Application
 {
 public:
-	Sandbox() :Hanabi::Application("SandBox")
+	Sandbox(const Hanabi::ApplicationSpecification& specification) : Hanabi::Application(specification)
 	{
 		PushLayer(new ExampleLayer());
 	}
@@ -28,7 +28,12 @@ public:
 	}
 };
 
-Hanabi::Application* CreateApplication()
+Hanabi::Application* Hanabi::CreateApplication(Hanabi::ApplicationCommandLineArgs args)
 {
-	return new Sandbox();
+	Hanabi::ApplicationSpecification spec;
+	spec.Name = "Sandbox";
+	spec.WorkingDirectory = "../Sandbox";
+	spec.CommandLineArgs = args;
+
+	return new Sandbox(spec);
 }

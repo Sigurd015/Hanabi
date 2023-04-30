@@ -8,7 +8,7 @@ namespace Hanabi
 	class HanabiEditor : public Application
 	{
 	public:
-		HanabiEditor(ApplicationCommandLineArgs args) : Application("Hanabi Editor", args)
+		HanabiEditor(const Hanabi::ApplicationSpecification& specification) : Hanabi::Application(specification)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -16,10 +16,14 @@ namespace Hanabi
 		~HanabiEditor()
 		{}
 	};
-
 }
 
 Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 {
-	return new Hanabi::HanabiEditor(args);
+	Hanabi::ApplicationSpecification spec;
+	spec.Name = "Hanabi Editor";
+	spec.WorkingDirectory = "../Hanabi_Editor";
+	spec.CommandLineArgs = args;
+
+	return new HanabiEditor(spec);
 }

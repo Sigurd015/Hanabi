@@ -1,5 +1,4 @@
 #pragma once
-#include <xhash>
 #include <random>
 #include <unordered_map>
 
@@ -29,7 +28,7 @@ namespace std
 	{
 		std::size_t operator()(const Hanabi::UUID& uuid) const
 		{
-			return hash<uint64_t>()((uint64_t)uuid);
+			return (uint64_t)uuid;
 		}
 	};
 

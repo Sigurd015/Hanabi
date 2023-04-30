@@ -19,6 +19,7 @@ namespace Hanabi
 		void OnEvent(Event& e) override;
 	private:
 		void OnScenePlay();
+		void OnSceneSimulate();
 		void OnSceneStop();
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
@@ -29,6 +30,7 @@ namespace Hanabi
 		void SaveSceneAs();
 		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 		void OnDuplicateEntity();
+		void OnOverlayRender();
 
 		// UI Panels
 		void UI_Toolbar();
@@ -38,7 +40,7 @@ namespace Hanabi
 
 		enum class SceneState
 		{
-			Edit = 0, Play = 1
+			Edit = 0, Play = 1, Simulate = 2
 		};
 		SceneState m_SceneState = SceneState::Edit;
 
@@ -51,11 +53,12 @@ namespace Hanabi
 		ContentBrowserPanel m_ContentBrowserPanel;
 		Ref<Scene> m_EditorScene;
 		std::filesystem::path m_EditorScenePath;
+		bool m_ShowPhysicsColliders = false;
 		bool m_PrimaryCamera = true;
 		Ref<Scene> m_ActiveScene;
 		Ref<Framebuffer> m_Framebuffer;
 		Entity m_HoveredEntity;
 		// Editor resources
-		Ref<Texture2D> m_IconPlay, m_IconStop;
+		Ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
 	};
 }

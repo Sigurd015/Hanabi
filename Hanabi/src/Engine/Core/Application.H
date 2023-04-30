@@ -20,11 +20,18 @@ namespace Hanabi
 			return Args[index];
 		}
 	};
+
+	struct ApplicationSpecification
+	{
+		std::string Name = "Hanabi App";
+		std::string WorkingDirectory;
+		ApplicationCommandLineArgs CommandLineArgs;
+	};
+
 	class  Application
 	{
 	public:
-		Application(const std::string& name = "Hanabi App", ApplicationCommandLineArgs args = ApplicationCommandLineArgs());
-		ApplicationCommandLineArgs GetCommandLineArgs() const { return m_CommandLineArgs; }
+		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
@@ -33,11 +40,12 @@ namespace Hanabi
 		Window& GetWindow() { return *m_Window; }
 		static Application& Get() { return *s_Instance; }
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
 	private:
 		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
-		ApplicationCommandLineArgs m_CommandLineArgs;
+		ApplicationSpecification m_Specification;
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;

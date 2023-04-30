@@ -1,18 +1,22 @@
 #include "hnbpch.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
-#include <glfw/glfw3.h>
+#include "Engine/Utils/PlatformUtils.h"
 
 namespace Hanabi
 {
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application(const std::string& name, ApplicationCommandLineArgs args) : m_CommandLineArgs(args)
+	Application::Application(const ApplicationSpecification& specification) : m_Specification(specification)
 	{
 		HNB_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = Window::Create(WindowProps(name));
+		// Set working directory here
+		if (!m_Specification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_Specification.WorkingDirectory);
+
+		m_Window = Window::Create(WindowProps(m_Specification.Name));
 		m_Window->SetEventCallback(HNB_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
@@ -56,7 +60,7 @@ namespace Hanabi
 	{
 		while (m_Running)
 		{
-			float time = (float)glfwGetTime();
+			float time = Time::GetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 

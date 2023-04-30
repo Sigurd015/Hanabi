@@ -16,6 +16,7 @@ namespace Hanabi
 		virtual bool IsLoaded() const override { return m_IsLoaded; }
 		void Bind(uint32_t slot = 0) const override;
 		void SetData(void* data, uint32_t size) override;
+		virtual const std::string& GetPath() const override { return m_Path; }
 		bool operator==(const Texture& other) const override;
 	private:
 		std::string m_Path;
