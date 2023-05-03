@@ -4,7 +4,9 @@
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/UniformBuffer.h"
+
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Hanabi
 {
@@ -317,7 +319,8 @@ namespace Hanabi
 		s_Data.LineWidth = width;
 	}
 
-	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness /*= 1.0f*/, float fade /*= 0.005f*/, int entityID /*= -1*/)
+	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, 
+		float thickness, float fade, int entityID)
 	{
 		// TODO: implement for circles
 		// if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
@@ -350,7 +353,8 @@ namespace Hanabi
 		SetQuadVertex(transform, color, entityID, s_Data.QuadTexCoord, texIndex, tilingFactor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& tintColor, float tilingFactor, int entityID)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
+		const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
@@ -358,7 +362,8 @@ namespace Hanabi
 		SetQuadVertex(transform, tintColor, entityID, s_Data.QuadTexCoord, GetTextureID(texture), tilingFactor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& tintColor, float tilingFactor, int entityID)
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, 
+		const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
@@ -392,7 +397,8 @@ namespace Hanabi
 		return texIndex;
 	}
 
-	void Renderer2D::SetQuadVertex(const glm::mat4& transform, const glm::vec4& color, int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor)
+	void Renderer2D::SetQuadVertex(const glm::mat4& transform, 
+		const glm::vec4& color, int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor)
 	{
 		for (size_t i = 0; i < 4; i++)
 		{

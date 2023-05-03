@@ -1,5 +1,4 @@
 #pragma once
-#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/RendererAPI.h"
 #include <glm/glm.hpp>

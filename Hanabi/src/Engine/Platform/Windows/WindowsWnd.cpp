@@ -5,9 +5,8 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
-#include "Engine/Renderer/OpenGL/OpenGLContext.h"
+#include "Engine/Renderer/RenderingContext.h"
 #include "Engine/Renderer/RendererAPI.h"
-#include <glad/glad.h>
 
 namespace Hanabi
 {
@@ -16,7 +15,6 @@ namespace Hanabi
 		return CreateScope<WindowsWnd>(props);
 	}
 
-	static bool s_GLFWInitialized = false;
 	static uint8_t s_GLFWWindowCount = 0;
 
 	static void GLFWErrorCallback(int error, const char* description)
@@ -26,22 +24,30 @@ namespace Hanabi
 
 	WindowsWnd::WindowsWnd(const WindowProps& props)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		Init(props);
 	}
 
 	WindowsWnd::~WindowsWnd()
 	{
+		HNB_PROFILE_FUNCTION();
+
 		Shutdown();
 	}
 
 	void WindowsWnd::OnUpdate()
 	{
+		HNB_PROFILE_FUNCTION();
+
 		glfwPollEvents();
 		m_Context->SwapBuffer();
 	}
 
 	void WindowsWnd::SetVSync(bool enable)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		if (enable)
 			glfwSwapInterval(1);
 		else
@@ -56,6 +62,8 @@ namespace Hanabi
 
 	void WindowsWnd::Init(const WindowProps& props)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -64,18 +72,22 @@ namespace Hanabi
 
 		if (s_GLFWWindowCount == 0)
 		{
+			HNB_PROFILE_SCOPE("glfwInit");
+
 			int success = glfwInit();
 			HNB_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
-
+		{
+			HNB_PROFILE_SCOPE("glfwCreateWindow");
 #if defined(HNB_DEBUG)
-		if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 
-		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		++s_GLFWWindowCount;
+			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			++s_GLFWWindowCount;
+		}
 
 		m_Context = RenderingContext::Create(m_Window);
 		m_Context->Init();
@@ -107,19 +119,19 @@ namespace Hanabi
 				{
 				case GLFW_PRESS:
 				{
-					KeyPressedEvent event(static_cast<KeyCode>(key), 0);
+					KeyPressedEvent event(key, false);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					KeyReleasedEvent event(static_cast<KeyCode>(key));
+					KeyReleasedEvent event(key);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent event(static_cast<KeyCode>(key), true);
+					KeyPressedEvent event(key, true);
 					data.EventCallback(event);
 					break;
 				}
@@ -130,7 +142,7 @@ namespace Hanabi
 			{
 				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 
-				KeyTypedEvent event(static_cast<KeyCode>(keycode));
+				KeyTypedEvent event(keycode);
 				data.EventCallback(event);
 			});
 
@@ -141,13 +153,13 @@ namespace Hanabi
 				{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent event(static_cast<MouseCode>(button));
+					MouseButtonPressedEvent event(button);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent event(static_cast<MouseCode>(button));
+					MouseButtonReleasedEvent event(button);
 					data.EventCallback(event);
 					break;
 				}
@@ -172,6 +184,8 @@ namespace Hanabi
 
 	void WindowsWnd::Shutdown()
 	{
+		HNB_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 		--s_GLFWWindowCount;
 		if (s_GLFWWindowCount == 0)

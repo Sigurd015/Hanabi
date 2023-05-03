@@ -1,5 +1,6 @@
 #include "hnbpch.h"
 #include "Engine/Scene/SceneCamera.h"
+
 #include <glm/ext/matrix_clip_space.hpp>
 
 namespace Hanabi
@@ -49,6 +50,4 @@ namespace Hanabi
 				orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
 		}
 	}
-
-
 }

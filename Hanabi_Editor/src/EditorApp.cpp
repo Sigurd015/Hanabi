@@ -1,6 +1,5 @@
 #include <Hanabi.h>
 #include "EditorLayer.h"
-#include "imgui.h"
 #include "Engine/EntryPoint.h"
 
 namespace Hanabi

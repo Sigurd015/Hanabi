@@ -33,7 +33,7 @@ namespace Hanabi
 		uint32_t Size;
 		size_t Offset;
 		bool Normalized;
-		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false)
+		BufferElement(ShaderDataType type, const std::string& name, bool normalized = false) 
 			: Name(name), Type(type), Size(ShaderDataTypeSize(type)), Offset(0), Normalized(normalized)
 		{}
 
@@ -62,8 +62,7 @@ namespace Hanabi
 	{
 	public:
 		BufferLayout() {}
-		BufferLayout(std::initializer_list<BufferElement> elements)
-			: m_Elements(elements)
+		BufferLayout(std::initializer_list<BufferElement> elements) : m_Elements(elements)
 		{
 			CalculateOffsetsAndStride();
 		}

@@ -1,8 +1,7 @@
 #pragma once
-#include "Engine/Renderer/RenderCommand.h"
-#include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/VertexArray.h"
 
 namespace Hanabi
 {

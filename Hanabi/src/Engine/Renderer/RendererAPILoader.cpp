@@ -27,8 +27,11 @@ namespace Hanabi
 	{
 		switch (s_API)
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLRendererAPI>();
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateScope<OpenGLRendererAPI>();
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -39,8 +42,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -51,8 +57,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLShader>(filepath);
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -62,8 +71,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexArray>();
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLVertexArray>();
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -73,8 +85,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(size);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLVertexBuffer>(size);
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -83,8 +98,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLVertexBuffer>(vertices, size);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLVertexBuffer>(vertices, size);
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -94,8 +112,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLIndexBuffer>(indices, count);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLIndexBuffer>(indices, count);
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -105,8 +126,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return  CreateRef<OpenGLTexture2D>(path);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return  CreateRef<OpenGLTexture2D>(path);
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -116,8 +140,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLTexture2D>(width, height);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLTexture2D>(width, height);
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -127,8 +154,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLFramebuffer>(spec);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLFramebuffer>(spec);
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -139,8 +169,11 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:    HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateRef<OpenGLUniformBuffer>(size, binding);
+		case RendererAPI::API::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLUniformBuffer>(size, binding);
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

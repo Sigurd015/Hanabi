@@ -1,8 +1,9 @@
 #pragma once
 #include "Engine/Core/UUID.h"
-#include "Engine/Renderer/Camera.h"
 #include "Engine/Scene/SceneCamera.h"
+#include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Texture.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL

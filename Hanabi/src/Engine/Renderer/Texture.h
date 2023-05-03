@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Core/Base.h"
+
 #include <string>
 
 namespace Hanabi

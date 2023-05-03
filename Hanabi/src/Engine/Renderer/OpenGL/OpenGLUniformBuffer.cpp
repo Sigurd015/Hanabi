@@ -1,5 +1,6 @@
 #include "hnbpch.h"
-#include "OpenGLUniformBuffer.h"
+#include "Engine/Renderer/OpenGL/OpenGLUniformBuffer.h"
+
 #include <glad/glad.h>
 
 namespace Hanabi

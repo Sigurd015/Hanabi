@@ -1,5 +1,4 @@
 #pragma once
-#include "hnbpch.h"
 #include "Engine/Core/Base.h"
 
 namespace Hanabi
@@ -31,6 +30,7 @@ namespace Hanabi
 	class  Event
 	{
 	public:
+		virtual ~Event() = default;
 		bool Handled = false;
 		virtual EventType GetEventType() const = 0;
 		virtual const char* GetName() const = 0;

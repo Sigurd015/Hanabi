@@ -15,10 +15,13 @@ namespace Hanabi
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
 		static void Flush();
-		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color, float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
+		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color, 
+			float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, 
+			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
+		static void DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture,
+			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
 		static void DrawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entityID = -1);
 		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
 		static void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
@@ -36,7 +39,8 @@ namespace Hanabi
 		static Statistics GetStats();
 	private:
 		static float GetTextureID(const Ref<Texture2D>& texture);
-		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color, int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor);
+		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color, 
+			int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor);
 		static void StartBatch();
 		static void NextBatch();
 	};

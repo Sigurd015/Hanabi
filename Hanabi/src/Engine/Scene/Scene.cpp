@@ -4,12 +4,13 @@
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/ScriptableEntity.h"
+
 // Box2D
-#include "box2d/b2_world.h"
-#include "box2d/b2_body.h"
-#include "box2d/b2_fixture.h"
-#include "box2d/b2_polygon_shape.h"
-#include "box2d/b2_circle_shape.h"
+#include <box2d/b2_world.h>
+#include <box2d/b2_body.h>
+#include <box2d/b2_fixture.h>
+#include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_circle_shape.h>
 
 namespace Hanabi
 {
@@ -27,7 +28,8 @@ namespace Hanabi
 	}
 
 	template<typename... Component>
-	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	static void CopyComponent(entt::registry& dst, entt::registry& src, 
+		const std::unordered_map<UUID, entt::entity>& enttMap)
 	{
 		([&]()
 			{
@@ -42,7 +44,8 @@ namespace Hanabi
 	}
 
 	template<typename... Component>
-	static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst,
+		entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
 	{
 		CopyComponent<Component...>(dst, src, enttMap);
 	}
@@ -203,7 +206,8 @@ namespace Hanabi
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
 				if (sprite.Texture)
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture, sprite.Color, sprite.TilingFactor);
+					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture, 
+						sprite.Color, sprite.TilingFactor);
 				else
 					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
@@ -323,7 +327,8 @@ namespace Hanabi
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
 			if (sprite.Texture)
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture, sprite.Color, sprite.TilingFactor, (int)entity);
+				Renderer2D::DrawQuad(transform.GetTransform(), 
+					sprite.Texture, sprite.Color, sprite.TilingFactor, (int)entity);
 			else
 				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
 		}
@@ -334,7 +339,8 @@ namespace Hanabi
 		{
 			auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-			Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade, (int)entity);
+			Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, 
+				circle.Thickness, circle.Fade, (int)entity);
 		}
 
 		Renderer2D::EndScene();
