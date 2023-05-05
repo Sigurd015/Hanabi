@@ -17,6 +17,8 @@
 [submodule "Hanabi/vendor/yaml_cpp"]
 	path = Hanabi/vendor/yaml_cpp
 	url = https://github.com/Sigurd015/yaml-cpp
+	branch = master
 [submodule "Hanabi/vendor/box2d"]
 	path = Hanabi/vendor/box2d
 	url = https://github.com/Sigurd015/box2d
+	branch = main

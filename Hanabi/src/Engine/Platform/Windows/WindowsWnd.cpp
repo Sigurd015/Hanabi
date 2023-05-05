@@ -22,11 +22,11 @@ namespace Hanabi
 		HNB_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	WindowsWnd::WindowsWnd(const WindowProps& props)
+	WindowsWnd::WindowsWnd(const WindowProps& props) :m_Data(props)
 	{
 		HNB_PROFILE_FUNCTION();
 
-		Init(props);
+		Init();
 	}
 
 	WindowsWnd::~WindowsWnd()
@@ -60,15 +60,11 @@ namespace Hanabi
 		return m_Data.VSync;
 	}
 
-	void WindowsWnd::Init(const WindowProps& props)
+	void WindowsWnd::Init()
 	{
 		HNB_PROFILE_FUNCTION();
 
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
-
-		HNB_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
+		HNB_CORE_INFO("Creating window {0} ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
 
 		if (s_GLFWWindowCount == 0)
 		{
@@ -85,7 +81,7 @@ namespace Hanabi
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 
-			m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+			m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 			++s_GLFWWindowCount;
 		}
 
@@ -93,11 +89,11 @@ namespace Hanabi
 		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(true);
+		SetVSync(m_Data.VSync);
 
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 				data.Width = width;
 				data.Height = height;
 
@@ -107,14 +103,14 @@ namespace Hanabi
 
 		glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 				WindowCloseEvent event;
 				data.EventCallback(event);
 			});
 
 		glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int key, int scancode, int action, int modes)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 				switch (action)
 				{
 				case GLFW_PRESS:
@@ -140,7 +136,7 @@ namespace Hanabi
 
 		glfwSetCharCallback(m_Window, [](GLFWwindow* window, unsigned int keycode)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 
 				KeyTypedEvent event(keycode);
 				data.EventCallback(event);
@@ -148,7 +144,7 @@ namespace Hanabi
 
 		glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int button, int action, int mods)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 				switch (action)
 				{
 				case GLFW_PRESS:
@@ -168,14 +164,14 @@ namespace Hanabi
 
 		glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 				MouseScrolledEvent event((float)xOffset, (float)yOffset);
 				data.EventCallback(event);
 			});
 
 		glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
 			{
-				WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
+				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 
 				MouseMovedEvent event((float)xPos, (float)yPos);
 				data.EventCallback(event);

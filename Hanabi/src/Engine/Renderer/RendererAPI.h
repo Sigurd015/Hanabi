@@ -9,7 +9,7 @@ namespace Hanabi
 	public:
 		enum class API
 		{
-			None = 0, OpenGL = 1, Vulkan = 2, D3D11 = 3, D3D12 = 4
+			None = 0, OpenGL = 1, Vulkan = 2, DX11 = 3, DX12 = 4
 		};
 	public:
 		virtual void Init() = 0;

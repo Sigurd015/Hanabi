@@ -18,8 +18,7 @@ namespace Hanabi
 		if (!m_Specification.WorkingDirectory.empty())
 			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-		m_Window = Window::Create(WindowProps(m_Specification.Name));
-		m_Window->SetEventCallback(HNB_BIND_EVENT_FN(Application::OnEvent));
+		m_Window = Window::Create(WindowProps(HNB_BIND_EVENT_FN(Application::OnEvent), m_Specification.Name));
 
 		Renderer::Init();
 
