@@ -115,7 +115,7 @@ namespace Hanabi
 			{ ShaderDataType::Int,    "a_EntityID"     }
 			});
 		s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
-		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer);
+		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer, s_Data.QuadShader);
 		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 		//IndexBuffer
 		uint32_t* quadIndices = new uint32_t[s_Data.MaxIndices];
@@ -152,7 +152,7 @@ namespace Hanabi
 			{ ShaderDataType::Int,    "a_EntityID"      }
 			});
 		s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
-		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer);
+		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer, s_Data.CircleShader);
 		s_Data.CircleVertexArray->SetIndexBuffer(quadIB); // Use quad IB
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
 
@@ -166,9 +166,8 @@ namespace Hanabi
 			{ ShaderDataType::Int,    "a_EntityID" }
 			});
 		s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
-		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer);
+		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer, s_Data.LineShader);
 		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
-
 
 		// Set WhiteTexture slots to 0
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
@@ -319,12 +318,11 @@ namespace Hanabi
 		s_Data.LineWidth = width;
 	}
 
-	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color, 
+	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color,
 		float thickness, float fade, int entityID)
 	{
-		// TODO: implement for circles
-		// if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-		// 	NextBatch();
+		 if (s_Data.CircleIndexCount >= Renderer2DData::MaxIndices)
+		 	NextBatch();
 
 		for (size_t i = 0; i < 4; i++)
 		{
@@ -362,7 +360,7 @@ namespace Hanabi
 		SetQuadVertex(transform, tintColor, entityID, s_Data.QuadTexCoord, GetTextureID(texture), tilingFactor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture, 
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture,
 		const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
@@ -397,7 +395,7 @@ namespace Hanabi
 		return texIndex;
 	}
 
-	void Renderer2D::SetQuadVertex(const glm::mat4& transform, 
+	void Renderer2D::SetQuadVertex(const glm::mat4& transform,
 		const glm::vec4& color, int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor)
 	{
 		for (size_t i = 0; i < 4; i++)

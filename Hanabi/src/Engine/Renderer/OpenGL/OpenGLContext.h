@@ -8,9 +8,9 @@ namespace Hanabi
 	{
 	public:
 		OpenGLContext(GLFWwindow* windowHandle);
-		void Init() override;
-		void SwapBuffer() override;
+		void SwapBuffer(bool VSync) override;
 	private:
+		void Init();
 		GLFWwindow* m_WindowHandle;
 	};
 }

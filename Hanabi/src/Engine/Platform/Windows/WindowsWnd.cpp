@@ -41,17 +41,11 @@ namespace Hanabi
 		HNB_PROFILE_FUNCTION();
 
 		glfwPollEvents();
-		m_Context->SwapBuffer();
+		m_Context->SwapBuffer(m_Data.VSync);
 	}
 
 	void WindowsWnd::SetVSync(bool enable)
 	{
-		HNB_PROFILE_FUNCTION();
-
-		if (enable)
-			glfwSwapInterval(1);
-		else
-			glfwSwapInterval(0);
 		m_Data.VSync = enable;
 	}
 
@@ -86,10 +80,8 @@ namespace Hanabi
 		}
 
 		m_Context = RenderingContext::Create(m_Window);
-		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
-		SetVSync(m_Data.VSync);
 
 		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{

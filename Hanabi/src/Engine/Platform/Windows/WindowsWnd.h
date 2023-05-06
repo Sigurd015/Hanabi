@@ -14,8 +14,8 @@ namespace Hanabi
 		WindowsWnd(const WindowProps& props);
 		virtual ~WindowsWnd();
 		void OnUpdate() override;
-		unsigned int GetWidth() const override { return m_Data.Width; }
-		unsigned int GetHeight() const override { return m_Data.Height; }
+		uint32_t GetWidth() const override { return m_Data.Width; }
+		uint32_t GetHeight() const override { return m_Data.Height; }
 		void SetVSync(bool enable) override;
 		bool IsVSync() const override;
 		void* GetNativeWindow() const override { return m_Window; }

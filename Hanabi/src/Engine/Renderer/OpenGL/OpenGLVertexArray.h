@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/Shader.h"
 
 namespace Hanabi
 {
@@ -10,7 +11,7 @@ namespace Hanabi
 		~OpenGLVertexArray();
 		void Bind() const override;
 		void Unbind() const override;
-		void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer) override;
+		void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader) override;
 		void SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer) override;
 		const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const { return m_VertexBuffers; }
 		const Ref<IndexBuffer>& GetIndexBuffer() const { return m_IndexBuffer; }
