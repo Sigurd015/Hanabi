@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/Texture.h"
+
 #include <glad/glad.h>
 
 namespace Hanabi

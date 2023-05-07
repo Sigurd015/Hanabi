@@ -4,6 +4,8 @@
 #include "Engine/Renderer/Framebuffer.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
+#include "Engine/Events/KeyEvent.h"
+#include "Engine/Events/MouseEvent.h"
 
 namespace Hanabi
 {

@@ -1,8 +1,6 @@
 #pragma once
 #include "Engine/Layer/Layer.h"
-#include "Engine/Events/ApplicationEvent.h"
-#include "Engine/Events/KeyEvent.h"
-#include "Engine/Events/MouseEvent.h"
+#include "Engine/Events/Event.h"
 
 namespace Hanabi
 {

@@ -22,7 +22,6 @@ namespace Hanabi
 }
 namespace std
 {
-
 	template<>
 	struct hash<Hanabi::UUID>
 	{

@@ -1,7 +1,9 @@
 #include "hnbpch.h"
+#include "Engine/Scene/SceneCamera.h"
 #include "Engine/Scene/SceneSerializer.h"
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/Components.h"
+
 #include <yaml-cpp/yaml.h>
 
 namespace YAML

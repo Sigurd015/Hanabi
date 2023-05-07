@@ -1,4 +1,5 @@
 #pragma once
+#include "Engine/Core/Log.h"
 
 #include <algorithm>
 #include <chrono>
@@ -6,6 +7,8 @@
 #include <iomanip>
 #include <string>
 #include <thread>
+#include <mutex>
+#include <sstream>
 
 namespace Hanabi
 {
@@ -39,7 +42,8 @@ namespace Hanabi
 				// profiling output.
 				if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
 				{
-					HNB_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, m_CurrentSession->Name);
+					HNB_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", 
+						name, m_CurrentSession->Name);
 				}
 				InternalEndSession();
 			}
@@ -130,7 +134,8 @@ namespace Hanabi
 	class InstrumentationTimer
 	{
 	public:
-		InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) { m_StartTimepoint = std::chrono::steady_clock::now(); }
+		InstrumentationTimer(const char* name) : m_Name(name), m_Stopped(false) 
+		{ m_StartTimepoint = std::chrono::steady_clock::now(); }
 		~InstrumentationTimer()
 		{
 			if (!m_Stopped)
@@ -141,7 +146,8 @@ namespace Hanabi
 		{
 			auto endTimepoint = std::chrono::steady_clock::now();
 			auto highResStart = FloatingPointMicroseconds{ m_StartTimepoint.time_since_epoch() };
-			auto elapsedTime = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch() - std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch();
+			auto elapsedTime = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch() 
+				- std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch();
 
 			Instrumentor::Get().WriteProfile({ m_Name, highResStart, elapsedTime, std::this_thread::get_id() });
 
@@ -171,7 +177,8 @@ namespace Hanabi
 			while (srcIndex < N)
 			{
 				size_t matchIndex = 0;
-				while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 && expr[srcIndex + matchIndex] == remove[matchIndex])
+				while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 
+					&& expr[srcIndex + matchIndex] == remove[matchIndex])
 					matchIndex++;
 				if (matchIndex == K - 1)
 					srcIndex += matchIndex;
@@ -209,7 +216,7 @@ namespace Hanabi
 #define HNB_PROFILE_BEGIN_SESSION(name, filepath) ::Hanabi::Instrumentor::Get().BeginSession(name, filepath)
 #define HNB_PROFILE_END_SESSION() ::Hanabi::Instrumentor::Get().EndSession()
 #define HNB_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Hanabi::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-											   ::Hanabi::InstrumentationTimer timer##line(fixedName##line.Data)
+													   ::Hanabi::InstrumentationTimer timer##line(fixedName##line.Data)
 #define HNB_PROFILE_SCOPE_LINE(name, line) HNB_PROFILE_SCOPE_LINE2(name, line)
 #define HNB_PROFILE_SCOPE(name) HNB_PROFILE_SCOPE_LINE(name, __LINE__)
 #define HNB_PROFILE_FUNCTION() HNB_PROFILE_SCOPE(HNB_FUNC_SIG)

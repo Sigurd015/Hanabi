@@ -1,14 +1,18 @@
 #include "hnbpch.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Input/Input.h"
-#include <glfw/glfw3.h>
+#include "Engine/Input/KeyCodes.h"
+#include "Engine/Input/MouseCodes.h"
 
+#include <glfw/glfw3.h>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
+
 namespace Hanabi
 {
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
+		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), 
+		Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
 	{
 		UpdateView();
 	}

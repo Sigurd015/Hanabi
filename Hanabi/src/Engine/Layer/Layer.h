@@ -8,7 +8,7 @@ namespace Hanabi
 	class Layer
 	{
 	public:
-		Layer(const std::string& name = "Layer");
+		Layer(const std::string& name = "Layer") :m_DebugName(name) {}
 		virtual ~Layer() = default;
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}

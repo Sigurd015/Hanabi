@@ -1,5 +1,4 @@
 #pragma once
-#include "hnbpch.h"
 #include "Engine/Core/Base.h"
 #include "Engine/Events/Event.h"
 
@@ -11,7 +10,8 @@ namespace Hanabi
 		uint32_t Width;
 		uint32_t Height;
 
-		WindowProps(const std::string& title = "Hanabi Engine", uint32_t width = 1920, uint32_t height = 1080) :Title(title), Width(width), Height(height) {}
+		WindowProps(const std::string& title = "Hanabi Engine", 
+			uint32_t width = 1920, uint32_t height = 1080) :Title(title), Width(width), Height(height) {}
 	};
 
 	class Window

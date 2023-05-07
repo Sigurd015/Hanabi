@@ -3,6 +3,7 @@
 #ifdef HNB_PLATFORM_WINDOWS
 #include "Engine/Input/Input.h"
 #include "Engine/Core/Application.H"
+
 #include <GLFW/glfw3.h>
 
 namespace Hanabi
@@ -10,13 +11,13 @@ namespace Hanabi
 	bool Input::IsKeyPressed(const KeyCode key)
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetKey(window, static_cast<int32_t>(key));
+		auto state = glfwGetKey(window, key);
 		return state == GLFW_PRESS;
 	}
 	bool Input::IsMouseButtonPressed(const MouseCode button)
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetMouseButton(window, static_cast<int32_t>(button));
+		auto state = glfwGetMouseButton(window, button);
 		return state == GLFW_PRESS;
 	}
 	glm::vec2 Input::GetMousePosition()

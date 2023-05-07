@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/Shader.h"
+
 #include <string>
 #include <glm/glm.hpp>
 #include <glad/glad.h>
@@ -38,5 +39,4 @@ namespace Hanabi
 		mutable	std::unordered_map<std::string, GLint> m_UniformLocationCache;
 		std::string m_Name;
 	};
-
 }

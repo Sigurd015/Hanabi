@@ -5,6 +5,8 @@
 
 namespace Hanabi
 {
+	static const uint32_t s_MaxFramebufferSize = 8192;
+
 	namespace Utils
 	{
 		static GLenum TextureTarget(bool multisampled)
@@ -22,7 +24,8 @@ namespace Hanabi
 			glBindTexture(TextureTarget(multisampled), id);
 		}
 
-		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, GLenum format, uint32_t width, uint32_t height, int index)
+		static void AttachColorTexture(uint32_t id, int samples, GLenum internalFormat, 
+			GLenum format, uint32_t width, uint32_t height, int index)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
@@ -43,7 +46,8 @@ namespace Hanabi
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), id, 0);
 		}
 
-		static void AttachDepthTexture(uint32_t id, int samples, GLenum format, GLenum attachmentType, uint32_t width, uint32_t height)
+		static void AttachDepthTexture(uint32_t id, int samples, GLenum format,
+			GLenum attachmentType, uint32_t width, uint32_t height)
 		{
 			bool multisampled = samples > 1;
 			if (multisampled)
@@ -85,8 +89,6 @@ namespace Hanabi
 			return 0;
 		}
 	}
-
-	static const uint32_t s_MaxFramebufferSize = 8192;
 
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec) : m_Specification(spec)
 	{
@@ -137,10 +139,12 @@ namespace Hanabi
 				switch (m_ColorAttachmentSpecifications[i].TextureFormat)
 				{
 				case FramebufferTextureFormat::RGBA8:
-					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);
+					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, 
+						GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);
 					break;
 				case FramebufferTextureFormat::RED_INTEGER:
-					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, i);
+					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, 
+						GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, i);
 					break;
 				}
 			}
@@ -153,7 +157,8 @@ namespace Hanabi
 			switch (m_DepthAttachmentSpecification.TextureFormat)
 			{
 			case FramebufferTextureFormat::DEPTH24STENCIL8:
-				Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
+				Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, 
+					GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 				break;
 			}
 		}
@@ -161,7 +166,8 @@ namespace Hanabi
 		if (m_ColorAttachments.size() > 1)
 		{
 			HNB_CORE_ASSERT(m_ColorAttachments.size() <= 4);
-			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+			GLenum buffers[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, 
+				GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 			glDrawBuffers(m_ColorAttachments.size(), buffers);
 		}
 		else if (m_ColorAttachments.empty())
@@ -169,7 +175,8 @@ namespace Hanabi
 			// Only depth-pass
 			glDrawBuffer(GL_NONE);
 		}
-		HNB_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is incomplete!");
+		HNB_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, 
+			"Framebuffer is incomplete!");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}

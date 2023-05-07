@@ -1,7 +1,8 @@
 #include "hnbpch.h"
+#include "Engine/Renderer/RenderCommand.h"
+#include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/Renderer.h"
-#include "OpenGL/OpenGLShader.h"
 
 namespace Hanabi
 {
@@ -9,6 +10,8 @@ namespace Hanabi
 
 	void Renderer::Init()
 	{
+		HNB_PROFILE_FUNCTION();
+
 		RenderCommand::Init();
 		Renderer2D::Init();
 	}
