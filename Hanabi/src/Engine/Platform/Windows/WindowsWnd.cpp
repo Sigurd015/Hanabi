@@ -83,7 +83,7 @@ namespace Hanabi
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
-		glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
+		glfwSetFramebufferSizeCallback(m_Window, [](GLFWwindow* window, int width, int height)
 			{
 				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 				data.Width = width;
