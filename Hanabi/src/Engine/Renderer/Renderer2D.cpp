@@ -1,4 +1,5 @@
 #include "hnbpch.h"
+#include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Shader.h"
@@ -183,6 +184,15 @@ namespace Hanabi
 	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		s_Data.CameraBuffer.ViewProjection = camera.GetProjection() * glm::inverse(transform);
+
+		switch (RendererAPI::GetAPI())
+		{
+#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPI::API::DX11:
+			s_Data.CameraBuffer.ViewProjection = glm::transpose(s_Data.CameraBuffer.ViewProjection);
+#endif
+		}
+
 		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
@@ -191,6 +201,15 @@ namespace Hanabi
 	void Renderer2D::BeginScene(const EditorCamera& camera)
 	{
 		s_Data.CameraBuffer.ViewProjection = camera.GetViewProjection();
+
+		switch (RendererAPI::GetAPI())
+		{
+#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPI::API::DX11:
+			s_Data.CameraBuffer.ViewProjection = glm::transpose(s_Data.CameraBuffer.ViewProjection);
+#endif
+		}
+
 		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
@@ -321,8 +340,8 @@ namespace Hanabi
 	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color,
 		float thickness, float fade, int entityID)
 	{
-		 if (s_Data.CircleIndexCount >= Renderer2DData::MaxIndices)
-		 	NextBatch();
+		if (s_Data.CircleIndexCount >= Renderer2DData::MaxIndices)
+			NextBatch();
 
 		for (size_t i = 0; i < 4; i++)
 		{
