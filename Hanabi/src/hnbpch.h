@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef HNB_PLATFORM_WINDOWS
+#if defined(HNB_PLATFORM_WINDOWS)
 #ifndef NOMINMAX
 // See github.com/skypjack/entt/wiki/Frequently-Asked-Questions#warning-c4003-the-min-the-max-and-the-macro
 #define NOMINMAX
@@ -24,6 +24,6 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Debug/Instrumentor.h"
 
-#ifdef HNB_PLATFORM_WINDOWS
+#if defined(HNB_PLATFORM_WINDOWS)
 #include <Windows.h>
 #endif 

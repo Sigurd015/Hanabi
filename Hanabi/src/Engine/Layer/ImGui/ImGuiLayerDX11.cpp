@@ -1,20 +1,27 @@
 #include "hnbpch.h"
+
+#if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Layer/ImGui/ImGuiLayer.h"
 #include "Engine/Core/Application.h"
+#include "Engine/Renderer/DX11/DX11Context.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <backends/imgui_impl_dx11.h>
 #include <ImGuizmo.h>
+
 #include <GLFW/glfw3.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_NATIVE_INCLUDE_NONE
+#include <GLFW/glfw3native.h>
 
 namespace Hanabi
 {
-	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
+	ImGuiLayerDX11::ImGuiLayerDX11() : ImGuiLayer("ImGuiLayerDX11")
 	{}
 
-	void ImGuiLayer::OnAttach()
+	void ImGuiLayerDX11::OnAttach()
 	{
 		HNB_PROFILE_FUNCTION();
 
@@ -49,20 +56,20 @@ namespace Hanabi
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
 		// Setup Platform/Renderer bindings
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init("#version 410");
+		ImGui_ImplGlfw_InitForOther(window, true);
+		ImGui_ImplDX11_Init(DX11Context::GetDevice().Get(), DX11Context::GetDeviceContext().Get());
 	}
 
-	void ImGuiLayer::OnDetach()
+	void ImGuiLayerDX11::OnDetach()
 	{
-		HNB_PROFILE_FUNCTION(); 
+		HNB_PROFILE_FUNCTION();
 
-		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::OnEvent(Event& e)
+	void ImGuiLayerDX11::OnEvent(Event& e)
 	{
 		if (m_BlockEvents)
 		{
@@ -72,19 +79,19 @@ namespace Hanabi
 		}
 	}
 
-	void ImGuiLayer::Begin()
+	void ImGuiLayerDX11::Begin()
 	{
-		HNB_PROFILE_FUNCTION(); 
+		HNB_PROFILE_FUNCTION();
 
-		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		ImGuizmo::BeginFrame();
 	}
 
-	void ImGuiLayer::End()
+	void ImGuiLayerDX11::End()
 	{
-		HNB_PROFILE_FUNCTION(); 
+		HNB_PROFILE_FUNCTION();
 
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
@@ -92,18 +99,16 @@ namespace Hanabi
 
 		// Rendering
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			GLFWwindow* backup_current_context = glfwGetCurrentContext();
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
 
-	void ImGuiLayer::SetDarkThemeColors()
+	void ImGuiLayerDX11::SetDarkThemeColors()
 	{
 		auto& colors = ImGui::GetStyle().Colors;
 		colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
@@ -136,3 +141,4 @@ namespace Hanabi
 		colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 	}
 }
+#endif

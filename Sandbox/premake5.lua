@@ -19,6 +19,7 @@ project "Sandbox"
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.entt}"
 	}
 

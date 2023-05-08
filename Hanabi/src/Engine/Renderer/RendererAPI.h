@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Renderer/VertexArray.h"
+
 #include <glm/glm.hpp>
 
 namespace Hanabi
@@ -20,6 +21,7 @@ namespace Hanabi
 		virtual void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) = 0;
 		virtual void SetLineWidth(float width) = 0;
 		static API GetAPI() { return s_API; }
+		static void SetAPI(API api) { s_API = api; };
 		static Scope<RendererAPI> Create();
 	private:
 		static API s_API;

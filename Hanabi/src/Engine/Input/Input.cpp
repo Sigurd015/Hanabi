@@ -1,6 +1,4 @@
 #include "hnbpch.h"
-
-#ifdef HNB_PLATFORM_WINDOWS
 #include "Engine/Input/Input.h"
 #include "Engine/Core/Application.H"
 
@@ -28,4 +26,3 @@ namespace Hanabi
 		return { x,y };
 	}
 }
-#endif

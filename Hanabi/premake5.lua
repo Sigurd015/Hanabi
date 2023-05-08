@@ -57,6 +57,12 @@ project "Hanabi"
 	filter "system:windows"
 		systemversion "latest"
 		
+		links
+		{
+			"d3d11.lib",
+			"D3DCompiler.lib"
+		}
+		
 		defines
 		{
 			"HNB_PLATFORM_WINDOWS"

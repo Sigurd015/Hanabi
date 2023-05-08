@@ -3,7 +3,6 @@
 #include "Engine/Input/KeyCodes.h"
 #include <glm/glm.hpp>
 
-
 namespace Hanabi
 {
 	class Input

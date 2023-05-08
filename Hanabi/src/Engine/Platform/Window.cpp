@@ -1,7 +1,5 @@
 #include "hnbpch.h"
-
-#ifdef HNB_PLATFORM_WINDOWS
-#include "WindowsWnd.h"
+#include "Window.h"
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
@@ -12,7 +10,7 @@ namespace Hanabi
 {
 	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return CreateScope<WindowsWnd>(props);
+		return CreateScope<Window>(props);
 	}
 
 	static uint8_t s_GLFWWindowCount = 0;
@@ -22,21 +20,21 @@ namespace Hanabi
 		HNB_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	WindowsWnd::WindowsWnd(const WindowProps& props) :m_Data(props)
+	Window::Window(const WindowProps& props) :m_Data(props)
 	{
 		HNB_PROFILE_FUNCTION();
 
 		Init();
 	}
 
-	WindowsWnd::~WindowsWnd()
+	Window::~Window()
 	{
 		HNB_PROFILE_FUNCTION();
 
 		Shutdown();
 	}
 
-	void WindowsWnd::OnUpdate()
+	void Window::OnUpdate()
 	{
 		HNB_PROFILE_FUNCTION();
 
@@ -44,17 +42,22 @@ namespace Hanabi
 		m_Context->SwapBuffer(m_Data.VSync);
 	}
 
-	void WindowsWnd::SetVSync(bool enable)
+	void Window::SetWindowTitle(const std::string& title)
+	{
+		glfwSetWindowTitle(m_Window, (m_Data.Title + title).c_str());
+	}
+
+	void Window::SetVSync(bool enable)
 	{
 		m_Data.VSync = enable;
 	}
 
-	bool WindowsWnd::IsVSync() const
+	bool Window::IsVSync() const
 	{
 		return m_Data.VSync;
 	}
 
-	void WindowsWnd::Init()
+	void Window::Init()
 	{
 		HNB_PROFILE_FUNCTION();
 
@@ -80,6 +83,18 @@ namespace Hanabi
 		}
 
 		m_Context = RenderingContext::Create(m_Window);
+
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGL:
+			m_Data.Title += "(OpenGL)";
+			glfwSetWindowTitle(m_Window, m_Data.Title.c_str());
+			break;
+		case RendererAPI::API::DX11:
+			m_Data.Title += "(DX11)";
+			glfwSetWindowTitle(m_Window, m_Data.Title.c_str());
+			break;
+		}
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 
@@ -170,7 +185,7 @@ namespace Hanabi
 			});
 	}
 
-	void WindowsWnd::Shutdown()
+	void Window::Shutdown()
 	{
 		HNB_PROFILE_FUNCTION();
 
@@ -182,4 +197,3 @@ namespace Hanabi
 		}
 	}
 }
-#endif

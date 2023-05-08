@@ -1,7 +1,11 @@
 #include "hnbpch.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Utils/PlatformUtils.h"
+#include "Engine/Platform/Window.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Hanabi
 {
@@ -22,7 +26,7 @@ namespace Hanabi
 
 		Renderer::Init();
 
-		m_ImGuiLayer = new ImGuiLayer();
+		m_ImGuiLayer = ImGuiLayer::Create();;
 		PushOverlay(m_ImGuiLayer);
 	}
 
@@ -73,7 +77,7 @@ namespace Hanabi
 		{
 			HNB_PROFILE_SCOPE("RunLoop");
 
-			float time = Time::GetTime();
+			float time = glfwGetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
