@@ -9,9 +9,9 @@
 #include <iostream>
 #include <Windows.h>
 #include <comdef.h>
-#define HNB_DX_ASSERT(x) {if(FAILED(x)){_com_error err(x);LPCTSTR errMsg = err.ErrorMessage();	HNB_DEBUGBREAK();}}
+#define HNB_CORE_DX_ASSERT(x) {if(FAILED(x)){_com_error err(x);LPCTSTR errMsg = err.ErrorMessage();HNB_DEBUGBREAK();}}
 #else
-#define HNB_DX_ASSERT(x)
+#define HNB_CORE_DX_ASSERT(x)
 #endif
 #define HNB_ENABLE_ASSERTS
 #else
@@ -62,5 +62,4 @@ namespace Hanabi
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 }
-
 #include "Engine/Core/Log.h"

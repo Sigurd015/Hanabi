@@ -16,7 +16,7 @@ namespace Hanabi
 		bufferDesc.CPUAccessFlags = cpuAccess;
 		bufferDesc.MiscFlags = 0;
 		bufferDesc.StructureByteStride = stride;
-		DX11Context::GetDevice()->CreateBuffer(&bufferDesc, pInitialData, ppBuffer);
+		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateBuffer(&bufferDesc, pInitialData, ppBuffer));
 	}
 
 	//-------------
@@ -55,7 +55,7 @@ namespace Hanabi
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-		DX11Context::GetDeviceContext()->Map(m_VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(m_VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 		memcpy(mappedResource.pData, data, size);
 		DX11Context::GetDeviceContext()->Unmap(m_VertexBuffer.Get(), 0);
 	}

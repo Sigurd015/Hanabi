@@ -1,6 +1,6 @@
 #include "hnbpch.h"
 
-#ifdef HNB_PLATFORM_WINDOWS
+#if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Utils/PlatformUtils.h"
 #include "Engine/Core/Application.h"
 

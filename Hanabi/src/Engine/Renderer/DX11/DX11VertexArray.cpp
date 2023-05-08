@@ -77,9 +77,9 @@ namespace Hanabi
 		}
 
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
-		DX11Context::GetDevice()->CreateInputLayout(
+		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateInputLayout(
 			&temp[0], (UINT)temp.size(), vertexShader->GetVertextBufferPointer(),
-			vertexShader->GetVertextBufferSize(), inputLayout.GetAddressOf());
+			vertexShader->GetVertextBufferSize(), inputLayout.GetAddressOf()));
 		DX11Context::GetDeviceContext()->IASetInputLayout(inputLayout.Get());
 		m_VertexBuffers.push_back(vertexBuffer);
 	}

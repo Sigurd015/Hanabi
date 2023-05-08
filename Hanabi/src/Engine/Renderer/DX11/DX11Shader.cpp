@@ -91,19 +91,19 @@ namespace Hanabi
 			{
 			case Hanabi::VERTEX_SHADER:
 			{
-				D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
-					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, m_VertexShaderBlob.GetAddressOf(), nullptr);
-				DX11Context::GetDevice()->CreateVertexShader(m_VertexShaderBlob->GetBufferPointer(),
-					m_VertexShaderBlob->GetBufferSize(), nullptr, m_VertexShader.GetAddressOf());
+				HNB_CORE_DX_ASSERT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
+					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
+				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateVertexShader(m_VertexShaderBlob->GetBufferPointer(),
+					m_VertexShaderBlob->GetBufferSize(), nullptr, m_VertexShader.GetAddressOf()));
 				break;
 			}
 			case Hanabi::PIXEL_SHADER:
 			{
 				Microsoft::WRL::ComPtr<ID3DBlob> blob;
-				D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
-					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, blob.ReleaseAndGetAddressOf(), nullptr);
-				DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
-					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf());
+				HNB_CORE_DX_ASSERT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
+					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, blob.ReleaseAndGetAddressOf(), nullptr));
+				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
+					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf()));
 				break;
 			}
 			case Hanabi::UNKNOWN:
