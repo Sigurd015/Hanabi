@@ -65,7 +65,9 @@ project "Hanabi"
 		
 		defines
 		{
-			"HNB_PLATFORM_WINDOWS"
+			"HNB_PLATFORM_WINDOWS",
+			"GLFW_EXPOSE_NATIVE_WIN32",
+			"GLFW_NATIVE_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"

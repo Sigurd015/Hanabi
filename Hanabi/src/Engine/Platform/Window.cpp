@@ -6,6 +6,10 @@
 #include "Engine/Renderer/RenderingContext.h"
 #include "Engine/Renderer/RendererAPI.h"
 
+#if defined(HNB_PLATFORM_WINDOWS)
+#include <GLFW/glfw3native.h>
+#endif
+
 namespace Hanabi
 {
 	Scope<Window> Window::Create(const WindowProps& props)
@@ -73,27 +77,44 @@ namespace Hanabi
 		}
 		{
 			HNB_PROFILE_SCOPE("glfwCreateWindow");
+
+			switch (RendererAPI::GetAPI())
+			{
+			case RendererAPI::API::OpenGL:
 #if defined(HNB_DEBUG)
-			if (RendererAPI::GetAPI() == RendererAPI::API::OpenGL)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
+				m_Data.Title += "(OpenGL)";
+				break;
+
+#if defined(HNB_PLATFORM_WINDOWS)
+			case RendererAPI::API::DX11:
+				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+				m_Data.Title += "(DX11)";
+				break;
+#endif
+			}
 
 			m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 			++s_GLFWWindowCount;
 		}
-
-		m_Context = RenderingContext::Create(m_Window);
-
-		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
-			m_Data.Title += "(OpenGL)";
-			glfwSetWindowTitle(m_Window, m_Data.Title.c_str());
-			break;
-		case RendererAPI::API::DX11:
-			m_Data.Title += "(DX11)";
-			glfwSetWindowTitle(m_Window, m_Data.Title.c_str());
-			break;
+			HNB_PROFILE_SCOPE("RenderingContext Init");
+
+			switch (RendererAPI::GetAPI())
+			{
+			case RendererAPI::API::OpenGL:
+				m_Context = RenderingContext::Create(m_Window);
+				m_Data.Title += "(OpenGL)";
+				break;
+
+#if defined(HNB_PLATFORM_WINDOWS)
+			case RendererAPI::API::DX11:
+				HWND winWnd = glfwGetWin32Window(m_Window);
+				m_Context = RenderingContext::Create(&winWnd);
+				break;
+#endif
+			}
 		}
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);

@@ -28,11 +28,6 @@
 #include "Engine/Renderer/DX11/DX11VertexArray.h"
 #include "Engine/Renderer/DX11/DX11Framebuffer.h"
 #include "Engine/Renderer/DX11/DX11ConstantBuffer.h"
-
-#define GLFW_EXPOSE_NATIVE_WIN32
-#define GLFW_NATIVE_INCLUDE_NONE
-#include <GLFW/glfw3native.h>
-
 #endif
 
 namespace Hanabi
@@ -73,8 +68,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPI::API::DX11:
-			HWND winWnd = glfwGetWin32Window(static_cast<GLFWwindow*>(window));
-			return CreateScope<DX11Context>(static_cast<HWND*>(&winWnd));
+			return CreateScope<DX11Context>(static_cast<HWND*>(window));
 #endif
 		}
 
