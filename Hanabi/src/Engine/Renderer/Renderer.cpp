@@ -13,7 +13,7 @@ namespace Hanabi
 		HNB_PROFILE_FUNCTION();
 
 		RenderCommand::Init();
-		//Renderer2D::Init();
+		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()

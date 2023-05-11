@@ -115,7 +115,7 @@ namespace Hanabi
 			{ ShaderDataType::Float,  "a_TilingFactor" },
 			{ ShaderDataType::Int,    "a_EntityID"     }
 			});
-		s_Data.QuadShader = Shader::Create("assets/shaders/Renderer2D_Quad.glsl");
+		s_Data.QuadShader = Shader::Create("Renderer2D_Quad");
 		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer, s_Data.QuadShader);
 		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
 		//IndexBuffer
@@ -152,7 +152,7 @@ namespace Hanabi
 			{ ShaderDataType::Float,  "a_Fade"          },
 			{ ShaderDataType::Int,    "a_EntityID"      }
 			});
-		s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
+		s_Data.CircleShader = Shader::Create("Renderer2D_Circle");
 		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer, s_Data.CircleShader);
 		s_Data.CircleVertexArray->SetIndexBuffer(quadIB); // Use quad IB
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
@@ -166,7 +166,7 @@ namespace Hanabi
 			{ ShaderDataType::Float4, "a_Color"    },
 			{ ShaderDataType::Int,    "a_EntityID" }
 			});
-		s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
+		s_Data.LineShader = Shader::Create("Renderer2D_Line");
 		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer, s_Data.LineShader);
 		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
 

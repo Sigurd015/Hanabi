@@ -21,7 +21,7 @@ namespace Hanabi
 
 	DX11Shader::DX11Shader(const std::string& filepath)
 	{
-		std::string source = ReadFile(filepath);
+		std::string source = ReadFile("assets/shaders/DX11/" + filepath + ".hlsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
 

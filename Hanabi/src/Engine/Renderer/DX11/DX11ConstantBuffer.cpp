@@ -22,7 +22,7 @@ namespace Hanabi
 
 	DX11ConstantBuffer::~DX11ConstantBuffer()
 	{
-
+		m_ConstantBuffer.Reset();
 	}
 
 	void DX11ConstantBuffer::SetData(const void* data, uint32_t size, uint32_t offset)

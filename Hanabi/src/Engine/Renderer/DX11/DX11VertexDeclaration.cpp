@@ -1,7 +1,7 @@
 #include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
-#include "Engine/Renderer/DX11/DX11VertexArray.h"
+#include "Engine/Renderer/DX11/DX11VertexDeclaration.h"
 #include "Engine/Renderer/DX11/DX11Shader.h"
 #include "Engine/Renderer/DX11/DX11Context.h"
 
@@ -28,19 +28,19 @@ namespace Hanabi
 		return DXGI_FORMAT_UNKNOWN;
 	}
 
-	DX11VertexArray::DX11VertexArray()
+	DX11VertexDeclaration::DX11VertexDeclaration()
 	{}
 
-	DX11VertexArray::~DX11VertexArray()
+	DX11VertexDeclaration::~DX11VertexDeclaration()
 	{}
 
-	void DX11VertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	void DX11VertexDeclaration::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
 		indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;
 	}
 
-	void DX11VertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
+	void DX11VertexDeclaration::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
 	{
 		vertexBuffer->Bind();
 		DX11Shader* vertexShader = (DX11Shader*)shader.get();
@@ -84,12 +84,12 @@ namespace Hanabi
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
-	void DX11VertexArray::Bind() const
+	void DX11VertexDeclaration::Bind() const
 	{
 
 	}
 
-	void DX11VertexArray::Unbind() const
+	void DX11VertexDeclaration::Unbind() const
 	{
 
 	}

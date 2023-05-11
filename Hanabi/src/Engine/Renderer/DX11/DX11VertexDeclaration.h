@@ -4,11 +4,11 @@
 
 namespace Hanabi
 {
-	class DX11VertexArray : public VertexArray
+	class DX11VertexDeclaration : public VertexArray
 	{
 	public:
-		DX11VertexArray();
-		~DX11VertexArray();
+		DX11VertexDeclaration();
+		~DX11VertexDeclaration();
 		void Bind() const override;
 		void Unbind() const override;
 		void AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader) override;

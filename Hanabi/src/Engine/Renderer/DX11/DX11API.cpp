@@ -7,8 +7,12 @@
 
 namespace Hanabi
 {
+	DX11RendererAPI* DX11RendererAPI::s_Instance = nullptr;
+
 	void DX11RendererAPI::Init()
 	{
+		s_Instance = this;
+
 		m_DeviceContext = DX11Context::GetDeviceContext();
 		m_Device = DX11Context::GetDevice();
 		m_SwapChain = DX11Context::GetSwapChain();
@@ -18,13 +22,28 @@ namespace Hanabi
 
 	void DX11RendererAPI::SetClearColor(const glm::vec4& color)
 	{
-		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &color.x);
+		m_ClearColor = color;
 	}
 
 	void DX11RendererAPI::Clear()
 	{
-		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
-		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+		if (m_RenderToBackbuffer)
+		{
+			m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
+			m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+			m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
+		}
+	}
+
+	void DX11RendererAPI::SetAttachments(bool renderToBackbuffer)
+	{
+		m_RenderToBackbuffer = renderToBackbuffer;
+	}
+
+	void DX11RendererAPI::ReSetAttachments()
+	{
+		m_RenderToBackbuffer = true;
+		Clear();
 	}
 
 	void DX11RendererAPI::SetBuffer(uint32_t width, uint32_t height, uint32_t x, uint32_t y)

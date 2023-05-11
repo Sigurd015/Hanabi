@@ -25,7 +25,7 @@
 #include "Engine/Renderer/DX11/DX11Context.h"
 #include "Engine/Renderer/DX11/DX11Shader.h"
 #include "Engine/Renderer/DX11/DX11Texture.h"
-#include "Engine/Renderer/DX11/DX11VertexArray.h"
+#include "Engine/Renderer/DX11/DX11VertexDeclaration.h"
 #include "Engine/Renderer/DX11/DX11Framebuffer.h"
 #include "Engine/Renderer/DX11/DX11ConstantBuffer.h"
 #endif
@@ -34,7 +34,7 @@ namespace Hanabi
 {
 	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
 
-	RendererAPI::API RendererAPI::s_API = RendererAPI::API::DX11;
+	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
@@ -107,7 +107,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPI::API::DX11:
-			return CreateScope<DX11VertexArray>();
+			return CreateScope<DX11VertexDeclaration>();
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

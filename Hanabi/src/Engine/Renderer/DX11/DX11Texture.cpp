@@ -80,7 +80,11 @@ namespace Hanabi
 	}
 
 	DX11Texture2D::~DX11Texture2D()
-	{}
+	{
+		m_Texture.Reset();
+		m_TextureView.Reset();
+		m_SamplerState.Reset();
+	}
 
 	void DX11Texture2D::SetData(void* data, uint32_t size)
 	{

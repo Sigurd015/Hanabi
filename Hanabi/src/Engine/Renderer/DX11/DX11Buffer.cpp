@@ -37,7 +37,7 @@ namespace Hanabi
 
 	DX11VertexBuffer::~DX11VertexBuffer()
 	{
-
+		m_VertexBuffer.Reset();
 	}
 
 	void DX11VertexBuffer::Bind() const
@@ -73,7 +73,7 @@ namespace Hanabi
 
 	DX11IndexBuffer::~DX11IndexBuffer()
 	{
-
+		m_IndexBuffer.Reset();
 	}
 
 	void DX11IndexBuffer::Bind() const
