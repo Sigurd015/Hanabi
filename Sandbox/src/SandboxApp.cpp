@@ -6,111 +6,58 @@
 
 #include <imgui.h>
 
-struct Vertex
-{
-	glm::vec3 Pos;
-};
-
-Vertex vertices[] =
-{
-	{ glm::vec3(-1.0f, -1.0f, -1.0f)},
-	{ glm::vec3(-1.0f, 1.0f, -1.0f)},
-	{ glm::vec3(1.0f, 1.0f, -1.0f) },
-	{ glm::vec3(1.0f, -1.0f, -1.0f)},
-	{ glm::vec3(-1.0f, -1.0f, 1.0f)},
-	{ glm::vec3(-1.0f, 1.0f, 1.0f)},
-	{ glm::vec3(1.0f, 1.0f, 1.0f) },
-	{ glm::vec3(1.0f, -1.0f, 1.0f)}
-};
-
-uint32_t indices[] =
-{
-  0, 1, 2,
-  2, 3, 0,
-  4, 5, 1,
-  1, 0, 4,
-  1, 5, 6,
-  6, 2, 1,
-  7, 6, 5,
-  5, 4, 7,
-  3, 2, 6,
-  6, 7, 3,
-  4, 0, 3,
-  3, 7, 4
-};
-
-struct ConstantBuffer
-{
-	glm::mat4 World;
-	glm::mat4 View;
-	glm::mat4 Proj;
-	glm::vec4 Color;
-};
-
-
 class ExampleLayer :public Hanabi::Layer
 {
 private:
-	Hanabi::Ref<Hanabi::VertexArray> m_VertexArray;
-	Hanabi::Ref<Hanabi::VertexBuffer>	m_VertexBuffer;
-	Hanabi::Ref<Hanabi::IndexBuffer>	m_IndexBuffer;
-	Hanabi::Ref<Hanabi::UniformBuffer> m_UniformBuffer;
-	Hanabi::Ref<Hanabi::Texture2D> m_Texture;
-	Hanabi::Ref<Hanabi::Shader>	m_Shader;
-	ConstantBuffer m_ConstantBuffer = {};
-	float Phi, Theta, Scale, Tx, Ty;
-	glm::vec4 color = { 0.3f,0.3f,0.3f,1.0f };
+	glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
+	glm::vec2 m_ViewportBounds[2];
+	Hanabi::Ref<Hanabi::Framebuffer> m_Framebuffer;
+	Hanabi::EditorCamera m_EditorCamera;
 public:
 	ExampleLayer() :Layer("ExampleLayer") {}
 	~ExampleLayer() {}
 	void OnAttach() override
 	{
-		m_VertexArray = Hanabi::VertexArray::Create();
-		m_VertexBuffer = Hanabi::VertexBuffer::Create(60 * sizeof(Vertex));
-		m_VertexBuffer->SetLayout({
-				{ Hanabi::ShaderDataType::Float3, "Position" },
-				/*			{ Hanabi::ShaderDataType::Float4, "Color"    },*/
-							/*{ Hanabi::ShaderDataType::Float2, "TexCoord" },*/
-			});
-		m_Shader = Hanabi::Shader::Create("assets/shaders/dx11/TestShader.hlsl");
-		m_VertexArray->AddVertexBuffer(m_VertexBuffer, m_Shader);
-		m_IndexBuffer = Hanabi::IndexBuffer::Create(indices, (uint32_t)std::size(indices));
-		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
-
-		m_VertexBuffer->SetData(vertices, sizeof(vertices));
-		m_UniformBuffer = Hanabi::UniformBuffer::Create(sizeof(ConstantBuffer), 0);
-
-		//m_Texture = Hanabi::Texture2D::Create("assets/textures/Checkerboard.png");
-		/*	m_WhiteTexture = Hanabi::Texture2D::Create(1,1);
-			uint32_t whiteTextureData = 0xffffffff;
-			m_WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));*/
-
-		m_ConstantBuffer.World = glm::mat4(1.0f);    
-		m_ConstantBuffer.View = glm::transpose(glm::lookAtLH(
-			glm::vec3(0.0f, 0.0f, -5.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f)));
-		m_ConstantBuffer.Proj = glm::transpose(glm::perspectiveFovLH(1.570796327f, 1920.0f, 1080.0f, 1.0f, 1000.0f));
-		Tx = Ty = Phi = Theta = 0.0f;
-		Scale = 1.0f;
-		m_ConstantBuffer.Color = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		Hanabi::FramebufferSpecification fbSpec;
+		fbSpec.Attachments = { Hanabi::FramebufferTextureFormat::RGBA8, Hanabi::FramebufferTextureFormat::RED_INTEGER ,Hanabi::FramebufferTextureFormat::Depth };
+		fbSpec.Width = 1920;
+		fbSpec.Height = 1080;
+		m_Framebuffer = Hanabi::Framebuffer::Create(fbSpec);
 	}
 	void OnDetach() override {}
 	void OnUpdate(Hanabi::Timestep ts)override
 	{
-		Hanabi::RenderCommand::SetClearColor(color);
+		// Resize
+		if (Hanabi::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		}
+
+		m_EditorCamera.OnUpdate(ts);
+
+		m_Framebuffer->Bind();
+		Hanabi::RenderCommand::SetClearColor({ 0.3f,0.3f,0.3f,1.0f });
 		Hanabi::RenderCommand::Clear();
+		m_Framebuffer->ClearAttachment(1, -1);
 
-		m_ConstantBuffer.World = glm::transpose(glm::scale(glm::mat4(1.0f), glm::vec3(Scale)) *
-			glm::rotate(glm::mat4(1.0f), Phi, glm::vec3(1.0f, 0, 0)) * glm::rotate(glm::mat4(1.0f), Theta, glm::vec3(0, 1.0f, 0)) *
-			glm::translate(glm::mat4(1.0f), glm::vec3(Tx, Ty, 0.0f)));
+		Hanabi::Renderer2D::ResetStats();
+		Hanabi::Renderer2D::BeginScene(m_EditorCamera);
+		for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		{
+			for (float x = -5.0f; x < 5.0f; x += 0.5f)
+			{
+				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+				Hanabi::Renderer2D::DrawQuad(glm::translate(glm::mat4(1.0f), { x * 2.5f,y * 2.5f,1.0f }), color);
+			}
+		}
+		Hanabi::Renderer2D::EndScene();
 
-		m_UniformBuffer->SetData(&m_ConstantBuffer, sizeof(ConstantBuffer));
+		m_Framebuffer->Unbind();
 
-		//m_Texture->Bind(1);
-
-		Hanabi::Renderer::Submit(m_Shader, m_VertexArray, glm::mat4(1.0f));
-
+		//Hanabi_INFO("Timestep:",ts);
 		//HNB_INFO("Time Step:{0}", ts);
 	}
 
@@ -127,21 +74,70 @@ public:
 	}
 	void OnImGuiRender()override
 	{
-		if (ImGui::Begin("Tools"))
-		{
-			if (ImGui::Button("Reset Params"))
-			{
-				Tx = Ty = Phi = Theta = 0.0f;
-				Scale = 1.0f;
-			}
-			ImGui::SliderFloat("Scale", &Scale, 0.2f, 2.0f);
+		static bool dockspaceOpen = true;
+		static bool opt_fullscreen_persistant = true;
+		bool opt_fullscreen = opt_fullscreen_persistant;
+		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
 
-			ImGui::Text("Phi: %.2f degrees", glm::degrees(Phi));
-			ImGui::SliderFloat("##1", &Phi, -3.1415926f, 3.1415926f, "");
-			ImGui::Text("Theta: %.2f degrees", glm::degrees(Theta));
-			ImGui::SliderFloat("##2", &Theta, -3.1415926f, 3.1415926f, "");
-			ImGui::ColorEdit4("Color:", &m_ConstantBuffer.Color.x);
+		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+		// because it would be confusing to have two docking targets within each others.
+		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+		if (opt_fullscreen)
+		{
+			ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGui::SetNextWindowPos(viewport->Pos);
+			ImGui::SetNextWindowSize(viewport->Size);
+			ImGui::SetNextWindowViewport(viewport->ID);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 		}
+
+		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
+		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+			window_flags |= ImGuiWindowFlags_NoBackground;
+
+		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
+		// all active windows docked into it will lose their parent and become undocked.
+		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
+		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		ImGui::PopStyleVar();
+
+		if (opt_fullscreen)
+			ImGui::PopStyleVar(2);
+
+		// DockSpace
+		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float minWinSizeX = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
+		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+		{
+			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+		}
+		style.WindowMinSize.x = minWinSizeX;
+
+		ImGui::Begin("Settings");
+		auto stats = Hanabi::Renderer2D::GetStats();
+		ImGui::Text("Renderer2D Stats:");
+		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+		ImGui::Text("Quads: %d", stats.QuadCount);
+		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+		ImGui::End();
+
+		ImGui::Begin("Viewport");
+
+		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+		ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		ImGui::End();
 		ImGui::End();
 	}
 

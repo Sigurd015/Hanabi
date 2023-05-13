@@ -6,6 +6,8 @@
 
 namespace Hanabi
 {
+	uint32_t DX11VertexBuffer::m_RendererID = 0;
+
 	void CreateBuffer(D3D11_BIND_FLAG bindFlag, uint32_t size, D3D11_USAGE usage, int cpuAccess, uint32_t stride,
 		D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer)
 	{
@@ -43,7 +45,7 @@ namespace Hanabi
 	void DX11VertexBuffer::Bind() const
 	{
 		const UINT offset = 0;
-		DX11Context::GetDeviceContext()->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &m_Stride, &offset);
+		DX11Context::GetDeviceContext()->IASetVertexBuffers(m_RendererID++, 1, m_VertexBuffer.GetAddressOf(), &m_Stride, &offset);
 	}
 
 	void DX11VertexBuffer::Unbind() const
@@ -66,9 +68,14 @@ namespace Hanabi
 
 	DX11IndexBuffer::DX11IndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count)
 	{
+		// Flip the index order to match DirectX 11
+		for (size_t i = 0; i < count; i += 3)
+		{
+			std::swap(indices[i], indices[i + 2]);
+		}
 		D3D11_SUBRESOURCE_DATA resourceData = {};
 		resourceData.pSysMem = indices;
-		CreateBuffer(D3D11_BIND_INDEX_BUFFER, count * sizeof(uint32_t), D3D11_USAGE_DEFAULT, 0, 0, &resourceData, m_IndexBuffer.GetAddressOf());
+		CreateBuffer(D3D11_BIND_INDEX_BUFFER, count * sizeof(uint32_t), D3D11_USAGE_IMMUTABLE, 0, 0, &resourceData, m_IndexBuffer.GetAddressOf());
 	}
 
 	DX11IndexBuffer::~DX11IndexBuffer()

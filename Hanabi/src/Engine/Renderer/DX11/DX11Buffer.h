@@ -21,6 +21,7 @@ namespace Hanabi
 	private:
 		uint32_t m_Stride = 0;
 		BufferLayout m_Layout;
+		static uint32_t m_RendererID;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_VertexBuffer;
 	};
 

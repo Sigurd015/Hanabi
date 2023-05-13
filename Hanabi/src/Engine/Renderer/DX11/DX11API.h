@@ -21,8 +21,8 @@ namespace Hanabi
 		void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;
 		void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) override;
 		void SetLineWidth(float width) override;
-		void DX11RendererAPI::SetAttachments(bool renderToBackbuffer = false);
-		void ReSetAttachments();
+		static void DX11RendererAPI::SetAttachments(bool renderToBackbuffer = false) { s_Instance->m_RenderToBackbuffer = renderToBackbuffer; }
+		static void ReSetAttachments() { s_Instance->m_RenderToBackbuffer = true; s_Instance->Clear(); }
 		static const glm::vec4& GetClearColor() { return s_Instance->m_ClearColor; }
 		static DX11RendererAPI* Get() { return s_Instance; }
 	private:

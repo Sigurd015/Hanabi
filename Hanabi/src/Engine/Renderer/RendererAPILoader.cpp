@@ -34,7 +34,7 @@ namespace Hanabi
 {
 	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
 
-	RendererAPI::API RendererAPI::s_API = RendererAPI::API::OpenGL;
+	RendererAPI::API RendererAPI::s_API = RendererAPI::API::DX11;
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{

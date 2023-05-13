@@ -40,7 +40,6 @@ namespace Hanabi
 	/*	shader->SetUniform("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
 		shader->SetUniform("u_Transform", transform);*/
 
-		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);
 	}
 }

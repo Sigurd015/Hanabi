@@ -35,17 +35,6 @@ namespace Hanabi
 		}
 	}
 
-	void DX11RendererAPI::SetAttachments(bool renderToBackbuffer)
-	{
-		m_RenderToBackbuffer = renderToBackbuffer;
-	}
-
-	void DX11RendererAPI::ReSetAttachments()
-	{
-		m_RenderToBackbuffer = true;
-		Clear();
-	}
-
 	void DX11RendererAPI::SetBuffer(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 	{
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
@@ -89,12 +78,17 @@ namespace Hanabi
 
 	void DX11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
+		vertexArray->Bind();
 		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		m_DeviceContext->DrawIndexed(count, 0, 0);
 	}
 	void DX11RendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
-	{}
+	{
+		vertexArray->Bind();
+		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		m_DeviceContext->DrawIndexed(vertexCount, 0, 0);
+	}
 	void DX11RendererAPI::SetLineWidth(float width)
 	{}
 }

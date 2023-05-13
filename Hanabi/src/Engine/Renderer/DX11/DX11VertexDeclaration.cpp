@@ -6,11 +6,10 @@
 #include "Engine/Renderer/DX11/DX11Context.h"
 
 #include <vector>
-#include <d3d11.h>
 
 namespace Hanabi
 {
-	static DXGI_FORMAT ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
+	static DXGI_FORMAT ShaderDataTypeToDX11BaseType(ShaderDataType type)
 	{
 		switch (type)
 		{
@@ -20,10 +19,10 @@ namespace Hanabi
 		case ShaderDataType::Float4:   return DXGI_FORMAT_R32G32B32A32_FLOAT;
 		case ShaderDataType::Mat3:     return DXGI_FORMAT_R32G32B32_FLOAT;
 		case ShaderDataType::Mat4:     return DXGI_FORMAT_R32G32B32A32_FLOAT;
-		case ShaderDataType::Int:      return DXGI_FORMAT_R32_UINT;
-		case ShaderDataType::Int2:     return DXGI_FORMAT_R32G32_UINT;
-		case ShaderDataType::Int3:     return DXGI_FORMAT_R32G32B32_UINT;
-		case ShaderDataType::Int4:     return DXGI_FORMAT_R32G32B32A32_UINT;
+		case ShaderDataType::Int:      return DXGI_FORMAT_R32_SINT;
+		case ShaderDataType::Int2:     return DXGI_FORMAT_R32G32_SINT;
+		case ShaderDataType::Int3:     return DXGI_FORMAT_R32G32B32_SINT;
+		case ShaderDataType::Int4:     return DXGI_FORMAT_R32G32B32A32_SINT;
 		}
 		return DXGI_FORMAT_UNKNOWN;
 	}
@@ -48,45 +47,21 @@ namespace Hanabi
 		std::vector<D3D11_INPUT_ELEMENT_DESC> temp;
 		for (const auto& element : layout)
 		{
-			switch (element.Type)
-			{
-			case ShaderDataType::Float:
-			case ShaderDataType::Float2:
-			case ShaderDataType::Float3:
-			case ShaderDataType::Float4:
-			{
-				temp.push_back(D3D11_INPUT_ELEMENT_DESC{
-						element.Name.c_str(),0,ShaderDataTypeToOpenGLBaseType(element.Type),
-						0,(UINT)element.Offset ,D3D11_INPUT_PER_VERTEX_DATA ,0 });
-				m_VertexBufferIndex++;
-				break;
-			}
-			case ShaderDataType::Int:
-			case ShaderDataType::Int2:
-			case ShaderDataType::Int3:
-			case ShaderDataType::Int4:
-			case ShaderDataType::Bool:
-			case ShaderDataType::Mat3:
-			case ShaderDataType::Mat4:
-			{
-				break;
-			}
-			default:
-				break;
-			}
+			temp.push_back(D3D11_INPUT_ELEMENT_DESC{
+				element.Name.c_str(),0,ShaderDataTypeToDX11BaseType(element.Type),
+				0,(UINT)element.Offset ,D3D11_INPUT_PER_VERTEX_DATA ,0 });
+			m_VertexBufferIndex++;
 		}
 
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateInputLayout(
 			&temp[0], (UINT)temp.size(), vertexShader->GetVertextBufferPointer(),
-			vertexShader->GetVertextBufferSize(), inputLayout.GetAddressOf()));
-		DX11Context::GetDeviceContext()->IASetInputLayout(inputLayout.Get());
+			vertexShader->GetVertextBufferSize(), m_InputLayout.GetAddressOf()));
 		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
 	void DX11VertexDeclaration::Bind() const
 	{
-
+		DX11Context::GetDeviceContext()->IASetInputLayout(m_InputLayout.Get());
 	}
 
 	void DX11VertexDeclaration::Unbind() const

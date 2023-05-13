@@ -272,7 +272,7 @@ namespace Hanabi
 		}
 		catch (YAML::ParserException e)
 		{
-			HNB_CORE_ERROR("Failed to load .hazel file '{0}'\n     {1}", filepath, e.what());
+			HNB_CORE_ERROR("Failed to load .Hanabi file '{0}'\n     {1}", filepath, e.what());
 			return false;
 		}
 		if (!data["Scene"])
