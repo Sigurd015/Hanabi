@@ -34,7 +34,7 @@ namespace Hanabi
 			{
 			case FramebufferTextureFormat::RGBA8:       return DXGI_FORMAT_R32G32B32A32_FLOAT;
 			case FramebufferTextureFormat::RED_INTEGER: return DXGI_FORMAT_R32_SINT;
-			case FramebufferTextureFormat::DEPTH24STENCIL8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
+			case FramebufferTextureFormat::DEPTH24STENCIL8: return DXGI_FORMAT_R24G8_TYPELESS;
 			}
 
 			return DXGI_FORMAT_UNKNOWN;
@@ -131,7 +131,7 @@ namespace Hanabi
 				shaderResourceDesc.Format = textureDesc.Format;
 				shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 				shaderResourceDesc.Texture2D.MipLevels = 1;
-				DX11Context::GetDevice()->CreateShaderResourceView(texture.Get(), nullptr, shaderResourceView.GetAddressOf());
+				DX11Context::GetDevice()->CreateShaderResourceView(texture.Get(), &shaderResourceDesc, shaderResourceView.GetAddressOf());
 				m_ShaderResourceViews.push_back(shaderResourceView);
 			}
 		}
@@ -145,11 +145,16 @@ namespace Hanabi
 			depthStencilDesc.Format = Utils::FBTextureFormatToDX11(m_DepthAttachmentSpecification.TextureFormat);
 			depthStencilDesc.SampleDesc = Utils::Multisample(m_Specification.Samples, depthStencilDesc.Format);
 			depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 			depthStencilDesc.CPUAccessFlags = 0;
 			depthStencilDesc.MiscFlags = 0;
 			HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilAttachmentsTexture.GetAddressOf()));
-			HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateDepthStencilView(m_DepthStencilAttachmentsTexture.Get(), nullptr, m_DepthStencilAttachment.GetAddressOf()));
+			D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
+			depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			depthStencilViewDesc.Flags = 0;
+			depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			depthStencilViewDesc.Texture2D.MipSlice = 0;
+			HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateDepthStencilView(m_DepthStencilAttachmentsTexture.Get(), &depthStencilViewDesc, m_DepthStencilAttachment.GetAddressOf()));
 		}
 	}
 

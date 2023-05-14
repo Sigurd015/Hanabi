@@ -45,12 +45,14 @@ public:
 
 		Hanabi::Renderer2D::ResetStats();
 		Hanabi::Renderer2D::BeginScene(m_EditorCamera);
+
 		for (float y = -5.0f; y < 5.0f; y += 0.5f)
 		{
 			for (float x = -5.0f; x < 5.0f; x += 0.5f)
 			{
 				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
 				Hanabi::Renderer2D::DrawQuad(glm::translate(glm::mat4(1.0f), { x * 2.5f,y * 2.5f,1.0f }), color);
+				Hanabi::Renderer2D::DrawCircle(glm::translate(glm::mat4(1.0f), { x * 3,y * 3,1.0f }), color);
 			}
 		}
 		Hanabi::Renderer2D::EndScene();
@@ -63,6 +65,7 @@ public:
 
 	void OnEvent(Hanabi::Event& evnet) override
 	{
+		m_EditorCamera.OnEvent(evnet);
 		Hanabi::EventDispatcher dispatcher(evnet);
 		//dispatcher.Dispatch<Hanabi::KeyPressedEvent>(HNB_BIND_EVENT_FN(ExampleLayer::OnKeyPressed));
 		//dispatcher.Dispatch<Hanabi::KeyReleasedEvent>(HNB_BIND_EVENT_FN(ExampleLayer::OnKeyReleased));

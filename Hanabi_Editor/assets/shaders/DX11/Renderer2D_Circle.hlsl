@@ -62,10 +62,10 @@ PixelOutput main(PixelInput Input)
 	
     // Calculate distance and fill circle with white
 	float distance = 1.0f - length(Input.LocalPosition);
-	float circle = smoothstep(0.0, Input.Fade, distance);
+	float circle = smoothstep(0.0f, Input.Fade, distance);
 	circle *= smoothstep(Input.Thickness + Input.Fade, Input.Thickness, distance);
 	
-	if (circle == 0.0)
+	if (circle == 0.0f)
 		discard;
 
     Output.Color = Input.Color;

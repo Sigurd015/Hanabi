@@ -69,14 +69,6 @@ Texture2D u_Textures4   : register(t4);
 SamplerState u_SamplerState4 : register(s4);
 Texture2D u_Textures5   : register(t5);
 SamplerState u_SamplerState5 : register(s5);
-Texture2D u_Textures6   : register(t6);
-SamplerState u_SamplerState6 : register(s6);
-Texture2D u_Textures7   : register(t7);
-SamplerState u_SamplerState7 : register(s7);
-Texture2D u_Textures8   : register(t8);
-SamplerState u_SamplerState8 : register(s8);
-Texture2D u_Textures9   : register(t9);
-SamplerState u_SamplerState9 : register(s9);
 
 PixelOutput main(PixelInput Input)
 {
@@ -96,6 +88,12 @@ PixelOutput main(PixelInput Input)
 	case 3:
 		texColor = u_Textures3.Sample(u_SamplerState3, Input.TexCoord * Input.TilingFactor) * Input.Color;
 		break;
+	case 4:
+        texColor = u_Textures4.Sample(u_SamplerState4, Input.TexCoord * Input.TilingFactor) * Input.Color;
+        break;
+    case 5:
+        texColor = u_Textures5.Sample(u_SamplerState5, Input.TexCoord * Input.TilingFactor) * Input.Color;
+        break;
 	}
 
 	if (texColor.a == 0.0)

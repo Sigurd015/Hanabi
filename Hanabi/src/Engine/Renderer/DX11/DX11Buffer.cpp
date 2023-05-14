@@ -6,8 +6,6 @@
 
 namespace Hanabi
 {
-	uint32_t DX11VertexBuffer::m_RendererID = 0;
-
 	void CreateBuffer(D3D11_BIND_FLAG bindFlag, uint32_t size, D3D11_USAGE usage, int cpuAccess, uint32_t stride,
 		D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer)
 	{
@@ -45,12 +43,12 @@ namespace Hanabi
 	void DX11VertexBuffer::Bind() const
 	{
 		const UINT offset = 0;
-		DX11Context::GetDeviceContext()->IASetVertexBuffers(m_RendererID++, 1, m_VertexBuffer.GetAddressOf(), &m_Stride, &offset);
+		DX11Context::GetDeviceContext()->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &m_Stride, &offset);
 	}
 
 	void DX11VertexBuffer::Unbind() const
 	{
-
+		DX11Context::GetDeviceContext()->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
 	}
 
 	void DX11VertexBuffer::SetData(const void* data, uint32_t size)
@@ -90,7 +88,7 @@ namespace Hanabi
 
 	void DX11IndexBuffer::Unbind() const
 	{
-
+		DX11Context::GetDeviceContext()->IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0);
 	}
 }
 #endif
