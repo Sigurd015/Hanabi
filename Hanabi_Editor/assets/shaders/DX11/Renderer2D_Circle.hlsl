@@ -43,6 +43,7 @@ VertexOutput main(VertexInput Input)
 #type:pixel
 struct PixelInput
 {
+	float4 Pos : SV_Position;
 	float3 LocalPosition : LoP;
 	float4 Color : Cor;
 	float Thickness : Ths;
@@ -67,7 +68,7 @@ PixelOutput main(PixelInput Input)
 	
 	if (circle == 0.0f)
 		discard;
-
+		
     Output.Color = Input.Color;
 	Output.Color.a *= circle;
 	Output.EntityID = Input.EntityID;

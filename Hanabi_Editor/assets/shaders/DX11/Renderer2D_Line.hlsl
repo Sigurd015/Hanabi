@@ -34,6 +34,7 @@ VertexOutput main(VertexInput Input)
 #type:pixel
 struct PixelInput
 {
+	float4 Pos : SV_Position;
 	float4 Color : Cor;
 	int EntityID : EID;
 };

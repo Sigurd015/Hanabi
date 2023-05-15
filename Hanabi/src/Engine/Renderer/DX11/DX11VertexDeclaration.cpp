@@ -35,13 +35,11 @@ namespace Hanabi
 
 	void DX11VertexDeclaration::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
-		//indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;
 	}
 
 	void DX11VertexDeclaration::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
 	{
-		//vertexBuffer->Bind();
 		DX11Shader* vertexShader = (DX11Shader*)shader.get();
 		const auto& layout = vertexBuffer->GetLayout();
 		std::vector<D3D11_INPUT_ELEMENT_DESC> temp;
@@ -65,17 +63,19 @@ namespace Hanabi
 		{
 			vertexBuffer->Bind();
 		}
-		m_IndexBuffer->Bind();
+		if (m_IndexBuffer != nullptr)
+			m_IndexBuffer->Bind();
 		DX11Context::GetDeviceContext()->IASetInputLayout(m_InputLayout.Get());
 	}
 
 	void DX11VertexDeclaration::Unbind() const
 	{
-		for (auto vertexBuffer: m_VertexBuffers)
+		for (auto vertexBuffer : m_VertexBuffers)
 		{
 			vertexBuffer->Unbind();
 		}
-		m_IndexBuffer->Unbind();
+		if (m_IndexBuffer != nullptr)
+			m_IndexBuffer->Unbind();
 		DX11Context::GetDeviceContext()->IASetInputLayout(nullptr);
 	}
 }

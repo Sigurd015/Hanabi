@@ -51,11 +51,26 @@ public:
 			for (float x = -5.0f; x < 5.0f; x += 0.5f)
 			{
 				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-				Hanabi::Renderer2D::DrawQuad(glm::translate(glm::mat4(1.0f), { x * 2.5f,y * 2.5f,1.0f }), color);
-				Hanabi::Renderer2D::DrawCircle(glm::translate(glm::mat4(1.0f), { x * 3,y * 3,1.0f }), color);
+				Hanabi::Renderer2D::DrawQuad(glm::translate(glm::mat4(1.0f), { x * 2.5f,y * 2.5f,1.0f }), color, 5);
+				Hanabi::Renderer2D::DrawCircle(glm::translate(glm::mat4(1.0f), { x * 3,y * 3,1.0f }), color, 5);
+				Hanabi::Renderer2D::DrawRect(glm::translate(glm::mat4(1.0f), { x * 5,y * 5,1.0f }), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 		}
 		Hanabi::Renderer2D::EndScene();
+
+		ImVec2 mousePos = ImGui::GetMousePos();
+		mousePos.x -= m_ViewportBounds[0].x;
+		mousePos.y -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		mousePos.y = viewportSize.y - mousePos.y;
+		int mouseX = (int)mousePos.x;
+		int mouseY = (int)mousePos.y;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			HNB_INFO("Selected:{0}", pixelData);
+		}
 
 		m_Framebuffer->Unbind();
 
@@ -140,54 +155,55 @@ public:
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 		ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 
+		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+		auto viewportOffset = ImGui::GetWindowPos();
+		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
 		ImGui::End();
 		ImGui::End();
 	}
 
 	bool OnMouseMove(Hanabi::MouseMovedEvent& event)
 	{
-		HNB_INFO("Mouse Pos:X({0}) Y({1})", event.GetX(), event.GetY());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnMouseButtonDown(Hanabi::MouseButtonPressedEvent& event)
 	{
-		HNB_INFO("MouseButton:{0} Down", event.ToString());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnMouseButtonUp(Hanabi::MouseButtonReleasedEvent& event)
 	{
-		HNB_INFO("MouseButton:{0} Up", event.ToString());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnMouseScrolled(Hanabi::MouseScrolledEvent& event)
 	{
-		HNB_INFO("MouseScrolled:X({0}) Y({1})", event.GetXOffset(), event.GetYOffset());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnKeyPressed(Hanabi::KeyPressedEvent& event)
 	{
-		if (event.IsRepeat())
-		{
-			HNB_INFO("Key:{0} Repeat", event.GetKeyCode());
-			return false;
-		}
-		HNB_INFO("Key:{0} Down", event.GetKeyCode());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnKeyReleased(Hanabi::KeyReleasedEvent& event)
 	{
-		HNB_INFO("Key:{0} Up", event.GetKeyCode());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnKeyTyped(Hanabi::KeyTypedEvent& event)
 	{
-		HNB_INFO("Key:{0} Typed", event.GetKeyCode());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 };
