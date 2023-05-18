@@ -114,8 +114,7 @@ namespace Hanabi
 				textureDesc.Usage = D3D11_USAGE_DEFAULT;
 				textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 				textureDesc.CPUAccessFlags = 0;
-				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, texture.GetAddressOf()))
-					m_RenderTargetAttachmentsTextures.push_back(texture);
+				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, texture.GetAddressOf()));
 				m_RenderTargetAttachmentsTextures.push_back(texture);
 
 				Microsoft::WRL::ComPtr<ID3D11RenderTargetView> targetView;
@@ -217,27 +216,17 @@ namespace Hanabi
 		D3D11_MAPPED_SUBRESOURCE mappedTexture;
 		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(textureCopy.Get(), 0, D3D11_MAP_READ, 0, &mappedTexture));
 
-		//TODO::Make Position Correctly
-		//Hanabi_INFO("RowPitch:", mappedTexture.RowPitch, ",DepthPitch:", mappedTexture.DepthPitch);
-		size_t pixelSize = sizeof(int);
-		size_t rowPitch = textureCopyDesc.Width * pixelSize;
-		size_t x_offset = x * sizeof(int);
-		size_t y_offset = (textureCopyDesc.Height - y - 1) * rowPitch;
-		size_t offset = x_offset + y_offset;
+		uint8_t* pData = reinterpret_cast<uint8_t*>(mappedTexture.pData);
+		int32_t rowPitch = mappedTexture.RowPitch;
+		int32_t pixelValue = -1;
 
-		int* pixels = reinterpret_cast<int*>(mappedTexture.pData);
-		int value = pixels[offset / pixelSize];
-
-		/*	int* pixels = reinterpret_cast<int*>(mappedTexture.pData);
-			int value = pixels[(textureCopyDesc.Height - 1 - y) * rowPitch / pixelSize + x];*/
-			//uint32_t* id = static_cast<float*>(mappedTexture.pData);
-			//uint32_t objectId = id[x + (m_Specification.Height - y - 1) * m_Specification.Width];
+		if (textureDesc.Format == DXGI_FORMAT_R32_SINT)
+			memcpy(&pixelValue, pData + y * rowPitch + x * sizeof(int32_t), sizeof(int32_t));
 
 		DX11Context::GetDeviceContext()->Unmap(textureCopy.Get(), 0);
-
 		textureCopy.Reset();
 
-		return value;
+		return pixelValue;
 	}
 
 	void* DX11Framebuffer::GetColorAttachment(uint32_t index) const

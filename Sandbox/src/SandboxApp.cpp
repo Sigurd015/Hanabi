@@ -52,7 +52,7 @@ public:
 			{
 				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
 				Hanabi::Renderer2D::DrawQuad(glm::translate(glm::mat4(1.0f), { x * 2.5f,y * 2.5f,1.0f }), color, 5);
-				Hanabi::Renderer2D::DrawCircle(glm::translate(glm::mat4(1.0f), { x * 3,y * 3,1.0f }), color, 5);
+				Hanabi::Renderer2D::DrawCircle(glm::translate(glm::mat4(1.0f), { x * 3,y * 3,1.0f }), color, 1.0f, 0.005f, 6);
 				Hanabi::Renderer2D::DrawRect(glm::translate(glm::mat4(1.0f), { x * 5,y * 5,1.0f }), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 		}
@@ -69,7 +69,7 @@ public:
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
 			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			HNB_INFO("Selected:{0}", pixelData);
+			HNB_INFO("Mouse X{0},Y{1},Selected:{2}", mouseX, mouseY, pixelData);
 		}
 
 		m_Framebuffer->Unbind();
