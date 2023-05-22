@@ -48,7 +48,7 @@ namespace Hanabi
 		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, ppSamplerState));
 	}
 
-	DX11Texture2D::DX11Texture2D(const std::string& path) : m_Path(path), m_UUID(UUID())
+	DX11Texture2D::DX11Texture2D(const std::string& path) : m_Path(path)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
@@ -71,7 +71,7 @@ namespace Hanabi
 		}
 	}
 
-	DX11Texture2D::DX11Texture2D(uint32_t width, uint32_t height) : m_Width(width), m_Height(height), m_UUID(UUID())
+	DX11Texture2D::DX11Texture2D(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
 	{
 		m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		CreateTexDesc(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
@@ -97,7 +97,12 @@ namespace Hanabi
 
 	bool DX11Texture2D::operator==(const Texture& other) const
 	{
-		return m_UUID == other.GetRendererID();
+		ID3D11Resource* resource1;
+		ID3D11Resource* resource2;
+		m_TextureView->GetResource(&resource1);
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> temp = static_cast<ID3D11ShaderResourceView*>(other.GetRendererID());
+		temp->GetResource(&resource2);
+		return resource1 == resource2;
 	}
 
 	void DX11Texture2D::Bind(uint32_t slot) const

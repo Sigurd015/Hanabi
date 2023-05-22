@@ -15,7 +15,7 @@ namespace Hanabi
 		~DX11Texture2D();
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
-		uint32_t GetRendererID() const override { return m_UUID; }
+		void* GetRendererID() const override { return m_TextureView.Get(); }
 		virtual bool IsLoaded() const override { return m_IsLoaded; }
 		void Bind(uint32_t slot = 0) const override;
 		void SetData(void* data, uint32_t size) override;
@@ -28,7 +28,6 @@ namespace Hanabi
 		std::string m_Path;
 		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
-		uint32_t m_UUID;
 		DXGI_FORMAT m_DataFormat;
 	};
 }
