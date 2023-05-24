@@ -9,11 +9,15 @@ namespace Hanabi
 
 	DX11Context::DX11Context(HWND* windowHandle) :m_WindowHandle(windowHandle)
 	{
+		HNB_CORE_ASSERT(windowHandle, "Window handle is null!");
+
 		Init();
 	}
 
 	void DX11Context::Init()
 	{
+		HNB_PROFILE_FUNCTION();
+
 		s_Instance = this;
 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
@@ -39,6 +43,8 @@ namespace Hanabi
 
 	void DX11Context::SwapBuffer(bool VSync)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		m_SwapChain->Present(VSync, 0);
 	}
 }

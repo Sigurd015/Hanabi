@@ -6,6 +6,7 @@
 
 #include <fstream>
 #include <d3dcompiler.h>
+#pragma pack_matrix(row_major)
 
 namespace Hanabi
 {
@@ -16,11 +17,14 @@ namespace Hanabi
 		if (type == "fragment" || type == "pixel")
 			return PIXEL_SHADER;
 
+		HNB_CORE_ASSERT(false, "Unknown shader type!");
 		return UNKNOWN;
 	}
 
 	DX11Shader::DX11Shader(const std::string& filepath)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		std::string source = ReadFile("assets/shaders/DX11/" + filepath + ".hlsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
@@ -35,6 +39,8 @@ namespace Hanabi
 
 	std::string DX11Shader::ReadFile(const std::string& filepath)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in)
@@ -50,18 +56,19 @@ namespace Hanabi
 			}
 			else
 			{
-				HNB_CORE_ASSERT("[Shader]Could not read from file", filepath);
+				HNB_CORE_ERROR("Could not read from file '{0}'", filepath);
 			}
 		}
 		else
 		{
-			HNB_CORE_ASSERT("[Shader]Could not open file", filepath);
+			HNB_CORE_ERROR("Could not open file '{0}'", filepath);
 		}
 		return result;
 	}
 
 	std::unordered_map<ShaderType, std::string> DX11Shader::PreProcess(const std::string& source)
 	{
+		HNB_PROFILE_FUNCTION();
 
 		std::unordered_map<ShaderType, std::string> shaderSources;
 		const char* typeToken = "#type:";
@@ -82,6 +89,7 @@ namespace Hanabi
 
 	void DX11Shader::Compile(const std::unordered_map<ShaderType, std::string>& shaderSources)
 	{
+		HNB_PROFILE_FUNCTION();
 
 		for (auto& kv : shaderSources)
 		{
@@ -106,23 +114,32 @@ namespace Hanabi
 					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf()));
 				break;
 			}
-			case Hanabi::UNKNOWN:
-			default:
-				HNB_CORE_ASSERT("[Shader]Unknown Shader Type!");
-				break;
 			}
 		}
 	}
 
 	void DX11Shader::Bind() const
 	{
+		HNB_PROFILE_FUNCTION();
+
 		DX11Context::GetDeviceContext()->VSSetShader(m_VertexShader.Get(), nullptr, 0);
 		DX11Context::GetDeviceContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 	}
 
 	void DX11Shader::Unbind() const
 	{
+		HNB_PROFILE_FUNCTION();
 
+		DX11Context::GetDeviceContext()->VSSetShader(nullptr, nullptr, 0);
+		DX11Context::GetDeviceContext()->PSSetShader(nullptr, nullptr, 0);
+	}
+
+	DX11Shader::~DX11Shader()
+	{
+		HNB_PROFILE_FUNCTION();
+
+		m_VertexShader.Reset();
+		m_PixelShader.Reset();
 	}
 
 	void DX11Shader::SetUniform(const std::string& name, int value)
@@ -144,9 +161,6 @@ namespace Hanabi
 	{}
 
 	void DX11Shader::SetUniform(const std::string& name, const glm::mat4& value)
-	{}
-
-	DX11Shader::~DX11Shader()
 	{}
 }
 #endif

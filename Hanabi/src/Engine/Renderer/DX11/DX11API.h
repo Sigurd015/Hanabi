@@ -24,7 +24,6 @@ namespace Hanabi
 		static void DX11RendererAPI::SetAttachments(bool renderToBackbuffer = false) { s_Instance->m_RenderToBackbuffer = renderToBackbuffer; }
 		static void ReSetAttachments() { s_Instance->m_RenderToBackbuffer = true; s_Instance->Clear(); }
 		static const glm::vec4& GetClearColor() { return s_Instance->m_ClearColor; }
-		static DX11RendererAPI* Get() { return s_Instance; }
 	private:
 		void SetBuffer(uint32_t width, uint32_t height, uint32_t x = 0, uint32_t y = 0);
 		static DX11RendererAPI* s_Instance;

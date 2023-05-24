@@ -27,19 +27,17 @@ namespace Hanabi
 		return DXGI_FORMAT_UNKNOWN;
 	}
 
-	DX11VertexDeclaration::DX11VertexDeclaration()
-	{}
-
-	DX11VertexDeclaration::~DX11VertexDeclaration()
-	{}
-
 	void DX11VertexDeclaration::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		m_IndexBuffer = indexBuffer;
 	}
 
 	void DX11VertexDeclaration::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		DX11Shader* vertexShader = (DX11Shader*)shader.get();
 		const auto& layout = vertexBuffer->GetLayout();
 		std::vector<D3D11_INPUT_ELEMENT_DESC> temp;
@@ -59,6 +57,8 @@ namespace Hanabi
 
 	void DX11VertexDeclaration::Bind() const
 	{
+		HNB_PROFILE_FUNCTION();
+
 		for (auto vertexBuffer : m_VertexBuffers)
 		{
 			vertexBuffer->Bind();
@@ -70,6 +70,8 @@ namespace Hanabi
 
 	void DX11VertexDeclaration::Unbind() const
 	{
+		HNB_PROFILE_FUNCTION();
+
 		for (auto vertexBuffer : m_VertexBuffers)
 		{
 			vertexBuffer->Unbind();

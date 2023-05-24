@@ -84,13 +84,13 @@ namespace Hanabi
 #if defined(HNB_DEBUG)
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
-				m_Data.Title += "(OpenGL)";
+				m_Data.Title += "<OpenGL>";
 				break;
 
 #if defined(HNB_PLATFORM_WINDOWS)
 			case RendererAPI::API::DX11:
 				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-				m_Data.Title += "(DX11)";
+				m_Data.Title += "<DX11>";
 				break;
 #endif
 			}

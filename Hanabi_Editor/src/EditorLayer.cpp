@@ -94,7 +94,14 @@ namespace Hanabi
 		mousePos.x -= m_ViewportBounds[0].x;
 		mousePos.y -= m_ViewportBounds[0].y;
 		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-		mousePos.y = viewportSize.y - mousePos.y;
+
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGL:
+			mousePos.y = viewportSize.y - mousePos.y;
+			break;
+		}
+
 		int mouseX = (int)mousePos.x;
 		int mouseY = (int)mousePos.y;
 
@@ -342,7 +349,18 @@ namespace Hanabi
 
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-		ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGL:
+			ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			break;
+#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPI::API::DX11:
+			ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+			break;
+#endif
+		}
 
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();

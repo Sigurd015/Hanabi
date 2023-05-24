@@ -159,6 +159,8 @@ namespace Hanabi
 
 	void DX11Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
 	{
+		HNB_CORE_ASSERT(attachmentIndex < m_RenderTargetAttachments.size());
+
 		const glm::vec4 color = DX11RendererAPI::GetClearColor();
 		for (size_t i = 0; i < m_RenderTargetAttachments.size(); i++)
 		{
@@ -186,6 +188,12 @@ namespace Hanabi
 
 	void DX11Framebuffer::Resize(uint32_t width, uint32_t height)
 	{
+		if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
+		{
+			HNB_CORE_WARN("Attempted to rezize framebuffer to {0}, {1}", width, height);
+			return;
+		}
+
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 
@@ -203,6 +211,8 @@ namespace Hanabi
 
 	int DX11Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 	{
+		HNB_CORE_ASSERT(attachmentIndex < m_RenderTargetAttachmentsTextures.size());
+
 		D3D11_TEXTURE2D_DESC textureDesc = {};
 		m_RenderTargetAttachmentsTextures[attachmentIndex]->GetDesc(&textureDesc);
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> textureCopy;
@@ -231,6 +241,8 @@ namespace Hanabi
 
 	void* DX11Framebuffer::GetColorAttachment(uint32_t index) const
 	{
+		HNB_CORE_ASSERT(index < m_ShaderResourceViews.size());
+
 		return m_ShaderResourceViews[index].Get();
 	}
 }

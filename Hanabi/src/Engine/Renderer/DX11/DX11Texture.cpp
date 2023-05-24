@@ -50,6 +50,8 @@ namespace Hanabi
 
 	DX11Texture2D::DX11Texture2D(const std::string& path) : m_Path(path)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
 		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
@@ -73,6 +75,8 @@ namespace Hanabi
 
 	DX11Texture2D::DX11Texture2D(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		CreateTexDesc(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
 		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureView.GetAddressOf());
@@ -81,6 +85,8 @@ namespace Hanabi
 
 	DX11Texture2D::~DX11Texture2D()
 	{
+		HNB_PROFILE_FUNCTION();
+
 		m_Texture.Reset();
 		m_TextureView.Reset();
 		m_SamplerState.Reset();
@@ -88,6 +94,8 @@ namespace Hanabi
 
 	void DX11Texture2D::SetData(void* data, uint32_t size)
 	{
+		HNB_PROFILE_FUNCTION();
+
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(m_Texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
@@ -107,6 +115,8 @@ namespace Hanabi
 
 	void DX11Texture2D::Bind(uint32_t slot) const
 	{
+		HNB_PROFILE_FUNCTION();
+
 		DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
 		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureView.GetAddressOf());
 	}
