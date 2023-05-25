@@ -5,11 +5,14 @@ Mini game engine
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 
-Now only support platform Windows
+Now only support Windows
 
-OpenGL 4.5
+OpenGL 4.5, DX11
 
-TODO:: DX11 support
+TODO:
+- [X] DX11 Support
+- [ ] SPIR-V Shader System
+- [ ] Script Engine
 
 ## Getting Started
 
@@ -28,4 +31,5 @@ git submodule update --init
 
 ## Credits
 
-- Cherno [Hazel](https://github.com/TheCherno/Hazel)
+- [TheCherno](https://www.youtube.com/@TheCherno) [Hazel](https://github.com/TheCherno/Hazel)
+
