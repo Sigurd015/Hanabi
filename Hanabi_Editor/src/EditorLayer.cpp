@@ -41,7 +41,6 @@ namespace Hanabi
 		m_IconPlay = Texture2D::Create("assets/Icons/PlayButton.png");
 		m_IconSimulate = Texture2D::Create("assets/Icons/SimulateButton.png");
 		m_IconStop = Texture2D::Create("assets/Icons/StopButton.png");
-
 	}
 
 	void EditorLayer::OnDetach()

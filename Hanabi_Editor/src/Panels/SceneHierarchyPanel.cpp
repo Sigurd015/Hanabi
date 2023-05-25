@@ -303,7 +303,19 @@ namespace Hanabi
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				ImGui::Button("Texture", ImVec2(100.0f, 0.0f));
+				if (component.Texture)
+				{
+					ImGui::Image(component.Texture->GetRendererID(), ImVec2(100.0f, 100.0f));
+				}
+				else
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+					ImGui::PopItemFlag();
+					ImGui::PopStyleColor();
+				}
+
 				if (ImGui::BeginDragDropTarget())
 				{
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
@@ -317,6 +329,12 @@ namespace Hanabi
 							HNB_WARN("Could not load texture {0}", texturePath.filename().string());
 					}
 					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("ReSet"))
+				{
+					component.Texture = nullptr;
 				}
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
