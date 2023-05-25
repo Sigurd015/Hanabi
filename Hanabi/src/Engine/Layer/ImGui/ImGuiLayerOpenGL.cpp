@@ -10,10 +10,10 @@
 
 namespace Hanabi
 {
-	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
+	ImGuiLayerOpenGL::ImGuiLayerOpenGL() : ImGuiLayer("ImGuiLayerOpenGL")
 	{}
 
-	void ImGuiLayer::OnAttach()
+	void ImGuiLayerOpenGL::OnAttach()
 	{
 		HNB_PROFILE_FUNCTION();
 
@@ -52,7 +52,7 @@ namespace Hanabi
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
-	void ImGuiLayer::OnDetach()
+	void ImGuiLayerOpenGL::OnDetach()
 	{
 		HNB_PROFILE_FUNCTION(); 
 
@@ -61,7 +61,7 @@ namespace Hanabi
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::OnEvent(Event& e)
+	void ImGuiLayerOpenGL::OnEvent(Event& e)
 	{
 		if (m_BlockEvents)
 		{
@@ -71,7 +71,7 @@ namespace Hanabi
 		}
 	}
 
-	void ImGuiLayer::Begin()
+	void ImGuiLayerOpenGL::Begin()
 	{
 		HNB_PROFILE_FUNCTION(); 
 
@@ -81,7 +81,7 @@ namespace Hanabi
 		ImGuizmo::BeginFrame();
 	}
 
-	void ImGuiLayer::End()
+	void ImGuiLayerOpenGL::End()
 	{
 		HNB_PROFILE_FUNCTION(); 
 
@@ -102,7 +102,7 @@ namespace Hanabi
 		}
 	}
 
-	void ImGuiLayer::SetDarkThemeColors()
+	void ImGuiLayerOpenGL::SetDarkThemeColors()
 	{
 		auto& colors = ImGui::GetStyle().Colors;
 		colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };

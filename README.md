@@ -32,4 +32,3 @@ git submodule update --init
 ## Credits
 
 - [TheCherno](https://www.youtube.com/@TheCherno) [Hazel](https://github.com/TheCherno/Hazel)
-

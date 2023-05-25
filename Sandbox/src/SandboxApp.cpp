@@ -1,15 +1,19 @@
-#include <Hanabi.h>
+﻿#include <Hanabi.h>
 #include "Engine/EntryPoint.h"
 #include "Engine/Events/Event.h"
 #include "Engine/Core/Timestep.h"
 #include "Engine/Events/KeyEvent.h"
+
+#include <imgui.h>
 
 class ExampleLayer :public Hanabi::Layer
 {
 public:
 	ExampleLayer() :Layer("ExampleLayer") {}
 	~ExampleLayer() {}
-	void OnAttach() override {}
+	void OnAttach() override
+	{
+	}
 	void OnDetach() override {}
 	void OnUpdate(Hanabi::Timestep ts)override
 	{
@@ -27,52 +31,49 @@ public:
 		//dispatcher.Dispatch<Hanabi::MouseButtonReleasedEvent>(HNB_BIND_EVENT_FN(ExampleLayer::OnMouseButtonUp));
 		//dispatcher.Dispatch<Hanabi::MouseScrolledEvent>(HNB_BIND_EVENT_FN(ExampleLayer::OnMouseScrolled));
 	}
-	void OnImGuiRender()override {}
+	void OnImGuiRender()override
+	{
+	}
 
 	bool OnMouseMove(Hanabi::MouseMovedEvent& event)
 	{
-		HNB_INFO("Mouse Pos:X({0}) Y({1})", event.GetX(), event.GetY());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnMouseButtonDown(Hanabi::MouseButtonPressedEvent& event)
 	{
-		HNB_INFO("MouseButton:{0} Down", event.ToString());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnMouseButtonUp(Hanabi::MouseButtonReleasedEvent& event)
 	{
-		HNB_INFO("MouseButton:{0} Up", event.ToString());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnMouseScrolled(Hanabi::MouseScrolledEvent& event)
 	{
-		HNB_INFO("MouseScrolled:X({0}) Y({1})", event.GetXOffset(), event.GetYOffset());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnKeyPressed(Hanabi::KeyPressedEvent& event)
 	{
-		if (event.IsRepeat())
-		{
-			HNB_INFO("Key:{0} Repeat", event.GetKeyCode());
-			return false;
-		}
-		HNB_INFO("Key:{0} Down", event.GetKeyCode());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnKeyReleased(Hanabi::KeyReleasedEvent& event)
 	{
-		HNB_INFO("Key:{0} Up", event.GetKeyCode());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 
 	bool OnKeyTyped(Hanabi::KeyTypedEvent& event)
 	{
-		HNB_INFO("Key:{0} Typed", event.GetKeyCode());
+		HNB_INFO(event.ToString());
 		return false;
 	}
 };

@@ -22,7 +22,7 @@ namespace Hanabi
 	{
 		HNB_PROFILE_FUNCTION();
 
-		std::string source = ReadFile(filepath);
+		std::string source = ReadFile("assets/shaders/OpenGl/" + filepath + ".glsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
 
@@ -81,7 +81,7 @@ namespace Hanabi
 			size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
 			HNB_CORE_ASSERT(nextLinePos != std::string::npos, "Syntax error");
 			pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line
-			shaderSources[ShaderTypeFromString(type)] = 
+			shaderSources[ShaderTypeFromString(type)] =
 				(pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
 		}
 		return shaderSources;

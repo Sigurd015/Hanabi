@@ -1,12 +1,13 @@
 #include "hnbpch.h"
 
-#ifdef HNB_PLATFORM_WINDOWS
+#if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Utils/PlatformUtils.h"
 #include "Engine/Core/Application.h"
 
 #include <commdlg.h>
 #include <GLFW/glfw3.h>
 #define GLFW_EXPOSE_NATIVE_WIN32
+#define GLFW_NATIVE_INCLUDE_NONE
 #include <GLFW/glfw3native.h>
 
 namespace Hanabi
@@ -56,11 +57,6 @@ namespace Hanabi
 			return ofn.lpstrFile;
 		}
 		return std::string();
-	}
-
-	float Time::GetTime()
-	{
-		return glfwGetTime();
 	}
 }
 #endif 

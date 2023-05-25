@@ -1,32 +1,47 @@
 #pragma once
 #include "Engine/Core/Base.h"
 #include "Engine/Events/Event.h"
+#include "Engine/Renderer/RenderingContext.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Hanabi
 {
+	using EventCallBackFn = std::function<void(Event&)>;
+
 	struct WindowProps
 	{
 		std::string Title;
 		uint32_t Width;
 		uint32_t Height;
 
-		WindowProps(const std::string& title = "Hanabi Engine", 
-			uint32_t width = 1920, uint32_t height = 1080) :Title(title), Width(width), Height(height) {}
+		bool VSync;
+		EventCallBackFn EventCallback;
+
+		WindowProps(const EventCallBackFn& callback, const std::string& title = "Hanabi Engine",
+			uint32_t width = 1920, uint32_t height = 1080, bool vSync = true)
+			:EventCallback(callback), Title(title), Width(width), Height(height), VSync(vSync)
+		{}
 	};
 
 	class Window
 	{
 	public:
-		using EventCallBackFn = std::function<void(Event&)>;
-
-		virtual ~Window() = default;
-		virtual void OnUpdate() = 0;
-		virtual uint32_t GetWidth() const = 0;
-		virtual uint32_t GetHeight() const = 0;
-		virtual void SetEventCallback(const EventCallBackFn& callback) = 0;
-		virtual void SetVSync(bool enable) = 0;
-		virtual bool IsVSync() const = 0;
-		virtual void* GetNativeWindow() const = 0;
-		static Scope<Window> Create(const WindowProps& props = WindowProps());
+		Window(const WindowProps& props);
+		~Window();
+		void OnUpdate();
+		uint32_t GetWidth() const { return m_Data.Width; }
+		uint32_t GetHeight() const { return m_Data.Height; }
+		void SetWindowTitle(const std::string& title);
+		void SetVSync(bool enable);
+		bool IsVSync() const;
+		void* GetNativeWindow() const { return m_Window; }
+		static Scope<Window> Create(const WindowProps& props);
+	private:
+		virtual void Init();
+		virtual void Shutdown();
+		GLFWwindow* m_Window;
+		Scope<RenderingContext> m_Context;
+		WindowProps m_Data;
 	};
 }

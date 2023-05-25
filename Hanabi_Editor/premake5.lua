@@ -20,6 +20,7 @@ project "Hanabi_Editor"
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
+		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.ImGuizmo}"
 	}
 	

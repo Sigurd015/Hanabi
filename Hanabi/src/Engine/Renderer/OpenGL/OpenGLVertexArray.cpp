@@ -53,7 +53,7 @@ namespace Hanabi
 		glBindVertexArray(0);
 	}
 
-	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer)
+	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
 	{
 		HNB_PROFILE_FUNCTION();
 

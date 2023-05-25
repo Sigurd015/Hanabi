@@ -1,7 +1,11 @@
 #include "hnbpch.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Utils/PlatformUtils.h"
+#include "Engine/Platform/Window.h"
+
+#include <GLFW/glfw3.h>
 
 namespace Hanabi
 {
@@ -18,12 +22,11 @@ namespace Hanabi
 		if (!m_Specification.WorkingDirectory.empty())
 			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-		m_Window = Window::Create(WindowProps(m_Specification.Name));
-		m_Window->SetEventCallback(HNB_BIND_EVENT_FN(Application::OnEvent));
+		m_Window = Window::Create(WindowProps(HNB_BIND_EVENT_FN(Application::OnEvent), m_Specification.Name));
 
 		Renderer::Init();
 
-		m_ImGuiLayer = new ImGuiLayer();
+		m_ImGuiLayer = ImGuiLayer::Create();;
 		PushOverlay(m_ImGuiLayer);
 	}
 
@@ -74,7 +77,7 @@ namespace Hanabi
 		{
 			HNB_PROFILE_SCOPE("RunLoop");
 
-			float time = Time::GetTime();
+			float time = glfwGetTime();
 			Timestep timestep = time - m_LastFrameTime;
 			m_LastFrameTime = time;
 
