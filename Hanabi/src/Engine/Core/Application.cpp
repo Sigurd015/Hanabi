@@ -4,6 +4,7 @@
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Utils/PlatformUtils.h"
 #include "Engine/Platform/Window.h"
+#include "Engine/Scripting/ScriptEngine.h"
 
 #include <GLFW/glfw3.h>
 
@@ -25,6 +26,7 @@ namespace Hanabi
 		m_Window = Window::Create(WindowProps(HNB_BIND_EVENT_FN(Application::OnEvent), m_Specification.Name));
 
 		Renderer::Init();
+		ScriptEngine::Init();
 
 		m_ImGuiLayer = ImGuiLayer::Create();;
 		PushOverlay(m_ImGuiLayer);
@@ -34,6 +36,7 @@ namespace Hanabi
 	{
 		HNB_PROFILE_FUNCTION();
 
+		ScriptEngine::Shutdown();
 		Renderer::Shutdown();
 	}
 

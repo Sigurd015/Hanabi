@@ -10,7 +10,7 @@ Now only support Windows
 OpenGL 4.5, DX11
 
 TODO:
-- [X] DX11 Support
+- [X] ~~DX11 Support~~
 - [ ] SPIR-V Shader System
 - [ ] Script Engine
 

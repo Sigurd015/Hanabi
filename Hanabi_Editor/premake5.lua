@@ -2,7 +2,7 @@ project "Hanabi_Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 	
 	targetdir (outputdir .. "/%{prj.name}")
 	objdir (intdir .. "/%{prj.name}")

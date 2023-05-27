@@ -38,9 +38,9 @@ namespace Hanabi
 
 		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 
-		m_IconPlay = Texture2D::Create("assets/Icons/PlayButton.png");
-		m_IconSimulate = Texture2D::Create("assets/Icons/SimulateButton.png");
-		m_IconStop = Texture2D::Create("assets/Icons/StopButton.png");
+		m_IconPlay = Texture2D::Create("resources/icons/PlayButton.png");
+		m_IconSimulate = Texture2D::Create("resources/icons/SimulateButton.png");
+		m_IconStop = Texture2D::Create("resources/icons/StopButton.png");
 	}
 
 	void EditorLayer::OnDetach()

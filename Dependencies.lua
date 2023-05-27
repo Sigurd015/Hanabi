@@ -9,3 +9,18 @@ IncludeDir["entt"] = "%{wks.location}/Hanabi/vendor/entt"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Hanabi/vendor/yaml_cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Hanabi/vendor/ImGuizmo"
 IncludeDir["Box2D"] = "%{wks.location}/Hanabi/vendor/box2D/include"
+IncludeDir["mono"] = "%{wks.location}/Hanabi/vendor/mono/include"
+
+LibraryDir = {}
+LibraryDir["mono"] = "%{wks.location}/Hanabi/vendor/mono/lib/%{cfg.buildcfg}"
+
+Library = {}
+Library["mono"] = "%{LibraryDir.mono}/libmono-static-sgen.lib"
+
+-- Windows
+Library["DX11"] = "d3d11.lib"
+Library["DXC"] = "D3DCompiler.lib"
+Library["WinSock"] = "Ws2_32.lib"
+Library["WinMM"] = "Winmm.lib"
+Library["WinVersion"] = "Version.lib"
+Library["BCrypt"] = "Bcrypt.lib"

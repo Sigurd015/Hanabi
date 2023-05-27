@@ -2,7 +2,7 @@ project "Hanabi"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir (outputdir .. "/%{prj.name}")
 	objdir (intdir .. "/%{prj.name}")
@@ -41,7 +41,8 @@ project "Hanabi"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.Box2D}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.mono}"
 	}
 
 	links 
@@ -51,7 +52,8 @@ project "Hanabi"
 		"ImGui",
 		"yaml_cpp",
 		"Box2D",
-		"opengl32.lib"
+		"opengl32.lib",
+		"%{Library.mono}"
 	}
 	
 	filter "system:windows"
@@ -59,8 +61,12 @@ project "Hanabi"
 		
 		links
 		{
-			"d3d11.lib",
-			"D3DCompiler.lib"
+			"%{Library.DX11}",
+			"%{Library.DXC}",
+			"%{Library.WinSock}",
+			"%{Library.WinMM}",
+			"%{Library.WinVersion}",
+			"%{Library.BCrypt}"
 		}
 		
 		defines

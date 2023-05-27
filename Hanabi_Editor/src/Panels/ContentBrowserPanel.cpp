@@ -10,8 +10,8 @@ namespace Hanabi
 
 	ContentBrowserPanel::ContentBrowserPanel() : m_CurrentDirectory(g_AssetPath)
 	{
-		m_DirectoryIcon = Texture2D::Create("assets/Icons/ContentBrowser/DirectoryIcon.png");
-		m_FileIcon = Texture2D::Create("assets/Icons/ContentBrowser/FileIcon.png");
+		m_DirectoryIcon = Texture2D::Create("resources/icons/ContentBrowser/DirectoryIcon.png");
+		m_FileIcon = Texture2D::Create("resources/icons/ContentBrowser/FileIcon.png");
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
