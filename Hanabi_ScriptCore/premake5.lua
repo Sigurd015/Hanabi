@@ -2,9 +2,10 @@ project "Hanabi_ScriptCore"
 	kind "SharedLib"
 	language "C#"
 	dotnetframework "4.7.2"
+	namespace "Hanabi"
 
-    targetdir ("%{wks.location}/Hanabi_Editor/resources/scripts")
-	objdir (intdir .. "/%{prj.name}")
+    targetdir ("../Hanabi_Editor/resources/scripts")
+	objdir ("../build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
 
 	files 
 	{

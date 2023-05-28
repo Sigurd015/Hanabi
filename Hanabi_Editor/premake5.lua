@@ -26,7 +26,8 @@ project "Hanabi_Editor"
 	
 	links
 	{
-		"Hanabi"
+		"Hanabi",
+		"Hanabi_ScriptCore"
 	}
 	
 	filter "system:windows"

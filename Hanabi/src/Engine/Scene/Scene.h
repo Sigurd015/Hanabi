@@ -28,6 +28,7 @@ namespace Hanabi
 		void DestroyEntity(Entity entity);
 		Entity GetPrimaryCameraEntity();
 		void DuplicateEntity(Entity entity);
+		Entity GetEntityByUUID(UUID uuid);
 		template<typename... Components>
 		auto GetAllEntitiesWith()
 		{
@@ -41,6 +42,7 @@ namespace Hanabi
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 		b2World* m_PhysicsWorld = nullptr;
+		std::unordered_map<UUID, entt::entity> m_EntityMap;
 		friend class Entity;
 		friend class SceneHierarchyPanel;
 		friend class SceneSerializer;

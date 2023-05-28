@@ -158,6 +158,7 @@ namespace Hanabi
 				auto& tag = entity.GetComponent<TagComponent>().Tag;
 				out << YAML::Key << "Tag" << YAML::Value << tag;
 			});
+
 		SerializeComponent<TransformComponent>("TransformComponent", entity, out, [&]()
 			{
 				auto& tc = entity.GetComponent<TransformComponent>();
@@ -165,6 +166,7 @@ namespace Hanabi
 				out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
 				out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 			});
+
 		SerializeComponent<CameraComponent>("CameraComponent", entity, out, [&]()
 			{
 				auto& cameraComponent = entity.GetComponent<CameraComponent>();
@@ -185,6 +187,13 @@ namespace Hanabi
 				out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
 
 			});
+
+		SerializeComponent<ScriptComponent>("ScriptComponent", entity, out, [&]()
+			{
+				auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+				out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+			});
+
 		SerializeComponent<SpriteRendererComponent>("SpriteRendererComponent", entity, out, [&]()
 			{
 				auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
@@ -325,6 +334,13 @@ namespace Hanabi
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+				}
+
+				auto scriptComponent = entity["ScriptComponent"];
+				if (scriptComponent)
+				{
+					auto& sc = deserializedEntity.AddComponent<ScriptComponent>();
+					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
 				}
 
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];
