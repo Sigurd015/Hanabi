@@ -16,7 +16,7 @@ namespace Hanabi
 
 	void DX11Context::Init()
 	{
-		HNB_PROFILE_FUNCTION();
+		HNB_CORE_ASSERT(!s_Instance, "DX11Context already exists!");
 
 		s_Instance = this;
 
@@ -43,8 +43,6 @@ namespace Hanabi
 
 	void DX11Context::SwapBuffer(bool VSync)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		m_SwapChain->Present(VSync, 0);
 	}
 }

@@ -13,8 +13,6 @@ namespace Hanabi
 
 	void OpenGLContext::Init()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glfwMakeContextCurrent(m_WindowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		HNB_CORE_ASSERT(status, "Failed to initialize Glad!");
@@ -22,8 +20,6 @@ namespace Hanabi
 
 	void OpenGLContext::SwapBuffer(bool VSync)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glfwSwapInterval(VSync);
 		glfwSwapBuffers(m_WindowHandle);
 	}

@@ -63,13 +63,17 @@ Entities:
       RestitutionThreshold: 0.5
   - Entity: 15045535320033348975
     TagComponent:
-      Tag: Sprite
+      Tag: Player
     TransformComponent:
       Translation: [0.358530521, 1.5614537, 0.0225147791]
       Rotation: [0, 0, -0.235084534]
       Scale: [0.361159712, 0.375572056, 0.848135769]
     ScriptComponent:
       ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 0.5
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
       TexturePath: assets\textures\Checkerboard.png
@@ -102,6 +106,10 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
+    ScriptComponent:
+      ClassName: Sandbox.Camera
+      ScriptFields:
+        []
   - Entity: 16672940118998907085
     TagComponent:
       Tag: Floor

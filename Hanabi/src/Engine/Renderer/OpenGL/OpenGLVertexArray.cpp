@@ -27,36 +27,26 @@ namespace Hanabi
 
 	OpenGLVertexArray::OpenGLVertexArray()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glCreateVertexArrays(1, &m_RendererID);
 	}
 
 	OpenGLVertexArray::~OpenGLVertexArray()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glDeleteVertexArrays(1, &m_RendererID);
 	}
 
 	void OpenGLVertexArray::Bind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glBindVertexArray(m_RendererID);
 	}
 
 	void OpenGLVertexArray::Unbind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glBindVertexArray(0);
 	}
 
 	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		HNB_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 		glBindVertexArray(m_RendererID);
 		vertexBuffer->Bind();
@@ -122,8 +112,6 @@ namespace Hanabi
 
 	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glBindVertexArray(m_RendererID);
 		indexBuffer->Bind();
 		m_IndexBuffer = indexBuffer;

@@ -18,6 +18,7 @@ project "Hanabi_Editor"
 		"%{wks.location}/Hanabi/src",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.GLFW}",

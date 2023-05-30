@@ -11,6 +11,8 @@ namespace Hanabi
 
 	void DX11RendererAPI::Init()
 	{
+		HNB_CORE_ASSERT(!s_Instance, "DX11RendererAPI already exists!");
+
 		s_Instance = this;
 
 		m_DeviceContext = DX11Context::GetDeviceContext();
@@ -83,12 +85,14 @@ namespace Hanabi
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 		m_DeviceContext->DrawIndexed(count, 0, 0);
 	}
+
 	void DX11RendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
 	{
 		vertexArray->Bind();
 		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 		m_DeviceContext->Draw(vertexCount, 0);
 	}
+
 	void DX11RendererAPI::SetLineWidth(float width)
 	{}
 }

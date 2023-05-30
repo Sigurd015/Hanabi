@@ -38,7 +38,7 @@ namespace Hanabi
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
-		switch (s_API)
+		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");

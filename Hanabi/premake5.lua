@@ -33,6 +33,7 @@ project "Hanabi"
 	{
 		"src",
 		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",

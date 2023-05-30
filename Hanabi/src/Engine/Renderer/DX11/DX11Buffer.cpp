@@ -25,15 +25,11 @@ namespace Hanabi
 
 	DX11VertexBuffer::DX11VertexBuffer(uint32_t size)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		CreateBuffer(D3D11_BIND_VERTEX_BUFFER, size, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Stride, nullptr, m_VertexBuffer.GetAddressOf());
 	}
 
 	DX11VertexBuffer::DX11VertexBuffer(float* vertices, uint32_t size)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		D3D11_SUBRESOURCE_DATA resourceData = {};
 		resourceData.pSysMem = vertices;
 		CreateBuffer(D3D11_BIND_VERTEX_BUFFER, size, D3D11_USAGE_DEFAULT, 0, m_Stride, &resourceData, m_VertexBuffer.GetAddressOf());
@@ -41,30 +37,22 @@ namespace Hanabi
 
 	DX11VertexBuffer::~DX11VertexBuffer()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		m_VertexBuffer.Reset();
 	}
 
 	void DX11VertexBuffer::Bind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		const UINT offset = 0;
 		DX11Context::GetDeviceContext()->IASetVertexBuffers(0, 1, m_VertexBuffer.GetAddressOf(), &m_Stride, &offset);
 	}
 
 	void DX11VertexBuffer::Unbind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		DX11Context::GetDeviceContext()->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
 	}
 
 	void DX11VertexBuffer::SetData(const void* data, uint32_t size)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(m_VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
@@ -78,8 +66,6 @@ namespace Hanabi
 
 	DX11IndexBuffer::DX11IndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		// Flip the index order to match DirectX 11
 		for (size_t i = 0; i < count; i += 3)
 		{
@@ -92,22 +78,16 @@ namespace Hanabi
 
 	DX11IndexBuffer::~DX11IndexBuffer()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		m_IndexBuffer.Reset();
 	}
 
 	void DX11IndexBuffer::Bind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		DX11Context::GetDeviceContext()->IASetIndexBuffer(m_IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	}
 
 	void DX11IndexBuffer::Unbind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		DX11Context::GetDeviceContext()->IASetIndexBuffer(nullptr, DXGI_FORMAT_R32_UINT, 0);
 	}
 }

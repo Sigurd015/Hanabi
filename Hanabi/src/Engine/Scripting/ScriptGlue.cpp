@@ -26,6 +26,26 @@ namespace Hanabi
 		return  entity;
 	}
 
+	static MonoObject* GetScriptInstance(UUID entityID)
+	{
+		return ScriptEngine::GetManagedInstance(entityID);
+	}
+
+	static uint64_t Entity_FindEntityByName(MonoString* name)
+	{
+		char* nameCStr = mono_string_to_utf8(name);
+
+		Scene* scene = ScriptEngine::GetSceneContext();
+		HNB_CORE_ASSERT(scene);
+		Entity entity = scene->FindEntityByName(nameCStr);
+		mono_free(nameCStr);
+
+		if (!entity)
+			return 0;
+
+		return entity.GetUUID();
+	}
+
 	static bool Entity_HasComponent(UUID entityID, MonoReflectionType* componentType)
 	{
 		Entity entity = GetEntity(entityID);
@@ -100,12 +120,15 @@ namespace Hanabi
 
 	void ScriptGlue::RegisterComponents()
 	{
+		s_EntityHasComponentFuncs.clear();
 		RegisterComponent(AllComponents{});
 	}
 
 	void ScriptGlue::RegisterFunctions()
 	{
+		HNB_ADD_INTERNAL_CALL(GetScriptInstance);
 		HNB_ADD_INTERNAL_CALL(Entity_HasComponent);
+		HNB_ADD_INTERNAL_CALL(Entity_FindEntityByName);
 
 		HNB_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		HNB_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);

@@ -41,10 +41,13 @@ namespace Hanabi
 		static Application& Get() { return *s_Instance; }
 		ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
 		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
+		void SubmitToMainThread(const std::function<void()>& function);
 	private:
 		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
+		void ExecuteMainThreadQueue();
+
 		ApplicationSpecification m_Specification;
 		Scope<Window> m_Window;
 		ImGuiLayer* m_ImGuiLayer;
@@ -53,6 +56,9 @@ namespace Hanabi
 		LayerStack m_LayerStack;
 		static Application* s_Instance;
 		float m_LastFrameTime = 0.0f;
+		std::vector<std::function<void()>> m_MainThreadQueue;
+		std::mutex m_MainThreadQueueMutex;
+
 		friend int ::main(int argc, char** argv);
 	};
 

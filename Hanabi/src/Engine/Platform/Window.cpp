@@ -26,21 +26,21 @@ namespace Hanabi
 
 	Window::Window(const WindowProps& props) :m_Data(props)
 	{
-		HNB_PROFILE_FUNCTION();
+
 
 		Init();
 	}
 
 	Window::~Window()
 	{
-		HNB_PROFILE_FUNCTION();
+
 
 		Shutdown();
 	}
 
 	void Window::OnUpdate()
 	{
-		HNB_PROFILE_FUNCTION();
+
 
 		glfwPollEvents();
 		m_Context->SwapBuffer(m_Data.VSync);
@@ -63,58 +63,49 @@ namespace Hanabi
 
 	void Window::Init()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		HNB_CORE_INFO("Creating window {0} ({1}, {2})", m_Data.Title, m_Data.Width, m_Data.Height);
 
 		if (s_GLFWWindowCount == 0)
 		{
-			HNB_PROFILE_SCOPE("glfwInit");
-
 			int success = glfwInit();
 			HNB_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
-		{
-			HNB_PROFILE_SCOPE("glfwCreateWindow");
 
-			switch (RendererAPI::GetAPI())
-			{
-			case RendererAPI::API::OpenGL:
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGL:
 #if defined(HNB_DEBUG)
-				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
-				m_Data.Title += "<OpenGL>";
-				break;
+			m_Data.Title += "<OpenGL>";
+			break;
 
 #if defined(HNB_PLATFORM_WINDOWS)
-			case RendererAPI::API::DX11:
-				glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-				m_Data.Title += "<DX11>";
-				break;
+		case RendererAPI::API::DX11:
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+			m_Data.Title += "<DX11>";
+			break;
 #endif
-			}
-
-			m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
-			++s_GLFWWindowCount;
 		}
-		{
-			HNB_PROFILE_SCOPE("RenderingContext Init");
 
-			switch (RendererAPI::GetAPI())
-			{
-			case RendererAPI::API::OpenGL:
-				m_Context = RenderingContext::Create(m_Window);
-				m_Data.Title += "(OpenGL)";
-				break;
+		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		++s_GLFWWindowCount;
+
+
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPI::API::OpenGL:
+			m_Context = RenderingContext::Create(m_Window);
+			m_Data.Title += "(OpenGL)";
+			break;
 
 #if defined(HNB_PLATFORM_WINDOWS)
-			case RendererAPI::API::DX11:
-				HWND winWnd = glfwGetWin32Window(m_Window);
-				m_Context = RenderingContext::Create(&winWnd);
-				break;
+		case RendererAPI::API::DX11:
+			HWND winWnd = glfwGetWin32Window(m_Window);
+			m_Context = RenderingContext::Create(&winWnd);
+			break;
 #endif
-			}
 		}
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -208,8 +199,6 @@ namespace Hanabi
 
 	void Window::Shutdown()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glfwDestroyWindow(m_Window);
 		--s_GLFWWindowCount;
 		if (s_GLFWWindowCount == 0)

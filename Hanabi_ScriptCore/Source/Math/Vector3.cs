@@ -13,13 +13,19 @@
             Z = scalar;
         }
 
+        public Vector3(Vector2 xy, float z)
+        {
+            X = xy.X;
+            Y = xy.Y;
+            Z = z;
+        }
+
         public Vector3(float x, float y, float z)
         {
             X = x;
             Y = y;
             Z = z;
         }
-
 
         public Vector2 XY
         {
