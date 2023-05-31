@@ -9,4 +9,4 @@ Sandbox/imgui.ini
 *.log
 *.json
 *.csproj
-Hanabi_Editor/SandboxProject/Assets/Scripts
+Hanabi_Editor/SandboxProject/Assets/Scripts/Binaries
