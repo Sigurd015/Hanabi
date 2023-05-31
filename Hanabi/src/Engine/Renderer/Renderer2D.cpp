@@ -188,7 +188,7 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			s_Data.CameraBuffer.ViewProjection = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f))
 				* glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)) * s_Data.CameraBuffer.ViewProjection;
 			s_Data.CameraBuffer.ViewProjection = glm::transpose(s_Data.CameraBuffer.ViewProjection);
@@ -208,7 +208,7 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			s_Data.CameraBuffer.ViewProjection = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 1.0f))
 				* glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, -1.0f)) * s_Data.CameraBuffer.ViewProjection;
 			s_Data.CameraBuffer.ViewProjection = glm::transpose(s_Data.CameraBuffer.ViewProjection);

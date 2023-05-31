@@ -32,22 +32,22 @@
 
 namespace Hanabi
 {
-	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
+	Scope<RendererAPI> RenderCommand::s_RendererAPI = nullptr;
 
-	RendererAPI::API RendererAPI::s_API = RendererAPI::API::DX11;
+	RendererAPIType RendererAPI::s_API = RendererAPIType::None;
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateScope<OpenGLRendererAPI>();
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11RendererAPI>();
 #endif
 		}
@@ -60,14 +60,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11Context>(static_cast<HWND*>(window));
 #endif
 		}
@@ -80,14 +80,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLShader>(filepath);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11Shader>(filepath);
 #endif
 		}
@@ -99,14 +99,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLVertexArray>();
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11VertexDeclaration>();
 #endif
 		}
@@ -118,14 +118,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLVertexBuffer>(size);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11VertexBuffer>(size);
 #endif
 		}
@@ -136,14 +136,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLVertexBuffer>(vertices, size);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11VertexBuffer>(vertices, size);
 #endif
 		}
@@ -155,14 +155,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLIndexBuffer>(indices, count);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11IndexBuffer>(indices, count);
 #endif
 		}
@@ -174,14 +174,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return  CreateRef<OpenGLTexture2D>(path);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11Texture2D>(path);
 #endif
 		}
@@ -193,14 +193,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLTexture2D>(width, height);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11Texture2D>(width, height);
 #endif
 		}
@@ -212,14 +212,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLFramebuffer>(spec);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11Framebuffer>(spec);
 #endif
 		}
@@ -232,14 +232,14 @@ namespace Hanabi
 	{
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::None:
+		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLUniformBuffer>(size, binding);
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			return CreateScope<DX11ConstantBuffer>(size, binding);
 #endif
 		}

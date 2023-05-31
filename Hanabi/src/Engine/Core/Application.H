@@ -5,6 +5,7 @@
 #include "Engine/Layer/LayerStack.h"
 #include "Engine/Layer/Imgui/ImGuiLayer.h"
 #include "Engine/Scripting/ScriptEngine.h"
+#include "Engine/Renderer/RendererAPI.h"
 
 int main(int argc, char** argv);
 
@@ -30,6 +31,7 @@ namespace Hanabi
 		bool EnableImGui;
 		bool EnableScripting;
 		ScriptEngineConfig ScriptConfig;
+		RendererConfig RendererConfig;	
 	};
 
 	class  Application

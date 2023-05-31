@@ -20,6 +20,8 @@ namespace Hanabi
 		if (!m_Specification.WorkingDirectory.empty())
 			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
+		RendererAPI::SetAPI(m_Specification.RendererConfig.APIType);
+
 		m_Window = Window::Create(WindowProps(HNB_BIND_EVENT_FN(Application::OnEvent), m_Specification.Name));
 
 		Renderer::Init();

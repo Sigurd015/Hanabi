@@ -19,9 +19,9 @@ namespace Hanabi
 		m_ActiveScene = m_EditorScene;
 
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
-		if (commandLineArgs.Count > 1)
+		if (commandLineArgs.Count > 2)
 		{
-			auto projectFilePath = commandLineArgs[1];
+			auto projectFilePath = commandLineArgs[2];
 			OpenProject(projectFilePath);
 		}
 		else
@@ -86,7 +86,7 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			mousePos.y = viewportSize.y - mousePos.y;
 			break;
 		}
@@ -363,11 +363,11 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 			break;
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 			break;
 #endif

@@ -74,7 +74,7 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 #if defined(HNB_DEBUG)
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
@@ -82,7 +82,7 @@ namespace Hanabi
 			break;
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 			m_Data.Title += "<DX11>";
 			break;
@@ -94,12 +94,12 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPI::API::OpenGL:
+		case RendererAPIType::OpenGL:
 			m_Context = RenderingContext::Create(m_Window);
 			break;
 
 #if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPI::API::DX11:
+		case RendererAPIType::DX11:
 			HWND winWnd = glfwGetWin32Window(m_Window);
 			m_Context = RenderingContext::Create(&winWnd);
 			break;
