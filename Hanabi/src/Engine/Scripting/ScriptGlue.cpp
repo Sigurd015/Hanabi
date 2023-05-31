@@ -17,6 +17,20 @@ namespace Hanabi
 
 #define HNB_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Hanabi.InternalCalls::" #Name, Name)
 
+	namespace Utils
+	{
+		static std::string MonoStringToUTF8(MonoString* monoString)
+		{
+			if (monoString == nullptr || mono_string_length(monoString) == 0)
+				return "";
+
+			char* str = mono_string_to_utf8(monoString);
+			std::string result(str);
+			mono_free(str);
+			return result;
+		}
+	}
+
 	static Entity GetEntity(UUID entityID)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -92,6 +106,29 @@ namespace Hanabi
 		return Input::IsKeyPressed(keycode);
 	}
 
+	static void Log_LogMessage(LogLevel level, MonoString* inFormattedMessage)
+	{
+		std::string message = Utils::MonoStringToUTF8(inFormattedMessage);
+		switch (level)
+		{
+		case LogLevel::Trace:
+			HNB_SCRIPT_TRACE(message);
+			break;
+		case LogLevel::Info:
+			HNB_SCRIPT_INFO(message);
+			break;
+		case LogLevel::Warn:
+			HNB_SCRIPT_WARN(message);
+			break;
+		case LogLevel::Error:
+			HNB_SCRIPT_ERROR(message);
+			break;
+		case LogLevel::Critical:
+			HNB_SCRIPT_CRITICAL(message);
+			break;
+		}
+	}
+
 	template<typename... Component>
 	static void RegisterComponent()
 	{
@@ -137,5 +174,6 @@ namespace Hanabi
 		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
 
 		HNB_ADD_INTERNAL_CALL(Input_IsKeyDown);
+		HNB_ADD_INTERNAL_CALL(Log_LogMessage);
 	}
 }

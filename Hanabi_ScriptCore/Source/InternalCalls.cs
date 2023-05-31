@@ -28,5 +28,8 @@ namespace Hanabi
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static bool Input_IsKeyDown(KeyCode keycode);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static bool Log_LogMessage(LogLevel level, string message);
     }
 }

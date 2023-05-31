@@ -7,6 +7,7 @@ namespace Hanabi
 {
 	Ref<spdlog::logger> Log::s_CoreLogger;
 	Ref<spdlog::logger> Log::s_ClientLogger;
+	Ref<spdlog::logger> Log::s_ScriptLogger;
 
 	void Log::Init()
 	{
@@ -25,5 +26,9 @@ namespace Hanabi
 		spdlog::register_logger(s_ClientLogger);
 		s_ClientLogger->set_level(spdlog::level::trace);
 		s_ClientLogger->flush_on(spdlog::level::trace);
+		s_ScriptLogger = std::make_shared<spdlog::logger>("SCRIPT", begin(logSinks), end(logSinks));
+		spdlog::register_logger(s_ScriptLogger);
+		s_ScriptLogger->set_level(spdlog::level::trace);
+		s_ScriptLogger->flush_on(spdlog::level::trace);
 	}
 }

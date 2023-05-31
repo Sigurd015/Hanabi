@@ -12,15 +12,26 @@
 
 namespace Hanabi
 {
+	enum class LogLevel : int32_t
+	{
+		Trace = BIT(0),
+		Info = BIT(1),
+		Warn = BIT(2),
+		Error = BIT(3),
+		Critical = BIT(4)
+	};
+
 	class Log
 	{
 	public:
 		static void Init();
 		static Ref<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		static Ref<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+		static Ref<spdlog::logger>& GetScriptLogger() { return s_ScriptLogger; }
 	private:
 		static Ref<spdlog::logger> s_CoreLogger;
 		static Ref<spdlog::logger> s_ClientLogger;
+		static Ref<spdlog::logger> s_ScriptLogger;
 	};
 }
 
@@ -55,3 +66,10 @@ inline OStream& operator<<(OStream& os, glm::qua<T, Q> quaternion)
 #define HNB_WARN(...) ::Hanabi::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define HNB_ERROR(...) ::Hanabi::Log::GetClientLogger()->error(__VA_ARGS__)
 #define HNB_CRITICAL(...) ::Hanabi::Log::GetClientLogger()->critical(__VA_ARGS__)
+
+//Script log macros
+#define HNB_SCRIPT_TRACE(...) ::Hanabi::Log::GetScriptLogger()->trace(__VA_ARGS__)
+#define HNB_SCRIPT_INFO(...) ::Hanabi::Log::GetScriptLogger()->info(__VA_ARGS__)
+#define HNB_SCRIPT_WARN(...) ::Hanabi::Log::GetScriptLogger()->warn(__VA_ARGS__)
+#define HNB_SCRIPT_ERROR(...) ::Hanabi::Log::GetScriptLogger()->error(__VA_ARGS__)
+#define HNB_SCRIPT_CRITICAL(...) ::Hanabi::Log::GetScriptLogger()->critical(__VA_ARGS__)
