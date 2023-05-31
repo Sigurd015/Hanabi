@@ -79,21 +79,12 @@ namespace Hanabi
 		SpriteRendererComponent(const glm::vec4& color) : Color(color) {}
 	};
 
-	// Forward declaration
-	class ScriptableEntity;
-
-	struct NativeScriptComponent
+	struct ScriptComponent
 	{
-		ScriptableEntity* Instance = nullptr;
-		ScriptableEntity* (*InstantiateScript)();
-		void (*DestroyScript)(NativeScriptComponent*);
+		std::string ClassName;
 
-		template<typename T>
-		void Bind()
-		{
-			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
-		}
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
 	};
 
 	// Physics
@@ -152,6 +143,6 @@ namespace Hanabi
 
 	using AllComponents =
 		ComponentGroup<TransformComponent, SpriteRendererComponent,
-		CircleRendererComponent, CameraComponent, NativeScriptComponent,
+		CircleRendererComponent, CameraComponent, ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent>;
 }

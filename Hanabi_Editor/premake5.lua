@@ -2,7 +2,7 @@ project "Hanabi_Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 	
 	targetdir (outputdir .. "/%{prj.name}")
 	objdir (intdir .. "/%{prj.name}")
@@ -18,6 +18,7 @@ project "Hanabi_Editor"
 		"%{wks.location}/Hanabi/src",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.GLFW}",
@@ -26,7 +27,8 @@ project "Hanabi_Editor"
 	
 	links
 	{
-		"Hanabi"
+		"Hanabi",
+		"Hanabi_ScriptCore"
 	}
 	
 	filter "system:windows"

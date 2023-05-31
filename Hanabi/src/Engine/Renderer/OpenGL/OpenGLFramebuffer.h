@@ -16,7 +16,7 @@ namespace Hanabi
 		void ClearAttachment(uint32_t attachmentIndex, int value) override;
 		void* GetColorAttachment(uint32_t index = 0) const override
 		{
-			HNB_CORE_ASSERT(index < m_ColorAttachments.size()); return reinterpret_cast<void*>(m_ColorAttachments[index]);
+			HNB_CORE_ASSERT(index < m_ColorAttachments.size()); return (void*)m_ColorAttachments[index];
 		}
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:

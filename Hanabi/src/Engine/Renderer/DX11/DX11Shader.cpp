@@ -23,8 +23,6 @@ namespace Hanabi
 
 	DX11Shader::DX11Shader(const std::string& filepath)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		std::string source = ReadFile("assets/shaders/DX11/" + filepath + ".hlsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
@@ -39,8 +37,6 @@ namespace Hanabi
 
 	std::string DX11Shader::ReadFile(const std::string& filepath)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in)
@@ -68,8 +64,6 @@ namespace Hanabi
 
 	std::unordered_map<ShaderType, std::string> DX11Shader::PreProcess(const std::string& source)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		std::unordered_map<ShaderType, std::string> shaderSources;
 		const char* typeToken = "#type:";
 		size_t typeTokenLength = strlen(typeToken);
@@ -89,8 +83,6 @@ namespace Hanabi
 
 	void DX11Shader::Compile(const std::unordered_map<ShaderType, std::string>& shaderSources)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		for (auto& kv : shaderSources)
 		{
 			ShaderType type = kv.first;
@@ -120,24 +112,18 @@ namespace Hanabi
 
 	void DX11Shader::Bind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		DX11Context::GetDeviceContext()->VSSetShader(m_VertexShader.Get(), nullptr, 0);
 		DX11Context::GetDeviceContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
 	}
 
 	void DX11Shader::Unbind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		DX11Context::GetDeviceContext()->VSSetShader(nullptr, nullptr, 0);
 		DX11Context::GetDeviceContext()->PSSetShader(nullptr, nullptr, 0);
 	}
 
 	DX11Shader::~DX11Shader()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		m_VertexShader.Reset();
 		m_PixelShader.Reset();
 	}

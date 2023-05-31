@@ -1,6 +1,4 @@
-#include "hnbpch.h"
 #include "SceneHierarchyPanel.h"
-#include "Engine/Scene/Components.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,9 +6,6 @@
 
 namespace Hanabi
 {
-	//TODO
-	extern const std::filesystem::path g_AssetPath;
-
 	template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 	{
@@ -98,11 +93,7 @@ namespace Hanabi
 
 		if (opened)
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
-			ImGui::TreePop();
+			//TODO: Draw Children Entity	
 		}
 	}
 
@@ -210,7 +201,7 @@ namespace Hanabi
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
-			std::strncpy(buffer, tag.c_str(), sizeof(buffer));
+			strncpy_s(buffer, sizeof(buffer), tag.c_str(), sizeof(buffer));
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
@@ -226,6 +217,7 @@ namespace Hanabi
 		if (ImGui::BeginPopup("AddComponent"))
 		{
 			DisplayAddComponentEntry<CameraComponent>("Camera");
+			DisplayAddComponentEntry<ScriptComponent>("Script");
 			DisplayAddComponentEntry<SpriteRendererComponent>("Sprite Renderer");
 			DisplayAddComponentEntry<CircleRendererComponent>("Circle Renderer");
 			DisplayAddComponentEntry<Rigidbody2DComponent>("Rigidbody 2D");
@@ -299,6 +291,82 @@ namespace Hanabi
 				}
 			});
 
+		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
+			{
+				bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+				static char buffer[64];
+				strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
+
+				Utils::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
+
+				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
+					component.ClassName = buffer;
+					return;
+				}
+
+				// Fields
+				bool sceneRunning = scene->IsRunning();
+				if (sceneRunning)
+				{
+					Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+					if (scriptInstance)
+					{
+						const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+
+						for (const auto& [name, field] : fields)
+						{
+							if (field.Type == ScriptFieldType::Float)
+							{
+								float data = scriptInstance->GetFieldValue<float>(name);
+								if (ImGui::DragFloat(name.c_str(), &data))
+								{
+									scriptInstance->SetFieldValue(name, data);
+								}
+							}
+						}
+					}
+				}
+				else if (scriptClassExists)
+				{
+					Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+					const auto& fields = entityClass->GetFields();
+
+					auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+					for (const auto& [name, field] : fields)
+					{
+						// Field has been set in editor
+						if (entityFields.find(name) != entityFields.end())
+						{
+							ScriptFieldInstance& scriptField = entityFields.at(name);
+
+							// Display control to set it maybe
+							if (field.Type == ScriptFieldType::Float)
+							{
+								float data = scriptField.GetValue<float>();
+								if (ImGui::DragFloat(name.c_str(), &data))
+									scriptField.SetValue(data);
+							}
+						}
+						else
+						{
+							// Display control to set it maybe
+							if (field.Type == ScriptFieldType::Float)
+							{
+								float data = 0.0f;
+								if (ImGui::DragFloat(name.c_str(), &data))
+								{		
+									ScriptFieldInstance& fieldInstance = entityFields[name];
+									fieldInstance.Field = field;
+									fieldInstance.SetValue(data);
+								}
+							}
+						}
+					}
+				}
+			});
+
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
@@ -321,7 +389,7 @@ namespace Hanabi
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+						std::filesystem::path texturePath(path);
 						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
 						if (texture->IsLoaded())
 							component.Texture = texture;

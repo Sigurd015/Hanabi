@@ -4,6 +4,9 @@ build/
 *.filters
 *.vcxproj
 *.sln
+Hanabi_Editor/resources/scripts
 Sandbox/imgui.ini
 *.log
 *.json
+*.csproj
+Hanabi_Editor/SandboxProject/Assets/Scripts

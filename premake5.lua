@@ -25,9 +25,17 @@ group "Dependencies"
 	include "Hanabi/vendor/imgui"
 	include "Hanabi/vendor/Box2D"
 	include "Hanabi/vendor/yaml_cpp"
-
 group ""
 
-include "Hanabi/"
-include "Hanabi_Editor/"
-include "Sandbox/"
+group "Core"
+	include "Hanabi/"
+	include "Hanabi_ScriptCore/"
+group ""
+
+group "Tools"
+	include "Hanabi_Editor/"
+group ""
+
+group "Misc"
+	include "Sandbox/"
+group ""

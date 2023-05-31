@@ -2,7 +2,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
 	targetdir (outputdir .. "/%{prj.name}")
 	objdir (intdir .. "/%{prj.name}")
@@ -25,7 +25,8 @@ project "Sandbox"
 
 	links
 	{
-		"Hanabi"
+		"Hanabi",
+		"Hanabi_ScriptCore"
 	}
 
 	filter "system:windows"

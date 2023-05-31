@@ -3,7 +3,8 @@
 #include "Engine/Renderer/Renderer2D.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Entity.h"
-#include "Engine/Scene/ScriptableEntity.h"
+#include "Engine/Scripting/ScriptEngine.h"
+#include "Engine/Physics/Physics2D.h"
 
 // Box2D
 #include <box2d/b2_world.h>
@@ -14,21 +15,8 @@
 
 namespace Hanabi
 {
-	static b2BodyType Rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType)
-	{
-		switch (bodyType)
-		{
-		case Rigidbody2DComponent::BodyType::Static:    return b2_staticBody;
-		case Rigidbody2DComponent::BodyType::Dynamic:   return b2_dynamicBody;
-		case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-		}
-
-		HNB_CORE_ASSERT(false, "Unknown body type");
-		return b2_staticBody;
-	}
-
 	template<typename... Component>
-	static void CopyComponent(entt::registry& dst, entt::registry& src, 
+	static void CopyComponent(entt::registry& dst, entt::registry& src,
 		const std::unordered_map<UUID, entt::entity>& enttMap)
 	{
 		([&]()
@@ -100,11 +88,31 @@ namespace Hanabi
 		return newScene;
 	}
 
-	void Scene::DuplicateEntity(Entity entity)
+	Entity Scene::DuplicateEntity(Entity entity)
 	{
 		std::string name = entity.GetName();
 		Entity newEntity = CreateEntity(name);
 		CopyComponentIfExists(AllComponents{}, newEntity, entity);
+		return newEntity;
+	}
+
+	Entity Scene::GetEntityByUUID(UUID uuid)
+	{
+		bool IsExist = m_EntityMap.find(uuid) != m_EntityMap.end();
+		HNB_CORE_ASSERT(IsExist);
+		return { m_EntityMap.at(uuid), this };
+	}
+
+	Entity Scene::FindEntityByName(std::string_view name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			const TagComponent& tc = view.get<TagComponent>(entity);
+			if (tc.Tag == name)
+				return Entity{ entity, this };
+		}
+		return {};
 	}
 
 	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
@@ -114,6 +122,9 @@ namespace Hanabi
 		entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
+
+		m_EntityMap[uuid] = entity;
+
 		return entity;
 	}
 
@@ -122,61 +133,80 @@ namespace Hanabi
 		return CreateEntityWithUUID(UUID(), name);
 	}
 
+	void Scene::DestroyEntity(Entity entity)
+	{	
+		m_EntityMap.erase(entity.GetUUID());
+		m_Registry.destroy(entity);
+	}
+
 	void Scene::OnRuntimeStart()
 	{
+		m_IsRunning = true;
+
 		OnPhysics2DStart();
+
+		// Scripting
+		{
+			ScriptEngine::OnRuntimeStart(this);
+			// Instantiate all script entities
+
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::OnCreateEntity(entity);
+			}
+		}
 	}
 
 	void Scene::OnRuntimeStop()
 	{
+		m_IsRunning = false;
+
 		OnPhysics2DStop();
+		ScriptEngine::OnRuntimeStop();
 	}
 
-	void Scene::OnSimulationStart()
+	void Scene::Step(int frames)
 	{
-		OnPhysics2DStart();
-	}
-
-	void Scene::OnSimulationStop()
-	{
-		OnPhysics2DStop();
+		m_StepFrames = frames;
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		//Update scripts
-		m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
-			{
-				if (!nsc.Instance)
-				{
-					nsc.Instance = nsc.InstantiateScript();
-					nsc.Instance->m_Entity = Entity{ entity, this };
-
-					nsc.Instance->OnCreate();
-				}
-
-				nsc.Instance->OnUpdate(ts);
-			});
-
-		// Physics
+		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
-			const int32_t velocityIterations = 6;
-			const int32_t positionIterations = 2;
-			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
-			// Retrieve transform from Box2D
-			auto view = m_Registry.view<Rigidbody2DComponent>();
-			for (auto e : view)
+			// C# Entity OnUpdate
 			{
-				Entity entity = { e, this };
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+				auto view = m_Registry.view<ScriptComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					ScriptEngine::OnUpdateEntity(entity, ts);
+				}
+			}
 
-				b2Body* body = (b2Body*)rb2d.RuntimeBody;
-				const auto& position = body->GetPosition();
-				transform.Translation.x = position.x;
-				transform.Translation.y = position.y;
-				transform.Rotation.z = body->GetAngle();
+			// Physics
+			{
+				const int32_t velocityIterations = 6;
+				const int32_t positionIterations = 2;
+				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+
+				// Retrieve transform from Box2D
+				auto view = m_Registry.view<Rigidbody2DComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					auto& transform = entity.GetComponent<TransformComponent>();
+					auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+
+					b2Body* body = (b2Body*)rb2d.RuntimeBody;
+					const auto& position = body->GetPosition();
+					transform.Translation.x = position.x;
+					transform.Translation.y = position.y;
+					transform.Rotation.z = body->GetAngle();
+				}
 			}
 		}
 
@@ -206,7 +236,7 @@ namespace Hanabi
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
 				if (sprite.Texture)
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture, 
+					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
 						sprite.Color, sprite.TilingFactor);
 				else
 					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
@@ -267,7 +297,7 @@ namespace Hanabi
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 			b2BodyDef bodyDef;
-			bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+			bodyDef.type = bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
 			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
 			bodyDef.angle = transform.Rotation.z;
 
@@ -327,7 +357,7 @@ namespace Hanabi
 			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 
 			if (sprite.Texture)
-				Renderer2D::DrawQuad(transform.GetTransform(), 
+				Renderer2D::DrawQuad(transform.GetTransform(),
 					sprite.Texture, sprite.Color, sprite.TilingFactor, (int)entity);
 			else
 				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
@@ -339,7 +369,7 @@ namespace Hanabi
 		{
 			auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-			Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, 
+			Renderer2D::DrawCircle(transform.GetTransform(), circle.Color,
 				circle.Thickness, circle.Fade, (int)entity);
 		}
 
@@ -348,6 +378,9 @@ namespace Hanabi
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
 	{
+		if (m_ViewportWidth == width && m_ViewportHeight == height)
+			return;
+
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 
@@ -371,10 +404,5 @@ namespace Hanabi
 				return Entity{ entity, this };
 		}
 		return {};
-	}
-
-	void Scene::DestroyEntity(Entity entity)
-	{
-		m_Registry.destroy(entity);
 	}
 }

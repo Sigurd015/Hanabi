@@ -1,9 +1,5 @@
 #pragma once
-
-#include "Engine/Core/Base.h"
-#include "Engine/Core/Log.h"
-#include "Engine/Scene/Scene.h"
-#include "Engine/Scene/Entity.h"
+#include "Hanabi.h"
 
 namespace Hanabi
 {

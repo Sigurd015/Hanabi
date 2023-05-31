@@ -20,8 +20,6 @@ namespace Hanabi
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		std::string source = ReadFile("assets/shaders/OpenGl/" + filepath + ".glsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
@@ -36,8 +34,6 @@ namespace Hanabi
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		std::string result;
 		std::ifstream in(filepath, std::ios::in | std::ios::binary);
 		if (in)
@@ -65,8 +61,6 @@ namespace Hanabi
 
 	std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const std::string& source)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		std::unordered_map<GLenum, std::string> shaderSources;
 		const char* typeToken = "#type:";
 		size_t typeTokenLength = strlen(typeToken);
@@ -159,22 +153,16 @@ namespace Hanabi
 
 	OpenGLShader::~OpenGLShader()
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glDeleteProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Bind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glUseProgram(m_RendererID);
 	}
 
 	void OpenGLShader::Unbind() const
 	{
-		HNB_PROFILE_FUNCTION();
-
 		glUseProgram(0);
 	}
 
@@ -190,46 +178,32 @@ namespace Hanabi
 
 	void OpenGLShader::SetUniform(const std::string& name, int value)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformInt(name, value);
 	}
 
 	void OpenGLShader::SetUniform(const std::string& name, int* values, uint32_t count)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformIntArray(name, values, count);
 	}
 
 	void OpenGLShader::SetUniform(const std::string& name, float value)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformFloat(name, value);
 	}
 	void OpenGLShader::SetUniform(const std::string& name, const glm::vec2& value)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformVec2(name, value);
 	}
 	void OpenGLShader::SetUniform(const std::string& name, const glm::vec3& value)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformVec3(name, value);
 	}
 	void OpenGLShader::SetUniform(const std::string& name, const glm::vec4& value)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformVec4(name, value);
 	}
 	void OpenGLShader::SetUniform(const std::string& name, const glm::mat4& value)
 	{
-		HNB_PROFILE_FUNCTION();
-
 		UploadUniformMat4(name, value);
 	}
 	void OpenGLShader::UploadUniformInt(const std::string& name, int value)

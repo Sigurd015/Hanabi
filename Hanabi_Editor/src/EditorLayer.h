@@ -1,18 +1,14 @@
 #pragma once
 #include "Hanabi.h"
-#include "Engine/Renderer/EditorCamera.h"
-#include "Engine/Renderer/Framebuffer.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
-#include "Engine/Events/KeyEvent.h"
-#include "Engine/Events/MouseEvent.h"
 
 namespace Hanabi
 {
 	class EditorLayer : public Layer
 	{
 	public:
-		EditorLayer();
+		EditorLayer() : Layer("EditorLayer") {}
 		virtual ~EditorLayer() = default;
 		virtual void OnAttach() override;
 		virtual void OnDetach() override;
@@ -21,10 +17,13 @@ namespace Hanabi
 		void OnEvent(Event& e) override;
 	private:
 		void OnScenePlay();
-		void OnSceneSimulate();
 		void OnSceneStop();
+		void OnScenePause(bool pause);
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+		bool OpenProject();
+		void OpenProject(const std::filesystem::path& path);
+		void SaveProject();
 		void NewScene();
 		void OpenScene(const std::filesystem::path& path);
 		void OpenScene();
@@ -34,33 +33,33 @@ namespace Hanabi
 		void OnDuplicateEntity();
 		void OnOverlayRender();
 
-		// UI Panels
-		void UI_Toolbar();
-		void UI_MenuBar();
-		void UI_StatesPanel();
-		void UI_Viewport();
+		//UI
+		void UI_StatisticsPanel();
+		void UI_ViewportPanel();
 
 		enum class SceneState
 		{
-			Edit = 0, Play = 1, Simulate = 2
+			Edit = 0, Play = 1,
 		};
 		SceneState m_SceneState = SceneState::Edit;
+
+		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 
 		EditorCamera m_EditorCamera;
 		int m_GizmoType = -1;
 		bool m_ViewportFocused = false, m_ViewportHovered = false;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		glm::vec2 m_ViewportBounds[2];
-		SceneHierarchyPanel m_SceneHierarchyPanel;
-		ContentBrowserPanel m_ContentBrowserPanel;
 		Ref<Scene> m_EditorScene;
 		std::filesystem::path m_EditorScenePath;
-		bool m_ShowPhysicsColliders = false;
 		bool m_PrimaryCamera = true;
+		bool m_ShowPhysicsColliders = false;
+		bool m_EnableVsyn = false;
 		Ref<Scene> m_ActiveScene;
 		Ref<Framebuffer> m_Framebuffer;
 		Entity m_HoveredEntity;
 		// Editor resources
-		Ref<Texture2D> m_IconPlay, m_IconSimulate, m_IconStop;
+		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconPause, m_IconStep;
 	};
 }

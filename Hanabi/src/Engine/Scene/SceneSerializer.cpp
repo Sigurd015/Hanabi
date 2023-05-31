@@ -3,11 +3,31 @@
 #include "Engine/Scene/SceneSerializer.h"
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scene/Components.h"
+#include "Engine/Scripting/ScriptEngine.h"
+#include "Engine/Core/UUID.h"
+#include "Engine/Project/Project.h"
 
 #include <yaml-cpp/yaml.h>
 
 namespace YAML
 {
+	template<>
+	struct convert<Hanabi::UUID>
+	{
+		static Node encode(const Hanabi::UUID& uuid)
+		{
+			Node node;
+			node.push_back((uint64_t)uuid);
+			return node;
+		}
+
+		static bool decode(const Node& node, Hanabi::UUID& uuid)
+		{
+			uuid = node.as<uint64_t>();
+			return true;
+		}
+	};
+
 	template<>
 	struct convert<glm::vec2>
 	{
@@ -86,6 +106,20 @@ namespace YAML
 
 namespace Hanabi
 {
+
+#define WRITE_SCRIPT_FIELD(FieldType, Type)           \
+			case ScriptFieldType::FieldType:          \
+				out << scriptField.GetValue<Type>();  \
+				break
+
+#define READ_SCRIPT_FIELD(FieldType, Type)             \
+	case ScriptFieldType::FieldType:                   \
+	{                                                  \
+		Type data = scriptField["Data"].as<Type>();    \
+		fieldInstance.SetValue(data);                  \
+		break;                                         \
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
 	{
 		out << YAML::Flow;
@@ -130,10 +164,6 @@ namespace Hanabi
 		return Rigidbody2DComponent::BodyType::Static;
 	}
 
-
-	SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : m_Scene(scene)
-	{}
-
 	template<typename T, typename Function>
 	static void SerializeComponent(const std::string& name, Entity entity, YAML::Emitter& out, Function func)
 	{
@@ -158,6 +188,7 @@ namespace Hanabi
 				auto& tag = entity.GetComponent<TagComponent>().Tag;
 				out << YAML::Key << "Tag" << YAML::Value << tag;
 			});
+
 		SerializeComponent<TransformComponent>("TransformComponent", entity, out, [&]()
 			{
 				auto& tc = entity.GetComponent<TransformComponent>();
@@ -165,6 +196,7 @@ namespace Hanabi
 				out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
 				out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 			});
+
 		SerializeComponent<CameraComponent>("CameraComponent", entity, out, [&]()
 			{
 				auto& cameraComponent = entity.GetComponent<CameraComponent>();
@@ -185,6 +217,57 @@ namespace Hanabi
 				out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
 
 			});
+
+		SerializeComponent<ScriptComponent>("ScriptComponent", entity, out, [&]()
+			{
+				auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+				out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
+
+				// Fields
+				Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComponent.ClassName);
+				const auto& fields = entityClass->GetFields();
+				if (fields.size() > 0)
+				{
+					out << YAML::Key << "ScriptFields" << YAML::Value;
+					auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+					out << YAML::BeginSeq;
+					for (const auto& [name, field] : fields)
+					{
+						if (entityFields.find(name) == entityFields.end())
+							continue;
+
+						out << YAML::BeginMap; // ScriptField
+						out << YAML::Key << "Name" << YAML::Value << name;
+						out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
+
+						out << YAML::Key << "Data" << YAML::Value;
+						ScriptFieldInstance& scriptField = entityFields.at(name);
+
+						switch (field.Type)
+						{
+							WRITE_SCRIPT_FIELD(Float, float);
+							WRITE_SCRIPT_FIELD(Double, double);
+							WRITE_SCRIPT_FIELD(Bool, bool);
+							WRITE_SCRIPT_FIELD(Char, char);
+							WRITE_SCRIPT_FIELD(Byte, int8_t);
+							WRITE_SCRIPT_FIELD(Short, int16_t);
+							WRITE_SCRIPT_FIELD(Int, int32_t);
+							WRITE_SCRIPT_FIELD(Long, int64_t);
+							WRITE_SCRIPT_FIELD(UByte, uint8_t);
+							WRITE_SCRIPT_FIELD(UShort, uint16_t);
+							WRITE_SCRIPT_FIELD(UInt, uint32_t);
+							WRITE_SCRIPT_FIELD(ULong, uint64_t);
+							WRITE_SCRIPT_FIELD(Vector2, glm::vec2);
+							WRITE_SCRIPT_FIELD(Vector3, glm::vec3);
+							WRITE_SCRIPT_FIELD(Vector4, glm::vec4);
+							WRITE_SCRIPT_FIELD(Entity, UUID);
+						}
+						out << YAML::EndMap; // ScriptFields
+					}
+					out << YAML::EndSeq;
+				}
+			});
+
 		SerializeComponent<SpriteRendererComponent>("SpriteRendererComponent", entity, out, [&]()
 			{
 				auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
@@ -269,8 +352,7 @@ namespace Hanabi
 		try
 		{
 			data = YAML::LoadFile(filepath);
-		}
-		catch (YAML::ParserException e)
+		} catch (YAML::ParserException e)
 		{
 			HNB_CORE_ERROR("Failed to load .Hanabi file '{0}'\n     {1}", filepath, e.what());
 			return false;
@@ -327,13 +409,70 @@ namespace Hanabi
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
 				}
 
+				auto scriptComponent = entity["ScriptComponent"];
+				if (scriptComponent)
+				{
+					auto& sc = deserializedEntity.AddComponent<ScriptComponent>();
+					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+
+					auto scriptFields = scriptComponent["ScriptFields"];
+					if (scriptFields)
+					{
+						Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+						if (entityClass)
+						{
+							const auto& fields = entityClass->GetFields();
+							auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+							for (auto scriptField : scriptFields)
+							{
+								std::string name = scriptField["Name"].as<std::string>();
+								std::string typeString = scriptField["Type"].as<std::string>();
+								ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+								ScriptFieldInstance& fieldInstance = entityFields[name];
+
+								HNB_CORE_ASSERT(fields.find(name) != fields.end());
+
+								if (fields.find(name) == fields.end())
+									continue;
+
+								fieldInstance.Field = fields.at(name);
+
+								switch (type)
+								{
+									READ_SCRIPT_FIELD(Float, float);
+									READ_SCRIPT_FIELD(Double, double);
+									READ_SCRIPT_FIELD(Bool, bool);
+									READ_SCRIPT_FIELD(Char, char);
+									READ_SCRIPT_FIELD(Byte, int8_t);
+									READ_SCRIPT_FIELD(Short, int16_t);
+									READ_SCRIPT_FIELD(Int, int32_t);
+									READ_SCRIPT_FIELD(Long, int64_t);
+									READ_SCRIPT_FIELD(UByte, uint8_t);
+									READ_SCRIPT_FIELD(UShort, uint16_t);
+									READ_SCRIPT_FIELD(UInt, uint32_t);
+									READ_SCRIPT_FIELD(ULong, uint64_t);
+									READ_SCRIPT_FIELD(Vector2, glm::vec2);
+									READ_SCRIPT_FIELD(Vector3, glm::vec3);
+									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Entity, UUID);
+								}
+							}
+						}
+					}
+				}
+
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];
 				if (spriteRendererComponent)
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 					if (spriteRendererComponent["TexturePath"])
-						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+					{					
+						//TODO: move to asset manger
+						std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+						src.Texture = Texture2D::Create(texturePath);
+					}
 
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
