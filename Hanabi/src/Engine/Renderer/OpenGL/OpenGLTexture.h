@@ -13,7 +13,7 @@ namespace Hanabi
 		~OpenGLTexture2D();
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
-		void* GetRendererID() const override { return reinterpret_cast<void*>(m_RendererID); }
+		void* GetRendererID() const override { return (void*)m_RendererID; }
 		virtual bool IsLoaded() const override { return m_IsLoaded; }
 		void Bind(uint32_t slot = 0) const override;
 		void SetData(void* data, uint32_t size) override;

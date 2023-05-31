@@ -28,8 +28,8 @@ namespace Hanabi
 		~ImGuiLayerOpenGL() = default;
 		void OnAttach() override;
 		void OnDetach() override;
-		void Begin();
-		void End();
+		void Begin() override;
+		void End() override;
 	};
 #if defined(HNB_PLATFORM_WINDOWS)
 	class ImGuiLayerDX11 : public ImGuiLayer
@@ -39,8 +39,8 @@ namespace Hanabi
 		~ImGuiLayerDX11() = default;
 		void OnAttach() override;
 		void OnDetach() override;
-		void Begin();
-		void End();
+		void Begin() override;
+		void End() override;
 	};
 #endif
 }

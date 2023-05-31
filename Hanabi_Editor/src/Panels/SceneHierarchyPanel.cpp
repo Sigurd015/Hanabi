@@ -1,7 +1,4 @@
-#include "hnbpch.h"
 #include "SceneHierarchyPanel.h"
-#include "Engine/Scene/Components.h"
-#include "Engine/Scripting/ScriptEngine.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,9 +6,6 @@
 
 namespace Hanabi
 {
-	//TODO
-	extern const std::filesystem::path g_AssetPath;
-
 	template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 	{
@@ -99,11 +93,7 @@ namespace Hanabi
 
 		if (opened)
 		{
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
-			ImGui::TreePop();
+			//TODO: Draw Children Entity	
 		}
 	}
 
@@ -308,11 +298,13 @@ namespace Hanabi
 				static char buffer[64];
 				strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-				if (!scriptClassExists)
-					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+				Utils::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
 
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				{
 					component.ClassName = buffer;
+					return;
+				}
 
 				// Fields
 				bool sceneRunning = scene->IsRunning();
@@ -373,9 +365,6 @@ namespace Hanabi
 						}
 					}
 				}
-
-				if (!scriptClassExists)
-					ImGui::PopStyleColor();
 			});
 
 		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
@@ -400,7 +389,7 @@ namespace Hanabi
 					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+						std::filesystem::path texturePath(path);
 						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
 						if (texture->IsLoaded())
 							component.Texture = texture;

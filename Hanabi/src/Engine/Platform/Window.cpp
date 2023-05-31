@@ -48,7 +48,7 @@ namespace Hanabi
 
 	void Window::SetWindowTitle(const std::string& title)
 	{
-		glfwSetWindowTitle(m_Window, (m_Data.Title + title).c_str());
+		glfwSetWindowTitle(m_Window, (title + " - " + m_Data.Title).c_str());
 	}
 
 	void Window::SetVSync(bool enable)
@@ -92,12 +92,10 @@ namespace Hanabi
 		m_Window = glfwCreateWindow((int)m_Data.Width, (int)m_Data.Height, m_Data.Title.c_str(), nullptr, nullptr);
 		++s_GLFWWindowCount;
 
-
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPI::API::OpenGL:
 			m_Context = RenderingContext::Create(m_Window);
-			m_Data.Title += "(OpenGL)";
 			break;
 
 #if defined(HNB_PLATFORM_WINDOWS)

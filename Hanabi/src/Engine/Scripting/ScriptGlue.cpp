@@ -105,7 +105,7 @@ namespace Hanabi
 				MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
 				if (!managedType)
 				{
-					HNB_CORE_ERROR("Could not find component type {}", managedTypename);
+					HNB_CORE_ERROR("[ScriptEngine] Could not find component type {}", managedTypename);
 					return;
 				}
 				s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };

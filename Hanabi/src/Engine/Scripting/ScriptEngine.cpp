@@ -2,11 +2,14 @@
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Scripting/ScriptGlue.h"
 #include "Engine/Core/Application.h"
+#include "Engine/Core/FileSystem.h"
+#include "Engine/Project/Project.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/object.h>
 #include <mono/metadata/tabledefs.h>
+#include <mono/metadata/threads.h>
 #include <FileWatch.h>
 
 namespace Hanabi
@@ -34,71 +37,21 @@ namespace Hanabi
 
 	namespace Utils
 	{
-		// TODO: move to FileSystem class
-		static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
-		{
-			std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-			if (!stream)
-			{
-				// Failed to open the file
-				return nullptr;
-			}
-
-			std::streampos end = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			uint64_t size = end - stream.tellg();
-
-			if (size == 0)
-			{
-				// File is empty
-				return nullptr;
-			}
-
-			char* buffer = new char[size];
-			stream.read((char*)buffer, size);
-			stream.close();
-
-			*outSize = (uint32_t)size;
-			return buffer;
-		}
-
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
 		{
-			uint32_t fileSize = 0;
-			char* fileData = ReadBytes(assemblyPath, &fileSize);
+			ScopedBuffer fileData = FileSystem::ReadFileBinary(assemblyPath);
 			// NOTE: We can't use this image for anything other than loading the assembly because this image doesn't have a reference to the assembly
 			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+			MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size(), 1, &status, 0);
 			if (status != MONO_IMAGE_OK)
 			{
 				const char* errorMessage = mono_image_strerror(status);
-				// Log some error message using the errorMessage data
 				return nullptr;
 			}
 			std::string pathString = assemblyPath.string();
 			MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
 			mono_image_close(image);
-			// Don't forget to free the file data
-			delete[] fileData;
 			return assembly;
-		}
-
-		void PrintAssemblyTypes(MonoAssembly* assembly)
-		{
-			MonoImage* image = mono_assembly_get_image(assembly);
-			const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-			int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
-
-			for (int32_t i = 0; i < numTypes; i++)
-			{
-				uint32_t cols[MONO_TYPEDEF_SIZE];
-				mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
-				const char* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-				const char* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-
-				HNB_CORE_TRACE("{}.{}", nameSpace, name);
-			}
 		}
 
 		ScriptFieldType MonoTypeToScriptFieldType(MonoType* monoType)
@@ -108,7 +61,7 @@ namespace Hanabi
 			auto it = s_ScriptFieldTypeMap.find(typeName);
 			if (it == s_ScriptFieldTypeMap.end())
 			{
-				HNB_CORE_ERROR("Unknown type: {}", typeName);
+				HNB_CORE_ERROR("[ScriptEngine] Unknown Field type: {}", typeName);
 				return ScriptFieldType::None;
 			}
 
@@ -158,25 +111,20 @@ namespace Hanabi
 		}
 	}
 
-	void ScriptEngine::Init()
+	void ScriptEngine::Init(const ScriptEngineConfig& config)
 	{
 		s_Data = new ScriptEngineData();
 
 		InitMono();
 		ScriptGlue::RegisterFunctions();
 
-		s_Data->CoreAssemblyFilepath = "resources/scripts/Hanabi_ScriptCore.dll";
-		s_Data->AppAssemblyFilepath = "SandboxProject/Assets/Scripts/Binaries/Sandbox.dll";
-
-		//ReloadAssembly();
-		LoadAssembly(s_Data->CoreAssemblyFilepath);
-		LoadAppAssembly(s_Data->AppAssemblyFilepath);
-		LoadAssemblyClasses();
-
-		ScriptGlue::RegisterComponents();
-
-		// Retrieve and instantiate class
-		s_Data->EntityClass = ScriptClass("Hanabi", "Entity", true);
+		s_Data->CoreAssemblyFilepath = config.CoreAssemblyPath;
+		bool status = LoadAssembly(s_Data->CoreAssemblyFilepath);
+		if (!status)
+		{
+			HNB_CORE_ERROR("[ScriptEngine] Could not load ScriptCore assembly at path: {}", s_Data->CoreAssemblyFilepath);
+			return;
+		}
 	}
 
 	void ScriptEngine::InitMono()
@@ -188,6 +136,8 @@ namespace Hanabi
 
 		// Store the root domain pointer
 		s_Data->RootDomain = rootDomain;
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::Shutdown()
@@ -207,32 +157,48 @@ namespace Hanabi
 		s_Data->RootDomain = nullptr;
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		// Create an App Domain
 		s_Data->AppDomain = mono_domain_create_appdomain("HanabiJITRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
+		if (s_Data->CoreAssembly == nullptr)
+			return false;
+
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
-		//Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
+		return true;
 	}
 
-	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
+		s_Data->AppAssemblyFilepath = filepath;
 		// Move this maybe
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
-		auto assemb = s_Data->AppAssembly;
+		if (s_Data->AppAssembly == nullptr)
+		{
+			HNB_CORE_ERROR("[ScriptEngine] Could not load app assembly at path: {}", s_Data->AppAssemblyFilepath);
+			return false;
+		}
+
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
-		auto assembi = s_Data->AppAssemblyImage;
-		//Utils::PrintAssemblyTypes(s_Data->AppAssembly);
 
 		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
+
+		LoadAssemblyClasses();
+
+		ScriptGlue::RegisterComponents();
+
+		// Retrieve and instantiate class
+		s_Data->EntityClass = ScriptClass("Hanabi", "Entity", true);
+
+		return true;
 	}
 
 	void ScriptEngine::ReloadAssembly()
 	{
-		HNB_CORE_INFO("Reloading script assembly");
+		HNB_CORE_INFO("[ScriptEngine] Reload assembly");
 
 		mono_domain_set(mono_get_root_domain(), false);
 
@@ -306,10 +272,15 @@ namespace Hanabi
 	void ScriptEngine::OnUpdateEntity(Entity entity, Timestep ts)
 	{
 		UUID entityUUID = entity.GetUUID();
-		HNB_CORE_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end());
-
-		Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
-		instance->InvokeOnUpdate((float)ts);
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnUpdate((float)ts);
+		}
+		else
+		{
+			HNB_CORE_ERROR("[ScriptEngine] Could not find ScriptInstance for entity {}", entityUUID);
+		}
 	}
 
 	Scene* ScriptEngine::GetSceneContext()
@@ -387,7 +358,7 @@ namespace Hanabi
 			// to iterate over all of the elements. When no more values are available, the return value is NULL.
 
 			int fieldCount = mono_class_num_fields(monoClass);
-			HNB_CORE_WARN("{} has {} fields:", className, fieldCount);
+			HNB_CORE_WARN("[ScriptEngine] {} has {} fields:", className, fieldCount);
 			void* iterator = nullptr;
 			while (MonoClassField* field = mono_class_get_fields(monoClass, &iterator))
 			{
@@ -397,7 +368,7 @@ namespace Hanabi
 				{
 					MonoType* type = mono_field_get_type(field);
 					ScriptFieldType fieldType = Utils::MonoTypeToScriptFieldType(type);
-					HNB_CORE_WARN("  {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
+					HNB_CORE_WARN("[ScriptEngine]  {} ({})", fieldName, Utils::ScriptFieldTypeToString(fieldType));
 
 					scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
 				}
@@ -424,7 +395,8 @@ namespace Hanabi
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* method, void** params)
 	{
-		return mono_runtime_invoke(method, instance, params, nullptr);
+		MonoObject* exception = nullptr;
+		return mono_runtime_invoke(method, instance, params, &exception);
 	}
 
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity) : m_ScriptClass(scriptClass)

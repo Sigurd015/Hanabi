@@ -11,10 +11,10 @@
 #include <comdef.h>
 #define HNB_CORE_DX_ASSERT(x) {if(FAILED(x)){_com_error err(x);LPCTSTR errMsg = err.ErrorMessage();HNB_DEBUGBREAK();}}
 #else
-#define HNB_CORE_DX_ASSERT(x)
 #endif
 #define HNB_ENABLE_ASSERTS
 #else
+#define HNB_CORE_DX_ASSERT(x) x	
 #define HNB_DEBUGBREAK()
 #endif
 

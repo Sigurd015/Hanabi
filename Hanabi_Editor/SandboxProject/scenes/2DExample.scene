@@ -73,10 +73,10 @@ Entities:
       ScriptFields:
         - Name: Speed
           Type: Float
-          Data: 0.5
+          Data: 0.600000024
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
-      TexturePath: assets\textures\Checkerboard.png
+      TexturePath: SandboxProject\Assets\textures\Checkerboard.png
       TilingFactor: 1.39999998
     Rigidbody2DComponent:
       BodyType: Dynamic

@@ -1,8 +1,4 @@
 #include "EditorLayer.h"
-#include "Engine/Scene/Components.h"
-#include "Engine/Scene/SceneSerializer.h"
-#include "Engine/Utils/PlatformUtils.h"
-#include "Engine/Math/Math.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -11,12 +7,6 @@
 
 namespace Hanabi
 {
-	//TODO
-	extern const std::filesystem::path g_AssetPath;
-
-	EditorLayer::EditorLayer() : Layer("EditorLayer")
-	{}
-
 	void EditorLayer::OnAttach()
 	{
 		FramebufferSpecification fbSpec;
@@ -31,15 +21,21 @@ namespace Hanabi
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
 		{
-			auto sceneFilePath = commandLineArgs[1];
-			OpenScene(sceneFilePath);
+			auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);
+		}
+		else
+		{
+			if (!OpenProject())
+				Application::Get().Close();
 		}
 
 		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 
 		m_IconPlay = Texture2D::Create("resources/icons/PlayButton.png");
-		m_IconSimulate = Texture2D::Create("resources/icons/SimulateButton.png");
 		m_IconStop = Texture2D::Create("resources/icons/StopButton.png");
+		m_IconPause = Texture2D::Create("resources/icons/PauseButton.png");
+		m_IconStep = Texture2D::Create("resources/icons/StepButton.png");
 	}
 
 	void EditorLayer::OnDetach()
@@ -79,12 +75,6 @@ namespace Hanabi
 		case SceneState::Play:
 		{
 			m_ActiveScene->OnUpdateRuntime(ts);
-			break;
-		}
-		case SceneState::Simulate:
-		{
-			m_EditorCamera.OnUpdate(ts);
-			m_ActiveScene->OnUpdateSimulation(ts, m_EditorCamera);
 			break;
 		}
 		}
@@ -179,6 +169,7 @@ namespace Hanabi
 
 	void EditorLayer::OnImGuiRender()
 	{
+#pragma region Dockspace Settings
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
 		bool opt_fullscreen = opt_fullscreen_persistant;
@@ -202,6 +193,7 @@ namespace Hanabi
 		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
 		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
 			window_flags |= ImGuiWindowFlags_NoBackground;
+#pragma endregion	
 
 		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
 		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
@@ -227,12 +219,43 @@ namespace Hanabi
 		}
 		style.WindowMinSize.x = minWinSizeX;
 
-		UI_MenuBar();
+#pragma region Menu Bar	
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
+				// which we can't undo at the moment without finer window depth/z control.
+				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
+				if (ImGui::MenuItem("Open Project...", "Ctrl+O"))
+					OpenProject();
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("New Scene", "Ctrl+N"))
+					NewScene();
+
+				if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+					SaveScene();
+
+				if (ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem("Exit"))
+					Application::Get().Close();
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+#pragma endregion	
+
 		m_SceneHierarchyPanel.OnImGuiRender();
 		m_ContentBrowserPanel.OnImGuiRender();
-		UI_StatesPanel();
-		UI_Viewport();
-		UI_Toolbar();
+		UI_StatisticsPanel();
+		UI_ViewportPanel();
 		ImGui::End();
 	}
 
@@ -247,38 +270,29 @@ namespace Hanabi
 		dispatcher.Dispatch<MouseButtonPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 
-	void EditorLayer::UI_MenuBar()
+	void EditorLayer::UI_StatisticsPanel()
 	{
-		if (ImGui::BeginMenuBar())
+		m_EnableVsyn = Application::Get().GetWindow().IsVSync();
+		ImGui::Begin("Settings");
+		auto stats = Renderer2D::GetStats();
+		ImGui::Text("Renderer2D Stats:");
+		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+		ImGui::Text("Quads: %d", stats.QuadCount);
+		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
+		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+		ImGui::Separator();
+		ImGui::Text("Render Settings:");
+		ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
+		if (ImGui::Checkbox("Enable Vsyn", &m_EnableVsyn))
 		{
-			if (ImGui::BeginMenu("File"))
-			{
-				// Disabling fullscreen would allow the window to be moved to the front of other windows, 
-				// which we can't undo at the moment without finer window depth/z control.
-				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
-				if (ImGui::MenuItem("New", "Ctrl+N"))
-					NewScene();
-
-				if (ImGui::MenuItem("Open...", "Ctrl+O"))
-					OpenScene();
-
-				if (ImGui::MenuItem("Save", "Ctrl+S"))
-					SaveScene();
-
-				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
-					SaveSceneAs();
-
-				if (ImGui::MenuItem("Exit"))
-					Application::Get().Close();
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
+			Application::Get().GetWindow().SetVSync(m_EnableVsyn);
 		}
+		ImGui::End();
 	}
 
-	void EditorLayer::UI_Toolbar()
+	void EditorLayer::UI_ViewportPanel()
 	{
+#pragma region Viewport_Toolbar	
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -297,48 +311,46 @@ namespace Hanabi
 			tintColor.w = 0.5f;
 
 		float size = ImGui::GetWindowHeight() - 4.0f;
-		Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate) ? m_IconPlay : m_IconStop;
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+		if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 		{
-			if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Simulate)
+			if (m_SceneState == SceneState::Edit)
 				OnScenePlay();
 			else if (m_SceneState == SceneState::Play)
 				OnSceneStop();
 		}
 
-		ImGui::SameLine();
+		if (m_SceneState == SceneState::Play)
 		{
-			Ref<Texture2D> icon = (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play) ? m_IconSimulate : m_IconStop;		//ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-			if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+			ImGui::SameLine();
+			bool isPaused = m_ActiveScene->IsPaused();
+			Ref<Texture2D> icon = isPaused ? m_IconPlay : m_IconPause;
+			if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
-				if (m_SceneState == SceneState::Edit || m_SceneState == SceneState::Play)
-					OnSceneSimulate();
-				else if (m_SceneState == SceneState::Simulate)
-					OnSceneStop();
+				OnScenePause(!isPaused);
+			}
+
+			if (isPaused)
+			{
+				ImGui::SameLine();
+				{
+					Ref<Texture2D> icon = m_IconStep;
+					bool isPaused = m_ActiveScene->IsPaused();
+					if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+					{
+						m_ActiveScene->Step();
+					}
+				}
 			}
 		}
 
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
 		ImGui::End();
-	}
+#pragma endregion	
 
-	void EditorLayer::UI_StatesPanel()
-	{
-		ImGui::Begin("Settings");
-		ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
-		auto stats = Renderer2D::GetStats();
-		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-		ImGui::Text("Quads: %d", stats.QuadCount);
-		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-		ImGui::End();
-	}
-
-	void EditorLayer::UI_Viewport()
-	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
 
@@ -372,7 +384,7 @@ namespace Hanabi
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
 				const wchar_t* path = (const wchar_t*)payload->Data;
-				OpenScene(std::filesystem::path(g_AssetPath) / path);
+				OpenScene(path);
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -444,7 +456,7 @@ namespace Hanabi
 		case Key::O:
 		{
 			if (control)
-				OpenScene();
+				OpenProject();
 			break;
 		}
 		case Key::S:
@@ -484,6 +496,8 @@ namespace Hanabi
 				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 		}
+
+		return false;
 	}
 
 	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
@@ -494,6 +508,32 @@ namespace Hanabi
 				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
 		return false;
+	}
+
+	bool EditorLayer::OpenProject()
+	{
+		std::string filepath = FileDialogs::OpenFile("Hanabi Project (*.hproj)\0*.hproj\0");
+		if (filepath.empty())
+			return false;
+
+		OpenProject(filepath);
+		return true;
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& path)
+	{
+		if (Project::Load(path))
+		{
+			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
+			auto startScenePath = Project::GetProjectDirectory() / Project::GetActive()->GetConfig().StartScene;
+			OpenScene(startScenePath);
+			m_ContentBrowserPanel.SetPath(Project::GetAssetDirectory());
+		}
+	}
+
+	void EditorLayer::SaveProject()
+	{
+		//Project::Save();
 	}
 
 	void EditorLayer::NewScene()
@@ -530,6 +570,7 @@ namespace Hanabi
 
 			m_ActiveScene = m_EditorScene;
 			m_EditorScenePath = path;
+			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
 		}
 	}
 
@@ -559,9 +600,6 @@ namespace Hanabi
 
 	void EditorLayer::OnScenePlay()
 	{
-		if (m_SceneState == SceneState::Simulate)
-			OnSceneStop();
-
 		m_SceneState = SceneState::Play;
 
 		m_ActiveScene = Scene::Copy(m_EditorScene);
@@ -571,12 +609,11 @@ namespace Hanabi
 	}
 	void EditorLayer::OnSceneStop()
 	{
-		HNB_CORE_ASSERT(m_SceneState == SceneState::Play || m_SceneState == SceneState::Simulate);
+		HNB_CORE_ASSERT(m_SceneState == SceneState::Play);
 
 		if (m_SceneState == SceneState::Play)
 			m_ActiveScene->OnRuntimeStop();
-		else if (m_SceneState == SceneState::Simulate)
-			m_ActiveScene->OnSimulationStop();
+
 		m_SceneState = SceneState::Edit;
 
 		m_ActiveScene = m_EditorScene;
@@ -584,17 +621,12 @@ namespace Hanabi
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
-	void EditorLayer::OnSceneSimulate()
+	void EditorLayer::OnScenePause(bool pause)
 	{
-		if (m_SceneState == SceneState::Play)
-			OnSceneStop();
+		if (m_SceneState == SceneState::Edit)
+			return;
 
-		m_SceneState = SceneState::Simulate;
-
-		m_ActiveScene = Scene::Copy(m_EditorScene);
-		m_ActiveScene->OnSimulationStart();
-
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		m_ActiveScene->SetPaused(pause);
 	}
 
 	void EditorLayer::OnDuplicateEntity()
@@ -604,6 +636,9 @@ namespace Hanabi
 
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity)
-			m_EditorScene->DuplicateEntity(selectedEntity);
+		{
+			Entity newEntity = m_EditorScene->DuplicateEntity(selectedEntity);
+			m_SceneHierarchyPanel.SetSelectedEntity(newEntity);
+		}
 	}
 }

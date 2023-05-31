@@ -4,6 +4,7 @@
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scripting/ScriptEngine.h"
+#include "Engine/Physics/Physics2D.h"
 
 // Box2D
 #include <box2d/b2_world.h>
@@ -14,19 +15,6 @@
 
 namespace Hanabi
 {
-	static b2BodyType Rigidbody2DTypeToBox2DBody(Rigidbody2DComponent::BodyType bodyType)
-	{
-		switch (bodyType)
-		{
-		case Rigidbody2DComponent::BodyType::Static:    return b2_staticBody;
-		case Rigidbody2DComponent::BodyType::Dynamic:   return b2_dynamicBody;
-		case Rigidbody2DComponent::BodyType::Kinematic: return b2_kinematicBody;
-		}
-
-		HNB_CORE_ASSERT(false, "Unknown body type");
-		return b2_staticBody;
-	}
-
 	template<typename... Component>
 	static void CopyComponent(entt::registry& dst, entt::registry& src,
 		const std::unordered_map<UUID, entt::entity>& enttMap)
@@ -100,11 +88,12 @@ namespace Hanabi
 		return newScene;
 	}
 
-	void Scene::DuplicateEntity(Entity entity)
+	Entity Scene::DuplicateEntity(Entity entity)
 	{
 		std::string name = entity.GetName();
 		Entity newEntity = CreateEntity(name);
 		CopyComponentIfExists(AllComponents{}, newEntity, entity);
+		return newEntity;
 	}
 
 	Entity Scene::GetEntityByUUID(UUID uuid)
@@ -145,9 +134,9 @@ namespace Hanabi
 	}
 
 	void Scene::DestroyEntity(Entity entity)
-	{
-		m_Registry.destroy(entity);
+	{	
 		m_EntityMap.erase(entity.GetUUID());
+		m_Registry.destroy(entity);
 	}
 
 	void Scene::OnRuntimeStart()
@@ -178,47 +167,46 @@ namespace Hanabi
 		ScriptEngine::OnRuntimeStop();
 	}
 
-	void Scene::OnSimulationStart()
+	void Scene::Step(int frames)
 	{
-		OnPhysics2DStart();
-	}
-
-	void Scene::OnSimulationStop()
-	{
-		OnPhysics2DStop();
+		m_StepFrames = frames;
 	}
 
 	void Scene::OnUpdateRuntime(Timestep ts)
 	{
 		//Update scripts
+		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
 			// C# Entity OnUpdate
-			auto view = m_Registry.view<ScriptComponent>();
-			for (auto e : view)
 			{
-				Entity entity = { e, this };
-				ScriptEngine::OnUpdateEntity(entity, ts);
+				auto view = m_Registry.view<ScriptComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					ScriptEngine::OnUpdateEntity(entity, ts);
+				}
 			}
-		}
-		// Physics
-		{
-			const int32_t velocityIterations = 6;
-			const int32_t positionIterations = 2;
-			m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
 
-			// Retrieve transform from Box2D
-			auto view = m_Registry.view<Rigidbody2DComponent>();
-			for (auto e : view)
+			// Physics
 			{
-				Entity entity = { e, this };
-				auto& transform = entity.GetComponent<TransformComponent>();
-				auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+				const int32_t velocityIterations = 6;
+				const int32_t positionIterations = 2;
+				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
 
-				b2Body* body = (b2Body*)rb2d.RuntimeBody;
-				const auto& position = body->GetPosition();
-				transform.Translation.x = position.x;
-				transform.Translation.y = position.y;
-				transform.Rotation.z = body->GetAngle();
+				// Retrieve transform from Box2D
+				auto view = m_Registry.view<Rigidbody2DComponent>();
+				for (auto e : view)
+				{
+					Entity entity = { e, this };
+					auto& transform = entity.GetComponent<TransformComponent>();
+					auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+
+					b2Body* body = (b2Body*)rb2d.RuntimeBody;
+					const auto& position = body->GetPosition();
+					transform.Translation.x = position.x;
+					transform.Translation.y = position.y;
+					transform.Rotation.z = body->GetAngle();
+				}
 			}
 		}
 
@@ -309,7 +297,7 @@ namespace Hanabi
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 			b2BodyDef bodyDef;
-			bodyDef.type = Rigidbody2DTypeToBox2DBody(rb2d.Type);
+			bodyDef.type = bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
 			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
 			bodyDef.angle = transform.Rotation.z;
 

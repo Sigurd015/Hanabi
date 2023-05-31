@@ -5,6 +5,7 @@
 #include "Engine/Scene/Components.h"
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Core/UUID.h"
+#include "Engine/Project/Project.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -162,10 +163,6 @@ namespace Hanabi
 		HNB_CORE_ASSERT(false, "Unknown body type");
 		return Rigidbody2DComponent::BodyType::Static;
 	}
-
-
-	SceneSerializer::SceneSerializer(const Ref<Scene>& scene) : m_Scene(scene)
-	{}
 
 	template<typename T, typename Function>
 	static void SerializeComponent(const std::string& name, Entity entity, YAML::Emitter& out, Function func)
@@ -355,8 +352,7 @@ namespace Hanabi
 		try
 		{
 			data = YAML::LoadFile(filepath);
-		}
-		catch (YAML::ParserException e)
+		} catch (YAML::ParserException e)
 		{
 			HNB_CORE_ERROR("Failed to load .Hanabi file '{0}'\n     {1}", filepath, e.what());
 			return false;
@@ -423,43 +419,44 @@ namespace Hanabi
 					if (scriptFields)
 					{
 						Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
-						HNB_CORE_ASSERT(entityClass);
-						const auto& fields = entityClass->GetFields();
-						auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
-
-						for (auto scriptField : scriptFields)
+						if (entityClass)
 						{
-							std::string name = scriptField["Name"].as<std::string>();
-							std::string typeString = scriptField["Type"].as<std::string>();
-							ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
-
-							ScriptFieldInstance& fieldInstance = entityFields[name];
-
-							HNB_CORE_ASSERT(fields.find(name) != fields.end());
-
-							if (fields.find(name) == fields.end())
-								continue;
-
-							fieldInstance.Field = fields.at(name);
-
-							switch (type)
+							const auto& fields = entityClass->GetFields();
+							auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+							for (auto scriptField : scriptFields)
 							{
-								READ_SCRIPT_FIELD(Float, float);
-								READ_SCRIPT_FIELD(Double, double);
-								READ_SCRIPT_FIELD(Bool, bool);
-								READ_SCRIPT_FIELD(Char, char);
-								READ_SCRIPT_FIELD(Byte, int8_t);
-								READ_SCRIPT_FIELD(Short, int16_t);
-								READ_SCRIPT_FIELD(Int, int32_t);
-								READ_SCRIPT_FIELD(Long, int64_t);
-								READ_SCRIPT_FIELD(UByte, uint8_t);
-								READ_SCRIPT_FIELD(UShort, uint16_t);
-								READ_SCRIPT_FIELD(UInt, uint32_t);
-								READ_SCRIPT_FIELD(ULong, uint64_t);
-								READ_SCRIPT_FIELD(Vector2, glm::vec2);
-								READ_SCRIPT_FIELD(Vector3, glm::vec3);
-								READ_SCRIPT_FIELD(Vector4, glm::vec4);
-								READ_SCRIPT_FIELD(Entity, UUID);
+								std::string name = scriptField["Name"].as<std::string>();
+								std::string typeString = scriptField["Type"].as<std::string>();
+								ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+
+								ScriptFieldInstance& fieldInstance = entityFields[name];
+
+								HNB_CORE_ASSERT(fields.find(name) != fields.end());
+
+								if (fields.find(name) == fields.end())
+									continue;
+
+								fieldInstance.Field = fields.at(name);
+
+								switch (type)
+								{
+									READ_SCRIPT_FIELD(Float, float);
+									READ_SCRIPT_FIELD(Double, double);
+									READ_SCRIPT_FIELD(Bool, bool);
+									READ_SCRIPT_FIELD(Char, char);
+									READ_SCRIPT_FIELD(Byte, int8_t);
+									READ_SCRIPT_FIELD(Short, int16_t);
+									READ_SCRIPT_FIELD(Int, int32_t);
+									READ_SCRIPT_FIELD(Long, int64_t);
+									READ_SCRIPT_FIELD(UByte, uint8_t);
+									READ_SCRIPT_FIELD(UShort, uint16_t);
+									READ_SCRIPT_FIELD(UInt, uint32_t);
+									READ_SCRIPT_FIELD(ULong, uint64_t);
+									READ_SCRIPT_FIELD(Vector2, glm::vec2);
+									READ_SCRIPT_FIELD(Vector3, glm::vec3);
+									READ_SCRIPT_FIELD(Vector4, glm::vec4);
+									READ_SCRIPT_FIELD(Entity, UUID);
+								}
 							}
 						}
 					}
@@ -471,7 +468,11 @@ namespace Hanabi
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 					if (spriteRendererComponent["TexturePath"])
-						src.Texture = Texture2D::Create(spriteRendererComponent["TexturePath"].as<std::string>());
+					{					
+						//TODO: move to asset manger
+						std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+						src.Texture = Texture2D::Create(texturePath);
+					}
 
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();

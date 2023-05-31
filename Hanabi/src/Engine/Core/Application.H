@@ -4,6 +4,7 @@
 #include "Engine/Platform/Window.h"
 #include "Engine/Layer/LayerStack.h"
 #include "Engine/Layer/Imgui/ImGuiLayer.h"
+#include "Engine/Scripting/ScriptEngine.h"
 
 int main(int argc, char** argv);
 
@@ -26,6 +27,9 @@ namespace Hanabi
 		std::string Name = "Hanabi App";
 		std::string WorkingDirectory;
 		ApplicationCommandLineArgs CommandLineArgs;
+		bool EnableImGui;
+		bool EnableScripting;
+		ScriptEngineConfig ScriptConfig;
 	};
 
 	class  Application
