@@ -12,7 +12,11 @@ OpenGL 4.5, DX11
 TODO:
 - [X] ~~DX11 Support~~
 - [ ] SPIR-V Shader System
-- [ ] Script Engine
+- [X] ~~C# Script Engine~~
+- [ ] Sprite Animation
+- [ ] UI Render
+- [ ] Asset Manager
+- [ ] 3D Renderer
 
 ## Getting Started
 
