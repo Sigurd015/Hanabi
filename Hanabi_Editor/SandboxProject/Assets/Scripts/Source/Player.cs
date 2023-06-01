@@ -1,6 +1,4 @@
 ﻿using Hanabi;
-using System;
-using System.Threading;
 
 namespace Sandbox
 {
@@ -23,7 +21,7 @@ namespace Sandbox
         {
             Time += ts;
 
-            Log.Info($"Player.OnUpdate - {Time}");
+            Log.Info($"Player.OnUpdate - {m_Transform.Translation}");
             Log.Warn($"Player.OnUpdate - {Time}");
             Log.Trace($"Player.OnUpdate - {Time}");
             Log.Critical($"Player.OnUpdate - {Time}");

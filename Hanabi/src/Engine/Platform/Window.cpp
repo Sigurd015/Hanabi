@@ -26,22 +26,16 @@ namespace Hanabi
 
 	Window::Window(const WindowProps& props) :m_Data(props)
 	{
-
-
 		Init();
 	}
 
 	Window::~Window()
 	{
-
-
 		Shutdown();
 	}
 
 	void Window::OnUpdate()
 	{
-
-
 		glfwPollEvents();
 		m_Context->SwapBuffer(m_Data.VSync);
 	}

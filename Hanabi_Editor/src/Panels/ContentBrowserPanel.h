@@ -9,11 +9,14 @@ namespace Hanabi
 	{
 	public:
 		ContentBrowserPanel();
-		void SetPath(std::filesystem::path projPath);
+		void SetProjectPath(std::filesystem::path projPath);
 		void OnImGuiRender();
 	private:
-		std::filesystem::path m_BaseDirectory;
-		std::filesystem::path m_CurrentDirectory;
+		void DrawDirectoryTree();
+		void DrawDirectoryTree(const std::filesystem::path& directoryPath);
+		void DrawContents();
+		std::filesystem::path m_ProjectDirectory;
+		std::filesystem::path m_SelectedDirectory;
 		Ref<Texture2D> m_DirectoryIcon;
 		Ref<Texture2D> m_FileIcon;
 	};

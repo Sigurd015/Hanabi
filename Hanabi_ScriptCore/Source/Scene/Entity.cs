@@ -13,16 +13,16 @@ namespace Hanabi
 
         public readonly ulong ID;
 
-        public Vector3 Translation
+        private TransformComponent m_TransformComponent;
+
+        public TransformComponent Transform
         {
             get
             {
-                InternalCalls.TransformComponent_GetTranslation(ID, out Vector3 result);
-                return result;
-            }
-            set
-            {
-                InternalCalls.TransformComponent_SetTranslation(ID, ref value);
+                if (m_TransformComponent == null)
+                    m_TransformComponent = GetComponent<TransformComponent>();
+
+                return m_TransformComponent;
             }
         }
 

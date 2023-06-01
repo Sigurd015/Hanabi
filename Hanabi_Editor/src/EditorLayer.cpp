@@ -19,9 +19,9 @@ namespace Hanabi
 		m_ActiveScene = m_EditorScene;
 
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
-		if (commandLineArgs.Count > 2)
+		if (commandLineArgs.Count > 1)
 		{
-			auto projectFilePath = commandLineArgs[2];
+			auto projectFilePath = commandLineArgs[1];
 			OpenProject(projectFilePath);
 		}
 		else
@@ -337,7 +337,6 @@ namespace Hanabi
 				ImGui::SameLine();
 				{
 					Ref<Texture2D> icon = m_IconStep;
-					bool isPaused = m_ActiveScene->IsPaused();
 					if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 					{
 						m_ActiveScene->Step();
@@ -527,7 +526,8 @@ namespace Hanabi
 			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
 			auto startScenePath = Project::GetProjectDirectory() / Project::GetActive()->GetConfig().StartScene;
 			OpenScene(startScenePath);
-			m_ContentBrowserPanel.SetPath(Project::GetAssetDirectory());
+			m_ContentBrowserPanel.SetProjectPath(Project::GetProjectDirectory());
+			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
 		}
 	}
 
@@ -570,7 +570,6 @@ namespace Hanabi
 
 			m_ActiveScene = m_EditorScene;
 			m_EditorScenePath = path;
-			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
 		}
 	}
 

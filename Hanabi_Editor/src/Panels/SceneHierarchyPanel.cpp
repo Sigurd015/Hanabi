@@ -93,7 +93,12 @@ namespace Hanabi
 
 		if (opened)
 		{
-			//TODO: Draw Children Entity	
+			//TODO: Draw Children Entity
+			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
+			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
+			if (opened)
+				ImGui::TreePop();
+			ImGui::TreePop();
 		}
 	}
 
