@@ -22,3 +22,7 @@
 	path = Hanabi/vendor/box2d
 	url = https://github.com/Sigurd015/box2d
 	branch = main
+[submodule "Hanabi/vendor/msdf_atlas_gen"]
+	path = Hanabi/vendor/msdf_atlas_gen
+	url = https://github.com/Sigurd015/msdf-atlas-gen
+	branch = stable

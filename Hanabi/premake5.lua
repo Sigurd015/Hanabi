@@ -43,7 +43,9 @@ project "Hanabi"
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.ImGuizmo}",
-		"%{IncludeDir.mono}"
+		"%{IncludeDir.mono}",
+		"%{IncludeDir.msdfgen}",
+		"%{IncludeDir.msdf_atlas_gen}"
 	}
 
 	links 
@@ -54,6 +56,7 @@ project "Hanabi"
 		"yaml_cpp",
 		"Box2D",
 		"opengl32.lib",
+		"msdf_atlas_gen",
 		"%{Library.mono}"
 	}
 	

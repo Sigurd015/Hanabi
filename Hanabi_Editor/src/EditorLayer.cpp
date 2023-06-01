@@ -9,6 +9,9 @@ namespace Hanabi
 {
 	void EditorLayer::OnAttach()
 	{
+		//TODO:Need to be removed (Font Test)
+		Font font("resources/fonts/opensans/OpenSans-Regular.ttf");	
+
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
 		fbSpec.Width = 1920;
