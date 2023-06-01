@@ -46,5 +46,5 @@ project "Sandbox"
 		symbols "Off"
 
 group "ScriptCore"
-	include ("../../../../Hanabi_ScriptCore")
+	include ("../../../Hanabi_ScriptCore")
 group ""
