@@ -46,6 +46,9 @@
 
 namespace Hanabi
 {
+	void InitializeCore();
+	void ShutdownCore();	
+
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
 	template<typename T, typename ... Args>

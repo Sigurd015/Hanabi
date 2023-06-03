@@ -5,10 +5,28 @@
 
 namespace Hanabi
 {
+	enum class ImageFormat
+	{
+		None = 0,
+		R8,
+		RGB8,
+		RGBA8,
+		RGBA32F
+	};
+
+	struct TextureSpecification
+	{
+		uint32_t Width = 1;
+		uint32_t Height = 1;
+		ImageFormat Format = ImageFormat::RGBA8;
+		bool GenerateMips = true;
+	};
+
 	class Texture
 	{
 	public:
 		virtual ~Texture() = default;
+		virtual const TextureSpecification& GetSpecification() const = 0;
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
 		virtual void* GetRendererID() const = 0;
@@ -22,6 +40,6 @@ namespace Hanabi
 	{
 	public:
 		static Ref<Texture2D> Create(const std::string& path);
-		static Ref<Texture2D> Create(uint32_t width, uint32_t height);
+		static Ref<Texture2D> Create(const TextureSpecification& specification);
 	};
 }

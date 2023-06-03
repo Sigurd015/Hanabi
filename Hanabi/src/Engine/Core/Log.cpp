@@ -31,4 +31,11 @@ namespace Hanabi
 		s_ScriptLogger->set_level(spdlog::level::trace);
 		s_ScriptLogger->flush_on(spdlog::level::trace);
 	}
+
+	void Log::Showdown()
+	{
+		s_CoreLogger.reset();
+		s_ClientLogger.reset();
+		s_ScriptLogger.reset();
+	}
 }

@@ -6,10 +6,11 @@ extern Hanabi::Application* Hanabi::CreateApplication(Hanabi::ApplicationCommand
 
 int main(int argc, char** argv)
 {
-	Hanabi::Log::Init();
+	Hanabi::InitializeCore();
 	auto app = Hanabi::CreateApplication({ argc, argv });
 	app->Run();
 	delete app;
+	Hanabi::ShutdownCore();
 }
 
 #endif 

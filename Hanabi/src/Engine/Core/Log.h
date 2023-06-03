@@ -25,6 +25,7 @@ namespace Hanabi
 	{
 	public:
 		static void Init();
+		static void Showdown();	
 		static Ref<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
 		static Ref<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 		static Ref<spdlog::logger>& GetScriptLogger() { return s_ScriptLogger; }

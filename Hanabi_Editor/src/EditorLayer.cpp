@@ -7,10 +7,12 @@
 
 namespace Hanabi
 {
+	static Font* s_Font;
+
 	void EditorLayer::OnAttach()
 	{
-		//TODO:Need to be removed (Font Test)
-		Font font("resources/fonts/opensans/OpenSans-Regular.ttf");	
+		//TODO:Need to be remove (Font Test)
+		s_Font = new Font("resources/fonts/opensans/OpenSans-Regular.ttf");
 
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
@@ -290,6 +292,10 @@ namespace Hanabi
 		{
 			Application::Get().GetWindow().SetVSync(m_EnableVsyn);
 		}
+
+		//TODO:Need to be remove (Font Test)
+		ImGui::Image(s_Font->GetAtlasTexture()->GetRendererID(), { 512,512 }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
 		ImGui::End();
 	}
 

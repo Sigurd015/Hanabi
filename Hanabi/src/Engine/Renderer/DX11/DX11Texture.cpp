@@ -1,4 +1,4 @@
-#include "hnbpch.h"
+﻿#include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11Texture.h"
@@ -6,7 +6,6 @@
 #include "Engine/Core/UUID.h"
 
 #include <stb_image.h>
-
 
 namespace Hanabi
 {
@@ -71,7 +70,8 @@ namespace Hanabi
 		}
 	}
 
-	DX11Texture2D::DX11Texture2D(uint32_t width, uint32_t height) : m_Width(width), m_Height(height)
+	DX11Texture2D::DX11Texture2D(const TextureSpecification& specification) :m_Specification(specification),
+		m_Width(specification.Width), m_Height(specification.Height)
 	{
 		m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 		CreateTexDesc(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
@@ -91,7 +91,25 @@ namespace Hanabi
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(m_Texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-		memcpy(mappedResource.pData, data, size);
+
+		if (m_Specification.Format == ImageFormat::RGB8)
+		{
+			uint8_t* destData = static_cast<uint8_t*>(mappedResource.pData);
+			uint8_t* srcData = static_cast<uint8_t*>(data);
+
+			// Set Alpha to 255	
+			for (uint32_t i = 0; i < size / 3; i++)
+			{
+				destData[i * 4] = srcData[i * 3];     // R
+				destData[i * 4 + 1] = srcData[i * 3 + 1]; // G
+				destData[i * 4 + 2] = srcData[i * 3 + 2]; // B
+				destData[i * 4 + 3] = 255;           // Alpha
+			}
+			memcpy(mappedResource.pData, destData, size);
+		}
+		else
+			memcpy(mappedResource.pData, data, size);
+
 		DX11Context::GetDeviceContext()->Unmap(m_Texture.Get(), 0);
 	}
 

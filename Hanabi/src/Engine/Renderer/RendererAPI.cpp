@@ -132,6 +132,7 @@ namespace Hanabi
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
+
 	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
 	{
 		switch (RendererAPI::GetAPI())
@@ -189,7 +190,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -197,11 +198,11 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLTexture2D>(width, height);
+			return CreateRef<OpenGLTexture2D>(specification);
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11Texture2D>(width, height);
+			return CreateScope<DX11Texture2D>(specification);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
