@@ -9,15 +9,6 @@ Now only support Windows
 
 OpenGL 4.5, DX11
 
-TODO:
-- [X] ~~DX11 Support~~
-- [ ] SPIR-V Shader System
-- [X] ~~C# Script Engine~~
-- [X] ~~Sprite Animation~~
-- [ ] UI Render
-- [ ] Asset Manager
-- [ ] 3D Renderer
-
 ## Getting Started
 
 Visual Studio 2022 is recommended
