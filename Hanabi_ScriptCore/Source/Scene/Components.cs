@@ -21,6 +21,24 @@
         }
     }
 
+    public class CameraComponent : Component
+    { }
+
+    public class SpriteRendererComponent : Component
+    {
+        public void SetTextureCoords(Vector2 start, Vector2 end)
+        {
+            InternalCalls.SpriteRendererComponent_SetTextureCoords(Entity.ID, ref start, ref end);
+        }
+    }
+
+    public class CircleRendererComponent : Component
+    { }
+
+
+    public class ScriptComponent : Component
+    { }
+
     public class Rigidbody2DComponent : Component
     {
         public void ApplyLinearImpulse(Vector2 impulse, Vector2 worldPosition, bool wake)
@@ -33,4 +51,10 @@
             InternalCalls.Rigidbody2DComponent_ApplyLinearImpulseToCenter(Entity.ID, ref impulse, wake);
         }
     }
+
+    public class BoxCollider2DComponent : Component
+    { }
+
+    public class CircleCollider2DComponent : Component
+    { }
 }

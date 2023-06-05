@@ -1,50 +1,39 @@
 Scene: Untitled
 Entities:
-  - Entity: 2657841593516642014
+  - Entity: 15045535320033348975
     TagComponent:
-      Tag: Floor
+      Tag: Player
     TransformComponent:
-      Translation: [-2.0876739, -6.44679642, 0]
-      Rotation: [0, 0, -0.638996005]
-      Scale: [6.74196768, 0.46067813, 1]
+      Translation: [1.96902084, 0.0918498039, 0.0225147791]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1.35854316, 0.848135769]
+    ScriptComponent:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 10
     SpriteRendererComponent:
-      Color: [0.949806929, 0.455301404, 0.0660097376, 1]
+      Color: [1, 1, 1, 1]
+      TexturePath: ..\SandboxProject\Assets\Textures\SpriteAnimation.png
       TilingFactor: 1
+      UVStart: [0, 0.5]
+      UVEnd: [0.100000001, 1]
     Rigidbody2DComponent:
-      BodyType: Static
-      FixedRotation: false
+      BodyType: Dynamic
+      FixedRotation: true
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 16672940118998907085
-    TagComponent:
-      Tag: Floor
-    TransformComponent:
-      Translation: [-0.883175671, -1.09447932, 0]
-      Rotation: [0, 0, -0.638996005]
-      Scale: [6.74196768, 0.46067813, 1]
-    SpriteRendererComponent:
-      Color: [0.949806929, 0.455301404, 0.0660097376, 1]
-      TilingFactor: 1
-    Rigidbody2DComponent:
-      BodyType: Static
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
+      Density: 0.879999995
+      Friction: 0
       Restitution: 0
       RestitutionThreshold: 0.5
   - Entity: 4793924497264767156
     TagComponent:
       Tag: Camera
     TransformComponent:
-      Translation: [0, 0, 4.99711323]
+      Translation: [1.96902084, -1.47507906, 5]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     CameraComponent:
@@ -62,43 +51,18 @@ Entities:
       ClassName: Sandbox.Camera
       ScriptFields:
         []
-  - Entity: 15045535320033348975
-    TagComponent:
-      Tag: Player
-    TransformComponent:
-      Translation: [0.358530521, 1.5614537, 0.0225147791]
-      Rotation: [0, 0, -0.235084534]
-      Scale: [0.361159712, 0.375572056, 0.848135769]
-    ScriptComponent:
-      ClassName: Sandbox.Player
-      ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 0.600000024
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
-      TexturePath: ..\SandboxProject\Assets\Textures\Checkerboard.png
-      TilingFactor: 1.39999998
-    Rigidbody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
-      Density: 0.879999995
-      Friction: 0.100000001
-      Restitution: 0.819999993
-      RestitutionThreshold: 0.5
-  - Entity: 5134011587522944740
+  - Entity: 16672940118998907085
     TagComponent:
       Tag: Floor
     TransformComponent:
-      Translation: [3.59972453, -3.65678525, 0]
-      Rotation: [0, 0, 0.603692532]
-      Scale: [6.74196959, 0.46067816, 1]
+      Translation: [0.878449142, -2.40333867, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1000, 0.46067813, 1]
     SpriteRendererComponent:
       Color: [0.949806929, 0.455301404, 0.0660097376, 1]
       TilingFactor: 1
+      UVStart: [0, 0]
+      UVEnd: [1, 1]
     Rigidbody2DComponent:
       BodyType: Static
       FixedRotation: false
@@ -111,9 +75,9 @@ Entities:
       RestitutionThreshold: 0.5
   - Entity: 7385146648431404497
     TagComponent:
-      Tag: Empty Entity
+      Tag: Circle
     TransformComponent:
-      Translation: [0, 0.307534873, 0]
+      Translation: [0, -0.020157814, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     Rigidbody2DComponent:
@@ -126,26 +90,6 @@ Entities:
     CircleCollider2DComponent:
       Offset: [0, 0]
       Radius: 0.5
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 16303681961456981103
-    TagComponent:
-      Tag: Floor
-    TransformComponent:
-      Translation: [3.13590121, -1.88687003, 0]
-      Rotation: [0, 0, -2.5902431]
-      Scale: [6.74197006, 0.460678309, 1]
-    SpriteRendererComponent:
-      Color: [0.949806929, 0.455301404, 0.0660097376, 1]
-      TilingFactor: 1
-    Rigidbody2DComponent:
-      BodyType: Static
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [0.5, 0.5]
       Density: 1
       Friction: 0.5
       Restitution: 0

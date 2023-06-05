@@ -9,15 +9,6 @@ Now only support Windows
 
 OpenGL 4.5, DX11
 
-TODO:
-- [X] ~~DX11 Support~~
-- [ ] SPIR-V Shader System
-- [X] ~~C# Script Engine~~
-- [ ] Sprite Animation
-- [ ] UI Render
-- [ ] Asset Manager
-- [ ] 3D Renderer
-
 ## Getting Started
 
 Visual Studio 2022 is recommended
@@ -26,7 +17,7 @@ Visual Studio 2022 is recommended
 
 ```
 git clone https://github.com/Sigurd015/Hanabi
-git submodule update --init
+git submodule update --init --recursive
 ```
 
 <ins>**2. Run the [Win-GenProjects.bat](https://github.com/Sigurd015/Hanabi/blob/main/Win-GenProjects.bat)**</ins>

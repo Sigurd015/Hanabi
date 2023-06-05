@@ -101,6 +101,14 @@ namespace Hanabi
 		body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
 	}
 
+	static void SpriteRendererComponent_SetTextureCoords(UUID entityID, glm::vec2* start, glm::vec2* end)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& src = entity.GetComponent<SpriteRendererComponent>();
+		src.UVStart = *start;
+		src.UVEnd = *end;
+	}
+
 	static bool Input_IsKeyDown(KeyCode keycode)
 	{
 		return Input::IsKeyPressed(keycode);
@@ -172,6 +180,8 @@ namespace Hanabi
 
 		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
 		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+
+		HNB_ADD_INTERNAL_CALL(SpriteRendererComponent_SetTextureCoords);
 
 		HNB_ADD_INTERNAL_CALL(Input_IsKeyDown);
 		HNB_ADD_INTERNAL_CALL(Log_LogMessage);

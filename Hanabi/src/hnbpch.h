@@ -22,6 +22,7 @@
 
 #include "Engine/Core/Base.h"
 #include "Engine/Core/Log.h"
+#include "Engine/Core/Buffer.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include <Windows.h>
