@@ -276,7 +276,8 @@ namespace Hanabi
 					out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.Texture->GetPath();
 
 				out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
-
+				out << YAML::Key << "UVStart" << YAML::Value << spriteRendererComponent.UVStart;
+				out << YAML::Key << "UVEnd" << YAML::Value << spriteRendererComponent.UVEnd;
 			});
 
 		SerializeComponent<Rigidbody2DComponent>("Rigidbody2DComponent", entity, out, [&]()
@@ -468,7 +469,7 @@ namespace Hanabi
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 					if (spriteRendererComponent["TexturePath"])
-					{					
+					{
 						//TODO: move to asset manger
 						std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
 						src.Texture = Texture2D::Create(texturePath);
@@ -476,6 +477,10 @@ namespace Hanabi
 
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
+					if (spriteRendererComponent["UVStart"])
+						src.UVStart = spriteRendererComponent["UVStart"].as<glm::vec2>();
+					if (spriteRendererComponent["UVEnd"])
+						src.UVEnd = spriteRendererComponent["UVEnd"].as<glm::vec2>();
 				}
 
 				auto circleRendererComponent = entity["CircleRendererComponent"];

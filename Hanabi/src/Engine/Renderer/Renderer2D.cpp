@@ -376,25 +376,14 @@ namespace Hanabi
 		SetQuadVertex(transform, color, entityID, s_Data.QuadTexCoord, texIndex, tilingFactor);
 	}
 
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture,
+	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
 		const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
 		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
-		SetQuadVertex(transform, tintColor, entityID, s_Data.QuadTexCoord, GetTextureID(texture), tilingFactor);
-	}
-
-	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<SubTexture2D>& subTexture,
-		const glm::vec4& tintColor, float tilingFactor, int entityID)
-	{
-		if (s_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
-			NextBatch();
-
-		const glm::vec2* quadTexCoord = subTexture->GetTexCoords();
-		const Ref<Texture2D> texture = subTexture->GetTexture();
-
-		SetQuadVertex(transform, tintColor, entityID, quadTexCoord, GetTextureID(texture), tilingFactor);
+		glm::vec2 textureCoords[] = { uv0, { uv1.x, uv0.y }, uv1, { uv0.x, uv1.y } };
+		SetQuadVertex(transform, tintColor, entityID, textureCoords, GetTextureID(texture), tilingFactor);
 	}
 
 	float Renderer2D::GetTextureID(const Ref<Texture2D>& texture)

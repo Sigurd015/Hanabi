@@ -361,7 +361,7 @@ namespace Hanabi
 							{
 								float data = 0.0f;
 								if (ImGui::DragFloat(name.c_str(), &data))
-								{		
+								{
 									ScriptFieldInstance& fieldInstance = entityFields[name];
 									fieldInstance.Field = field;
 									fieldInstance.SetValue(data);
@@ -378,7 +378,7 @@ namespace Hanabi
 
 				if (component.Texture)
 				{
-					ImGui::Image(component.Texture->GetRendererID(), ImVec2(100.0f, 100.0f));
+					ImGui::Image(component.Texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 				}
 				else
 				{
@@ -411,6 +411,8 @@ namespace Hanabi
 				}
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
+				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
+				ImGui::DragFloat2("UV End", glm::value_ptr(component.UVEnd), 0.01f, 0.0f, 1.0f);
 			});
 
 		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)

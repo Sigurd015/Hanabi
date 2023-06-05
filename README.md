@@ -13,7 +13,7 @@ TODO:
 - [X] ~~DX11 Support~~
 - [ ] SPIR-V Shader System
 - [X] ~~C# Script Engine~~
-- [ ] Sprite Animation
+- [X] ~~Sprite Animation~~
 - [ ] UI Render
 - [ ] Asset Manager
 - [ ] 3D Renderer

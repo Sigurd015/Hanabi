@@ -134,7 +134,7 @@ namespace Hanabi
 	}
 
 	void Scene::DestroyEntity(Entity entity)
-	{	
+	{
 		m_EntityMap.erase(entity.GetUUID());
 		m_Registry.destroy(entity);
 	}
@@ -237,7 +237,7 @@ namespace Hanabi
 
 				if (sprite.Texture)
 					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
-						sprite.Color, sprite.TilingFactor);
+						sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
 				else
 					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
@@ -358,7 +358,7 @@ namespace Hanabi
 
 			if (sprite.Texture)
 				Renderer2D::DrawQuad(transform.GetTransform(),
-					sprite.Texture, sprite.Color, sprite.TilingFactor, (int)entity);
+					sprite.Texture, sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor, (int)entity);
 			else
 				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
 		}
