@@ -2,6 +2,7 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11Buffer.h"
+#include "Engine/Renderer/DX11/DX11.h"
 #include "Engine/Renderer/DX11/DX11Context.h"
 
 namespace Hanabi
@@ -16,7 +17,7 @@ namespace Hanabi
 		bufferDesc.CPUAccessFlags = cpuAccess;
 		bufferDesc.MiscFlags = 0;
 		bufferDesc.StructureByteStride = stride;
-		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateBuffer(&bufferDesc, pInitialData, ppBuffer));
+		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateBuffer(&bufferDesc, pInitialData, ppBuffer));
 	}
 
 	//-------------
@@ -55,7 +56,7 @@ namespace Hanabi
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
-		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(m_VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
+		DX_CHECK_RESULT(DX11Context::GetDeviceContext()->Map(m_VertexBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
 		memcpy(mappedResource.pData, data, size);
 		DX11Context::GetDeviceContext()->Unmap(m_VertexBuffer.Get(), 0);
 	}

@@ -4,17 +4,9 @@
 #include <filesystem>
 
 #ifdef HNB_DEBUG
-#if defined(HNB_PLATFORM_WINDOWS)
-#define HNB_DEBUGBREAK() __debugbreak()
-#include <iostream>
-#include <Windows.h>
-#include <comdef.h>
-#define HNB_CORE_DX_ASSERT(x) {if(FAILED(x)){_com_error err(x);LPCTSTR errMsg = err.ErrorMessage();HNB_DEBUGBREAK();}}
-#else
-#endif
 #define HNB_ENABLE_ASSERTS
+#define HNB_DEBUGBREAK() __debugbreak()
 #else
-#define HNB_CORE_DX_ASSERT(x) x	
 #define HNB_DEBUGBREAK()
 #endif
 

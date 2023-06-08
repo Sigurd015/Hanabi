@@ -7,14 +7,12 @@ namespace Sandbox
         public float Speed;
         public float Time = 0.0f;
 
-        private TransformComponent m_Transform;
         private Rigidbody2DComponent m_Rigidbody;
         private SpriteRendererComponent m_SpriteRenderer;
         private Vector2[] SpriteTextureCoords = new Vector2[4];
 
         void OnCreate()
         {
-            m_Transform = GetComponent<TransformComponent>();
             m_Rigidbody = GetComponent<Rigidbody2DComponent>();
             m_SpriteRenderer = GetComponent<SpriteRendererComponent>();
 
