@@ -35,8 +35,6 @@ namespace Hanabi
 	void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
 	{
 		shader->Bind();
-	/*	shader->SetUniform("u_ViewProjection", s_SceneData->ViewProjectionMatrix);
-		shader->SetUniform("u_Transform", transform);*/
 
 		RenderCommand::DrawIndexed(vertexArray);
 	}

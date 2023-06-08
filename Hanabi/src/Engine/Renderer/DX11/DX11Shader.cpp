@@ -3,6 +3,7 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11Shader.h"
 #include "Engine/Renderer/DX11/DX11Context.h"
+#include "Engine/Renderer/DX11/DX11.h"
 
 #include <fstream>
 #include <d3dcompiler.h>
@@ -91,18 +92,18 @@ namespace Hanabi
 			{
 			case Hanabi::VERTEX_SHADER:
 			{
-				HNB_CORE_DX_ASSERT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
+				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
 					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
-				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateVertexShader(m_VertexShaderBlob->GetBufferPointer(),
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateVertexShader(m_VertexShaderBlob->GetBufferPointer(),
 					m_VertexShaderBlob->GetBufferSize(), nullptr, m_VertexShader.GetAddressOf()));
 				break;
 			}
 			case Hanabi::PIXEL_SHADER:
 			{
 				Microsoft::WRL::ComPtr<ID3DBlob> blob;
-				HNB_CORE_DX_ASSERT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
+				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
 					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, blob.ReleaseAndGetAddressOf(), nullptr));
-				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
 					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf()));
 				break;
 			}
@@ -127,26 +128,5 @@ namespace Hanabi
 		m_VertexShader.Reset();
 		m_PixelShader.Reset();
 	}
-
-	void DX11Shader::SetUniform(const std::string& name, int value)
-	{}
-
-	void DX11Shader::SetUniform(const std::string& name, int* values, uint32_t count)
-	{}
-
-	void DX11Shader::SetUniform(const std::string& name, float value)
-	{}
-
-	void DX11Shader::SetUniform(const std::string& name, const glm::vec2& value)
-	{}
-
-	void DX11Shader::SetUniform(const std::string& name, const glm::vec3& value)
-	{}
-
-	void DX11Shader::SetUniform(const std::string& name, const glm::vec4& value)
-	{}
-
-	void DX11Shader::SetUniform(const std::string& name, const glm::mat4& value)
-	{}
 }
 #endif

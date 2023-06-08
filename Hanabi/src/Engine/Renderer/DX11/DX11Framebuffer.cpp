@@ -1,10 +1,11 @@
 #include "hnbpch.h"
+
+#if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11API.h"
 #include "Engine/Renderer/DX11/DX11Framebuffer.h"
 #include "Engine/Renderer/DX11/DX11Context.h"
-
-#if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11Framebuffer.h"
+#include "Engine/Renderer/DX11/DX11.h"
 
 namespace Hanabi
 {
@@ -114,7 +115,7 @@ namespace Hanabi
 				textureDesc.Usage = D3D11_USAGE_DEFAULT;
 				textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 				textureDesc.CPUAccessFlags = 0;
-				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, texture.GetAddressOf()));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, texture.GetAddressOf()));
 				m_RenderTargetAttachmentsTextures.push_back(texture);
 
 				Microsoft::WRL::ComPtr<ID3D11RenderTargetView> targetView;
@@ -122,7 +123,7 @@ namespace Hanabi
 				targetViewDesc.Format = textureDesc.Format;
 				targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 				targetViewDesc.Texture2D.MipSlice = 0;
-				HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateRenderTargetView(texture.Get(), &targetViewDesc, &targetView));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRenderTargetView(texture.Get(), &targetViewDesc, &targetView));
 				m_RenderTargetAttachments.push_back(targetView);
 
 				Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
@@ -147,13 +148,13 @@ namespace Hanabi
 			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 			depthStencilDesc.CPUAccessFlags = 0;
 			depthStencilDesc.MiscFlags = 0;
-			HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilAttachmentsTexture.GetAddressOf()));
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilAttachmentsTexture.GetAddressOf()));
 			D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 			depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 			depthStencilViewDesc.Flags = 0;
 			depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			depthStencilViewDesc.Texture2D.MipSlice = 0;
-			HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateDepthStencilView(m_DepthStencilAttachmentsTexture.Get(), &depthStencilViewDesc, m_DepthStencilAttachment.GetAddressOf()));
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateDepthStencilView(m_DepthStencilAttachmentsTexture.Get(), &depthStencilViewDesc, m_DepthStencilAttachment.GetAddressOf()));
 		}
 	}
 
@@ -220,11 +221,11 @@ namespace Hanabi
 		textureCopyDesc.Usage = D3D11_USAGE_STAGING;
 		textureCopyDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 		textureCopyDesc.BindFlags = 0;
-		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateTexture2D(&textureCopyDesc, nullptr, textureCopy.GetAddressOf()));
+		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureCopyDesc, nullptr, textureCopy.GetAddressOf()));
 		DX11Context::GetDeviceContext()->CopyResource(textureCopy.Get(), m_RenderTargetAttachmentsTextures[attachmentIndex].Get());
 
 		D3D11_MAPPED_SUBRESOURCE mappedTexture;
-		HNB_CORE_DX_ASSERT(DX11Context::GetDeviceContext()->Map(textureCopy.Get(), 0, D3D11_MAP_READ, 0, &mappedTexture));
+		DX_CHECK_RESULT(DX11Context::GetDeviceContext()->Map(textureCopy.Get(), 0, D3D11_MAP_READ, 0, &mappedTexture));
 
 		uint8_t* pData = reinterpret_cast<uint8_t*>(mappedTexture.pData);
 		int32_t rowPitch = mappedTexture.RowPitch;

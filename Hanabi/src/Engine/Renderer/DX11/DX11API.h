@@ -7,7 +7,6 @@
 #include <d3d11.h>
 #include <Windows.h>
 #include <wrl.h>
-#include <DirectXMath.h>
 
 namespace Hanabi
 {

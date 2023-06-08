@@ -2,6 +2,7 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11Context.h"
+#include "Engine/Renderer/DX11/DX11.h"
 
 namespace Hanabi
 {
@@ -37,7 +38,7 @@ namespace Hanabi
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		swapChainDesc.Flags = 0;
 
-		HNB_CORE_DX_ASSERT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &swapChainDesc,
+		DX_CHECK_RESULT(D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &swapChainDesc,
 			m_SwapChain.GetAddressOf(), m_Device.GetAddressOf(), nullptr, m_DeviceContext.GetAddressOf()));
 	}
 

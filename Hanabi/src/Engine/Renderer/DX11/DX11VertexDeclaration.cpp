@@ -4,6 +4,7 @@
 #include "Engine/Renderer/DX11/DX11VertexDeclaration.h"
 #include "Engine/Renderer/DX11/DX11Shader.h"
 #include "Engine/Renderer/DX11/DX11Context.h"
+#include "Engine/Renderer/DX11/DX11.h"
 
 #include <vector>
 
@@ -45,7 +46,7 @@ namespace Hanabi
 			m_VertexBufferIndex++;
 		}
 
-		HNB_CORE_DX_ASSERT(DX11Context::GetDevice()->CreateInputLayout(
+		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateInputLayout(
 			&temp[0], (UINT)temp.size(), vertexShader->GetVertextBufferPointer(),
 			vertexShader->GetVertextBufferSize(), m_InputLayout.GetAddressOf()));
 		m_VertexBuffers.push_back(vertexBuffer);

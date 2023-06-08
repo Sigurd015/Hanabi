@@ -2,6 +2,7 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "Engine/Renderer/DX11/DX11API.h"
+#include "Engine/Renderer/DX11/DX11.h"
 #include "Engine/Renderer/DX11/DX11Context.h"
 #include "Engine/Core/Application.h"
 
@@ -40,8 +41,8 @@ namespace Hanabi
 	void DX11RendererAPI::SetBuffer(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
 	{
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-		HNB_CORE_DX_ASSERT(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer));
-		HNB_CORE_DX_ASSERT(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
+		DX_CHECK_RESULT(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer));
+		DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
 
 		D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 		depthStencilDesc.Width = width;
@@ -53,8 +54,8 @@ namespace Hanabi
 		depthStencilDesc.SampleDesc.Quality = 0;
 		depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
 		depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		HNB_CORE_DX_ASSERT(m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilBuffer.GetAddressOf()));
-		HNB_CORE_DX_ASSERT(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
+		DX_CHECK_RESULT(m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilBuffer.GetAddressOf()));
+		DX_CHECK_RESULT(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 
 		D3D11_VIEWPORT viewPort{};
@@ -73,7 +74,7 @@ namespace Hanabi
 		m_DepthStencilView.Reset();
 		m_DepthStencilBuffer.Reset();
 
-		HNB_CORE_DX_ASSERT(m_SwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+		DX_CHECK_RESULT(m_SwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
 
 		SetBuffer(width, height, x, y);
 	}
