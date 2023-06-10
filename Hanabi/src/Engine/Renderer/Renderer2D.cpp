@@ -4,7 +4,7 @@
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/RenderCommand.h"
-#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/ConstantBuffer.h"
 #include "Engine/Renderer/UI/MSDFData.h"
 
 #include <glm/ext/matrix_transform.hpp>
@@ -116,7 +116,7 @@ namespace Hanabi
 			glm::mat4 ViewProjection;
 		};
 		CameraData CameraBuffer;
-		Ref<UniformBuffer> CameraUniformBuffer;
+		Ref<ConstantBuffer> CameraConstantBuffer;
 	};
 	static Renderer2DData s_Data;
 
@@ -222,12 +222,13 @@ namespace Hanabi
 
 		Ref<IndexBuffer> textIB = IndexBuffer::Create(textIndices, s_Data.MaxIndices);
 		s_Data.TextVertexArray->SetIndexBuffer(textIB);
+		delete[] textIndices;
 		s_Data.TextVertexBufferBase = new TextVertex[s_Data.MaxVertices];
 
 		// Set WhiteTexture slots to 0
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
-		s_Data.CameraUniformBuffer = UniformBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
+		s_Data.CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()
@@ -250,7 +251,7 @@ namespace Hanabi
 #endif
 		}
 
-		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data.CameraConstantBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}
@@ -270,7 +271,7 @@ namespace Hanabi
 #endif
 		}
 
-		s_Data.CameraUniformBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data.CameraConstantBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
 		StartBatch();
 	}

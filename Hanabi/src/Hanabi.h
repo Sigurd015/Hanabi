@@ -33,7 +33,7 @@
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Framebuffer.h"
-#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/ConstantBuffer.h"
 #include "Engine/Renderer/UI/Font.h"
 
 // ---Scene---------------------

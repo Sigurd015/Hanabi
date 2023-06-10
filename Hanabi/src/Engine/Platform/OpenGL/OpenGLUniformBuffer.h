@@ -1,9 +1,9 @@
 #pragma once
-#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/ConstantBuffer.h"
 
 namespace Hanabi
 {
-	class OpenGLUniformBuffer : public UniformBuffer
+	class OpenGLUniformBuffer : public ConstantBuffer
 	{
 	public:
 		OpenGLUniformBuffer(uint32_t size, uint32_t binding);

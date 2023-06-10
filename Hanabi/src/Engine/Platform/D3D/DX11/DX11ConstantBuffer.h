@@ -1,6 +1,6 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
-#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/ConstantBuffer.h"
 
 #include <d3d11.h>
 #include <Windows.h>
@@ -8,7 +8,7 @@
 
 namespace Hanabi
 {
-	class DX11ConstantBuffer : public UniformBuffer
+	class DX11ConstantBuffer : public ConstantBuffer
 	{
 	public:
 		DX11ConstantBuffer(uint32_t size, uint32_t binding);

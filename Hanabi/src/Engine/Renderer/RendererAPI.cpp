@@ -7,7 +7,7 @@
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/VertexArray.h"
 #include "Engine/Renderer/Framebuffer.h"
-#include "Engine/Renderer/UniformBuffer.h"
+#include "Engine/Renderer/ConstantBuffer.h"
 //----------OpenGL----------------------------------------
 #include "Engine/Platform/OpenGL/OpenGLBuffer.h"
 #include "Engine/Platform/OpenGL/OpenGLAPI.h"
@@ -229,7 +229,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<UniformBuffer> UniformBuffer::Create(uint32_t size, uint32_t binding)
+	Ref<ConstantBuffer> ConstantBuffer::Create(uint32_t size, uint32_t binding)
 	{
 		switch (RendererAPI::GetAPI())
 		{
