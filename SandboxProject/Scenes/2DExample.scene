@@ -4,7 +4,7 @@ Entities:
     TagComponent:
       Tag: Player
     TransformComponent:
-      Translation: [1.96902084, 0.0918498039, 0.0225147791]
+      Translation: [1.96902084, 0.840087414, 0.0225147791]
       Rotation: [0, 0, 0]
       Scale: [1, 1.35854316, 0.848135769]
     ScriptComponent:
@@ -77,7 +77,7 @@ Entities:
     TagComponent:
       Tag: Circle
     TransformComponent:
-      Translation: [0, -0.020157814, 0]
+      Translation: [0, 0.70383358, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     Rigidbody2DComponent:
@@ -94,3 +94,15 @@ Entities:
       Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
+  - Entity: 12183843591437764094
+    TagComponent:
+      Tag: Msg
+    TransformComponent:
+      Translation: [-3.86357307, -0.71830368, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    TextComponent:
+      TextString: This is a test message
+      Color: [0.779922783, 0.240902811, 0.240902811, 1]
+      Kerning: 0
+      LineSpacing: 0

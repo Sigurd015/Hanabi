@@ -230,59 +230,88 @@ namespace Hanabi
 			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 
 			// Draw sprites
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
 			{
-				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+				auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+				for (auto entity : view)
+				{
+					auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-				if (sprite.Texture)
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
-						sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
-				else
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+					if (sprite.Texture)
+						Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
+							sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
+					else
+						Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+				}
 			}
 
 			// Draw circles
-			auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-			for (auto entity : view)
 			{
-				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+				auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+				for (auto entity : view)
+				{
+					auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
+					Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
+				}
 			}
 
+			// Draw text
+			{
+				auto view = m_Registry.view<TransformComponent, TextComponent>();
+				for (auto entity : view)
+				{
+					auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+
+					Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+				}
+			}
 			Renderer2D::EndScene();
 		}
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
 	{
-		// Render
-		RenderScene(camera);
-	}
+		Renderer2D::BeginScene(camera);
 
-	void Scene::OnUpdateSimulation(Timestep ts, EditorCamera& camera)
-	{
-		// Physics
-		const int32_t velocityIterations = 6;
-		const int32_t positionIterations = 2;
-		m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
-		// Retrieve transform from Box2D
-		auto view = m_Registry.view<Rigidbody2DComponent>();
-		for (auto e : view)
+		// Draw sprites
 		{
-			Entity entity = { e, this };
-			auto& transform = entity.GetComponent<TransformComponent>();
-			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-			b2Body* body = (b2Body*)rb2d.RuntimeBody;
-			const auto& position = body->GetPosition();
-			transform.Translation.x = position.x;
-			transform.Translation.y = position.y;
-			transform.Rotation.z = body->GetAngle();
+			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
+
+				if (sprite.Texture)
+					Renderer2D::DrawQuad(transform.GetTransform(),
+						sprite.Texture, sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor, (int)entity);
+				else
+					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
+			}
 		}
-		// Render
-		RenderScene(camera);
+
+		// Draw circles
+		{
+			auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+
+				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color,
+					circle.Thickness, circle.Fade, (int)entity);
+			}
+		}
+
+		// Draw text
+		{
+			auto view = m_Registry.view<TransformComponent, TextComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+
+				Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+			}
+		}
+
+		Renderer2D::EndScene();
 	}
 
 	void Scene::OnPhysics2DStart()
@@ -310,7 +339,7 @@ namespace Hanabi
 				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
 
 				b2PolygonShape boxShape;
-				boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y);
+				boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y, b2Vec2(bc2d.Offset.x, bc2d.Offset.y), 0.0f);
 
 				b2FixtureDef fixtureDef;
 				fixtureDef.shape = &boxShape;
@@ -344,36 +373,6 @@ namespace Hanabi
 	{
 		delete m_PhysicsWorld;
 		m_PhysicsWorld = nullptr;
-	}
-
-	void Scene::RenderScene(EditorCamera& camera)
-	{
-		Renderer2D::BeginScene(camera);
-
-		// Draw sprites
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
-		{
-			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-
-			if (sprite.Texture)
-				Renderer2D::DrawQuad(transform.GetTransform(),
-					sprite.Texture, sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor, (int)entity);
-			else
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
-		}
-
-		// Draw circles
-		auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-		for (auto entity : view)
-		{
-			auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
-
-			Renderer2D::DrawCircle(transform.GetTransform(), circle.Color,
-				circle.Thickness, circle.Fade, (int)entity);
-		}
-
-		Renderer2D::EndScene();
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)

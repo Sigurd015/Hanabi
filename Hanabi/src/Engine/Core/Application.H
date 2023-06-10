@@ -1,7 +1,7 @@
 #pragma once
-#include "Engine/Core/Base.h"
+#include "Base.h"
 #include "Engine/Events/ApplicationEvent.h"
-#include "Engine/Platform/Window.h"
+#include "Window.h"
 #include "Engine/Layer/LayerStack.h"
 #include "Engine/Layer/Imgui/ImGuiLayer.h"
 #include "Engine/Scripting/ScriptEngine.h"

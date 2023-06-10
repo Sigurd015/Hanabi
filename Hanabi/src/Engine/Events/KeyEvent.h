@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Events/Event.h"
+#include "Event.h"
 #include "Engine/Input/KeyCodes.h"
 
 namespace Hanabi

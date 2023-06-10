@@ -1,16 +1,14 @@
 #include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
-#include "Engine/Layer/ImGui/ImGuiLayer.h"
+#include "ImGuiLayer.h"
 #include "Engine/Core/Application.h"
-#include "Engine/Renderer/DX11/DX11Context.h"
+#include "Engine/Platform/D3D/DX11/DX11Context.h"
 
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_dx11.h>
 #include <ImGuizmo.h>
-
-#include <GLFW/glfw3.h>
 
 namespace Hanabi
 {

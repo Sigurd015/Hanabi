@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "Engine/Renderer/OpenGL/OpenGLUniformBuffer.h"
+#include "OpenGLUniformBuffer.h"
 
 #include <glad/glad.h>
 

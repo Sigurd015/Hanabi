@@ -16,7 +16,6 @@ namespace Hanabi
 		~Scene();
 		static Ref<Scene> Copy(Ref<Scene> other);
 		void OnUpdateRuntime(Timestep ts);
-		void OnUpdateSimulation(Timestep ts, EditorCamera& camera);
 		void OnUpdateEditor(Timestep ts, EditorCamera& camera);
 		void OnRuntimeStart();
 		void OnRuntimeStop();
@@ -40,7 +39,6 @@ namespace Hanabi
 	private:
 		void OnPhysics2DStart();
 		void OnPhysics2DStop();
-		void RenderScene(EditorCamera& camera);
 
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;

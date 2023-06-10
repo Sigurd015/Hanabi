@@ -109,6 +109,62 @@ namespace Hanabi
 		src.UVEnd = *end;
 	}
 
+	static MonoString* TextComponent_GetText(UUID entityID)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		return ScriptEngine::CreateString(tc.TextString.c_str());
+	}
+
+	static void TextComponent_SetText(UUID entityID, MonoString* textString)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.TextString = Utils::MonoStringToUTF8(textString);
+	}
+
+	static void TextComponent_GetColor(UUID entityID, glm::vec4* color)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		*color = tc.Color;
+	}
+
+	static void TextComponent_SetColor(UUID entityID, glm::vec4* color)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.Color = *color;
+	}
+
+	static float TextComponent_GetKerning(UUID entityID)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		return tc.Kerning;
+	}
+
+	static void TextComponent_SetKerning(UUID entityID, float kerning)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.Kerning = kerning;
+	}
+
+	static float TextComponent_GetLineSpacing(UUID entityID)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		return tc.LineSpacing;
+	}
+
+	static void TextComponent_SetLineSpacing(UUID entityID, float lineSpacing)
+	{
+		Entity entity = GetEntity(entityID);
+		auto& tc = entity.GetComponent<TextComponent>();
+		tc.LineSpacing = lineSpacing;
+	}
+
 	static bool Input_IsKeyDown(KeyCode keycode)
 	{
 		return Input::IsKeyPressed(keycode);
@@ -182,6 +238,16 @@ namespace Hanabi
 		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
 
 		HNB_ADD_INTERNAL_CALL(SpriteRendererComponent_SetTextureCoords);
+
+		HNB_ADD_INTERNAL_CALL(TextComponent_GetText);
+		HNB_ADD_INTERNAL_CALL(TextComponent_SetText);
+		HNB_ADD_INTERNAL_CALL(TextComponent_GetColor);
+		HNB_ADD_INTERNAL_CALL(TextComponent_SetColor);
+		HNB_ADD_INTERNAL_CALL(TextComponent_GetKerning);
+		HNB_ADD_INTERNAL_CALL(TextComponent_SetKerning);
+		HNB_ADD_INTERNAL_CALL(TextComponent_GetLineSpacing);
+		HNB_ADD_INTERNAL_CALL(TextComponent_SetLineSpacing);
+
 
 		HNB_ADD_INTERNAL_CALL(Input_IsKeyDown);
 		HNB_ADD_INTERNAL_CALL(Log_LogMessage);

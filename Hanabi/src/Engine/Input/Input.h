@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Input/MouseCodes.h"
-#include "Engine/Input/KeyCodes.h"
+#include "MouseCodes.h"
+#include "KeyCodes.h"
 #include <glm/glm.hpp>
 
 namespace Hanabi

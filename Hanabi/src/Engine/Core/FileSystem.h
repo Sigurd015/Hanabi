@@ -1,5 +1,5 @@
 #pragma once
-#include "Engine/Core/Buffer.h"
+#include "Buffer.h"
 
 #include <filesystem>
 

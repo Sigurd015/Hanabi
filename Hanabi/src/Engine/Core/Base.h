@@ -57,4 +57,4 @@ namespace Hanabi
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
 }
-#include "Engine/Core/Log.h"
+#include "Log.h"

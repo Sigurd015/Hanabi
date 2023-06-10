@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "Engine/Renderer/OpenGL/OpenGLAPI.h"
+#include "OpenGLAPI.h"
 
 #include <glad/glad.h>
 

@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "Engine/Input/Input.h"
+#include "Input.h"
 #include "Engine/Core/Application.H"
 
 #include <GLFW/glfw3.h>

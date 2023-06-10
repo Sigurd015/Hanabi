@@ -1,11 +1,11 @@
 #include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
-#include "Engine/Renderer/DX11/DX11API.h"
-#include "Engine/Renderer/DX11/DX11Framebuffer.h"
-#include "Engine/Renderer/DX11/DX11Context.h"
-#include "Engine/Renderer/DX11/DX11Framebuffer.h"
-#include "Engine/Renderer/DX11/DX11.h"
+#include "DX11API.h"
+#include "DX11Framebuffer.h"
+#include "DX11Context.h"
+#include "DX11Framebuffer.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 namespace Hanabi
 {

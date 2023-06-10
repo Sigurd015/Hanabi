@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "Engine/Renderer/OpenGL/OpenGLShader.h"
+#include "OpenGLShader.h"
 
 #include <fstream>
 #include <glad/glad.h>
@@ -20,7 +20,7 @@ namespace Hanabi
 
 	OpenGLShader::OpenGLShader(const std::string& filepath)
 	{
-		std::string source = ReadFile("assets/shaders/OpenGl/" + filepath + ".glsl");
+		std::string source = ReadFile("assets/shaders/OpenGL/" + filepath + ".glsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
 

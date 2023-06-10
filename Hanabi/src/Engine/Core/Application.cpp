@@ -1,9 +1,9 @@
 #include "hnbpch.h"
-#include "Engine/Core/Application.h"
+#include "Application.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Utils/PlatformUtils.h"
-#include "Engine/Platform/Window.h"
+#include "Window.h"
 
 #include <GLFW/glfw3.h>
 

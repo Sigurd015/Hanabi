@@ -1,10 +1,10 @@
 ﻿#include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
-#include "Engine/Renderer/DX11/DX11Texture.h"
-#include "Engine/Renderer/DX11/DX11Context.h"
+#include "DX11Texture.h"
+#include "DX11Context.h"
 #include "Engine/Core/UUID.h"
-#include "Engine/Renderer/DX11/DX11.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <stb_image.h>
 

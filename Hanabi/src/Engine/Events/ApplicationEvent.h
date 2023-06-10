@@ -1,6 +1,6 @@
 #pragma once
 #include "hnbpch.h"
-#include "Engine/Events/Event.h"
+#include "Event.h"
 
 namespace Hanabi
 {

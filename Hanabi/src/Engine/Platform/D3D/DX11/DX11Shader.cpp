@@ -1,9 +1,9 @@
 #include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
-#include "Engine/Renderer/DX11/DX11Shader.h"
-#include "Engine/Renderer/DX11/DX11Context.h"
-#include "Engine/Renderer/DX11/DX11.h"
+#include "DX11Shader.h"
+#include "DX11Context.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <fstream>
 #include <d3dcompiler.h>

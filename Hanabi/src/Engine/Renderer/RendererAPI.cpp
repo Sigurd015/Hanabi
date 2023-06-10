@@ -9,25 +9,25 @@
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Renderer/UniformBuffer.h"
 //----------OpenGL----------------------------------------
-#include "Engine/Renderer/OpenGL/OpenGLBuffer.h"
-#include "Engine/Renderer/OpenGL/OpenGLAPI.h"
-#include "Engine/Renderer/OpenGL/OpenGLContext.h"
-#include "Engine/Renderer/OpenGL/OpenGLShader.h"
-#include "Engine/Renderer/OpenGL/OpenGLTexture.h"
-#include "Engine/Renderer/OpenGL/OpenGLVertexArray.h"
-#include "Engine/Renderer/OpenGL/OpenGLFramebuffer.h"
-#include "Engine/Renderer/OpenGL/OpenGLUniformBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLAPI.h"
+#include "Engine/Platform/OpenGL/OpenGLContext.h"
+#include "Engine/Platform/OpenGL/OpenGLShader.h"
+#include "Engine/Platform/OpenGL/OpenGLTexture.h"
+#include "Engine/Platform/OpenGL/OpenGLVertexArray.h"
+#include "Engine/Platform/OpenGL/OpenGLFramebuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLUniformBuffer.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
 //----------DX11----------------------------------------
-#include "Engine/Renderer/DX11/DX11Buffer.h"
-#include "Engine/Renderer/DX11/DX11API.h"
-#include "Engine/Renderer/DX11/DX11Context.h"
-#include "Engine/Renderer/DX11/DX11Shader.h"
-#include "Engine/Renderer/DX11/DX11Texture.h"
-#include "Engine/Renderer/DX11/DX11VertexDeclaration.h"
-#include "Engine/Renderer/DX11/DX11Framebuffer.h"
-#include "Engine/Renderer/DX11/DX11ConstantBuffer.h"
+#include "Engine/Platform/D3D/DX11/DX11Buffer.h"
+#include "Engine/Platform/D3D/DX11/DX11API.h"
+#include "Engine/Platform/D3D/DX11/DX11Context.h"
+#include "Engine/Platform/D3D/DX11/DX11Shader.h"
+#include "Engine/Platform/D3D/DX11/DX11Texture.h"
+#include "Engine/Platform/D3D/DX11/DX11VertexDeclaration.h"
+#include "Engine/Platform/D3D/DX11/DX11Framebuffer.h"
+#include "Engine/Platform/D3D/DX11/DX11ConstantBuffer.h"
 #endif
 
 namespace Hanabi
