@@ -1,40 +1,46 @@
 #include "hnbpch.h"
-#include "Engine/Renderer/Buffer.h"
-#include "Engine/Renderer/RendererAPI.h"
-#include "Engine/Renderer/RenderCommand.h"
-#include "Engine/Renderer/RenderingContext.h"
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Texture.h"
-#include "Engine/Renderer/VertexArray.h"
-#include "Engine/Renderer/Framebuffer.h"
-#include "Engine/Renderer/ConstantBuffer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "RendererAPI.h"
+#include "RenderPass.h"
+#include "RenderingContext.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "Pipeline.h"
+#include "Framebuffer.h"
+#include "ConstantBuffer.h"
 //----------OpenGL----------------------------------------
-#include "Engine/Platform/OpenGL/OpenGLBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLVertexBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLIndexBuffer.h"
 #include "Engine/Platform/OpenGL/OpenGLAPI.h"
 #include "Engine/Platform/OpenGL/OpenGLContext.h"
 #include "Engine/Platform/OpenGL/OpenGLShader.h"
 #include "Engine/Platform/OpenGL/OpenGLTexture.h"
-#include "Engine/Platform/OpenGL/OpenGLVertexArray.h"
 #include "Engine/Platform/OpenGL/OpenGLFramebuffer.h"
 #include "Engine/Platform/OpenGL/OpenGLUniformBuffer.h"
+#include "Engine/Platform/OpenGL/OpenGLPipeline.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
 //----------DX11----------------------------------------
-#include "Engine/Platform/D3D/DX11/DX11Buffer.h"
+#include "Engine/Platform/D3D/DX11/DX11VertexBuffer.h"
+#include "Engine/Platform/D3D/DX11/DX11IndexBuffer.h"
 #include "Engine/Platform/D3D/DX11/DX11API.h"
 #include "Engine/Platform/D3D/DX11/DX11Context.h"
 #include "Engine/Platform/D3D/DX11/DX11Shader.h"
 #include "Engine/Platform/D3D/DX11/DX11Texture.h"
-#include "Engine/Platform/D3D/DX11/DX11VertexDeclaration.h"
+#include "Engine/Platform/D3D/DX11/DX11Pipeline.h"
 #include "Engine/Platform/D3D/DX11/DX11Framebuffer.h"
 #include "Engine/Platform/D3D/DX11/DX11ConstantBuffer.h"
 #endif
 
 namespace Hanabi
 {
-	Scope<RendererAPI> RenderCommand::s_RendererAPI = nullptr;
-
 	RendererAPIType RendererAPI::s_API = RendererAPIType::None;
+
+	Ref<RenderPass> RenderPass::Create(const RenderPassSpecification& spec)
+	{
+		return CreateRef<RenderPass>(spec);
+	}
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
@@ -53,6 +59,20 @@ namespace Hanabi
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<Pipeline> Pipeline::Create(const PipelineSpecification& spec)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			return nullptr;
+		case RendererAPIType::OpenGL:
+			return CreateRef<OpenGLPipeline>(spec);
+		case RendererAPIType::DX11:
+			return CreateRef<DX11Pipeline>(spec);
+		}
 		return nullptr;
 	}
 
@@ -95,25 +115,6 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<VertexArray> VertexArray::Create()
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::None:
-			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLVertexArray>();
-
-#if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPIType::DX11:
-			return CreateScope<DX11VertexDeclaration>();
-#endif
-		}
-		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
 	Ref<VertexBuffer> VertexBuffer::Create(uint32_t size)
 	{
 		switch (RendererAPI::GetAPI())
@@ -133,7 +134,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<VertexBuffer> VertexBuffer::Create(float* vertices, uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::Create(const void* vertices, uint32_t size)
 	{
 		switch (RendererAPI::GetAPI())
 		{

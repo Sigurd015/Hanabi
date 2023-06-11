@@ -8,14 +8,23 @@
 
 namespace Hanabi
 {
-	DX11RendererAPI* DX11RendererAPI::s_Instance = nullptr;
+	static D3D11_PRIMITIVE_TOPOLOGY PrimitiveTopologyTypeToD3D(PrimitiveTopology type)
+	{
+		switch (type)
+		{
+		case PrimitiveTopology::Points:
+			return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+		case PrimitiveTopology::Lines:
+			return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+		case PrimitiveTopology::Triangles:
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown Primitive Topology!");
+	}
 
 	void DX11RendererAPI::Init()
 	{
-		HNB_CORE_ASSERT(!s_Instance, "DX11RendererAPI already exists!");
-
-		s_Instance = this;
-
 		m_DeviceContext = DX11Context::GetDeviceContext();
 		m_Device = DX11Context::GetDevice();
 		m_SwapChain = DX11Context::GetSwapChain();
@@ -28,14 +37,11 @@ namespace Hanabi
 		m_ClearColor = color;
 	}
 
-	void DX11RendererAPI::Clear()
+	void DX11RendererAPI::ClearAndBind()
 	{
-		if (m_RenderToBackbuffer)
-		{
-			m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
-			m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
-			m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-		}
+		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
+		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	}
 
 	void DX11RendererAPI::SetBuffer(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
@@ -79,18 +85,58 @@ namespace Hanabi
 		SetBuffer(width, height, x, y);
 	}
 
-	void DX11RendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
+	void DX11RendererAPI::BeginRender()
 	{
-		vertexArray->Bind();
-		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
+		ClearAndBind();
+	}
+
+	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass> renderPass)
+	{
+		renderPass->GetSpecification().TargetFramebuffer->ClearAndBind();
+	}
+
+	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass> renderPass)
+	{
+		renderPass->GetSpecification().TargetFramebuffer->Unbind();
+	}
+
+	void DX11RendererAPI::EndRender()
+	{
+		ClearAndBind();
+	}
+
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh> mesh, const  Ref<Pipeline> pipeline)
+	{
+		mesh->GetVertexBuffer()->Bind();
+		mesh->GetIndexBuffer()->Bind();
+		pipeline->Bind();
+		mesh->GetMaterial()->Bind();
+
+		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
+		uint32_t count = mesh->GetIndexBuffer()->GetCount();
 		m_DeviceContext->DrawIndexed(count, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer> vertexBuffer, const Ref<IndexBuffer> indexBuffer,
+		const Ref<Pipeline> pipeline, uint32_t indexCount)
 	{
-		vertexArray->Bind();
-		m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+		vertexBuffer->Bind();
+		indexBuffer->Bind();
+		pipeline->Bind();
+		pipeline->GetSpecification().Shader->Bind();
+
+		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
+		uint32_t count = indexCount ? indexCount : indexBuffer->GetCount();
+		m_DeviceContext->DrawIndexed(count, 0, 0);
+	}
+
+	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer> vertexBuffer,const Ref<Pipeline> pipeline, uint32_t vertexCount)
+	{
+		vertexBuffer->Bind();
+		pipeline->Bind();
+		pipeline->GetSpecification().Shader->Bind();
+
+		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->Draw(vertexCount, 0);
 	}
 

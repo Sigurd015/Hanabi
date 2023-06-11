@@ -1,11 +1,11 @@
 #include "hnbpch.h"
-#include "Engine/Renderer/RendererAPI.h"
-#include "Engine/Renderer/Renderer2D.h"
-#include "Engine/Renderer/VertexArray.h"
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/RenderCommand.h"
-#include "Engine/Renderer/ConstantBuffer.h"
-#include "Engine/Renderer/UI/MSDFData.h"
+#include "RendererAPI.h"
+#include "Renderer2D.h"
+#include "Pipeline.h"
+#include "Shader.h"
+#include "Renderer.h"
+#include "ConstantBuffer.h"
+#include "UI/MSDFData.h"
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -62,24 +62,25 @@ namespace Hanabi
 		static const uint32_t MaxQuads = 10000;
 		static const uint32_t MaxVertices = MaxQuads * 4;
 		static const uint32_t MaxIndices = MaxQuads * 6;
-		static const uint32_t MaxTextureSlots = 32;
+		static const uint32_t MaxTextureSlots = 15;//TODO:Default Font using slot 15,so we can only use 14 slots
 
-		Ref<VertexArray> QuadVertexArray;
+		Ref<Pipeline> QuadPipeline;
 		Ref<VertexBuffer> QuadVertexBuffer;
+		Ref<IndexBuffer> QuadIndexBuffer;
 		Ref<Shader> QuadShader;
 		Ref<Texture2D> WhiteTexture;
 		uint32_t QuadIndexCount = 0;
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
-		Ref<VertexArray> CircleVertexArray;
+		Ref<Pipeline> CirclePipeline;
 		Ref<VertexBuffer> CircleVertexBuffer;
 		Ref<Shader> CircleShader;
 		uint32_t CircleIndexCount = 0;
 		CircleVertex* CircleVertexBufferBase = nullptr;
 		CircleVertex* CircleVertexBufferPtr = nullptr;
 
-		Ref<VertexArray> LineVertexArray;
+		Ref<Pipeline> LinePipeline;
 		Ref<VertexBuffer> LineVertexBuffer;
 		Ref<Shader> LineShader;
 		uint32_t LineVertexCount = 0;
@@ -87,8 +88,9 @@ namespace Hanabi
 		LineVertex* LineVertexBufferPtr = nullptr;
 		float LineWidth = 2.0f;
 
-		Ref<VertexArray> TextVertexArray;
+		Ref<Pipeline> TextPipeline;
 		Ref<VertexBuffer> TextVertexBuffer;
+		Ref<IndexBuffer> TextIndexBuffer;
 		Ref<Shader> TextShader;
 		uint32_t TextIndexCount = 0;
 		TextVertex* TextVertexBufferBase = nullptr;
@@ -125,21 +127,24 @@ namespace Hanabi
 	void Renderer2D::Init()
 	{
 		//Quad
-		s_Data.QuadVertexArray = VertexArray::Create();
-		//VertexBuffer
-		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
-		s_Data.QuadVertexBuffer->SetLayout({
+		s_Data.QuadShader = Shader::Create("Renderer2D_Quad");
+		VertexBufferLayout quadLayout = {
 			{ ShaderDataType::Float3, "a_Position"     },
 			{ ShaderDataType::Float4, "a_Color"        },
 			{ ShaderDataType::Float2, "a_TexCoord"     },
 			{ ShaderDataType::Int,    "a_TexIndex"     },
 			{ ShaderDataType::Float,  "a_TilingFactor" },
 			{ ShaderDataType::Int,    "a_EntityID"     }
-			});
-		s_Data.QuadShader = Shader::Create("Renderer2D_Quad");
-		s_Data.QuadVertexArray->AddVertexBuffer(s_Data.QuadVertexBuffer, s_Data.QuadShader);
+		};
+
+		PipelineSpecification quadPipelineSpec;
+		quadPipelineSpec.Layout = quadLayout;
+		quadPipelineSpec.Shader = s_Data.QuadShader;
+		quadPipelineSpec.Topology = PrimitiveTopology::Triangles;
+		s_Data.QuadPipeline = Pipeline::Create(quadPipelineSpec);
+		s_Data.QuadVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(QuadVertex));
+		s_Data.QuadVertexBuffer->SetLayout(quadLayout);
 		s_Data.QuadVertexBufferBase = new QuadVertex[s_Data.MaxVertices];
-		//IndexBuffer
 		uint32_t* quadIndices = new uint32_t[s_Data.MaxIndices];
 		uint32_t offset = 0;
 		for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
@@ -154,78 +159,67 @@ namespace Hanabi
 
 			offset += 4;
 		}
-
-		Ref<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
-		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
-		delete[] quadIndices;
-		s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
-		uint32_t whiteTextureData = 0xffffffff;
-		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		s_Data.QuadIndexBuffer = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
 
 		// Circles
-		s_Data.CircleVertexArray = VertexArray::Create();
-		s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
-		s_Data.CircleVertexBuffer->SetLayout({
+		s_Data.CircleShader = Shader::Create("Renderer2D_Circle");
+		VertexBufferLayout circleLayout = {
 			{ ShaderDataType::Float3, "a_WorldPosition" },
 			{ ShaderDataType::Float3, "a_LocalPosition" },
 			{ ShaderDataType::Float4, "a_Color"         },
 			{ ShaderDataType::Float,  "a_Thickness"     },
 			{ ShaderDataType::Float,  "a_Fade"          },
 			{ ShaderDataType::Int,    "a_EntityID"      }
-			});
-		s_Data.CircleShader = Shader::Create("Renderer2D_Circle");
-		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer, s_Data.CircleShader);
-		s_Data.CircleVertexArray->SetIndexBuffer(quadIB); // Use quad IB
+		};
+		PipelineSpecification circlePipelineSpec;
+		circlePipelineSpec.Layout = circleLayout;
+		circlePipelineSpec.Shader = s_Data.CircleShader;
+		circlePipelineSpec.Topology = PrimitiveTopology::Triangles;
+		s_Data.CirclePipeline = Pipeline::Create(circlePipelineSpec);
+		s_Data.CircleVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(CircleVertex));
+		s_Data.CircleVertexBuffer->SetLayout(circleLayout);
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
 
 		// Lines
-		s_Data.LineVertexArray = VertexArray::Create();
-
-		s_Data.LineVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(LineVertex));
-		s_Data.LineVertexBuffer->SetLayout({
+		s_Data.LineShader = Shader::Create("Renderer2D_Line");
+		VertexBufferLayout lineLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"    },
 			{ ShaderDataType::Int,    "a_EntityID" }
-			});
-		s_Data.LineShader = Shader::Create("Renderer2D_Line");
-		s_Data.LineVertexArray->AddVertexBuffer(s_Data.LineVertexBuffer, s_Data.LineShader);
+		};
+		PipelineSpecification linePipelineSpec;
+		linePipelineSpec.Layout = lineLayout;
+		linePipelineSpec.Shader = s_Data.LineShader;
+		linePipelineSpec.Topology = PrimitiveTopology::Lines;
+		s_Data.LinePipeline = Pipeline::Create(linePipelineSpec);
+		s_Data.LineVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(LineVertex));
+		s_Data.LineVertexBuffer->SetLayout(lineLayout);
 		s_Data.LineVertexBufferBase = new LineVertex[s_Data.MaxVertices];
 
 		// Text
-		s_Data.TextVertexArray = VertexArray::Create();
-
-		s_Data.TextVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(TextVertex));
-		s_Data.TextVertexBuffer->SetLayout({
+		s_Data.TextShader = Shader::Create("Renderer2D_Text");
+		VertexBufferLayout textLayout = {
 			{ ShaderDataType::Float3, "a_Position"     },
 			{ ShaderDataType::Float4, "a_Color"        },
 			{ ShaderDataType::Float2, "a_TexCoord"     },
 			{ ShaderDataType::Int,    "a_EntityID"     }
-			});
-		s_Data.TextShader = Shader::Create("Renderer2D_Text");
-		s_Data.TextVertexArray->AddVertexBuffer(s_Data.TextVertexBuffer, s_Data.TextShader);
-
-		//TODO: need to do this ?
-		uint32_t* textIndices = new uint32_t[s_Data.MaxIndices];
-		uint32_t textIndicesOffset = 0;
-		for (uint32_t i = 0; i < s_Data.MaxIndices; i += 6)
-		{
-			textIndices[i + 0] = textIndicesOffset + 2;
-			textIndices[i + 1] = textIndicesOffset + 1;
-			textIndices[i + 2] = textIndicesOffset + 0;
-
-			textIndices[i + 3] = textIndicesOffset + 0;
-			textIndices[i + 4] = textIndicesOffset + 3;
-			textIndices[i + 5] = textIndicesOffset + 2;
-
-			textIndicesOffset += 4;
-		}
-
-		Ref<IndexBuffer> textIB = IndexBuffer::Create(textIndices, s_Data.MaxIndices);
-		s_Data.TextVertexArray->SetIndexBuffer(textIB);
-		delete[] textIndices;
+		};
+		PipelineSpecification textPipelineSpec;
+		textPipelineSpec.Layout = textLayout;
+		textPipelineSpec.Shader = s_Data.TextShader;
+		textPipelineSpec.Topology = PrimitiveTopology::Triangles;
+		s_Data.TextPipeline = Pipeline::Create(textPipelineSpec);
+		s_Data.TextVertexBuffer = VertexBuffer::Create(s_Data.MaxVertices * sizeof(TextVertex));
+		s_Data.TextVertexBuffer->SetLayout(textLayout);
 		s_Data.TextVertexBufferBase = new TextVertex[s_Data.MaxVertices];
+		//TODO:Notice that quadIndices is been Flipped for the DX11 case, but don't know why needs to flip again
+		s_Data.TextIndexBuffer = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
+		delete[] quadIndices;
 
 		// Set WhiteTexture slots to 0
+		s_Data.WhiteTexture = Texture2D::Create(TextureSpecification());
+		uint32_t whiteTextureData = 0xffffffff;
+		s_Data.WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 		s_Data.TextureSlots[0] = s_Data.WhiteTexture;
 
 		s_Data.CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
@@ -253,6 +247,11 @@ namespace Hanabi
 
 		s_Data.CameraConstantBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
 
+		s_Data.QuadPipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+		s_Data.CirclePipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+		s_Data.LinePipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+		s_Data.TextPipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+
 		StartBatch();
 	}
 
@@ -272,6 +271,11 @@ namespace Hanabi
 		}
 
 		s_Data.CameraConstantBuffer->SetData(&s_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+
+		s_Data.QuadPipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+		s_Data.CirclePipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+		s_Data.LinePipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
+		s_Data.TextPipeline->SetConstantBuffer(s_Data.CameraConstantBuffer);
 
 		StartBatch();
 	}
@@ -308,8 +312,7 @@ namespace Hanabi
 			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
 				s_Data.TextureSlots[i]->Bind(i);
 
-			s_Data.QuadShader->Bind();
-			RenderCommand::DrawIndexed(s_Data.QuadVertexArray, s_Data.QuadIndexCount);
+			Renderer::DrawIndexed(s_Data.QuadVertexBuffer, s_Data.QuadIndexBuffer, s_Data.QuadPipeline, s_Data.QuadIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
 
@@ -318,8 +321,8 @@ namespace Hanabi
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.CircleVertexBufferPtr - (uint8_t*)s_Data.CircleVertexBufferBase);
 			s_Data.CircleVertexBuffer->SetData(s_Data.CircleVertexBufferBase, dataSize);
 
-			s_Data.CircleShader->Bind();
-			RenderCommand::DrawIndexed(s_Data.CircleVertexArray, s_Data.CircleIndexCount);
+			// Use quad QuadIndexBuffer
+			Renderer::DrawIndexed(s_Data.CircleVertexBuffer, s_Data.QuadIndexBuffer, s_Data.CirclePipeline, s_Data.CircleIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
 
@@ -328,9 +331,8 @@ namespace Hanabi
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.LineVertexBufferPtr - (uint8_t*)s_Data.LineVertexBufferBase);
 			s_Data.LineVertexBuffer->SetData(s_Data.LineVertexBufferBase, dataSize);
 
-			s_Data.LineShader->Bind();
-			RenderCommand::SetLineWidth(s_Data.LineWidth);
-			RenderCommand::DrawLines(s_Data.LineVertexArray, s_Data.LineVertexCount);
+			Renderer::SetLineWidth(s_Data.LineWidth);
+			Renderer::DrawLines(s_Data.LineVertexBuffer, s_Data.LinePipeline, s_Data.LineVertexCount);
 			s_Data.Stats.DrawCalls++;
 		}
 
@@ -340,10 +342,10 @@ namespace Hanabi
 			s_Data.TextVertexBuffer->SetData(s_Data.TextVertexBufferBase, dataSize);
 
 			auto buf = s_Data.TextVertexBufferBase;
-			s_Data.FontAtlasTexture->Bind(0);
+			//TODO:The default FontAtlasTexture slot should be dynamic
+			s_Data.FontAtlasTexture->Bind(s_Data.MaxTextureSlots);
 
-			s_Data.TextShader->Bind();
-			RenderCommand::DrawIndexed(s_Data.TextVertexArray, s_Data.TextIndexCount);
+			Renderer::DrawIndexed(s_Data.TextVertexBuffer, s_Data.TextIndexBuffer, s_Data.TextPipeline, s_Data.TextIndexCount);
 			s_Data.Stats.DrawCalls++;
 		}
 	}
@@ -520,7 +522,6 @@ namespace Hanabi
 	{
 		DrawString(string, component.FontAsset, transform, { component.Color, component.Kerning, component.LineSpacing }, entityID);
 	}
-
 
 	float Renderer2D::GetLineWidth()
 	{

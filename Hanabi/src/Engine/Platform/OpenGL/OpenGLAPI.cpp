@@ -5,6 +5,21 @@
 
 namespace Hanabi
 {
+	static GLenum PrimitiveTopologyTypeToOpenGL(PrimitiveTopology type)
+	{
+		switch (type)
+		{
+		case PrimitiveTopology::Points:
+			return GL_POINT;
+		case PrimitiveTopology::Lines:
+			return GL_LINES;
+		case PrimitiveTopology::Triangles:
+			return GL_TRIANGLES;
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown Primitive Topology!");
+	}
+
 	void OpenGLMessageCallback(unsigned source, unsigned type, unsigned id, 
 		unsigned severity, int length, const char* message, const void* userParam)
 	{
@@ -48,21 +63,43 @@ namespace Hanabi
 		glViewport(x, y, width, height);
 	}
 
-	void OpenGLRendererAPI::Clear()
+	void OpenGLRendererAPI::BeginRender()
+	{}
+
+	void OpenGLRendererAPI::EndRender()
+	{}
+
+	void OpenGLRendererAPI::BeginRenderPass(const Ref<RenderPass> renderPass)
+	{}
+
+	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass> renderPass)
+	{}
+
+	void OpenGLRendererAPI::ClearAndBind()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh> mesh, const Ref<Pipeline> pipeline)
+	{}
+
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer> vertexBuffer, const Ref<IndexBuffer> indexBuffer, const Ref<Pipeline> pipeline, uint32_t indexCount)
 	{
-		vertexArray->Bind();
-		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
-		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+		vertexBuffer->Bind();
+		indexBuffer->Bind();
+		pipeline->Bind();
+		pipeline->GetSpecification().Shader->Bind();
+
+		uint32_t count = indexCount ? indexCount : indexBuffer->GetCount();
+		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), count, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRendererAPI::DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount)
+	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer> vertexBuffer, const Ref<Pipeline> pipeline, uint32_t vertexCount)
 	{
-		vertexArray->Bind();
+		vertexBuffer->Bind();
+		pipeline->Bind();
+		pipeline->GetSpecification().Shader->Bind();
+
 		glDrawArrays(GL_LINES, 0, vertexCount);
 	}
 

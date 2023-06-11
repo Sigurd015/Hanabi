@@ -17,13 +17,17 @@ namespace Hanabi
 		buffer.ByteWidth = size;
 		buffer.StructureByteStride = 0;
 		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateBuffer(&buffer, nullptr, m_ConstantBuffer.GetAddressOf()));
-		DX11Context::GetDeviceContext()->VSSetConstantBuffers(m_BindingID, 1, m_ConstantBuffer.GetAddressOf());
-		DX11Context::GetDeviceContext()->PSSetConstantBuffers(m_BindingID, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 	DX11ConstantBuffer::~DX11ConstantBuffer()
 	{
 		m_ConstantBuffer.Reset();
+	}
+
+	void DX11ConstantBuffer::Bind() const
+	{
+		DX11Context::GetDeviceContext()->VSSetConstantBuffers(m_BindingID, 1, m_ConstantBuffer.GetAddressOf());
+		DX11Context::GetDeviceContext()->PSSetConstantBuffers(m_BindingID, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 	void DX11ConstantBuffer::SetData(const void* data, uint32_t size, uint32_t offset)

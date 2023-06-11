@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "OpenGLVertexArray.h"
+#include "OpenGLPipeline.h"
 
 #include <glad/glad.h>
 
@@ -25,33 +25,15 @@ namespace Hanabi
 		return 0;
 	}
 
-	OpenGLVertexArray::OpenGLVertexArray()
+	OpenGLPipeline::OpenGLPipeline(const PipelineSpecification& spec)
 	{
+		HNB_CORE_ASSERT(spec.Layout.GetElements().size(), "Vertex Buffer has no layout!");
+
+		m_Specification = spec;
 		glCreateVertexArrays(1, &m_RendererID);
-	}
 
-	OpenGLVertexArray::~OpenGLVertexArray()
-	{
-		glDeleteVertexArrays(1, &m_RendererID);
-	}
-
-	void OpenGLVertexArray::Bind() const
-	{
 		glBindVertexArray(m_RendererID);
-	}
-
-	void OpenGLVertexArray::Unbind() const
-	{
-		glBindVertexArray(0);
-	}
-
-	void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
-	{
-		HNB_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
-		glBindVertexArray(m_RendererID);
-		vertexBuffer->Bind();
-		const auto& layout = vertexBuffer->GetLayout();
-		for (const auto& element : layout)
+		for (const auto& element : spec.Layout)
 		{
 			switch (element.Type)
 			{
@@ -65,7 +47,7 @@ namespace Hanabi
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
 					element.Normalized ? GL_TRUE : GL_FALSE,
-					layout.GetStride(),
+					spec.Layout.GetStride(),
 					(const void*)element.Offset);
 				m_VertexBufferIndex++;
 				break;
@@ -80,7 +62,7 @@ namespace Hanabi
 				glVertexAttribIPointer(m_VertexBufferIndex,
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
-					layout.GetStride(),
+					spec.Layout.GetStride(),
 					(const void*)element.Offset);
 				m_VertexBufferIndex++;
 				break;
@@ -96,7 +78,7 @@ namespace Hanabi
 						count,
 						ShaderDataTypeToOpenGLBaseType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
-						layout.GetStride(),
+						spec.Layout.GetStride(),
 						(const void*)(element.Offset + sizeof(float) * count * i));
 					glVertexAttribDivisor(m_VertexBufferIndex, 1);
 					m_VertexBufferIndex++;
@@ -107,13 +89,22 @@ namespace Hanabi
 				HNB_CORE_ASSERT(false, "Unknown ShaderDataType!");
 			}
 		}
-		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
-	void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	OpenGLPipeline::~OpenGLPipeline()
+	{
+		glDeleteVertexArrays(1, &m_RendererID);
+	}
+
+	void OpenGLPipeline::Bind()
 	{
 		glBindVertexArray(m_RendererID);
-		indexBuffer->Bind();
-		m_IndexBuffer = indexBuffer;
+		if (m_UniformBuffer != nullptr)
+			m_UniformBuffer->Bind();
+	}
+
+	void OpenGLPipeline::SetConstantBuffer(Ref<ConstantBuffer> uniformBuffer)
+	{
+		m_UniformBuffer = uniformBuffer;
 	}
 }

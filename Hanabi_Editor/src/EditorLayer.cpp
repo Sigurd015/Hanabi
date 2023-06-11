@@ -13,10 +13,15 @@ namespace Hanabi
 	void EditorLayer::OnAttach()
 	{
 		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth };
+		fbSpec.Attachments = {
+			{FramebufferTextureFormat::RGBA8},
+			{FramebufferTextureFormat::RED_INTEGER,glm::vec4(-1,0,0,0)},
+			{FramebufferTextureFormat::Depth} };
+
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
+		m_TargetRenderPass = RenderPass::Create({ m_Framebuffer });
 
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
@@ -59,13 +64,7 @@ namespace Hanabi
 
 		// Render
 		Renderer2D::ResetStats();
-		m_Framebuffer->Bind();
-		RenderCommand::SetClearColor({ 0.3f, 0.3f, 0.3f, 1 });
-		RenderCommand::Clear();
-
-		// Clear our entity ID attachment to -1
-		m_Framebuffer->ClearAttachment(1, -1);
-
+		Renderer::BeginRenderPass(m_TargetRenderPass);
 		// Update scene
 		switch (m_SceneState)
 		{
@@ -105,7 +104,7 @@ namespace Hanabi
 
 		OnOverlayRender();
 
-		m_Framebuffer->Unbind();
+		Renderer::EndRenderPass(m_TargetRenderPass);
 	}
 
 	void EditorLayer::OnOverlayRender()
@@ -143,7 +142,7 @@ namespace Hanabi
 				}
 			}
 
-			// Circle Colliders
+			// Circle Colliders TODO:Not work with dx11
 			{
 				auto view = m_ActiveScene->GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
 				for (auto entity : view)

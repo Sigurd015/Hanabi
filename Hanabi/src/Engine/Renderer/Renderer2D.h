@@ -1,8 +1,8 @@
 #pragma once
-#include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/EditorCamera.h"
-#include "Engine/Renderer/Texture.h"
-#include "Engine/Renderer/UI/Font.h"
+#include "Camera.h"
+#include "EditorCamera.h"
+#include "Texture.h"
+#include "UI/Font.h"
 #include "Engine/Scene/Components.h"
 
 namespace Hanabi

@@ -158,33 +158,19 @@ namespace Hanabi
 		}
 	}
 
-	void DX11Framebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
+	void DX11Framebuffer::ClearAndBind()
 	{
-		HNB_CORE_ASSERT(attachmentIndex < m_RenderTargetAttachments.size());
-
-		const glm::vec4 color = DX11RendererAPI::GetClearColor();
 		for (size_t i = 0; i < m_RenderTargetAttachments.size(); i++)
 		{
-			if (i == attachmentIndex)
-			{
-				const float temp[] = { value,0,0,0 };
-				DX11Context::GetDeviceContext()->ClearRenderTargetView(m_RenderTargetAttachments[i].Get(), temp);
-				continue;
-			}
-			DX11Context::GetDeviceContext()->ClearRenderTargetView(m_RenderTargetAttachments[i].Get(), &color.x);
+			DX11Context::GetDeviceContext()->ClearRenderTargetView(m_RenderTargetAttachments[i].Get(), &m_ColorAttachmentSpecifications[i].ClearColor.x);
 		}
-		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DepthStencilAttachment.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DepthStencilAttachment.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, m_Specification.DepthClearValue, 0);
 		DX11Context::GetDeviceContext()->OMSetRenderTargets(m_RenderTargetAttachments.size(), m_RenderTargetAttachments.data()->GetAddressOf(), m_DepthStencilAttachment.Get());
-	}
-
-	void DX11Framebuffer::Bind()
-	{
-		DX11RendererAPI::SetAttachments();
 	}
 
 	void DX11Framebuffer::Unbind()
 	{
-		DX11RendererAPI::ReSetAttachments();
+		DX11Context::GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
 	}
 
 	void DX11Framebuffer::Resize(uint32_t width, uint32_t height)

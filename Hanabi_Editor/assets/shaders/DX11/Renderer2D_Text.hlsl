@@ -49,8 +49,8 @@ struct PixelOutput
     int EntityID : SV_Target1;
 };
 
-Texture2D u_FontAtlas : register(t0);
-SamplerState u_FontAtlasSamplerState : register(s0);
+Texture2D u_FontAtlas : register(t15);
+SamplerState u_FontAtlasSamplerState : register(s15);
 
 float screenPxRange(PixelInput Input)
 {

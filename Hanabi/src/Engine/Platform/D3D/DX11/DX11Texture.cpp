@@ -92,7 +92,7 @@ namespace Hanabi
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
 		DX_CHECK_RESULT(DX11Context::GetDeviceContext()->Map(m_Texture.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource));
-		
+
 		if (m_Specification.Format == ImageFormat::RGB8)
 		{
 			uint8_t* targetData = static_cast<uint8_t*>(mappedResource.pData);

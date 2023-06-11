@@ -22,14 +22,15 @@
 #include "Engine/Events/MouseEvent.h"
 
 // ---Renderer---------------------
+#include "Engine/Renderer/RenderPass.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Renderer2D.h"
-#include "Engine/Renderer/RenderCommand.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Buffer.h"
-#include "Engine/Renderer/VertexArray.h"
+#include "Engine/Renderer/IndexBuffer.h"
+#include "Engine/Renderer/VertexBuffer.h"
+#include "Engine/Renderer/PipeLine.h"
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Framebuffer.h"

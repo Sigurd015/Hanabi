@@ -13,15 +13,14 @@ namespace Hanabi
 	public:
 		DX11Framebuffer(const FramebufferSpecification& spec);
 		~DX11Framebuffer();
-		void Invalidate();
-		void Bind() override;
+		void ClearAndBind() override;
 		void Unbind() override;
 		void Resize(uint32_t width, uint32_t height) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
-		void ClearAttachment(uint32_t attachmentIndex, int value) override;
 		void* GetColorAttachment(uint32_t index = 0) const override;
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:
+		void Invalidate();
 		FramebufferSpecification m_Specification;
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
 		FramebufferTextureSpecification m_DepthAttachmentSpecification = FramebufferTextureFormat::None;

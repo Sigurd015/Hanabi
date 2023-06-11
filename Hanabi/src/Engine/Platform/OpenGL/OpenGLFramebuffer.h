@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include "Engine/Renderer/Framebuffer.h"
 
 namespace Hanabi
@@ -9,11 +10,10 @@ namespace Hanabi
 		OpenGLFramebuffer(const FramebufferSpecification& spec);
 		~OpenGLFramebuffer();
 		void Invalidate();
-		void Bind() override;
+		void ClearAndBind() override;
 		void Unbind() override;
 		void Resize(uint32_t width, uint32_t height) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
-		void ClearAttachment(uint32_t attachmentIndex, int value) override;
 		void* GetColorAttachment(uint32_t index = 0) const override
 		{
 			HNB_CORE_ASSERT(index < m_ColorAttachments.size()); return (void*)m_ColorAttachments[index];

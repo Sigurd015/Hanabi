@@ -1,7 +1,5 @@
 #include "hnbpch.h"
-
-#if defined(HNB_PLATFORM_WINDOWS)
-#include "DX11VertexDeclaration.h"
+#include "DX11Pipeline.h"
 #include "DX11Shader.h"
 #include "DX11Context.h"
 #include "Engine/Platform/D3D/DXCommon.h"
@@ -28,50 +26,34 @@ namespace Hanabi
 		return DXGI_FORMAT_UNKNOWN;
 	}
 
-	void DX11VertexDeclaration::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
+	DX11Pipeline::DX11Pipeline(const PipelineSpecification& spec)
 	{
-		m_IndexBuffer = indexBuffer;
-	}
+		m_Specification = spec;
 
-	void DX11VertexDeclaration::AddVertexBuffer(const Ref<VertexBuffer>& vertexBuffer, const Ref<Shader>& shader)
-	{
-		DX11Shader* vertexShader = (DX11Shader*)shader.get();
-		const auto& layout = vertexBuffer->GetLayout();
+		DX11Shader* vertexShader = (DX11Shader*)m_Specification.Shader.get();
+		const auto& layout = m_Specification.Layout;
 		std::vector<D3D11_INPUT_ELEMENT_DESC> temp;
 		for (const auto& element : layout)
 		{
 			temp.push_back(D3D11_INPUT_ELEMENT_DESC{
 				element.Name.c_str(),0,ShaderDataTypeToDX11BaseType(element.Type),
 				0,(UINT)element.Offset ,D3D11_INPUT_PER_VERTEX_DATA ,0 });
-			m_VertexBufferIndex++;
 		}
 
 		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateInputLayout(
 			&temp[0], (UINT)temp.size(), vertexShader->GetVertextBufferPointer(),
 			vertexShader->GetVertextBufferSize(), m_InputLayout.GetAddressOf()));
-		m_VertexBuffers.push_back(vertexBuffer);
 	}
 
-	void DX11VertexDeclaration::Bind() const
+	void DX11Pipeline::Bind()
 	{
-		for (auto vertexBuffer : m_VertexBuffers)
-		{
-			vertexBuffer->Bind();
-		}
-		if (m_IndexBuffer != nullptr)
-			m_IndexBuffer->Bind();
 		DX11Context::GetDeviceContext()->IASetInputLayout(m_InputLayout.Get());
+		if (m_ConstantBuffer != nullptr)
+			m_ConstantBuffer->Bind();
 	}
 
-	void DX11VertexDeclaration::Unbind() const
+	void DX11Pipeline::SetConstantBuffer(Ref<ConstantBuffer> constantBuffer)
 	{
-		for (auto vertexBuffer : m_VertexBuffers)
-		{
-			vertexBuffer->Unbind();
-		}
-		if (m_IndexBuffer != nullptr)
-			m_IndexBuffer->Unbind();
-		DX11Context::GetDeviceContext()->IASetInputLayout(nullptr);
+		m_ConstantBuffer = constantBuffer;
 	}
 }
-#endif
