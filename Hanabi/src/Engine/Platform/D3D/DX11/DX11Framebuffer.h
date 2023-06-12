@@ -13,7 +13,8 @@ namespace Hanabi
 	public:
 		DX11Framebuffer(const FramebufferSpecification& spec);
 		~DX11Framebuffer();
-		void ClearAndBind() override;
+		void ClearAttachment() override;
+		void Bind() override;
 		void Unbind() override;
 		void Resize(uint32_t width, uint32_t height) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;

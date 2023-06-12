@@ -48,7 +48,7 @@ struct VertexOutput
 layout (location = 0) in VertexOutput Input;
 layout (location = 2) in flat int v_EntityID;
 
-layout (binding = 15) uniform sampler2D u_FontAtlas;
+layout (binding = 0) uniform sampler2D u_FontAtlas;
 
 float screenPxRange() {
 	const float pxRange = 2.0; // set to distance field's pixel range

@@ -1,5 +1,6 @@
 #pragma once
 #include "VertexBuffer.h"
+#include "IndexBuffer.h"
 #include "Shader.h"
 #include "ConstantBuffer.h"
 #include "RenderPass.h"
@@ -19,6 +20,11 @@ namespace Hanabi
 
 	struct PipelineSpecification
 	{
+		//For OpenGL
+		Ref<VertexBuffer> VertexBuffer;
+		Ref<IndexBuffer> IndexBuffer;
+		//-----------------
+
 		Ref<Shader> Shader;
 		VertexBufferLayout Layout;
 		Ref<RenderPass> RenderPass;

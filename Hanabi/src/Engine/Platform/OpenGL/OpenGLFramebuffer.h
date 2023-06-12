@@ -9,8 +9,8 @@ namespace Hanabi
 	public:
 		OpenGLFramebuffer(const FramebufferSpecification& spec);
 		~OpenGLFramebuffer();
-		void Invalidate();
-		void ClearAndBind() override;
+		void ClearAttachment() override;
+		void Bind() override;
 		void Unbind() override;
 		void Resize(uint32_t width, uint32_t height) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
@@ -20,6 +20,7 @@ namespace Hanabi
 		}
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:
+		void Invalidate();
 		uint32_t m_RendererID;
 		FramebufferSpecification m_Specification;
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;

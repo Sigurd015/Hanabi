@@ -158,13 +158,17 @@ namespace Hanabi
 		}
 	}
 
-	void DX11Framebuffer::ClearAndBind()
+	void DX11Framebuffer::ClearAttachment()
 	{
 		for (size_t i = 0; i < m_RenderTargetAttachments.size(); i++)
 		{
 			DX11Context::GetDeviceContext()->ClearRenderTargetView(m_RenderTargetAttachments[i].Get(), &m_ColorAttachmentSpecifications[i].ClearColor.x);
 		}
 		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DepthStencilAttachment.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, m_Specification.DepthClearValue, 0);
+	}
+
+	void DX11Framebuffer::Bind()
+	{
 		DX11Context::GetDeviceContext()->OMSetRenderTargets(m_RenderTargetAttachments.size(), m_RenderTargetAttachments.data()->GetAddressOf(), m_DepthStencilAttachment.Get());
 	}
 

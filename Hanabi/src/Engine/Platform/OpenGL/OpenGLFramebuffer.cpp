@@ -181,16 +181,16 @@ namespace Hanabi
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFramebuffer::ClearAndBind()
+	void OpenGLFramebuffer::ClearAttachment()
 	{
-		size_t	attachmentIndex = 0;
-		for (auto& spec : m_ColorAttachmentSpecifications)
-		{
-			glClearTexImage(m_ColorAttachments[attachmentIndex], 0,
-				Utils::FBTextureFormatToGL(spec.TextureFormat), GL_INT, &spec.ClearColor.x);
-			attachmentIndex++;
-		}
+		int value = -1;
+		auto& spec = m_ColorAttachmentSpecifications[1];
+		glClearTexImage(m_ColorAttachments[1], 0,
+			Utils::FBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
+	}
 
+	void OpenGLFramebuffer::Bind()
+	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 	}
@@ -218,10 +218,9 @@ namespace Hanabi
 	{
 		HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
 
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
-		int pixelData;
-		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
+		//glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
+		int pixelData = -1;
+		//glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 		return pixelData;
-
 	}
 }

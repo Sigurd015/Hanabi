@@ -51,20 +51,9 @@ namespace Hanabi
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
-		// Resize
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-
-		if (Hanabi::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
-			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
-			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
-		{
-			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-		}
-
-		// Render
 		Renderer2D::ResetStats();
-		Renderer::BeginRenderPass(m_TargetRenderPass);
+	    Renderer::BeginRenderPass(m_TargetRenderPass);
+
 		// Update scene
 		switch (m_SceneState)
 		{
@@ -79,27 +68,6 @@ namespace Hanabi
 			m_ActiveScene->OnUpdateRuntime(ts);
 			break;
 		}
-		}
-
-		ImVec2 mousePos = ImGui::GetMousePos();
-		mousePos.x -= m_ViewportBounds[0].x;
-		mousePos.y -= m_ViewportBounds[0].y;
-		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::OpenGL:
-			mousePos.y = viewportSize.y - mousePos.y;
-			break;
-		}
-
-		int mouseX = (int)mousePos.x;
-		int mouseY = (int)mousePos.y;
-
-		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
-		{
-			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
-			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 
 		OnOverlayRender();
@@ -172,6 +140,7 @@ namespace Hanabi
 
 	void EditorLayer::OnImGuiRender()
 	{
+
 #pragma region Dockspace Settings
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
@@ -260,6 +229,42 @@ namespace Hanabi
 		UI_StatisticsPanel();
 		UI_ViewportPanel();
 		ImGui::End();
+
+#pragma region Resize
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+
+		if (Hanabi::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
+			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
+		{
+			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		}
+#pragma endregion
+
+#pragma region Mouse Pick Up
+		ImVec2 mousePos = ImGui::GetMousePos();
+		mousePos.x -= m_ViewportBounds[0].x;
+		mousePos.y -= m_ViewportBounds[0].y;
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::OpenGL:
+			mousePos.y = viewportSize.y - mousePos.y;
+			break;
+		}
+
+		int mouseX = (int)mousePos.x;
+		int mouseY = (int)mousePos.y;
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
+		{
+			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
+		}
+#pragma endregion	
+
 	}
 
 	void EditorLayer::OnEvent(Event& e)

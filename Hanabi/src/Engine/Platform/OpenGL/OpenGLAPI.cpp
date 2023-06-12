@@ -20,7 +20,7 @@ namespace Hanabi
 		HNB_CORE_ASSERT(false, "Unknown Primitive Topology!");
 	}
 
-	void OpenGLMessageCallback(unsigned source, unsigned type, unsigned id, 
+	void OpenGLMessageCallback(unsigned source, unsigned type, unsigned id,
 		unsigned severity, int length, const char* message, const void* userParam)
 	{
 		switch (severity)
@@ -55,7 +55,13 @@ namespace Hanabi
 
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
 	{
-		glClearColor(color.r, color.g, color.b, color.a);
+		m_ClearColor = color;
+	}
+
+	void OpenGLRendererAPI::Clear()
+	{
+		glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
 	void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -67,23 +73,24 @@ namespace Hanabi
 	{}
 
 	void OpenGLRendererAPI::EndRender()
-	{}
-
-	void OpenGLRendererAPI::BeginRenderPass(const Ref<RenderPass> renderPass)
-	{}
-
-	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass> renderPass)
-	{}
-
-	void OpenGLRendererAPI::ClearAndBind()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh> mesh, const Ref<Pipeline> pipeline)
+	void OpenGLRendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass)
+	{
+		renderPass->GetSpecification().TargetFramebuffer->Bind();
+		Clear();
+		renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
+	}
+
+	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer> vertexBuffer, const Ref<IndexBuffer> indexBuffer, const Ref<Pipeline> pipeline, uint32_t indexCount)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline)
+	{}
+
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
@@ -94,13 +101,13 @@ namespace Hanabi
 		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), count, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer> vertexBuffer, const Ref<Pipeline> pipeline, uint32_t vertexCount)
+	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
 		pipeline->Bind();
 		pipeline->GetSpecification().Shader->Bind();
 
-		glDrawArrays(GL_LINES, 0, vertexCount);
+		glDrawArrays(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), 0, vertexCount);
 	}
 
 	void OpenGLRendererAPI::SetLineWidth(float width)

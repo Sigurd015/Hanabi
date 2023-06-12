@@ -17,8 +17,8 @@ namespace Hanabi
 		static void OnWindowResize(uint32_t width, uint32_t height);
 		static void BeginRender();
 		static void EndRender();
-		static void BeginRenderPass(const Ref<RenderPass> renderPass);
-		static void EndRenderPass(const Ref<RenderPass> renderPass);
+		static void BeginRenderPass(const Ref<RenderPass>& renderPass);
+		static void EndRenderPass(const Ref<RenderPass>& renderPass);
 
 		template<typename FuncT>
 		static void Submit(FuncT&& func)
@@ -37,10 +37,10 @@ namespace Hanabi
 			new (storageBuffer) FuncT(std::forward<FuncT>(func));
 		}
 
-		static void SubmitStaticMesh(const Ref<Mesh> mesh, const Ref<Pipeline> pipeline);
-		static void DrawIndexed(const Ref<VertexBuffer> vertexBuffer, const Ref<IndexBuffer> indexBuffer,
-			const Ref<Pipeline> pipeline, uint32_t indexCount = 0);
-		static void DrawLines(const Ref<VertexBuffer> vertexBuffer, const Ref<Pipeline> pipeline, uint32_t vertexCount);
+		static void SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline);
+		static void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer,
+			const Ref<Pipeline>& pipeline, uint32_t indexCount = 0);
+		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount);
 		static void SetLineWidth(float width);
 		static void WaitAndRender();
 	private:

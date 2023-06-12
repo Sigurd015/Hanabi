@@ -31,9 +31,10 @@ namespace Hanabi
 
 		m_Specification = spec;
 		glCreateVertexArrays(1, &m_RendererID);
-
 		glBindVertexArray(m_RendererID);
-		for (const auto& element : spec.Layout)
+		m_Specification.VertexBuffer->Bind();
+		size_t index = 0;
+		for (const auto& element : m_Specification.Layout)
 		{
 			switch (element.Type)
 			{
@@ -42,14 +43,14 @@ namespace Hanabi
 			case ShaderDataType::Float3:
 			case ShaderDataType::Float4:
 			{
-				glEnableVertexAttribArray(m_VertexBufferIndex);
-				glVertexAttribPointer(m_VertexBufferIndex,
+				glEnableVertexAttribArray(index);
+				glVertexAttribPointer(index,
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
 					element.Normalized ? GL_TRUE : GL_FALSE,
-					spec.Layout.GetStride(),
+					m_Specification.Layout.GetStride(),
 					(const void*)element.Offset);
-				m_VertexBufferIndex++;
+				index++;
 				break;
 			}
 			case ShaderDataType::Int:
@@ -58,13 +59,13 @@ namespace Hanabi
 			case ShaderDataType::Int4:
 			case ShaderDataType::Bool:
 			{
-				glEnableVertexAttribArray(m_VertexBufferIndex);
-				glVertexAttribIPointer(m_VertexBufferIndex,
+				glEnableVertexAttribArray(index);
+				glVertexAttribIPointer(index,
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
-					spec.Layout.GetStride(),
+					m_Specification.Layout.GetStride(),
 					(const void*)element.Offset);
-				m_VertexBufferIndex++;
+				index++;
 				break;
 			}
 			case ShaderDataType::Mat3:
@@ -73,15 +74,15 @@ namespace Hanabi
 				uint8_t count = element.GetComponentCount();
 				for (uint8_t i = 0; i < count; i++)
 				{
-					glEnableVertexAttribArray(m_VertexBufferIndex);
-					glVertexAttribPointer(m_VertexBufferIndex,
+					glEnableVertexAttribArray(index);
+					glVertexAttribPointer(index,
 						count,
 						ShaderDataTypeToOpenGLBaseType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
-						spec.Layout.GetStride(),
+						m_Specification.Layout.GetStride(),
 						(const void*)(element.Offset + sizeof(float) * count * i));
-					glVertexAttribDivisor(m_VertexBufferIndex, 1);
-					m_VertexBufferIndex++;
+					glVertexAttribDivisor(index, 1);
+					index++;
 				}
 				break;
 			}
@@ -89,6 +90,8 @@ namespace Hanabi
 				HNB_CORE_ASSERT(false, "Unknown ShaderDataType!");
 			}
 		}
+		if (m_Specification.IndexBuffer != nullptr)
+			m_Specification.IndexBuffer->Bind();
 	}
 
 	OpenGLPipeline::~OpenGLPipeline()

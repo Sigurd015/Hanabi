@@ -29,7 +29,7 @@ namespace Hanabi
 		Mesh(std::vector<Vertex>& vertices, std::vector<Index>& indices);
 		~Mesh() = default;
 
-		void SetMaterial(Ref<Material> material) { m_Material = material; }
+		void SetMaterial(const Ref<Material>& material) { m_Material = material; }
 		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 		const std::vector<Index>& GetIndices() const { return m_Indices; }
 		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }

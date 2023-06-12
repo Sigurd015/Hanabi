@@ -37,7 +37,7 @@ namespace Hanabi
 		m_ClearColor = color;
 	}
 
-	void DX11RendererAPI::ClearAndBind()
+	void DX11RendererAPI::ResetToBackBuffer()
 	{
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
@@ -87,25 +87,26 @@ namespace Hanabi
 
 	void DX11RendererAPI::BeginRender()
 	{
-		ClearAndBind();
+		ResetToBackBuffer();
 	}
 
-	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass> renderPass)
+	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		renderPass->GetSpecification().TargetFramebuffer->ClearAndBind();
+		renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
+		renderPass->GetSpecification().TargetFramebuffer->Bind();
 	}
 
-	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass> renderPass)
+	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
 	void DX11RendererAPI::EndRender()
 	{
-		ClearAndBind();
+		ResetToBackBuffer();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh> mesh, const  Ref<Pipeline> pipeline)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const  Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
@@ -117,8 +118,8 @@ namespace Hanabi
 		m_DeviceContext->DrawIndexed(count, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer> vertexBuffer, const Ref<IndexBuffer> indexBuffer,
-		const Ref<Pipeline> pipeline, uint32_t indexCount)
+	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer,
+		const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
@@ -130,7 +131,7 @@ namespace Hanabi
 		m_DeviceContext->DrawIndexed(count, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer> vertexBuffer,const Ref<Pipeline> pipeline, uint32_t vertexCount)
+	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
 		pipeline->Bind();

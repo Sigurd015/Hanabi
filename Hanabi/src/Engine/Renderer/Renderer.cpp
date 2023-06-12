@@ -34,7 +34,7 @@ namespace Hanabi
 		s_RendererAPI->SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginRenderPass(const Ref<RenderPass> renderPass)
+	void Renderer::BeginRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		Renderer::Submit([renderPass]()
 			{
@@ -42,7 +42,7 @@ namespace Hanabi
 			});
 	}
 
-	void Renderer::EndRenderPass(const Ref<RenderPass> renderPass)
+	void Renderer::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		Renderer::Submit([renderPass]()
 			{
@@ -66,7 +66,7 @@ namespace Hanabi
 			});
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<Mesh> mesh, const Ref<Pipeline> pipeline)
+	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline)
 	{
 		Renderer::Submit([mesh, pipeline]()
 			{
@@ -74,8 +74,8 @@ namespace Hanabi
 			});
 	}
 
-	void  Renderer::DrawIndexed(const Ref<VertexBuffer> vertexBuffer, const Ref<IndexBuffer> indexBuffer,
-		const Ref<Pipeline> pipeline, uint32_t indexCount)
+	void  Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer,
+		const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		Renderer::Submit([vertexBuffer, indexBuffer, pipeline, indexCount]()
 			{
@@ -83,7 +83,7 @@ namespace Hanabi
 			});
 	}
 
-	void  Renderer::DrawLines(const Ref<VertexBuffer> vertexBuffer, const Ref<Pipeline> pipeline, uint32_t vertexCount)
+	void  Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
 		Renderer::Submit([vertexBuffer, pipeline, vertexCount]()
 			{

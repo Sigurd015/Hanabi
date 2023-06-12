@@ -29,7 +29,6 @@ namespace Hanabi
 	DX11Pipeline::DX11Pipeline(const PipelineSpecification& spec)
 	{
 		m_Specification = spec;
-
 		DX11Shader* vertexShader = (DX11Shader*)m_Specification.Shader.get();
 		const auto& layout = m_Specification.Layout;
 		std::vector<D3D11_INPUT_ELEMENT_DESC> temp;

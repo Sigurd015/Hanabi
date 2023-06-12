@@ -4,6 +4,7 @@
 
 namespace Hanabi
 {
+	//Do the VertexArray work
 	class OpenGLPipeline : public Pipeline
 	{
 	public:
@@ -12,8 +13,7 @@ namespace Hanabi
 		void Bind() override;
 		void SetConstantBuffer(Ref<ConstantBuffer> constantBuffer) override;
 	private:
-		uint32_t m_RendererID;
-		uint32_t m_VertexBufferIndex = 0;
+		uint32_t m_RendererID = 0;
 		Ref<ConstantBuffer> m_UniformBuffer;
 	};
 }
