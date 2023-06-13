@@ -1,5 +1,4 @@
 project "Hanabi_Editor"
-	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "off"
@@ -42,16 +41,19 @@ project "Hanabi_Editor"
 		}
 	
 	filter "configurations:Debug"
+	    kind "ConsoleApp"
 		defines "HNB_DEBUG"
 		runtime "Debug"
 		symbols "on"
 	
 	filter "configurations:Release"
+	    kind "ConsoleApp"
 		defines "HNB_RELEASE"
 		runtime "Release"
 		optimize "on"
 	
 	filter "configurations:Dist"
+	    kind "WindowedApp"
 		defines "HNB_DIST"
 		runtime "Release"
 		optimize "on"

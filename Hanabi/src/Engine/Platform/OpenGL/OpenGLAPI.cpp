@@ -70,7 +70,9 @@ namespace Hanabi
 	}
 
 	void OpenGLRendererAPI::BeginRender()
-	{}
+	{
+		Clear();
+	}
 
 	void OpenGLRendererAPI::EndRender()
 	{
@@ -85,33 +87,30 @@ namespace Hanabi
 	}
 
 	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
-	{}
+	{
+		renderPass->GetSpecification().TargetFramebuffer->Unbind();
+	}
 
 	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline)
 	{}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Pipeline>& pipeline, uint32_t indexCount)
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
 		pipeline->Bind();
-		pipeline->GetSpecification().Shader->Bind();
+		material->Bind();
 
-		uint32_t count = indexCount ? indexCount : indexBuffer->GetCount();
-		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), count, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
 		pipeline->Bind();
-		pipeline->GetSpecification().Shader->Bind();
+		material->Bind();
 
+		glLineWidth(pipeline->GetSpecification().LineWidth);
 		glDrawArrays(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), 0, vertexCount);
-	}
-
-	void OpenGLRendererAPI::SetLineWidth(float width)
-	{
-		glLineWidth(width);
 	}
 }

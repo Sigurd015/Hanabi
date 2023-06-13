@@ -14,10 +14,9 @@ namespace Hanabi
 		void BeginRenderPass(const Ref<RenderPass>& renderPass) override;
 		void EndRenderPass(const Ref<RenderPass>& renderPass) override;
 		void SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline) override;
-		void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer,
+		void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 			const Ref<Pipeline>& pipeline, uint32_t indexCount = 0) override;
-		void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount) override;
-		void SetLineWidth(float width) override;
+		void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount) override;
 	private:
 		void Clear();
 		glm::vec4 m_ClearColor = { 0.3f,0.3f,0.3f,1.0f };

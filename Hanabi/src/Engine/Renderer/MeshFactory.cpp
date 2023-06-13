@@ -3,7 +3,7 @@
 
 namespace Hanabi
 {
-	Ref<Mesh> MeshFactory::CreateBox(const DirectX::XMFLOAT3& size)
+	Ref<Mesh> MeshFactory::CreateBox(const glm::vec3& size)
 	{
 		std::vector<Vertex> vertices;
 		vertices.resize(8);
@@ -53,15 +53,15 @@ namespace Hanabi
 
 		for (float latitude = 0.0f; latitude <= latitudeBands; latitude++)
 		{
-			const float theta = latitude * (float)DirectX::XM_PI / latitudeBands;
-			const float sinTheta = DirectX::XMScalarSin(theta);
-			const float cosTheta = DirectX::XMScalarCos(theta);
+			const float theta = latitude * glm::pi<float>() / latitudeBands;
+			const float sinTheta = glm::sin(theta);
+			const float cosTheta = glm::cos(theta);
 
 			for (float longitude = 0.0f; longitude <= longitudeBands; longitude++)
 			{
-				const float phi = longitude * 2.f * (float)DirectX::XM_PI / longitudeBands;
-				const float sinPhi = DirectX::XMScalarSin(phi);
-				const float cosPhi = DirectX::XMScalarCos(phi);
+				const float phi = longitude * 2.f * glm::pi<float>() / longitudeBands;
+				const float sinPhi = glm::sin(phi);
+				const float cosPhi = glm::cos(phi);
 
 				Vertex vertex;
 				vertex.Normal = { cosPhi * sinTheta, cosTheta, sinPhi * sinTheta };
@@ -90,11 +90,11 @@ namespace Hanabi
 		float segIncr = 1.0f / (float)(segments - 1);
 		for (size_t s = 0; s < segments; s++)
 		{
-			float x = DirectX::XMScalarCos(float(DirectX::XM_PI * 2) * s * segIncr) * radius;
-			float z = DirectX::XMScalarSin(float(DirectX::XM_PI * 2) * s * segIncr) * radius;
+			float x = glm::cos(float(glm::pi<float>() * 2) * s * segIncr) * radius;
+			float z = glm::sin(float(glm::pi<float>() * 2) * s * segIncr) * radius;
 
 			Vertex& vertex = vertices.emplace_back();
-			vertex.Position = DirectX::XMFLOAT3(actualRadius * x, actualRadius * y + height * dy, actualRadius * z);
+			vertex.Position = glm::vec3(actualRadius * x, actualRadius * y + height * dy, actualRadius * z);
 		}
 	}
 
@@ -116,13 +116,13 @@ namespace Hanabi
 		float ringIncr = 1.0f / (float)(subdivisionsHeight - 1);
 
 		for (int r = 0; r < subdivisionsHeight / 2; r++)
-			CalculateRing(numSegments, DirectX::XMScalarSin(float(DirectX::XM_PI) * r * ringIncr), DirectX::XMScalarSin(float(DirectX::XM_PI) * (r * ringIncr - 0.5f)), -0.5f, height, radius + radiusModifier, vertices);
+			CalculateRing(numSegments, glm::sin(glm::pi<float>() * r * ringIncr), glm::sin(glm::pi<float>() * (r * ringIncr - 0.5f)), -0.5f, height, radius + radiusModifier, vertices);
 
 		for (int r = 0; r < ringsBody; r++)
 			CalculateRing(numSegments, 1.0f, 0.0f, r * bodyIncr - 0.5f, height, radius + radiusModifier, vertices);
 
 		for (int r = subdivisionsHeight / 2; r < subdivisionsHeight; r++)
-			CalculateRing(numSegments, DirectX::XMScalarSin(float(DirectX::XM_PI) * r * ringIncr), DirectX::XMScalarSin(float(DirectX::XM_PI) * (r * ringIncr - 0.5f)), 0.5f, height, radius + radiusModifier, vertices);
+			CalculateRing(numSegments, glm::sin(glm::pi<float>() * r * ringIncr), glm::sin(glm::pi<float>() * (r * ringIncr - 0.5f)), 0.5f, height, radius + radiusModifier, vertices);
 
 		for (int r = 0; r < ringsTotal - 1; r++)
 		{

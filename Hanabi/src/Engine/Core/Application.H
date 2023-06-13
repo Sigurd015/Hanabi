@@ -39,6 +39,7 @@ namespace Hanabi
 	public:
 		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
+		void Run();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
@@ -49,7 +50,6 @@ namespace Hanabi
 		const ApplicationSpecification& GetSpecification() const { return m_Specification; }
 		void SubmitToMainThread(const std::function<void()>& function);
 	private:
-		void Run();
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 		void ExecuteMainThreadQueue();
@@ -64,8 +64,6 @@ namespace Hanabi
 		float m_LastFrameTime = 0.0f;
 		std::vector<std::function<void()>> m_MainThreadQueue;
 		std::mutex m_MainThreadQueueMutex;
-
-		friend int ::main(int argc, char** argv);
 	};
 
 	Application* CreateApplication(ApplicationCommandLineArgs args);

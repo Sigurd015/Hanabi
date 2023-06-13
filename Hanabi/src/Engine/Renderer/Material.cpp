@@ -15,6 +15,11 @@ namespace Hanabi
 	Material::~Material()
 	{}
 
+	void Material::SetTexture(const Ref<Texture>& texture, uint32_t index)
+	{
+		m_Textures[index] = texture;
+	}
+
 	void Material::Bind() const
 	{
 		m_Shader->Bind();
@@ -24,11 +29,9 @@ namespace Hanabi
 
 	void Material::BindTextures() const
 	{
-		for (size_t i = 0; i < m_Textures.size(); i++)
+		for (auto& texture : m_Textures)
 		{
-			auto& texture = m_Textures[i];
-			if (texture)
-				texture->Bind(i);
+			texture.second->Bind(texture.first);
 		}
 	}
 }

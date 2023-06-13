@@ -3,7 +3,7 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Renderer/RendererContext.h"
 #include "Engine/Renderer/RendererAPI.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
@@ -89,13 +89,13 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPIType::OpenGL:
-			m_Context = RenderingContext::Create(m_Window);
+			m_Context = RendererContext::Create(m_Window);
 			break;
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			HWND winWnd = glfwGetWin32Window(m_Window);
-			m_Context = RenderingContext::Create(&winWnd);
+			m_Context = RendererContext::Create(&winWnd);
 			break;
 #endif
 		}

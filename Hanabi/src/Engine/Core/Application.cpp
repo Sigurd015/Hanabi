@@ -31,7 +31,7 @@ namespace Hanabi
 
 		if (m_Specification.EnableImGui)
 		{
-			m_ImGuiLayer = ImGuiLayer::Create();;
+			m_ImGuiLayer = ImGuiLayer::Create();
 			PushOverlay(m_ImGuiLayer);
 		}
 	}
@@ -86,8 +86,6 @@ namespace Hanabi
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(timestep);
 				Renderer::EndRender();
-
-				Renderer::WaitAndRender();
 
 				if (m_Specification.EnableImGui)
 				{

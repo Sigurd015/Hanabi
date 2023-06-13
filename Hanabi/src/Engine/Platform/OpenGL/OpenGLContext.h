@@ -1,10 +1,11 @@
 #pragma once
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Renderer/RendererContext.h"
+
 #include <GLFW/glfw3.h>
 
 namespace Hanabi
 {
-	class OpenGLContext :public RenderingContext
+	class OpenGLContext :public RendererContext
 	{
 	public:
 		OpenGLContext(GLFWwindow* windowHandle);

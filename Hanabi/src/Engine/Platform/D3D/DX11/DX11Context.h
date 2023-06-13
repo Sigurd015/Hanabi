@@ -1,6 +1,6 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Renderer/RendererContext.h"
 
 #include <d3d11.h>
 #include <Windows.h>
@@ -8,7 +8,7 @@
 
 namespace Hanabi
 {
-	class DX11Context :public RenderingContext
+	class DX11Context :public RendererContext
 	{
 	public:
 		DX11Context(HWND* windowHandle);

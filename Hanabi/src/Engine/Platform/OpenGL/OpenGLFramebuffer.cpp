@@ -81,12 +81,22 @@ namespace Hanabi
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::RGBA8:       return GL_RGBA8;
-			case FramebufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
+			case FramebufferTextureFormat::RGBA8F:       return GL_RGBA8;
+			case FramebufferTextureFormat::RED8UI: return GL_RED_INTEGER;
 			}
 
 			HNB_CORE_ASSERT(false);
 			return 0;
+		}
+
+		static bool IsMousePickFormat(FramebufferTextureFormat format)
+		{
+			switch (format)
+			{
+			case FramebufferTextureFormat::RED8UI:  return true;
+			}
+
+			return false;
 		}
 	}
 
@@ -138,11 +148,11 @@ namespace Hanabi
 				Utils::BindTexture(multisample, m_ColorAttachments[i]);
 				switch (m_ColorAttachmentSpecifications[i].TextureFormat)
 				{
-				case FramebufferTextureFormat::RGBA8:
+				case FramebufferTextureFormat::RGBA8F:
 					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
 						GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);
 					break;
-				case FramebufferTextureFormat::RED_INTEGER:
+				case FramebufferTextureFormat::RED8UI:
 					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
 						GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, i);
 					break;
@@ -181,14 +191,6 @@ namespace Hanabi
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void OpenGLFramebuffer::ClearAttachment()
-	{
-		int value = -1;
-		auto& spec = m_ColorAttachmentSpecifications[1];
-		glClearTexImage(m_ColorAttachments[1], 0,
-			Utils::FBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
-	}
-
 	void OpenGLFramebuffer::Bind()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
@@ -212,6 +214,19 @@ namespace Hanabi
 		m_Specification.Height = height;
 
 		Invalidate();
+	}
+
+	void OpenGLFramebuffer::ClearAttachment()
+	{
+		for (size_t i = 0; i < m_ColorAttachments.size(); i++)
+		{
+			if (Utils::IsMousePickFormat(m_ColorAttachmentSpecifications[i].TextureFormat))
+			{
+				int value = m_Specification.MousePickClearValue;
+				glClearTexImage(m_ColorAttachments[i], 0,
+					Utils::FBTextureFormatToGL(m_ColorAttachmentSpecifications[i].TextureFormat), GL_INT, &value);
+			}
+		}
 	}
 
 	int OpenGLFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)

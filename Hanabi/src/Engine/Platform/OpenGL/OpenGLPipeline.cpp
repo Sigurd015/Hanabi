@@ -106,7 +106,7 @@ namespace Hanabi
 			m_UniformBuffer->Bind();
 	}
 
-	void OpenGLPipeline::SetConstantBuffer(Ref<ConstantBuffer> uniformBuffer)
+	void OpenGLPipeline::SetConstantBuffer(const Ref<ConstantBuffer>& uniformBuffer)
 	{
 		m_UniformBuffer = uniformBuffer;
 	}

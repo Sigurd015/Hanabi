@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "UI/Font.h"
 #include "Engine/Scene/Components.h"
+#include "RenderPass.h"
 
 namespace Hanabi
 {
@@ -12,10 +13,14 @@ namespace Hanabi
 	public:
 		static void Init();
 		static void Shutdown();
+
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void BeginScene(const EditorCamera& camera);
 		static void EndScene();
-		static void Flush();
+
+		static Ref<RenderPass> GetTargetRenderPass();
+		static void SetTargetRenderPass(const Ref<RenderPass>& renderPass);
+
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
 			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
@@ -40,12 +45,15 @@ namespace Hanabi
 		{
 			uint32_t DrawCalls = 0;
 			uint32_t QuadCount = 0;
-			uint32_t GetTotalVertexCount() const { return QuadCount * 4; }
-			uint32_t GetTotalIndexCount() const { return QuadCount * 6; }
+			uint32_t LineCount = 0;
+
+			uint32_t GetTotalVertexCount() const { return QuadCount * 4 + LineCount * 2; }
+			uint32_t GetTotalIndexCount() const { return QuadCount * 6 + LineCount * 2; }
 		};
 		static void ResetStats();
 		static Statistics GetStats();
 	private:
+		static void Flush();
 		static float GetTextureID(const Ref<Texture2D>& texture);
 		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color,
 			int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor);

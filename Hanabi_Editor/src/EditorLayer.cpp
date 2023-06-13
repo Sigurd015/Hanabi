@@ -12,16 +12,24 @@ namespace Hanabi
 
 	void EditorLayer::OnAttach()
 	{
-		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = {
-			{FramebufferTextureFormat::RGBA8},
-			{FramebufferTextureFormat::RED_INTEGER,glm::vec4(-1,0,0,0)},
-			{FramebufferTextureFormat::Depth} };
+		//TODO: Move this to a better place
+		FramebufferSpecification framebufferSpec;
+		framebufferSpec.Attachments = {
+			FramebufferTextureFormat::RGBA8F,
+			FramebufferTextureFormat::MousePick,
+			FramebufferTextureFormat::Depth };
+		framebufferSpec.Samples = 1;
+		framebufferSpec.Width = 1920;
+		framebufferSpec.Height = 1080;
+		framebufferSpec.ClearColor = { 0.3f, 0.3f, 0.3f, 1.0f };
+		framebufferSpec.MousePickClearValue = -1;
+		m_TargetFramebuffer = Framebuffer::Create(framebufferSpec);
 
-		fbSpec.Width = 1920;
-		fbSpec.Height = 1080;
-		m_Framebuffer = Framebuffer::Create(fbSpec);
-		m_TargetRenderPass = RenderPass::Create({ m_Framebuffer });
+		RenderPassSpecification renderPassSpec;
+		renderPassSpec.TargetFramebuffer = m_TargetFramebuffer;
+		m_TargetRenderPass = RenderPass::Create(renderPassSpec);
+
+		Renderer2D::SetTargetRenderPass(m_TargetRenderPass);
 
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
@@ -51,9 +59,7 @@ namespace Hanabi
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
-		Renderer2D::ResetStats();
-	    Renderer::BeginRenderPass(m_TargetRenderPass);
-
+		Renderer::BeginRenderPass(m_TargetRenderPass);
 		// Update scene
 		switch (m_SceneState)
 		{
@@ -99,7 +105,7 @@ namespace Hanabi
 					auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
 
 					glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
-					glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.0f, 1.0f);
+					glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.05f, 1.0f);
 
 					glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
 						* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
@@ -118,7 +124,7 @@ namespace Hanabi
 					auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
 
 					glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, 0.001f);
-					glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.0f);
+					glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.05f);
 
 					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
 						* glm::scale(glm::mat4(1.0f), scale);
@@ -233,11 +239,11 @@ namespace Hanabi
 #pragma region Resize
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
-		if (Hanabi::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+		if (Hanabi::FramebufferSpecification spec = m_TargetFramebuffer->GetSpecification();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
-			m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_TargetFramebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 #pragma endregion
@@ -260,7 +266,7 @@ namespace Hanabi
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			int pixelData = m_Framebuffer->ReadPixel(1, mouseX, mouseY);
+			int pixelData = m_TargetFramebuffer->ReadPixel(1, mouseX, mouseY);
 			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 #pragma endregion	
@@ -371,11 +377,11 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPIType::OpenGL:
-			ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			ImGui::Image(m_TargetFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 			break;
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			ImGui::Image(m_Framebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+			ImGui::Image(m_TargetFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 			break;
 #endif
 		}

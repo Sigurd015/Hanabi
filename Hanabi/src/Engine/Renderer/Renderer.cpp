@@ -5,23 +5,37 @@
 
 namespace Hanabi
 {
-	static RenderCommandQueue* s_CommandQueue = nullptr;
 	static Scope<RendererAPI> s_RendererAPI = nullptr;
 
-	Scope<Renderer::SceneData> Renderer::s_SceneData = CreateScope<Renderer::SceneData>();
+	struct RendererData
+	{
+		Ref<ShaderLibrary> ShaderLibrary;
+
+		Ref<Texture2D> WhiteTexture;
+	};
+
+	static RendererData* s_Data = nullptr;
 
 	void Renderer::Init()
 	{
-		s_CommandQueue = new RenderCommandQueue();
+		s_Data = new RendererData();
 		s_RendererAPI = RendererAPI::Create();
 		s_RendererAPI->Init();
+
+		//TODO:Load shaders
+		//s_Data->ShaderLibrary
+
+		//Setup textures
+		s_Data->WhiteTexture = Texture2D::Create(TextureSpecification());
+		uint32_t whiteTextureData = 0xffffffff;
+		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+
 		Renderer2D::Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		Renderer2D::Shutdown();
-		delete s_CommandQueue;
 	}
 
 	void Renderer::SetClearColor(const glm::vec4& color)
@@ -36,76 +50,42 @@ namespace Hanabi
 
 	void Renderer::BeginRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		Renderer::Submit([renderPass]()
-			{
-				s_RendererAPI->BeginRenderPass(renderPass);
-			});
+		s_RendererAPI->BeginRenderPass(renderPass);
 	}
 
 	void Renderer::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		Renderer::Submit([renderPass]()
-			{
-				s_RendererAPI->EndRenderPass(renderPass);
-			});
+		s_RendererAPI->EndRenderPass(renderPass);
 	}
 
 	void Renderer::BeginRender()
 	{
-		Renderer::Submit([]()
-			{
-				s_RendererAPI->BeginRender();
-			});
+		s_RendererAPI->BeginRender();
 	}
 
 	void Renderer::EndRender()
 	{
-		Renderer::Submit([]()
-			{
-				s_RendererAPI->EndRender();
-			});
+		s_RendererAPI->EndRender();
 	}
 
 	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline)
 	{
-		Renderer::Submit([mesh, pipeline]()
-			{
-				s_RendererAPI->SubmitStaticMesh(mesh, pipeline);
-			});
+		s_RendererAPI->SubmitStaticMesh(mesh, pipeline);
 	}
 
-	void  Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer,
+	void  Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 		const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
-		Renderer::Submit([vertexBuffer, indexBuffer, pipeline, indexCount]()
-			{
-				s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, pipeline, indexCount);
-			});
+		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, pipeline, indexCount);
 	}
 
-	void  Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void  Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
-		Renderer::Submit([vertexBuffer, pipeline, vertexCount]()
-			{
-				s_RendererAPI->DrawLines(vertexBuffer, pipeline, vertexCount);
-			});
+		s_RendererAPI->DrawLines(vertexBuffer, material, pipeline, vertexCount);
 	}
 
-	void Renderer::SetLineWidth(float width)
+	Ref<Texture2D> Renderer::GetWhiteTexture()
 	{
-		Renderer::Submit([width]()
-			{
-				s_RendererAPI->SetLineWidth(width);
-			});
-	}
-
-	void Renderer::WaitAndRender()
-	{
-		s_CommandQueue->Execute();
-	}
-
-	RenderCommandQueue& Renderer::GetRenderCommandQueue()
-	{
-		return *s_CommandQueue;
+		return s_Data->WhiteTexture;
 	}
 }

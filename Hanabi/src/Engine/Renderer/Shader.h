@@ -16,6 +16,7 @@ namespace Hanabi
 		static Ref<Shader> Create(const std::string& filepath);
 	};
 
+	//TODO:This should be handled by the Asset Manager
 	class ShaderLibrary
 	{
 	public:

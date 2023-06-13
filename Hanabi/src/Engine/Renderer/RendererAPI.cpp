@@ -3,7 +3,7 @@
 #include "IndexBuffer.h"
 #include "RendererAPI.h"
 #include "RenderPass.h"
-#include "RenderingContext.h"
+#include "RendererContext.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Pipeline.h"
@@ -76,7 +76,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Scope<RenderingContext> RenderingContext::Create(void* window)
+	Scope<RendererContext> RendererContext::Create(void* window)
 	{
 		switch (RendererAPI::GetAPI())
 		{

@@ -11,9 +11,14 @@ namespace Hanabi
 		OpenGLPipeline(const PipelineSpecification& spec);
 		~OpenGLPipeline();
 		void Bind() override;
-		void SetConstantBuffer(Ref<ConstantBuffer> constantBuffer) override;
+		void SetConstantBuffer(const Ref<ConstantBuffer>& constantBuffer) override;
+
+		PipelineSpecification& GetSpecification() override { return m_Specification; }
+		const PipelineSpecification& GetSpecification() const override { return m_Specification; }
 	private:
 		uint32_t m_RendererID = 0;
+
 		Ref<ConstantBuffer> m_UniformBuffer;
+		PipelineSpecification m_Specification;
 	};
 }

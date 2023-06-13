@@ -1,8 +1,5 @@
-﻿#include <Hanabi.h>
+﻿#include "Hanabi.h"
 #include "Engine/EntryPoint.h"
-#include "Engine/Events/Event.h"
-#include "Engine/Core/Timestep.h"
-#include "Engine/Events/KeyEvent.h"
 
 #include <imgui.h>
 
@@ -11,9 +8,7 @@ class ExampleLayer :public Hanabi::Layer
 public:
 	ExampleLayer() :Layer("ExampleLayer") {}
 	~ExampleLayer() {}
-	void OnAttach() override
-	{
-	}
+	void OnAttach() override {}
 	void OnDetach() override {}
 	void OnUpdate(Hanabi::Timestep ts)override
 	{
@@ -32,8 +27,7 @@ public:
 		//dispatcher.Dispatch<Hanabi::MouseScrolledEvent>(HNB_BIND_EVENT_FN(ExampleLayer::OnMouseScrolled));
 	}
 	void OnImGuiRender()override
-	{
-	}
+	{}
 
 	bool OnMouseMove(Hanabi::MouseMovedEvent& event)
 	{
@@ -99,5 +93,15 @@ Hanabi::Application* Hanabi::CreateApplication(Hanabi::ApplicationCommandLineArg
 	spec.CommandLineArgs = args;
 	spec.EnableImGui = true;
 	spec.EnableScripting = false;
+
+	if (spec.CommandLineArgs.Count > 2)
+	{
+		auto APIType = static_cast<RendererAPIType>(std::stoi(spec.CommandLineArgs[2]));
+		spec.RendererConfig.APIType = APIType;
+	}
+	else
+	{
+		spec.RendererConfig.APIType = RendererAPIType::OpenGL;
+	}
 	return new Sandbox(spec);
 }

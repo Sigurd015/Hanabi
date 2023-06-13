@@ -2,7 +2,6 @@
 #include "Shader.h"
 #include "Texture.h"
 
-#include <unordered_set>
 #include <iostream>
 #include <string>
 
@@ -14,26 +13,20 @@ namespace Hanabi
 		Material(const Ref<Shader>& shader);
 		virtual ~Material();
 		void Bind() const;
-		void SetTexture(const Ref<Texture>& texture)
+		void SetTexture(const Ref<Texture>& texture, uint32_t index);
+
+		void SetTexture(const Ref<Texture2D>& texture, uint32_t index)
 		{
-			if (m_Textures.size() <= m_TextureSlotIndex)
-				m_Textures.resize((size_t)m_TextureSlotIndex + 1);
-			m_Textures[m_TextureSlotIndex] = texture;
-			m_TextureSlotIndex++;
+			SetTexture((const Ref<Texture>&)texture, index);
 		}
 
-		void SetTexture(const Ref<Texture2D>& texture)
-		{
-			SetTexture((const Ref<Texture>&)texture);
-		}
+		Ref<Shader> GetShader() { return m_Shader; }
 
 		static Ref<Material> Create(const Ref<Shader>& shader);
 	private:
 		void BindTextures() const;
 
 		Ref<Shader> m_Shader;
-		std::vector<Ref<Texture>> m_Textures;
-
-		uint32_t m_TextureSlotIndex = 0;
+		std::unordered_map<uint32_t, Ref<Texture>> m_Textures;
 	};
 }

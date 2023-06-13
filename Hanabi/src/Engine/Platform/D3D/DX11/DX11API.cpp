@@ -118,30 +118,27 @@ namespace Hanabi
 		m_DeviceContext->DrawIndexed(count, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer,
+	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 		const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
 		pipeline->Bind();
-		pipeline->GetSpecification().Shader->Bind();
+		material->Bind();
 
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
-		uint32_t count = indexCount ? indexCount : indexBuffer->GetCount();
-		m_DeviceContext->DrawIndexed(count, 0, 0);
+		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
 		pipeline->Bind();
-		pipeline->GetSpecification().Shader->Bind();
+		material->Bind();
 
+		//TODO: Set Line Width
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->Draw(vertexCount, 0);
 	}
-
-	void DX11RendererAPI::SetLineWidth(float width)
-	{}
 }
 #endif

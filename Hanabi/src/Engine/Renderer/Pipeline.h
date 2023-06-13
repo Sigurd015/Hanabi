@@ -20,7 +20,7 @@ namespace Hanabi
 
 	struct PipelineSpecification
 	{
-		//For OpenGL
+		// For OpenGL
 		Ref<VertexBuffer> VertexBuffer;
 		Ref<IndexBuffer> IndexBuffer;
 		//-----------------
@@ -29,19 +29,21 @@ namespace Hanabi
 		VertexBufferLayout Layout;
 		Ref<RenderPass> RenderPass;
 		PrimitiveTopology Topology = PrimitiveTopology::Triangles;
+		float LineWidth = 1.0f;
 	};
 
 	class Pipeline
 	{
 	public:
 		virtual ~Pipeline() = default;
+
 		virtual void Bind() = 0;
-		PipelineSpecification& GetSpecification() { return m_Specification; }
-		const PipelineSpecification& GetSpecification() const { return m_Specification; }
-		virtual void SetConstantBuffer(Ref<ConstantBuffer> constantBuffer) = 0;
+
+		virtual PipelineSpecification& GetSpecification() = 0;
+		virtual const PipelineSpecification& GetSpecification() const = 0;
+
+		virtual void SetConstantBuffer(const Ref<ConstantBuffer>& constantBuffer) = 0;
 
 		static Ref<Pipeline> Create(const PipelineSpecification& spec);
-	protected:
-		PipelineSpecification m_Specification;
 	};
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Base.h"
 #include "Engine/Events/Event.h"
-#include "Engine/Renderer/RenderingContext.h"
+#include "Engine/Renderer/RendererContext.h"
 
 #include <GLFW/glfw3.h>
 
@@ -41,7 +41,7 @@ namespace Hanabi
 		virtual void Init();
 		virtual void Shutdown();
 		GLFWwindow* m_Window;
-		Scope<RenderingContext> m_Context;
+		Scope<RendererContext> m_Context;
 		WindowProps m_Data;
 	};
 }

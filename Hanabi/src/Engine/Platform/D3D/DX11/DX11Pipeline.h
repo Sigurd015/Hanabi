@@ -14,9 +14,13 @@ namespace Hanabi
 		DX11Pipeline(const PipelineSpecification& spec);
 		~DX11Pipeline() = default;
 		void Bind() override;
-		void SetConstantBuffer(Ref<ConstantBuffer> constantBuffer) override;
+		void SetConstantBuffer(const Ref<ConstantBuffer>& constantBuffer) override;
+
+		PipelineSpecification& GetSpecification() override { return m_Specification; }
+		const PipelineSpecification& GetSpecification() const override { return m_Specification; }
 	private:
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_InputLayout;
 		Ref<ConstantBuffer> m_ConstantBuffer;
+		PipelineSpecification m_Specification;
 	};
 }
