@@ -6,13 +6,8 @@
 
 namespace Hanabi
 {
-	DX11IndexBuffer::DX11IndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count)
+	DX11IndexBuffer::DX11IndexBuffer(void* indices, uint32_t count) : m_Count(count)
 	{
-		// Flip the index order to match DirectX 11
-		for (size_t i = 0; i < count; i += 3)
-		{
-			std::swap(indices[i], indices[i + 2]);
-		}
 		D3D11_SUBRESOURCE_DATA resourceData = {};
 		resourceData.pSysMem = indices;
 

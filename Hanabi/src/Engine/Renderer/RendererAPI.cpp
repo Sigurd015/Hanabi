@@ -108,7 +108,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11Shader>(filepath);
+			return CreateRef<DX11Shader>(filepath);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -127,7 +127,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11VertexBuffer>(size);
+			return CreateRef<DX11VertexBuffer>(size);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -146,14 +146,14 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11VertexBuffer>(vertices, size);
+			return CreateRef<DX11VertexBuffer>(vertices, size);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	Ref<IndexBuffer> IndexBuffer::Create(uint32_t* indices, uint32_t count)
+	Ref<IndexBuffer> IndexBuffer::Create(void* indices, uint32_t count)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -165,7 +165,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11IndexBuffer>(indices, count);
+			return CreateRef<DX11IndexBuffer>(indices, count);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -184,7 +184,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11Texture2D>(path);
+			return CreateRef<DX11Texture2D>(path);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -203,7 +203,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11Texture2D>(specification);
+			return CreateRef<DX11Texture2D>(specification);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -222,7 +222,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11Framebuffer>(spec);
+			return CreateRef<DX11Framebuffer>(spec);
 #endif
 		}
 
@@ -242,7 +242,7 @@ namespace Hanabi
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateScope<DX11ConstantBuffer>(size, binding);
+			return CreateRef<DX11ConstantBuffer>(size, binding);
 #endif
 		}
 

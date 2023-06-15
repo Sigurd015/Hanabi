@@ -5,7 +5,7 @@
 
 namespace Hanabi
 {
-	OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, uint32_t count) : m_Count(count)
+	OpenGLIndexBuffer::OpenGLIndexBuffer(void* indices, uint32_t count) : m_Count(count)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);

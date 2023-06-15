@@ -9,8 +9,8 @@ namespace Hanabi
 		void Init() override;
 		void SetClearColor(const glm::vec4& color) override;
 		void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) override;
-		void BeginRender() override;
-		void EndRender() override;
+		void ResetToSwapChain() override;
+
 		void BeginRenderPass(const Ref<RenderPass>& renderPass) override;
 		void EndRenderPass(const Ref<RenderPass>& renderPass) override;
 		void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline) override;

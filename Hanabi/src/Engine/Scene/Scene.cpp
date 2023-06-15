@@ -1,6 +1,6 @@
 #include "hnbpch.h"
 #include "Engine/Scene/Scene.h"
-#include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Renderer/Renderer.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scripting/ScriptEngine.h"
@@ -55,7 +55,9 @@ namespace Hanabi
 	}
 
 	Scene::Scene()
-	{}
+	{
+		m_SceneRenderer = CreateRef<SceneRenderer>();
+	}
 
 	Scene::~Scene()
 	{
@@ -172,7 +174,7 @@ namespace Hanabi
 		m_StepFrames = frames;
 	}
 
-	void Scene::OnUpdateRuntime(Timestep ts)
+	void Scene::OnUpdateRuntime(Timestep ts, Entity selectedEntity, bool enableOverlayRender)
 	{
 		//Update scripts
 		if (!m_IsPaused || m_StepFrames-- > 0)
@@ -227,7 +229,27 @@ namespace Hanabi
 
 		if (mainCamera)
 		{
-			Renderer2D::BeginScene(*mainCamera, cameraTransform);
+			m_SceneRenderer->BeginScene(*mainCamera, cameraTransform);
+
+			// Draw 3D Objects
+			{
+				auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
+				for (auto entity : view)
+				{
+					auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
+
+					if (mesh.Type == StaticMeshComponent::StaticMeshType::Cube)
+					{
+						if (mesh.Mesh)
+							m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, transform.GetTransform(), (int)entity);
+						else
+						{
+							mesh.Mesh = Renderer::GetCubeMesh();
+							m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, transform.GetTransform(), (int)entity);
+						}
+					}
+				}
+			}
 
 			// Draw sprites
 			{
@@ -237,10 +259,10 @@ namespace Hanabi
 					auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
 					if (sprite.Texture)
-						Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
+						m_SceneRenderer->GetRenderer2D()->DrawQuad(transform.GetTransform(), sprite.Texture,
 							sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
 					else
-						Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+						m_SceneRenderer->GetRenderer2D()->DrawQuad(transform.GetTransform(), sprite.Color);
 				}
 			}
 
@@ -251,7 +273,7 @@ namespace Hanabi
 				{
 					auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-					Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
+					m_SceneRenderer->GetRenderer2D()->DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
 				}
 			}
 
@@ -262,16 +284,48 @@ namespace Hanabi
 				{
 					auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-					Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+					m_SceneRenderer->GetRenderer2D()->DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
 				}
 			}
-			Renderer2D::EndScene();
+
+			OnOverlayRender(enableOverlayRender, selectedEntity);
+
+			m_SceneRenderer->EndScene();
 		}
 	}
 
-	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera)
+	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender)
 	{
-		Renderer2D::BeginScene(camera);
+		m_SceneRenderer->BeginScene(camera);
+
+		// Draw 3D Objects
+		{
+			auto view = m_Registry.view<TransformComponent, StaticMeshComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
+
+				if (mesh.Type != StaticMeshComponent::StaticMeshType::None)
+				{
+					if (!mesh.Mesh)
+					{
+						switch (mesh.Type)
+						{
+						case StaticMeshComponent::StaticMeshType::Cube:
+							mesh.Mesh = Renderer::GetCubeMesh();
+							break;
+						case StaticMeshComponent::StaticMeshType::Sphere:
+							mesh.Mesh = Renderer::GetSphereMesh();
+							break;
+						case StaticMeshComponent::StaticMeshType::Capsule:
+							mesh.Mesh = Renderer::GetCapsuleMesh();
+							break;
+						}
+					}
+					m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, transform.GetTransform(), (int)entity);
+				}
+			}
+		}
 
 		// Draw sprites
 		{
@@ -281,10 +335,10 @@ namespace Hanabi
 				auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
 				if (sprite.Texture)
-					Renderer2D::DrawQuad(transform.GetTransform(),
+					m_SceneRenderer->GetRenderer2D()->DrawQuad(transform.GetTransform(),
 						sprite.Texture, sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor, (int)entity);
 				else
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
+					m_SceneRenderer->GetRenderer2D()->DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
 			}
 		}
 
@@ -295,7 +349,7 @@ namespace Hanabi
 			{
 				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color,
+				m_SceneRenderer->GetRenderer2D()->DrawCircle(transform.GetTransform(), circle.Color,
 					circle.Thickness, circle.Fade, (int)entity);
 			}
 		}
@@ -307,11 +361,62 @@ namespace Hanabi
 			{
 				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-				Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+				m_SceneRenderer->GetRenderer2D()->DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
 			}
 		}
 
-		Renderer2D::EndScene();
+		OnOverlayRender(enableOverlayRender, selectedEntity);
+
+		m_SceneRenderer->EndScene();
+	}
+
+	void Scene::OnOverlayRender(bool enable, Entity selectedEntity)
+	{
+		if (enable)
+		{
+			// Box Colliders
+			{
+				auto view = GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
+				for (auto entity : view)
+				{
+					auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+
+					glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
+					glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.05f, 1.0f);
+
+					glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
+						* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+						* glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.Offset, 0.001f))
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					m_SceneRenderer->GetRenderer2D()->DrawRect(transform, glm::vec4(0, 1, 0, 1));
+				}
+			}
+
+			// Circle Colliders TODO:Not work with dx11
+			{
+				auto view = GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
+				for (auto entity : view)
+				{
+					auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
+
+					glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, 0.001f);
+					glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.05f);
+
+					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+						* glm::scale(glm::mat4(1.0f), scale);
+
+					m_SceneRenderer->GetRenderer2D()->DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+				}
+			}
+		}
+
+		// Draw selected entity outline 
+		if (selectedEntity)
+		{
+			const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
+			m_SceneRenderer->GetRenderer2D()->DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+		}
 	}
 
 	void Scene::OnPhysics2DStart()

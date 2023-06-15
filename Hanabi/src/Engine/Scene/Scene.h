@@ -3,6 +3,7 @@
 #include "Engine/Core/Timestep.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Core/UUID.h"
+#include "Engine/Renderer/SceneRenderer.h"
 
 #include <entt.hpp>
 
@@ -16,15 +17,19 @@ namespace Hanabi
 		Scene();
 		~Scene();
 		static Ref<Scene> Copy(Ref<Scene> other);
-		void OnUpdateRuntime(Timestep ts);
-		void OnUpdateEditor(Timestep ts, EditorCamera& camera);
+
+		void OnUpdateRuntime(Timestep ts, Entity selectedEntity, bool enableOverlayRender = false);
+		void OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender = false);
 		void OnRuntimeStart();
 		void OnRuntimeStop();
+
 		bool IsRunning() const { return m_IsRunning; }
 		bool IsPaused() const { return m_IsPaused; }
 		void SetPaused(bool paused) { m_IsPaused = paused; }
 		void Step(int frames = 1);
+
 		void OnViewportResize(uint32_t width, uint32_t height);
+
 		Entity CreateEntity(const std::string& name = std::string());
 		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
@@ -32,12 +37,14 @@ namespace Hanabi
 		Entity DuplicateEntity(Entity entity);
 		Entity GetEntityByUUID(UUID uuid);
 		Entity FindEntityByName(std::string_view name);
+
 		template<typename... Components>
 		auto GetAllEntitiesWith()
 		{
 			return m_Registry.view<Components...>();
 		}
 	private:
+		void OnOverlayRender(bool enable, Entity selectedEntity);
 		void OnPhysics2DStart();
 		void OnPhysics2DStop();
 
@@ -48,6 +55,7 @@ namespace Hanabi
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;
 		int m_StepFrames = 0;
+		Ref<SceneRenderer> m_SceneRenderer;
 
 		friend class Entity;
 		friend class SceneHierarchyPanel;

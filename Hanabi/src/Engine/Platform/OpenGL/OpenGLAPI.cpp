@@ -71,12 +71,7 @@ namespace Hanabi
 		glViewport(x, y, width, height);
 	}
 
-	void OpenGLRendererAPI::BeginRender()
-	{
-		Clear();
-	}
-
-	void OpenGLRendererAPI::EndRender()
+	void OpenGLRendererAPI::ResetToSwapChain()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -94,7 +89,19 @@ namespace Hanabi
 	}
 
 	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline)
-	{}
+	{
+		mesh->GetVertexBuffer()->Bind();
+		mesh->GetIndexBuffer()->Bind();
+		pipeline->Bind();
+		Ref<Material> material = mesh->GetMaterial();
+		if (material)
+			material->Bind();
+		else
+			pipeline->GetSpecification().Shader->Bind();
+
+		uint32_t count = mesh->GetIndexBuffer()->GetCount();
+		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), count, GL_UNSIGNED_INT, nullptr);
+	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{

@@ -10,5 +10,4 @@ namespace Hanabi
 		static Ref<StaticMesh> CreateSphere(float radius);
 		static Ref<StaticMesh> CreateCapsule(float radius, float height);
 	};
-
 }

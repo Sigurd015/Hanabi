@@ -37,7 +37,7 @@ namespace Hanabi
 		m_ClearColor = color;
 	}
 
-	void DX11RendererAPI::ResetToBackBuffer()
+	void DX11RendererAPI::ResetToSwapChain()
 	{
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
@@ -85,11 +85,6 @@ namespace Hanabi
 		SetBuffer(width, height, x, y);
 	}
 
-	void DX11RendererAPI::BeginRender()
-	{
-		ResetToBackBuffer();
-	}
-
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
@@ -101,17 +96,16 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void DX11RendererAPI::EndRender()
-	{
-		ResetToBackBuffer();
-	}
-
 	void DX11RendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const  Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
 		pipeline->Bind();
-		mesh->GetMaterial()->Bind();
+		Ref<Material> material = mesh->GetMaterial();
+		if (material)
+			material->Bind();
+		else
+			pipeline->GetSpecification().Shader->Bind();
 
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		uint32_t count = mesh->GetIndexBuffer()->GetCount();

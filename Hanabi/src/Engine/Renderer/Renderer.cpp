@@ -2,6 +2,7 @@
 #include "RendererAPI.h"
 #include "Renderer2D.h"
 #include "Renderer.h"
+#include "MeshFactory.h"
 
 namespace Hanabi
 {
@@ -12,6 +13,10 @@ namespace Hanabi
 		Ref<ShaderLibrary> ShaderLibrary;
 
 		Ref<Texture2D> WhiteTexture;
+
+		Ref<StaticMesh> CubeMesh;
+		Ref<StaticMesh> SphereMesh;
+		Ref<StaticMesh> CapsuleMesh;
 	};
 
 	static RendererData* s_Data = nullptr;
@@ -30,13 +35,14 @@ namespace Hanabi
 		uint32_t whiteTextureData = 0xffffffff;
 		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 
-		Renderer2D::Init();
+		//Load default meshes
+		s_Data->CubeMesh = MeshFactory::CreateBox(glm::vec3(1.0f));
+		//s_Data->CapsuleMesh = MeshFactory::CreateCapsule(1.0f, 1.0f);
+		s_Data->SphereMesh = MeshFactory::CreateSphere(1.0f);
 	}
 
 	void Renderer::Shutdown()
-	{
-		Renderer2D::Shutdown();
-	}
+	{}
 
 	void Renderer::SetClearColor(const glm::vec4& color)
 	{
@@ -58,17 +64,12 @@ namespace Hanabi
 		s_RendererAPI->EndRenderPass(renderPass);
 	}
 
-	void Renderer::BeginRender()
+	void Renderer::ResetToSwapChain()
 	{
-		s_RendererAPI->BeginRender();
+		s_RendererAPI->ResetToSwapChain();
 	}
 
-	void Renderer::EndRender()
-	{
-		s_RendererAPI->EndRender();
-	}
-
-	void Renderer::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline)
+	void Renderer::SubmitStaticMesh(const Ref<StaticMesh>& mesh,const Ref<Pipeline>& pipeline)
 	{
 		s_RendererAPI->SubmitStaticMesh(mesh, pipeline);
 	}
@@ -87,5 +88,20 @@ namespace Hanabi
 	Ref<Texture2D> Renderer::GetWhiteTexture()
 	{
 		return s_Data->WhiteTexture;
+	}
+
+	Ref<StaticMesh> Renderer::GetCubeMesh()
+	{
+		return s_Data->CubeMesh;
+	}
+
+	Ref<StaticMesh> Renderer::GetSphereMesh()
+	{
+		return s_Data->SphereMesh;
+	}
+
+	Ref<StaticMesh> Renderer::GetCapsuleMesh()
+	{
+		return s_Data->CapsuleMesh;
 	}
 }

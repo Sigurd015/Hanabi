@@ -39,6 +39,7 @@ namespace Hanabi
 
 		std::vector<FramebufferTextureSpecification> Attachments;
 	};
+
 	struct FramebufferSpecification
 	{
 		uint32_t Width = 0, Height = 0;

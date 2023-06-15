@@ -16,8 +16,7 @@ namespace Hanabi
 		static void SetClearColor(const glm::vec4& color);
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
-		static void BeginRender();
-		static void EndRender();
+		static void ResetToSwapChain();
 
 		static void BeginRenderPass(const Ref<RenderPass>& renderPass);
 		static void EndRenderPass(const Ref<RenderPass>& renderPass);
@@ -31,5 +30,8 @@ namespace Hanabi
 		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount);
 
 		static Ref<Texture2D> GetWhiteTexture();
+		static Ref<StaticMesh> GetCubeMesh();
+		static Ref<StaticMesh> GetSphereMesh();
+		static Ref<StaticMesh> GetCapsuleMesh();
 	};
 }

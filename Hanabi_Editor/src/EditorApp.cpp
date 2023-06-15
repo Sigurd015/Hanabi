@@ -34,7 +34,7 @@ Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 	}
 	else
 	{
-		spec.RendererConfig.APIType = RendererAPIType::OpenGL;
+		spec.RendererConfig.APIType = RendererAPIType::DX11;
 	}
 	return new HanabiEditor(spec);
 }

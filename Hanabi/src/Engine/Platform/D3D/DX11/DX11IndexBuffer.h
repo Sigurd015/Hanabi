@@ -11,7 +11,7 @@ namespace Hanabi
 	class DX11IndexBuffer : public IndexBuffer
 	{
 	public:
-		DX11IndexBuffer(uint32_t* indices, uint32_t count);
+		DX11IndexBuffer(void* indices, uint32_t count);
 		~DX11IndexBuffer();
 		void Bind() const override;
 		uint32_t GetCount() const { return m_Count; }

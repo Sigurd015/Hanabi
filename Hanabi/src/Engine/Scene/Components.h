@@ -4,6 +4,8 @@
 #include "Engine/Renderer/Camera.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/UI/Font.h"
+#include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/Material.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
@@ -82,6 +84,18 @@ namespace Hanabi
 		SpriteRendererComponent(const glm::vec4& color) : Color(color) {}
 	};
 
+	struct StaticMeshComponent
+	{
+		//TEMP
+		enum class StaticMeshType { None = 0, Cube, Capsule, Sphere };
+		StaticMeshType Type = StaticMeshType::None;
+		Ref<StaticMesh> Mesh;
+		Ref<Material> Material;
+
+		StaticMeshComponent() = default;
+		StaticMeshComponent(const StaticMeshComponent&) = default;
+	};
+
 	struct ScriptComponent
 	{
 		std::string ClassName;
@@ -154,7 +168,7 @@ namespace Hanabi
 	{};
 
 	using AllComponents =
-		ComponentGroup<TransformComponent, SpriteRendererComponent,
+		ComponentGroup<TransformComponent, SpriteRendererComponent, StaticMeshComponent,
 		CircleRendererComponent, CameraComponent, ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent, TextComponent>;
 }

@@ -31,7 +31,6 @@ namespace Hanabi
 		void SaveSceneAs();
 		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 		void OnDuplicateEntity();
-		void OnOverlayRender();
 
 		//UI
 		void UI_StatisticsPanel();

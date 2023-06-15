@@ -6,7 +6,7 @@ namespace Hanabi
 	class OpenGLIndexBuffer : public IndexBuffer
 	{
 	public:
-		OpenGLIndexBuffer(uint32_t* indices, uint32_t count);
+		OpenGLIndexBuffer(void* indices, uint32_t count);
 		~OpenGLIndexBuffer();
 		void Bind() const override;
 		uint32_t GetCount() const { return m_Count; }
