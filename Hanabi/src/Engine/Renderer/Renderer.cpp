@@ -68,7 +68,7 @@ namespace Hanabi
 		s_RendererAPI->EndRender();
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline)
+	void Renderer::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline)
 	{
 		s_RendererAPI->SubmitStaticMesh(mesh, pipeline);
 	}

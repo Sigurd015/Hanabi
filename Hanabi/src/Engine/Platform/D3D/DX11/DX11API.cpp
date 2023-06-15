@@ -106,7 +106,7 @@ namespace Hanabi
 		ResetToBackBuffer();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const  Ref<Pipeline>& pipeline)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const  Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();

@@ -21,12 +21,12 @@ namespace Hanabi
 		uint32_t V1, V2, V3;
 	};
 
-	class Mesh
+	class StaticMesh
 	{
 	public:
-		Mesh(const std::string& filename);
-		Mesh(std::vector<Vertex>& vertices, std::vector<Index>& indices);
-		~Mesh() = default;
+		StaticMesh(const std::string& filename);
+		StaticMesh(std::vector<Vertex>& vertices, std::vector<Index>& indices);
+		~StaticMesh() = default;
 
 		void SetMaterial(const Ref<Material>& material) { m_Material = material; }
 		

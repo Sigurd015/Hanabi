@@ -49,8 +49,10 @@ namespace Hanabi
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_SMOOTH);
 
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
+		//TODO: Same index buffer, get a different result
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);
+		glDisable(GL_CULL_FACE);
 	}
 
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
@@ -91,7 +93,7 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline)
 	{}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)

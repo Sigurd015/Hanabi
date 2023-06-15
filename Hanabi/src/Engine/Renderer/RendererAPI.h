@@ -28,7 +28,7 @@ namespace Hanabi
 		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass) = 0;
 		virtual void EndRenderPass(const Ref<RenderPass>& renderPass) = 0;
 
-		virtual void SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Pipeline>& pipeline) = 0;
+		virtual void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline) = 0;
 		
 		virtual void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 			const Ref<Pipeline>& pipeline, uint32_t indexCount) = 0;
