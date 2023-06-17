@@ -88,19 +88,14 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
 		pipeline->Bind();
-		Ref<Material> material = mesh->GetMaterial();
-		if (material)
-			material->Bind();
-		else
-			pipeline->GetSpecification().Shader->Bind();
+		material->Bind();
 
-		uint32_t count = mesh->GetIndexBuffer()->GetCount();
-		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), count, GL_UNSIGNED_INT, nullptr);
+		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)

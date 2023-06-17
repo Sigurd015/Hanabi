@@ -1,4 +1,4 @@
-#include "SceneHierarchyPanel.h"
+﻿#include "SceneHierarchyPanel.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -438,6 +438,85 @@ namespace Hanabi
 					}
 
 					ImGui::EndCombo();
+				}
+
+				if (!component.Material)
+				{
+					component.Material = Material::Create(Renderer::GetShader("3DStaticMesh_Default"));
+				}
+
+				Ref<Texture2D> diffuse = component.Material->GetTexture(Material::TextureType::Diffuse);
+				Ref<Texture2D> specular = component.Material->GetTexture(Material::TextureType::Specular);
+				//Diffuse
+				ImGui::Text("Diffuse");
+				if (diffuse)
+				{
+					ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+				}
+				else
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+					ImGui::PopItemFlag();
+					ImGui::PopStyleColor();
+				}
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path texturePath(path);
+						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+						if (texture->IsLoaded())
+							component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Diffuse);
+						else
+							HNB_WARN("Could not load texture {0}", texturePath.filename().string());
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("ReSet Diffuse"))
+				{
+					component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Diffuse);
+				}
+
+				//Specular
+				ImGui::Text("Specular");
+				if (specular)
+				{
+					ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+				}
+				else
+				{
+					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+					ImGui::PopItemFlag();
+					ImGui::PopStyleColor();
+				}
+
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path texturePath(path);
+						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+						if (texture->IsLoaded())
+							component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Specular);
+						else
+							HNB_WARN("Could not load texture {0}", texturePath.filename().string());
+					}
+					ImGui::EndDragDropTarget();
+				}
+
+				ImGui::SameLine();
+				if (ImGui::Button("ReSet Specular"))
+				{
+					component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Specular);
 				}
 			});
 

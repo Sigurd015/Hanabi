@@ -22,18 +22,11 @@ namespace Hanabi
 		return UNKNOWN;
 	}
 
-	DX11Shader::DX11Shader(const std::string& filepath)
+	DX11Shader::DX11Shader(const std::string& fileName) :m_Name(fileName)
 	{
-		std::string source = ReadFile("assets/shaders/DX11/" + filepath + ".hlsl");
+		std::string source = ReadFile("assets/shaders/DX11/" + fileName + ".hlsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
-
-		// Extract name from filepath
-		auto lastSlash = filepath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		auto lastDot = filepath.rfind('.');
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-		m_Name = filepath.substr(lastSlash, count);
 	}
 
 	std::string DX11Shader::ReadFile(const std::string& filepath)

@@ -16,7 +16,7 @@ namespace Hanabi
 	class DX11Shader :public Shader
 	{
 	public:
-		DX11Shader(const std::string& filepath);
+		DX11Shader(const std::string& fileName);
 		~DX11Shader();
 		void Bind() const override;
 		void Unbind() const override;

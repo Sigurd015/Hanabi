@@ -194,6 +194,13 @@ namespace Hanabi
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Debug"))
+			{
+				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &m_ImGuiDebugWndDraw);
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 #pragma endregion	
@@ -202,6 +209,10 @@ namespace Hanabi
 		m_ContentBrowserPanel.OnImGuiRender();
 		UI_StatisticsPanel();
 		UI_ViewportPanel();
+
+		if (m_ImGuiDebugWndDraw)
+			ImGui::ShowMetricsWindow();
+
 		ImGui::End();
 	}
 

@@ -27,8 +27,13 @@ namespace Hanabi
 		s_RendererAPI = RendererAPI::Create();
 		s_RendererAPI->Init();
 
-		//TODO:Load shaders
-		//s_Data->ShaderLibrary
+		//TODO:Load shaders from spirv files
+		s_Data->ShaderLibrary = CreateRef<ShaderLibrary>();
+		s_Data->ShaderLibrary->Load("Renderer2D_Quad");
+		s_Data->ShaderLibrary->Load("Renderer2D_Circle");
+		s_Data->ShaderLibrary->Load("Renderer2D_Line");
+		s_Data->ShaderLibrary->Load("Renderer2D_Text");
+		s_Data->ShaderLibrary->Load("3DStaticMesh_Default");
 
 		//Setup textures
 		s_Data->WhiteTexture = Texture2D::Create(TextureSpecification());
@@ -69,9 +74,9 @@ namespace Hanabi
 		s_RendererAPI->ResetToSwapChain();
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<StaticMesh>& mesh,const Ref<Pipeline>& pipeline)
+	void Renderer::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
-		s_RendererAPI->SubmitStaticMesh(mesh, pipeline);
+		s_RendererAPI->SubmitStaticMesh(mesh, material,pipeline);
 	}
 
 	void  Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
@@ -83,6 +88,11 @@ namespace Hanabi
 	void  Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
 		s_RendererAPI->DrawLines(vertexBuffer, material, pipeline, vertexCount);
+	}
+
+	Ref<Shader> Renderer::GetShader(const std::string& name)
+	{
+		return s_Data->ShaderLibrary->Get(name);
 	}
 
 	Ref<Texture2D> Renderer::GetWhiteTexture()

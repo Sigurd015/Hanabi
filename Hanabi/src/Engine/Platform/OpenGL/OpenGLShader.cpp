@@ -18,18 +18,11 @@ namespace Hanabi
 		return 0;
 	}
 
-	OpenGLShader::OpenGLShader(const std::string& filepath)
+	OpenGLShader::OpenGLShader(const std::string& fileName) :m_Name(fileName)
 	{
-		std::string source = ReadFile("assets/shaders/OpenGL/" + filepath + ".glsl");
+		std::string source = ReadFile("assets/shaders/OpenGL/" + fileName + ".glsl");
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
-
-		// Extract name from filepath
-		auto lastSlash = filepath.find_last_of("/\\");
-		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-		auto lastDot = filepath.rfind('.');
-		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-		m_Name = filepath.substr(lastSlash, count);
 	}
 
 	std::string OpenGLShader::ReadFile(const std::string& filepath)

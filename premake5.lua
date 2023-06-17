@@ -35,6 +35,8 @@ group ""
 
 group "Tools"
 	include "Hanabi_Editor"
+	include "Hanabi_Launcher"
+	include "Hanabi_Runtime"
 group ""
 
 group "Misc"

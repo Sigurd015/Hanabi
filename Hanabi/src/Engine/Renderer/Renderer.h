@@ -22,7 +22,7 @@ namespace Hanabi
 		static void EndRenderPass(const Ref<RenderPass>& renderPass);
 
 		//3D Objects
-		static void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline);
+		static void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline);
 
 		//2D Objects
 		static void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
@@ -30,6 +30,7 @@ namespace Hanabi
 		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount);
 
 		static Ref<Texture2D> GetWhiteTexture();
+		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<StaticMesh> GetCubeMesh();
 		static Ref<StaticMesh> GetSphereMesh();
 		static Ref<StaticMesh> GetCapsuleMesh();

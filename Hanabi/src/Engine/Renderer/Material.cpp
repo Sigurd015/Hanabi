@@ -1,5 +1,6 @@
 #include "hnbpch.h"
 #include "Material.h"
+#include "Renderer.h"
 
 namespace Hanabi
 {
@@ -9,13 +10,17 @@ namespace Hanabi
 	}
 
 	Material::Material(const Ref<Shader>& shader)
-		: m_Shader(shader)
-	{}
+	{
+		if (shader)
+			m_Shader= shader;
+		else 
+			m_Shader = Renderer::GetShader("3DStaticMesh_Default");
+	}
 
 	Material::~Material()
 	{}
 
-	void Material::SetTexture(const Ref<Texture>& texture, uint32_t index)
+	void Material::SetTexture(const Ref<Texture2D>& texture, uint32_t index)
 	{
 		m_Textures[index] = texture;
 	}
@@ -31,7 +36,18 @@ namespace Hanabi
 	{
 		for (auto& texture : m_Textures)
 		{
-			texture.second->Bind(texture.first);
+			if (texture.second)
+				texture.second->Bind(texture.first);
 		}
+	}
+
+	Ref<Texture2D> Material::GetTexture(TextureType type)
+	{
+		uint32_t index = static_cast<uint32_t>(type);
+
+		if (m_Textures.find(index) != m_Textures.end())
+			return m_Textures[index];
+
+		return nullptr;
 	}
 }

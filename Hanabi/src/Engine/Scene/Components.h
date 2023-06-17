@@ -168,7 +168,11 @@ namespace Hanabi
 	{};
 
 	using AllComponents =
-		ComponentGroup<TransformComponent, SpriteRendererComponent, StaticMeshComponent,
-		CircleRendererComponent, CameraComponent, ScriptComponent,
-		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent, TextComponent>;
+		ComponentGroup<
+		TransformComponent, SpriteRendererComponent, CircleRendererComponent,
+		StaticMeshComponent,
+		CameraComponent,
+		ScriptComponent,
+		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent,
+		TextComponent>;
 }

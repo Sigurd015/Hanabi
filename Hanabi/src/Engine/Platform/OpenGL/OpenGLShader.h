@@ -10,7 +10,7 @@ namespace Hanabi
 	class OpenGLShader :public Shader
 	{
 	public:
-		OpenGLShader(const std::string& filepath);
+		OpenGLShader(const std::string& fileName);
 		~OpenGLShader();
 		void Bind() const override;
 		void Unbind() const override;

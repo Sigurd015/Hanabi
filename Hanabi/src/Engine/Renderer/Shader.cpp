@@ -15,16 +15,16 @@ namespace Hanabi
 		Add(name, shader);
 	}
 
-	Ref<Shader> ShaderLibrary::Load(const std::string& filepath)
+	Ref<Shader> ShaderLibrary::Load(const std::string& fileName)
 	{
-		auto shader = Shader::Create(filepath);
+		auto shader = Shader::Create(fileName);
 		Add(shader);
 		return shader;
 	}
 
-	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& filepath)
+	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& fileName)
 	{
-		auto shader = Shader::Create(filepath);
+		auto shader = Shader::Create(fileName);
 		Add(name, shader);
 		return shader;
 	}

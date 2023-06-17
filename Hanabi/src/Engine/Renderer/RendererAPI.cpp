@@ -96,7 +96,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<Shader> Shader::Create(const std::string& filepath)
+	Ref<Shader> Shader::Create(const std::string& fileName)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -104,11 +104,11 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLShader>(filepath);
+			return CreateRef<OpenGLShader>(fileName);
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateRef<DX11Shader>(filepath);
+			return CreateRef<DX11Shader>(fileName);
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

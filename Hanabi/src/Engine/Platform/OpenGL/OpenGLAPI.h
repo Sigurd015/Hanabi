@@ -13,7 +13,7 @@ namespace Hanabi
 
 		void BeginRenderPass(const Ref<RenderPass>& renderPass) override;
 		void EndRenderPass(const Ref<RenderPass>& renderPass) override;
-		void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Pipeline>& pipeline) override;
+		void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline) override;
 		void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 			const Ref<Pipeline>& pipeline, uint32_t indexCount = 0) override;
 		void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount) override;

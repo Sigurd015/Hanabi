@@ -34,12 +34,12 @@ namespace Hanabi
 		return texture;
 	}
 
-	Font::Font(const std::filesystem::path& path):m_Data(new MSDFData())
+	Font::Font(const std::filesystem::path& path) :m_Data(new MSDFData())
 	{
 		msdfgen::FreetypeHandle* ft = msdfgen::initializeFreetype();
-		
+
 		HNB_CORE_ASSERT(ft);
-		
+
 		std::string fileString = path.string();
 
 		// TODO: msdfgen::loadFontData loads from memory buffer which we'll need 
@@ -49,7 +49,7 @@ namespace Hanabi
 			HNB_CORE_ERROR("Failed to load font: {}", fileString);
 			return;
 		}
-		
+
 		struct CharsetRange
 		{
 			uint32_t Begin, End;
@@ -58,8 +58,15 @@ namespace Hanabi
 		// From imgui_draw.cpp
 		static const CharsetRange charsetRanges[] =
 		{
-			{ 0x0020, 0x00FF }
+			{ 0x0020, 0x00FF }, // Basic Latin + Latin Supplement
+			{ 0x2000, 0x206F }, // General Punctuation
+			{ 0x3000, 0x30FF }, // CJK Symbols and Punctuations, Hiragana, Katakana
+			{ 0x31F0, 0x31FF }, // Katakana Phonetic Extensions
+			{ 0xFF00, 0xFFEF }, // Half-width characters
+			{ 0xFFFD, 0xFFFD }, // Invalid
+			{ 0x4e00, 0x9FAF }, // CJK Ideograms
 		};
+		//TODO: This not working,and can't type chinese in imgui
 
 		msdf_atlas::Charset charset;
 		for (CharsetRange range : charsetRanges)

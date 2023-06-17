@@ -28,7 +28,7 @@ namespace Hanabi
 			};
 			m_Data.QuadVertexBuffer = VertexBuffer::Create(m_Data.MaxVertices * sizeof(QuadVertex));
 			m_Data.QuadVertexBuffer->SetLayout(layout);
-			
+
 			uint32_t* indices = new uint32_t[m_Data.MaxIndices];
 			uint32_t offset = 0;
 			for (uint32_t i = 0; i < m_Data.MaxIndices; i += 6)
@@ -49,7 +49,7 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.RenderPass = nullptr;
-			pipelineSpec.Shader = Shader::Create("Renderer2D_Quad");
+			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Quad");
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
 			// For OpenGL
@@ -81,7 +81,7 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.RenderPass = nullptr;
-			pipelineSpec.Shader = Shader::Create("Renderer2D_Circle");
+			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Circle");
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
 			// For OpenGL
@@ -108,7 +108,7 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.RenderPass = nullptr;
-			pipelineSpec.Shader = Shader::Create("Renderer2D_Line");
+			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Line");
 			pipelineSpec.Topology = PrimitiveTopology::Lines;
 
 			// For OpenGL
@@ -152,7 +152,7 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.RenderPass = nullptr;
-			pipelineSpec.Shader = Shader::Create("Renderer2D_Text");
+			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Text");
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
 			// For OpenGL
@@ -364,6 +364,7 @@ namespace Hanabi
 		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
 		double y = 0.0;
 		const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
+
 
 		for (size_t i = 0; i < string.size(); i++)
 		{

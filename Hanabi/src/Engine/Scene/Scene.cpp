@@ -229,7 +229,8 @@ namespace Hanabi
 
 		if (mainCamera)
 		{
-			m_SceneRenderer->BeginScene(*mainCamera, cameraTransform);
+			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
+			m_SceneRenderer->BeginScene(viewProjection);
 
 			// Draw 3D Objects
 			{
@@ -238,15 +239,24 @@ namespace Hanabi
 				{
 					auto [transform, mesh] = view.get<TransformComponent, StaticMeshComponent>(entity);
 
-					if (mesh.Type == StaticMeshComponent::StaticMeshType::Cube)
+					if (mesh.Type != StaticMeshComponent::StaticMeshType::None)
 					{
-						if (mesh.Mesh)
-							m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, transform.GetTransform(), (int)entity);
-						else
+						if (!mesh.Mesh)
 						{
-							mesh.Mesh = Renderer::GetCubeMesh();
-							m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, transform.GetTransform(), (int)entity);
+							switch (mesh.Type)
+							{
+							case StaticMeshComponent::StaticMeshType::Cube:
+								mesh.Mesh = Renderer::GetCubeMesh();
+								break;
+							case StaticMeshComponent::StaticMeshType::Sphere:
+								mesh.Mesh = Renderer::GetSphereMesh();
+								break;
+							case StaticMeshComponent::StaticMeshType::Capsule:
+								mesh.Mesh = Renderer::GetCapsuleMesh();
+								break;
+							}
 						}
+						m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, mesh.Material, transform.GetTransform(), (int)entity);
 					}
 				}
 			}
@@ -296,7 +306,7 @@ namespace Hanabi
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender)
 	{
-		m_SceneRenderer->BeginScene(camera);
+		m_SceneRenderer->BeginScene(camera.GetViewProjection());
 
 		// Draw 3D Objects
 		{
@@ -322,7 +332,7 @@ namespace Hanabi
 							break;
 						}
 					}
-					m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, transform.GetTransform(), (int)entity);
+					m_SceneRenderer->SubmitStaticMesh(mesh.Mesh, mesh.Material, transform.GetTransform(), (int)entity);
 				}
 			}
 		}
@@ -412,6 +422,7 @@ namespace Hanabi
 		}
 
 		// Draw selected entity outline 
+		// TODO: Make this work for 3D Objects
 		if (selectedEntity)
 		{
 			const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
