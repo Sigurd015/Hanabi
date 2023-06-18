@@ -56,9 +56,11 @@ project "Hanabi"
 		"yaml_cpp",
 		"Box2D",
 		"opengl32.lib",
-		"msdf_atlas_gen",
-		"%{Library.mono}"
+		"msdf_atlas_gen"
 	}
+	
+	filter "files:vendor/stb_image/**.cpp or vendor/ImGuizmo/**.cpp"
+	flags { "NoPCH" }
 	
 	filter "system:windows"
 		systemversion "latest"
@@ -85,12 +87,27 @@ project "Hanabi"
 		runtime "Debug"
 		symbols "on"
 
+		links 
+		{ 
+			"%{Library.mono_Debug}"
+		}
+
 	filter "configurations:Release"
 		defines "HNB_RELEASE"
 		runtime "Release"
 		optimize "on"
 
+		links 
+		{ 
+			"%{Library.mono_Release}"
+		}
+
 	filter "configurations:Dist"
 		defines "HNB_DIST"
 		runtime "Release"
 		optimize "on"
+		
+		links 
+		{ 
+			"%{Library.mono_Release}"
+		}

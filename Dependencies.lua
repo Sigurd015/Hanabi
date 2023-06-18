@@ -15,10 +15,12 @@ IncludeDir["msdfgen"] = "%{wks.location}/Hanabi/vendor/msdf_atlas_gen/msdfgen"
 IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Hanabi/vendor/msdf_atlas_gen/msdf-atlas-gen"
 
 LibraryDir = {}
-LibraryDir["mono"] = "%{wks.location}/Hanabi/vendor/mono/lib/%{cfg.buildcfg}"
+LibraryDir["mono_Debug"] = "%{wks.location}/Hanabi/vendor/mono/lib/Debug"
+LibraryDir["mono_Release"] = "%{wks.location}/Hanabi/vendor/mono/lib/Release"
 
 Library = {}
-Library["mono"] = "%{LibraryDir.mono}/libmono-static-sgen.lib"
+Library["mono_Debug"] = "%{LibraryDir.mono_Debug}/libmono-static-sgen.lib"
+Library["mono_Release"] = "%{LibraryDir.mono_Release}/libmono-static-sgen.lib"
 
 -- Windows
 Library["DX11"] = "d3d11.lib"

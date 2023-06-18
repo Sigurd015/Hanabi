@@ -29,8 +29,7 @@ Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 
 	if (spec.CommandLineArgs.Count > 2)
 	{
-		auto APIType = static_cast<RendererAPIType>(std::stoi(spec.CommandLineArgs[2]));
-		spec.RendererConfig.APIType = APIType;
+		spec.RendererConfig.APIType = static_cast<RendererAPIType>(std::stoi(spec.CommandLineArgs[2]));
 	}
 	else
 	{
