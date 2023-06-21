@@ -3,7 +3,7 @@
 
 namespace Hanabi
 {
-	Ref<StaticMesh> MeshFactory::CreateBox(const glm::vec3& size)
+	Ref<Mesh> MeshFactory::CreateBox(const glm::vec3& size)
 	{
 		std::vector<Vertex> vertices;
 		vertices.resize(8);
@@ -40,10 +40,11 @@ namespace Hanabi
 		indices[10] = { 3, 2, 6 };
 		indices[11] = { 6, 7, 3 };
 
-		return CreateRef<StaticMesh>(vertices, indices);
+		Ref<MeshSource> meshSource = CreateRef<MeshSource>(vertices, indices);
+		return CreateRef<Mesh>(meshSource);
 	}
 
-	Ref<StaticMesh> MeshFactory::CreateSphere(float radius)
+	Ref<Mesh> MeshFactory::CreateSphere(float radius)
 	{
 		std::vector<Vertex> vertices;
 		std::vector<Index> indices;
@@ -82,7 +83,8 @@ namespace Hanabi
 			}
 		}
 
-		return CreateRef<StaticMesh>(vertices, indices);
+		Ref<MeshSource> meshSource = CreateRef<MeshSource>(vertices, indices);
+		return CreateRef<Mesh>(meshSource);
 	}
 
 	static void CalculateRing(size_t segments, float radius, float y, float dy, float height, float actualRadius, std::vector<Vertex>& vertices)
@@ -98,7 +100,7 @@ namespace Hanabi
 		}
 	}
 
-	Ref<StaticMesh> MeshFactory::CreateCapsule(float radius, float height)
+	Ref<Mesh> MeshFactory::CreateCapsule(float radius, float height)
 	{
 		constexpr size_t subdivisionsHeight = 8;
 		constexpr size_t ringsBody = subdivisionsHeight + 1;
@@ -140,6 +142,7 @@ namespace Hanabi
 			}
 		}
 
-		return CreateRef<StaticMesh>(vertices, indices);
+		Ref<MeshSource> meshSource = CreateRef<MeshSource>(vertices, indices);
+		return CreateRef<Mesh>(meshSource);
 	}
 }

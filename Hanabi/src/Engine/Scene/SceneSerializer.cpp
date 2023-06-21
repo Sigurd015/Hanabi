@@ -164,31 +164,6 @@ namespace Hanabi
 		return Rigidbody2DComponent::BodyType::Static;
 	}
 
-	//TODO: Temp
-	static std::string MeshTypeToString(StaticMeshComponent::StaticMeshType meshType)
-	{
-		switch (meshType)
-		{
-		case StaticMeshComponent::StaticMeshType::Cube:    return "Cube";
-		case StaticMeshComponent::StaticMeshType::Sphere:   return "Sphere";
-		case StaticMeshComponent::StaticMeshType::Capsule: return "Capsule";
-		}
-
-		HNB_CORE_ASSERT(false, "Unknown body type");
-		return {};
-	}
-
-	static StaticMeshComponent::StaticMeshType MeshTypeFromString(const std::string& meshTypeString)
-	{
-		if (meshTypeString == "Cube")    return StaticMeshComponent::StaticMeshType::Cube;
-		if (meshTypeString == "Sphere")   return StaticMeshComponent::StaticMeshType::Sphere;
-		if (meshTypeString == "Capsule") return StaticMeshComponent::StaticMeshType::Capsule;
-
-		HNB_CORE_ASSERT(false, "Unknown body type");
-		return StaticMeshComponent::StaticMeshType::None;
-	}
-	//---------------------------------------------
-
 	template<typename T, typename Function>
 	static void SerializeComponent(const std::string& name, Entity entity, YAML::Emitter& out, Function func)
 	{
@@ -292,14 +267,6 @@ namespace Hanabi
 					out << YAML::EndSeq;
 				}
 			});
-
-		//TODO: temp
-		SerializeComponent<StaticMeshComponent>("StaticMeshComponent", entity, out, [&]()
-			{
-				auto& staticMeshComponent = entity.GetComponent<StaticMeshComponent>();
-				out << YAML::Key << "MeshType" << YAML::Value << MeshTypeToString(staticMeshComponent.Type);
-			});
-		//---------------------
 
 		SerializeComponent<SpriteRendererComponent>("SpriteRendererComponent", entity, out, [&]()
 			{
@@ -525,15 +492,6 @@ namespace Hanabi
 					if (spriteRendererComponent["UVEnd"])
 						src.UVEnd = spriteRendererComponent["UVEnd"].as<glm::vec2>();
 				}
-
-				//TODO:temp
-				auto staticMeshComponent = entity["StaticMeshComponent"];
-				if (staticMeshComponent)
-				{
-					auto& smc = deserializedEntity.AddComponent<StaticMeshComponent>();
-					smc.Type = MeshTypeFromString(staticMeshComponent["MeshType"].as<std::string>());
-				}
-				//------------------
 
 				auto circleRendererComponent = entity["CircleRendererComponent"];
 				if (circleRendererComponent)

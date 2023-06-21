@@ -53,6 +53,7 @@ namespace Hanabi
 		//glEnable(GL_CULL_FACE);
 		//glCullFace(GL_BACK);
 		glDisable(GL_CULL_FACE);
+		glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE);
 	}
 
 	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
@@ -71,16 +72,15 @@ namespace Hanabi
 		glViewport(x, y, width, height);
 	}
 
-	void OpenGLRendererAPI::ResetToSwapChain()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
-	void OpenGLRendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass)
+	void OpenGLRendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
 		renderPass->GetSpecification().TargetFramebuffer->Bind();
-		Clear();
-		renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
+		if (clear)
+		{
+			const glm::vec4& clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
+			SetClearColor(clearColor);
+			Clear();
+		}
 	}
 
 	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
@@ -88,11 +88,13 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform)
 	{
 		mesh->GetVertexBuffer()->Bind();
+		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(1);// 1 is the slot for the transform ConstantBuffer by default
+		transformBuffer->SetData(&transform);
+		pipeline->Bind();	
 		mesh->GetIndexBuffer()->Bind();
-		pipeline->Bind();
 		material->Bind();
 
 		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
@@ -101,8 +103,8 @@ namespace Hanabi
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
-		indexBuffer->Bind();
 		pipeline->Bind();
+		indexBuffer->Bind();
 		material->Bind();
 
 		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), indexCount, GL_UNSIGNED_INT, nullptr);

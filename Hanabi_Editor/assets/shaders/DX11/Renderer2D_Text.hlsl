@@ -30,7 +30,7 @@ VertexOutput main(VertexInput Input)
 	Output.Color = Input.a_Color;
 	Output.TexCoord = Input.a_TexCoord;
 	Output.EntityID = Input.a_EntityID;
-	Output.Pos = mul(float4(Input.a_Position,1.0f),u_ViewProjection);
+	Output.Pos = mul(u_ViewProjection,float4(Input.a_Position,1.0f));
 	return Output;
 }
 

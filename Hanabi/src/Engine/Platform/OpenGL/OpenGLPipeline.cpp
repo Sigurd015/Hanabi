@@ -32,7 +32,6 @@ namespace Hanabi
 		m_Specification = spec;
 		glCreateVertexArrays(1, &m_RendererID);
 		glBindVertexArray(m_RendererID);
-		m_Specification.VertexBuffer->Bind();
 		size_t index = 0;
 		for (const auto& element : m_Specification.Layout)
 		{
@@ -90,8 +89,6 @@ namespace Hanabi
 				HNB_CORE_ASSERT(false, "Unknown ShaderDataType!");
 			}
 		}
-		if (m_Specification.IndexBuffer != nullptr)
-			m_Specification.IndexBuffer->Bind();
 	}
 
 	OpenGLPipeline::~OpenGLPipeline()
@@ -102,12 +99,23 @@ namespace Hanabi
 	void OpenGLPipeline::Bind()
 	{
 		glBindVertexArray(m_RendererID);
-		if (m_UniformBuffer != nullptr)
-			m_UniformBuffer->Bind();
+		if (m_UniformBuffers.size())
+		{
+			for (auto& constantBuffer : m_UniformBuffers)
+			{
+				constantBuffer->Bind();
+			}
+		}
 	}
 
 	void OpenGLPipeline::SetConstantBuffer(const Ref<ConstantBuffer>& uniformBuffer)
 	{
-		m_UniformBuffer = uniformBuffer;
+		m_UniformBuffers.push_back(uniformBuffer);
+	}
+
+	Ref<ConstantBuffer> OpenGLPipeline::GetConstantBuffer(uint32_t bindingID)
+	{
+		HNB_CORE_ASSERT(bindingID < m_UniformBuffers.size(), "Binding ID is out of range!");
+		return m_UniformBuffers[bindingID];
 	}
 }

@@ -55,7 +55,6 @@ namespace Hanabi
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;
 		int m_StepFrames = 0;
-		Ref<SceneRenderer> m_SceneRenderer;
 
 		friend class Entity;
 		friend class SceneHierarchyPanel;

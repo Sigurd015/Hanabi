@@ -3,6 +3,7 @@
 #include "Renderer2D.h"
 #include "Renderer.h"
 #include "MeshFactory.h"
+#include "SceneRenderer.h"
 
 namespace Hanabi
 {
@@ -12,11 +13,10 @@ namespace Hanabi
 	{
 		Ref<ShaderLibrary> ShaderLibrary;
 
-		Ref<Texture2D> WhiteTexture;
+		RenderCommandQueue* s_CommandQueue;
 
-		Ref<StaticMesh> CubeMesh;
-		Ref<StaticMesh> SphereMesh;
-		Ref<StaticMesh> CapsuleMesh;
+		std::unordered_map<std::string, Ref<Texture2D>> Textures;
+		std::unordered_map<std::string, Ref<Mesh>> Meshes;
 	};
 
 	static RendererData* s_Data = nullptr;
@@ -24,6 +24,7 @@ namespace Hanabi
 	void Renderer::Init()
 	{
 		s_Data = new RendererData();
+		s_Data->s_CommandQueue = new RenderCommandQueue();
 		s_RendererAPI = RendererAPI::Create();
 		s_RendererAPI->Init();
 
@@ -33,21 +34,28 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Circle");
 		s_Data->ShaderLibrary->Load("Renderer2D_Line");
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
-		s_Data->ShaderLibrary->Load("3DStaticMesh_Default");
+		s_Data->ShaderLibrary->Load("PhongLighting");
 
 		//Setup textures
-		s_Data->WhiteTexture = Texture2D::Create(TextureSpecification());
+		Ref<Texture2D> whiteTexture = Texture2D::Create(TextureSpecification());
 		uint32_t whiteTextureData = 0xffffffff;
-		s_Data->WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		s_Data->Textures["White"] = whiteTexture;
 
 		//Load default meshes
-		s_Data->CubeMesh = MeshFactory::CreateBox(glm::vec3(1.0f));
-		//s_Data->CapsuleMesh = MeshFactory::CreateCapsule(1.0f, 1.0f);
-		s_Data->SphereMesh = MeshFactory::CreateSphere(1.0f);
+		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });
+		//s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
+		//s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
+
+		Renderer2D::Init();
+		SceneRenderer::Init();
 	}
 
 	void Renderer::Shutdown()
-	{}
+	{
+		Renderer2D::Shutdown();
+		SceneRenderer::Shutdown();
+	}
 
 	void Renderer::SetClearColor(const glm::vec4& color)
 	{
@@ -59,35 +67,55 @@ namespace Hanabi
 		s_RendererAPI->SetViewport(0, 0, width, height);
 	}
 
-	void Renderer::BeginRenderPass(const Ref<RenderPass>& renderPass)
+	void Renderer::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
-		s_RendererAPI->BeginRenderPass(renderPass);
+		Renderer::Submit([renderPass, clear]()
+			{
+				s_RendererAPI->BeginRenderPass(renderPass, clear);
+			});
 	}
 
 	void Renderer::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		s_RendererAPI->EndRenderPass(renderPass);
+		Renderer::Submit([renderPass]()
+			{
+				s_RendererAPI->EndRenderPass(renderPass);
+			});
 	}
 
-	void Renderer::ResetToSwapChain()
+	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform)
 	{
-		s_RendererAPI->ResetToSwapChain();
+		Renderer::Submit([mesh, material, pipeline, transform]()
+			{
+				s_RendererAPI->SubmitStaticMesh(mesh, material, pipeline, transform);
+			});
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
-	{
-		s_RendererAPI->SubmitStaticMesh(mesh, material,pipeline);
-	}
-
-	void  Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
+	void Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 		const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
-		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, pipeline, indexCount);
+		Renderer::Submit([vertexBuffer, indexBuffer, material, pipeline, indexCount]()
+			{
+				s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, pipeline, indexCount);
+			});
 	}
 
-	void  Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
 	{
-		s_RendererAPI->DrawLines(vertexBuffer, material, pipeline, vertexCount);
+		Renderer::Submit([vertexBuffer, material, pipeline, vertexCount]()
+			{
+				s_RendererAPI->DrawLines(vertexBuffer, material, pipeline, vertexCount);
+			});
+	}
+
+	void Renderer::WaitAndRender()
+	{
+		s_Data->s_CommandQueue->Execute();
+	}
+
+	RenderCommandQueue& Renderer::GetRenderCommandQueue()
+	{
+		return *s_Data->s_CommandQueue;
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)
@@ -95,23 +123,19 @@ namespace Hanabi
 		return s_Data->ShaderLibrary->Get(name);
 	}
 
-	Ref<Texture2D> Renderer::GetWhiteTexture()
+	Ref<Mesh> Renderer::GetMesh(const std::string& name)
 	{
-		return s_Data->WhiteTexture;
+		if (s_Data->Meshes.find(name) == s_Data->Meshes.end())
+			return nullptr;
+
+		return s_Data->Meshes[name];
 	}
 
-	Ref<StaticMesh> Renderer::GetCubeMesh()
+	Ref<Texture2D> Renderer::GetTexture(const std::string& name)
 	{
-		return s_Data->CubeMesh;
-	}
+		if (s_Data->Textures.find(name) == s_Data->Textures.end())
+			return nullptr;
 
-	Ref<StaticMesh> Renderer::GetSphereMesh()
-	{
-		return s_Data->SphereMesh;
-	}
-
-	Ref<StaticMesh> Renderer::GetCapsuleMesh()
-	{
-		return s_Data->CapsuleMesh;
+		return s_Data->Textures[name];
 	}
 }

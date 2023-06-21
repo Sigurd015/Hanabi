@@ -36,7 +36,7 @@ VertexOutput main(VertexInput Input)
     Output.TexIndex = Input.a_TexIndex;
     Output.TilingFactor = Input.a_TilingFactor;
     Output.EntityID = Input.a_EntityID;
-    Output.Pos = mul(float4(Input.a_Position, 1.0f), u_ViewProjection);
+    Output.Pos = mul(u_ViewProjection, float4(Input.a_Position, 1.0f));
     return Output;
 }
 

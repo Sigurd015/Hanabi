@@ -26,6 +26,7 @@
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Renderer/SceneRenderer.h"
 #include "Engine/Renderer/Texture.h"
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/IndexBuffer.h"

@@ -86,7 +86,7 @@ namespace Hanabi
 			case Hanabi::VERTEX_SHADER:
 			{
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
-					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
+					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateVertexShader(m_VertexShaderBlob->GetBufferPointer(),
 					m_VertexShaderBlob->GetBufferSize(), nullptr, m_VertexShader.GetAddressOf()));
 				break;
@@ -95,7 +95,7 @@ namespace Hanabi
 			{
 				Microsoft::WRL::ComPtr<ID3DBlob> blob;
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
-					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS, 0, blob.ReleaseAndGetAddressOf(), nullptr));
+					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, blob.ReleaseAndGetAddressOf(), nullptr));
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
 					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf()));
 				break;

@@ -9,30 +9,13 @@ namespace Hanabi
 	class SceneRenderer
 	{
 	public:
-		SceneRenderer();
-		~SceneRenderer();
+		static void Init();
+		static void Shutdown();
+		static void SetViewportSize(uint32_t width, uint32_t height);
 
-		void Init();
-		void Shutdown();
+		static void BeginScene(const glm::mat4& viewProjection);
+		static void EndScene();
 
-		void BeginScene(const glm::mat4& viewProjection);
-		void EndScene();
-
-		//3D
-		void SubmitStaticMesh(const Ref<StaticMesh>& staticMesh, const Ref<Material>& material,const glm::mat4& transform = glm::mat4(1.0f), int entityID = -1);
-
-		Ref<Renderer2D> GetRenderer2D() { return m_Renderer2D; }
-	private:
-		Ref<Renderer2D> m_Renderer2D;
-		Ref<Material> m_DefaultMaterial;
-
-		struct SceneData
-		{
-			glm::mat4 Model;
-			glm::mat4 ViewProjection;
-		};
-
-		SceneData SceneBuffer;
-		Ref<ConstantBuffer> SceneConstantBuffer;
+		static void SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID = -1);
 	};
 }

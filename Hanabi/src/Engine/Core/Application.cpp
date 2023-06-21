@@ -98,9 +98,13 @@ namespace Hanabi
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(timestep);
 
-				Renderer::ResetToSwapChain(); //For ImGui Rendering
+				Application* app = this;
+				Renderer::Submit([app]
+					{
+						app->RenderImGui();
+					});
 
-				RenderImGui();
+				Renderer::WaitAndRender();
 			}
 
 			m_Window->OnUpdate();

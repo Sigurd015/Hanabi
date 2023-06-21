@@ -85,21 +85,25 @@ namespace Hanabi
 		SetBuffer(width, height, x, y);
 	}
 
-	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass)
+	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
-		renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
+		if (clear)
+			renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
 		renderPass->GetSpecification().TargetFramebuffer->Bind();
 	}
 
 	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
+		ResetToSwapChain();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
+		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(1);// 1 is the slot for the transform ConstantBuffer by default
+		transformBuffer->SetData(&transform);
 		pipeline->Bind();
 		material->Bind();
 
@@ -125,7 +129,7 @@ namespace Hanabi
 		pipeline->Bind();
 		material->Bind();
 
-		//TODO: Set Line Width
+		//TODO: Set Line Width here
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->Draw(vertexCount, 0);
 	}

@@ -11,7 +11,7 @@
 namespace Hanabi
 {
 	EditorCamera::EditorCamera(float fov, float aspectRatio, float nearClip, float farClip)
-		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip), 
+		: m_FOV(fov), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip),
 		Camera(glm::perspective(glm::radians(fov), aspectRatio, nearClip, farClip))
 	{
 		UpdateView();
@@ -83,6 +83,16 @@ namespace Hanabi
 		dispatcher.Dispatch<MouseScrolledEvent>(HNB_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
 	}
 
+	void EditorCamera::SetViewportSize(float width, float height)
+	{
+		if ((m_ViewportWidth == width && m_ViewportHeight == height) || (width <= 0 && height <= 0))
+			return;
+
+		m_ViewportWidth = width;
+		m_ViewportHeight = height;
+		UpdateProjection();
+	}
+
 	bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e)
 	{
 		float delta = e.GetYOffset() * 0.1f;
@@ -127,7 +137,7 @@ namespace Hanabi
 
 	glm::vec3 EditorCamera::GetForwardDirection() const
 	{
-		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
+		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, 1.0f));
 	}
 
 	glm::vec3 EditorCamera::CalculatePosition() const
@@ -137,6 +147,6 @@ namespace Hanabi
 
 	glm::quat EditorCamera::GetOrientation() const
 	{
-		return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
+		return glm::quat(glm::vec3(m_Pitch, m_Yaw, 0.0f));
 	}
 }

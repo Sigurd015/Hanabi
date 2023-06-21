@@ -36,7 +36,7 @@ VertexOutput main(VertexInput Input)
     Output.Thickness = Input.a_Thickness;
     Output.Fade = Input.a_Fade;
     Output.EntityID = Input.a_EntityID;
-    Output.Pos = mul(float4(Input.a_WorldPosition, 1.0f), u_ViewProjection);
+    Output.Pos = mul(u_ViewProjection,float4(Input.a_WorldPosition, 1.0f));
     return Output;
 }
 

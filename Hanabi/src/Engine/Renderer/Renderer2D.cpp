@@ -12,10 +12,121 @@
 
 namespace Hanabi
 {
-	static Renderer2D::Statistics RendererStats;
+	struct QuadVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		glm::vec2 TexCoord;
+		int TexIndex;
+		float TilingFactor;
+
+		// Editor-only
+		int EntityID;
+	};
+
+	struct CircleVertex
+	{
+		glm::vec3 WorldPosition;
+		glm::vec3 LocalPosition;
+		glm::vec4 Color;
+		float Thickness;
+		float Fade;
+
+		// Editor-only
+		int EntityID;
+	};
+
+	struct LineVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+
+		// Editor-only
+		int EntityID;
+	};
+
+	struct TextVertex
+	{
+		glm::vec3 Position;
+		glm::vec4 Color;
+		glm::vec2 TexCoord;
+
+		// TODO: bg color for outline/bg
+
+		// Editor-only
+		int EntityID;
+	};
+
+	struct Renderer2DData
+	{
+		static const uint32_t MaxQuads = 10000;
+		static const uint32_t MaxVertices = MaxQuads * 4;
+		static const uint32_t MaxIndices = MaxQuads * 6;
+		static const uint32_t MaxTextureSlots = 32;
+
+		Ref<Pipeline> QuadPipeline;
+		Ref<VertexBuffer> QuadVertexBuffer;
+		Ref<IndexBuffer> QuadIndexBuffer;
+		Ref<Material> QuadMaterial;
+		uint32_t QuadIndexCount = 0;
+		QuadVertex* QuadVertexBufferBase = nullptr;
+		QuadVertex* QuadVertexBufferPtr = nullptr;
+
+		Ref<Pipeline> CirclePipeline;
+		Ref<VertexBuffer> CircleVertexBuffer;
+		Ref<IndexBuffer> CircleIndexBuffer;
+		Ref<Material> CircleMaterial;
+		uint32_t CircleIndexCount = 0;
+		CircleVertex* CircleVertexBufferBase = nullptr;
+		CircleVertex* CircleVertexBufferPtr = nullptr;
+
+		Ref<Pipeline> LinePipeline;
+		Ref<VertexBuffer> LineVertexBuffer;
+		Ref<Material> LineMaterial;
+		uint32_t LineVertexCount = 0;
+		LineVertex* LineVertexBufferBase = nullptr;
+		LineVertex* LineVertexBufferPtr = nullptr;
+		float LineWidth = 2.0f;
+
+		Ref<Pipeline> TextPipeline;
+		Ref<VertexBuffer> TextVertexBuffer;
+		Ref<IndexBuffer> TextIndexBuffer;
+		Ref<Material> TextMaterial;
+		uint32_t TextIndexCount = 0;
+		TextVertex* TextVertexBufferBase = nullptr;
+		TextVertex* TextVertexBufferPtr = nullptr;
+
+		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;// 0 is white texture
+		uint32_t TextureSlotIndex = 1;
+		Ref<Texture2D> FontAtlasTexture;
+		Ref<Texture2D> WhiteTexture;
+
+		glm::vec4 QuadVertexPositions[4] =
+		{ { -0.5f, -0.5f, 0.0f, 1.0f },
+		  {  0.5f, -0.5f, 0.0f, 1.0f },
+		  {  0.5f,  0.5f, 0.0f, 1.0f },
+		  { -0.5f,  0.5f, 0.0f, 1.0f } };
+		glm::vec2 QuadTexCoord[4] =
+		{ { 0.0f, 0.0f },
+		  { 1.0f, 0.0f },
+		  { 1.0f, 1.0f },
+		  { 0.0f, 1.0f } };
+
+		struct CameraData
+		{
+			glm::mat4 ViewProjection;
+		};
+		CameraData SceneBuffer;
+		Ref<ConstantBuffer> CameraConstantBuffer;
+		Renderer2D::Statistics RendererStats;
+
+		Ref<RenderPass> TatgetRenderPass;
+	};
+	static Renderer2DData* s_Data;
 
 	void Renderer2D::Init()
 	{
+		s_Data = new Renderer2DData();
 		//Quad
 		{
 			VertexBufferLayout layout = {
@@ -26,12 +137,12 @@ namespace Hanabi
 			   { ShaderDataType::Float,  "a_TilingFactor" },
 			   { ShaderDataType::Int,    "a_EntityID"     }
 			};
-			m_Data.QuadVertexBuffer = VertexBuffer::Create(m_Data.MaxVertices * sizeof(QuadVertex));
-			m_Data.QuadVertexBuffer->SetLayout(layout);
+			s_Data->QuadVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(QuadVertex));
+			s_Data->QuadVertexBuffer->SetLayout(layout);
 
-			uint32_t* indices = new uint32_t[m_Data.MaxIndices];
+			uint32_t* indices = new uint32_t[s_Data->MaxIndices];
 			uint32_t offset = 0;
-			for (uint32_t i = 0; i < m_Data.MaxIndices; i += 6)
+			for (uint32_t i = 0; i < s_Data->MaxIndices; i += 6)
 			{
 				indices[i + 0] = offset + 2;
 				indices[i + 1] = offset + 1;
@@ -43,24 +154,18 @@ namespace Hanabi
 
 				offset += 4;
 			}
-			m_Data.QuadIndexBuffer = IndexBuffer::Create(indices, m_Data.MaxIndices);
+			s_Data->QuadIndexBuffer = IndexBuffer::Create(indices, s_Data->MaxIndices);
 			delete[] indices;
 
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
-			pipelineSpec.RenderPass = nullptr;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Quad");
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
-			// For OpenGL
-			pipelineSpec.VertexBuffer = m_Data.QuadVertexBuffer;
-			pipelineSpec.IndexBuffer = m_Data.QuadIndexBuffer;
-			//-----------------
+			s_Data->QuadPipeline = Pipeline::Create(pipelineSpec);
+			s_Data->QuadMaterial = Material::Create(pipelineSpec.Shader);
 
-			m_Data.QuadPipeline = Pipeline::Create(pipelineSpec);
-			m_Data.QuadMaterial = Material::Create(pipelineSpec.Shader);
-
-			m_Data.QuadVertexBufferBase = new QuadVertex[m_Data.MaxVertices];
+			s_Data->QuadVertexBufferBase = new QuadVertex[s_Data->MaxVertices];
 		}
 
 		// Circles
@@ -73,26 +178,20 @@ namespace Hanabi
 			  { ShaderDataType::Float,  "a_Fade"          },
 			  { ShaderDataType::Int,    "a_EntityID"      }
 			};
-			m_Data.CircleVertexBuffer = VertexBuffer::Create(m_Data.MaxVertices * sizeof(CircleVertex));
-			m_Data.CircleVertexBuffer->SetLayout(layout);
+			s_Data->CircleVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(CircleVertex));
+			s_Data->CircleVertexBuffer->SetLayout(layout);
 
-			m_Data.CircleIndexBuffer = m_Data.QuadIndexBuffer;
+			s_Data->CircleIndexBuffer = s_Data->QuadIndexBuffer;
 
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
-			pipelineSpec.RenderPass = nullptr;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Circle");
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
-			// For OpenGL
-			pipelineSpec.VertexBuffer = m_Data.CircleVertexBuffer;
-			pipelineSpec.IndexBuffer = m_Data.CircleIndexBuffer;
-			//-----------------
+			s_Data->CirclePipeline = Pipeline::Create(pipelineSpec);
+			s_Data->CircleMaterial = Material::Create(pipelineSpec.Shader);
 
-			m_Data.CirclePipeline = Pipeline::Create(pipelineSpec);
-			m_Data.CircleMaterial = Material::Create(pipelineSpec.Shader);
-
-			m_Data.CircleVertexBufferBase = new CircleVertex[m_Data.MaxVertices];
+			s_Data->CircleVertexBufferBase = new CircleVertex[s_Data->MaxVertices];
 		}
 
 		// Lines
@@ -102,23 +201,18 @@ namespace Hanabi
 			  { ShaderDataType::Float4, "a_Color"    },
 			  { ShaderDataType::Int,    "a_EntityID" }
 			};
-			m_Data.LineVertexBuffer = VertexBuffer::Create(m_Data.MaxVertices * sizeof(LineVertex));
-			m_Data.LineVertexBuffer->SetLayout(layout);
+			s_Data->LineVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(LineVertex));
+			s_Data->LineVertexBuffer->SetLayout(layout);
 
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
-			pipelineSpec.RenderPass = nullptr;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Line");
 			pipelineSpec.Topology = PrimitiveTopology::Lines;
 
-			// For OpenGL
-			pipelineSpec.VertexBuffer = m_Data.LineVertexBuffer;
-			//-----------------
+			s_Data->LinePipeline = Pipeline::Create(pipelineSpec);
+			s_Data->LineMaterial = Material::Create(pipelineSpec.Shader);
 
-			m_Data.LinePipeline = Pipeline::Create(pipelineSpec);
-			m_Data.LineMaterial = Material::Create(pipelineSpec.Shader);
-
-			m_Data.LineVertexBufferBase = new LineVertex[m_Data.MaxVertices];
+			s_Data->LineVertexBufferBase = new LineVertex[s_Data->MaxVertices];
 		}
 
 		// Text
@@ -129,12 +223,12 @@ namespace Hanabi
 			  { ShaderDataType::Float2, "a_TexCoord"     },
 			  { ShaderDataType::Int,    "a_EntityID"     }
 			};
-			m_Data.TextVertexBuffer = VertexBuffer::Create(m_Data.MaxVertices * sizeof(TextVertex));
-			m_Data.TextVertexBuffer->SetLayout(layout);
+			s_Data->TextVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(TextVertex));
+			s_Data->TextVertexBuffer->SetLayout(layout);
 
-			uint32_t* indices = new uint32_t[m_Data.MaxIndices];
+			uint32_t* indices = new uint32_t[s_Data->MaxIndices];
 			uint32_t offset = 0;
-			for (uint32_t i = 0; i < m_Data.MaxIndices; i += 6)
+			for (uint32_t i = 0; i < s_Data->MaxIndices; i += 6)
 			{
 				indices[i + 0] = offset + 0;
 				indices[i + 1] = offset + 1;
@@ -146,86 +240,64 @@ namespace Hanabi
 
 				offset += 4;
 			}
-			m_Data.TextIndexBuffer = IndexBuffer::Create(indices, m_Data.MaxIndices);
+			s_Data->TextIndexBuffer = IndexBuffer::Create(indices, s_Data->MaxIndices);
 			delete[] indices;
 
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
-			pipelineSpec.RenderPass = nullptr;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Text");
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
-			// For OpenGL
-			pipelineSpec.VertexBuffer = m_Data.TextVertexBuffer;
-			pipelineSpec.IndexBuffer = m_Data.TextIndexBuffer;
-			//-----------------
+			s_Data->TextPipeline = Pipeline::Create(pipelineSpec);
+			s_Data->TextMaterial = Material::Create(pipelineSpec.Shader);
 
-			m_Data.TextPipeline = Pipeline::Create(pipelineSpec);
-			m_Data.TextMaterial = Material::Create(pipelineSpec.Shader);
-
-			m_Data.TextVertexBufferBase = new TextVertex[m_Data.MaxVertices];
+			s_Data->TextVertexBufferBase = new TextVertex[s_Data->MaxVertices];
 		}
 
 		// Set WhiteTexture slots to 0
-		m_Data.WhiteTexture = Renderer::GetWhiteTexture();
-		m_Data.TextureSlots[0] = m_Data.WhiteTexture;
+		s_Data->WhiteTexture = Renderer::GetTexture("White");
+		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
-		m_Data.CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
+		s_Data->CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
 	}
 
 	void Renderer2D::Shutdown()
 	{
-		delete[] m_Data.QuadVertexBufferBase;
-		delete[] m_Data.CircleVertexBufferBase;
-		delete[] m_Data.LineVertexBufferBase;
-		delete[] m_Data.TextVertexBufferBase;
+		delete[] s_Data->QuadVertexBufferBase;
+		delete[] s_Data->CircleVertexBufferBase;
+		delete[] s_Data->LineVertexBufferBase;
+		delete[] s_Data->TextVertexBufferBase;
 	}
 
-	void Renderer2D::SetViewProjection(const glm::mat4& viewProjection)
+	void Renderer2D::BeginScene(const glm::mat4& viewProjection)
 	{
-		m_Data.CameraBuffer.ViewProjection = viewProjection;
-		m_Data.CameraConstantBuffer->SetData(&m_Data.CameraBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data->SceneBuffer.ViewProjection = viewProjection;
 
-		m_Data.QuadPipeline->SetConstantBuffer(m_Data.CameraConstantBuffer);
-		m_Data.CirclePipeline->SetConstantBuffer(m_Data.CameraConstantBuffer);
-		m_Data.LinePipeline->SetConstantBuffer(m_Data.CameraConstantBuffer);
-		m_Data.TextPipeline->SetConstantBuffer(m_Data.CameraConstantBuffer);
+		s_Data->CameraConstantBuffer->SetData(&s_Data->SceneBuffer, sizeof(Renderer2DData::CameraData));
+
+		s_Data->QuadPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->CirclePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->LinePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->TextPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
 
 		StartBatch();
 	}
 
+	void Renderer2D::EndScene()
+	{
+		Flush();
+	}
+
 	Ref<RenderPass> Renderer2D::GetTargetRenderPass()
 	{
-		return m_Data.QuadPipeline->GetSpecification().RenderPass;
+		return s_Data->TatgetRenderPass;
 	}
 
 	void Renderer2D::SetTargetRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		if (renderPass != m_Data.QuadPipeline->GetSpecification().RenderPass)
+		if (renderPass != s_Data->TatgetRenderPass)
 		{
-			{
-				PipelineSpecification pipelineSpecification = m_Data.QuadPipeline->GetSpecification();
-				pipelineSpecification.RenderPass = renderPass;
-				m_Data.QuadPipeline = Pipeline::Create(pipelineSpecification);
-			}
-
-			{
-				PipelineSpecification pipelineSpecification = m_Data.CirclePipeline->GetSpecification();
-				pipelineSpecification.RenderPass = renderPass;
-				m_Data.CirclePipeline = Pipeline::Create(pipelineSpecification);
-			}
-
-			{
-				PipelineSpecification pipelineSpecification = m_Data.LinePipeline->GetSpecification();
-				pipelineSpecification.RenderPass = renderPass;
-				m_Data.LinePipeline = Pipeline::Create(pipelineSpecification);
-			}
-
-			{
-				PipelineSpecification pipelineSpecification = m_Data.TextPipeline->GetSpecification();
-				pipelineSpecification.RenderPass = renderPass;
-				m_Data.TextPipeline = Pipeline::Create(pipelineSpecification);
-			}
+			s_Data->TatgetRenderPass = renderPass;
 		}
 	}
 
@@ -233,66 +305,66 @@ namespace Hanabi
 	{
 		ResetStats();
 
-		m_Data.QuadIndexCount = 0;
-		m_Data.QuadVertexBufferPtr = m_Data.QuadVertexBufferBase;
+		s_Data->QuadIndexCount = 0;
+		s_Data->QuadVertexBufferPtr = s_Data->QuadVertexBufferBase;
 
-		m_Data.CircleIndexCount = 0;
-		m_Data.CircleVertexBufferPtr = m_Data.CircleVertexBufferBase;
+		s_Data->CircleIndexCount = 0;
+		s_Data->CircleVertexBufferPtr = s_Data->CircleVertexBufferBase;
 
-		m_Data.LineVertexCount = 0;
-		m_Data.LineVertexBufferPtr = m_Data.LineVertexBufferBase;
+		s_Data->LineVertexCount = 0;
+		s_Data->LineVertexBufferPtr = s_Data->LineVertexBufferBase;
 
-		m_Data.TextIndexCount = 0;
-		m_Data.TextVertexBufferPtr = m_Data.TextVertexBufferBase;
+		s_Data->TextIndexCount = 0;
+		s_Data->TextVertexBufferPtr = s_Data->TextVertexBufferBase;
 
-		m_Data.TextureSlotIndex = 1;
+		s_Data->TextureSlotIndex = 1;
 	}
 
 	void Renderer2D::Flush()
 	{
-		if (m_Data.QuadIndexCount)
+		if (s_Data->QuadIndexCount)
 		{
-			uint32_t dataSize = (uint32_t)((uint8_t*)m_Data.QuadVertexBufferPtr - (uint8_t*)m_Data.QuadVertexBufferBase);
-			m_Data.QuadVertexBuffer->SetData(m_Data.QuadVertexBufferBase, dataSize);
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
+			s_Data->QuadVertexBuffer->SetData(s_Data->QuadVertexBufferBase, dataSize);
 
 			// Bind textures
-			for (uint32_t i = 0; i < m_Data.TextureSlotIndex; i++)
-				m_Data.QuadMaterial->SetTexture(m_Data.TextureSlots[i], i);
+			for (uint32_t i = 0; i < s_Data->TextureSlotIndex; i++)
+				s_Data->QuadMaterial->SetTexture(s_Data->TextureSlots[i], i);
 
-			Renderer::DrawIndexed(m_Data.QuadVertexBuffer, m_Data.QuadIndexBuffer, m_Data.QuadMaterial, m_Data.QuadPipeline, m_Data.QuadIndexCount);
-			RendererStats.DrawCalls++;
+			Renderer::DrawIndexed(s_Data->QuadVertexBuffer, s_Data->QuadIndexBuffer, s_Data->QuadMaterial, s_Data->QuadPipeline, s_Data->QuadIndexCount);
+			s_Data->RendererStats.DrawCalls++;
 		}
 
-		if (m_Data.CircleIndexCount)
+		if (s_Data->CircleIndexCount)
 		{
-			uint32_t dataSize = (uint32_t)((uint8_t*)m_Data.CircleVertexBufferPtr - (uint8_t*)m_Data.CircleVertexBufferBase);
-			m_Data.CircleVertexBuffer->SetData(m_Data.CircleVertexBufferBase, dataSize);
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->CircleVertexBufferPtr - (uint8_t*)s_Data->CircleVertexBufferBase);
+			s_Data->CircleVertexBuffer->SetData(s_Data->CircleVertexBufferBase, dataSize);
 
 			// Use quad QuadIndexBuffer
-			Renderer::DrawIndexed(m_Data.CircleVertexBuffer, m_Data.CircleIndexBuffer, m_Data.CircleMaterial, m_Data.CirclePipeline, m_Data.CircleIndexCount);
-			RendererStats.DrawCalls++;
+			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->CircleIndexBuffer, s_Data->CircleMaterial, s_Data->CirclePipeline, s_Data->CircleIndexCount);
+			s_Data->RendererStats.DrawCalls++;
 		}
 
-		if (m_Data.LineVertexCount)
+		if (s_Data->LineVertexCount)
 		{
-			uint32_t dataSize = (uint32_t)((uint8_t*)m_Data.LineVertexBufferPtr - (uint8_t*)m_Data.LineVertexBufferBase);
-			m_Data.LineVertexBuffer->SetData(m_Data.LineVertexBufferBase, dataSize);
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->LineVertexBufferPtr - (uint8_t*)s_Data->LineVertexBufferBase);
+			s_Data->LineVertexBuffer->SetData(s_Data->LineVertexBufferBase, dataSize);
 
-			Renderer::DrawLines(m_Data.LineVertexBuffer, m_Data.LineMaterial, m_Data.LinePipeline, m_Data.LineVertexCount);
-			RendererStats.DrawCalls++;
+			Renderer::DrawLines(s_Data->LineVertexBuffer, s_Data->LineMaterial, s_Data->LinePipeline, s_Data->LineVertexCount);
+			s_Data->RendererStats.DrawCalls++;
 		}
 
-		if (m_Data.TextIndexCount)
+		if (s_Data->TextIndexCount)
 		{
-			uint32_t dataSize = (uint32_t)((uint8_t*)m_Data.TextVertexBufferPtr - (uint8_t*)m_Data.TextVertexBufferBase);
-			m_Data.TextVertexBuffer->SetData(m_Data.TextVertexBufferBase, dataSize);
+			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->TextVertexBufferPtr - (uint8_t*)s_Data->TextVertexBufferBase);
+			s_Data->TextVertexBuffer->SetData(s_Data->TextVertexBufferBase, dataSize);
 
 			// Bind textures
 			// TODO: Bind multiple font atlas texture
-			m_Data.TextMaterial->SetTexture(m_Data.FontAtlasTexture, 0);
+			s_Data->TextMaterial->SetTexture(s_Data->FontAtlasTexture, 0);
 
-			Renderer::DrawIndexed(m_Data.TextVertexBuffer, m_Data.TextIndexBuffer, m_Data.TextMaterial, m_Data.TextPipeline, m_Data.TextIndexCount);
-			RendererStats.DrawCalls++;
+			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->TextIndexBuffer, s_Data->TextMaterial, s_Data->TextPipeline, s_Data->TextIndexCount);
+			s_Data->RendererStats.DrawCalls++;
 		}
 	}
 
@@ -304,27 +376,27 @@ namespace Hanabi
 
 	void Renderer2D::ResetStats()
 	{
-		memset(&RendererStats, 0, sizeof(Statistics));
+		memset(&s_Data->RendererStats, 0, sizeof(Statistics));
 	}
 
 	Renderer2D::Statistics Renderer2D::GetStats()
 	{
-		return RendererStats;
+		return s_Data->RendererStats;
 	}
 
 	void Renderer2D::DrawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entityID)
 	{
-		m_Data.LineVertexBufferPtr->Position = p0;
-		m_Data.LineVertexBufferPtr->Color = color;
-		m_Data.LineVertexBufferPtr->EntityID = entityID;
-		m_Data.LineVertexBufferPtr++;
+		s_Data->LineVertexBufferPtr->Position = p0;
+		s_Data->LineVertexBufferPtr->Color = color;
+		s_Data->LineVertexBufferPtr->EntityID = entityID;
+		s_Data->LineVertexBufferPtr++;
 
-		m_Data.LineVertexBufferPtr->Position = p1;
-		m_Data.LineVertexBufferPtr->Color = color;
-		m_Data.LineVertexBufferPtr->EntityID = entityID;
-		m_Data.LineVertexBufferPtr++;
+		s_Data->LineVertexBufferPtr->Position = p1;
+		s_Data->LineVertexBufferPtr->Color = color;
+		s_Data->LineVertexBufferPtr->EntityID = entityID;
+		s_Data->LineVertexBufferPtr++;
 
-		m_Data.LineVertexCount += 2;
+		s_Data->LineVertexCount += 2;
 	}
 
 	void Renderer2D::DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID)
@@ -344,7 +416,7 @@ namespace Hanabi
 	{
 		glm::vec3 lineVertices[4];
 		for (size_t i = 0; i < 4; i++)
-			lineVertices[i] = transform * m_Data.QuadVertexPositions[i];
+			lineVertices[i] = transform * s_Data->QuadVertexPositions[i];
 
 		DrawLine(lineVertices[0], lineVertices[1], color, entityID);
 		DrawLine(lineVertices[1], lineVertices[2], color, entityID);
@@ -358,7 +430,7 @@ namespace Hanabi
 		const auto& metrics = fontGeometry.getMetrics();
 		Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
 
-		m_Data.FontAtlasTexture = fontAtlas;
+		s_Data->FontAtlasTexture = fontAtlas;
 
 		double x = 0.0;
 		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
@@ -427,32 +499,32 @@ namespace Hanabi
 			texCoordMax *= glm::vec2(texelWidth, texelHeight);
 
 			// render here
-			m_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
-			m_Data.TextVertexBufferPtr->Color = textParams.Color;
-			m_Data.TextVertexBufferPtr->TexCoord = texCoordMin;
-			m_Data.TextVertexBufferPtr->EntityID = entityID;
-			m_Data.TextVertexBufferPtr++;
+			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
+			s_Data->TextVertexBufferPtr->Color = textParams.Color;
+			s_Data->TextVertexBufferPtr->TexCoord = texCoordMin;
+			s_Data->TextVertexBufferPtr->EntityID = entityID;
+			s_Data->TextVertexBufferPtr++;
 
-			m_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
-			m_Data.TextVertexBufferPtr->Color = textParams.Color;
-			m_Data.TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
-			m_Data.TextVertexBufferPtr->EntityID = entityID;
-			m_Data.TextVertexBufferPtr++;
+			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
+			s_Data->TextVertexBufferPtr->Color = textParams.Color;
+			s_Data->TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
+			s_Data->TextVertexBufferPtr->EntityID = entityID;
+			s_Data->TextVertexBufferPtr++;
 
-			m_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
-			m_Data.TextVertexBufferPtr->Color = textParams.Color;
-			m_Data.TextVertexBufferPtr->TexCoord = texCoordMax;
-			m_Data.TextVertexBufferPtr->EntityID = entityID;
-			m_Data.TextVertexBufferPtr++;
+			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
+			s_Data->TextVertexBufferPtr->Color = textParams.Color;
+			s_Data->TextVertexBufferPtr->TexCoord = texCoordMax;
+			s_Data->TextVertexBufferPtr->EntityID = entityID;
+			s_Data->TextVertexBufferPtr++;
 
-			m_Data.TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
-			m_Data.TextVertexBufferPtr->Color = textParams.Color;
-			m_Data.TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
-			m_Data.TextVertexBufferPtr->EntityID = entityID;
-			m_Data.TextVertexBufferPtr++;
+			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
+			s_Data->TextVertexBufferPtr->Color = textParams.Color;
+			s_Data->TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
+			s_Data->TextVertexBufferPtr->EntityID = entityID;
+			s_Data->TextVertexBufferPtr++;
 
-			m_Data.TextIndexCount += 6;
-			RendererStats.QuadCount++;
+			s_Data->TextIndexCount += 6;
+			s_Data->RendererStats.QuadCount++;
 
 			if (i < string.size() - 1)
 			{
@@ -472,51 +544,51 @@ namespace Hanabi
 
 	float Renderer2D::GetLineWidth()
 	{
-		return m_Data.LineWidth;
+		return s_Data->LineWidth;
 	}
 
 	void Renderer2D::SetLineWidth(float width)
 	{
-		m_Data.LineWidth = width;
+		s_Data->LineWidth = width;
 	}
 
 	void Renderer2D::DrawCircle(const glm::mat4& transform, const glm::vec4& color,
 		float thickness, float fade, int entityID)
 	{
-		if (m_Data.CircleIndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data->CircleIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		for (size_t i = 0; i < 4; i++)
 		{
-			m_Data.CircleVertexBufferPtr->WorldPosition = transform * m_Data.QuadVertexPositions[i];
-			m_Data.CircleVertexBufferPtr->LocalPosition = m_Data.QuadVertexPositions[i] * 2.0f;
-			m_Data.CircleVertexBufferPtr->Color = color;
-			m_Data.CircleVertexBufferPtr->Thickness = thickness;
-			m_Data.CircleVertexBufferPtr->Fade = fade;
-			m_Data.CircleVertexBufferPtr->EntityID = entityID;
-			m_Data.CircleVertexBufferPtr++;
+			s_Data->CircleVertexBufferPtr->WorldPosition = transform * s_Data->QuadVertexPositions[i];
+			s_Data->CircleVertexBufferPtr->LocalPosition = s_Data->QuadVertexPositions[i] * 2.0f;
+			s_Data->CircleVertexBufferPtr->Color = color;
+			s_Data->CircleVertexBufferPtr->Thickness = thickness;
+			s_Data->CircleVertexBufferPtr->Fade = fade;
+			s_Data->CircleVertexBufferPtr->EntityID = entityID;
+			s_Data->CircleVertexBufferPtr++;
 		}
 
-		m_Data.CircleIndexCount += 6;
+		s_Data->CircleIndexCount += 6;
 
-		RendererStats.QuadCount++;
+		s_Data->RendererStats.QuadCount++;
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
-		if (m_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		const float texIndex = 0.0f; // White Texture
 		const float tilingFactor = 1.0f;
 
-		SetQuadVertex(transform, color, entityID, m_Data.QuadTexCoord, texIndex, tilingFactor);
+		SetQuadVertex(transform, color, entityID, s_Data->QuadTexCoord, texIndex, tilingFactor);
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
 		const glm::vec4& tintColor, float tilingFactor, int entityID)
 	{
-		if (m_Data.QuadIndexCount >= Renderer2DData::MaxIndices)
+		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
 		glm::vec2 textureCoords[] = { uv0, { uv1.x, uv0.y }, uv1, { uv0.x, uv1.y } };
@@ -526,9 +598,9 @@ namespace Hanabi
 	float Renderer2D::GetTextureID(const Ref<Texture2D>& texture)
 	{
 		float texIndex = 0.0f;
-		for (uint32_t i = 1; i < m_Data.TextureSlotIndex; i++)
+		for (uint32_t i = 1; i < s_Data->TextureSlotIndex; i++)
 		{
-			if (*m_Data.TextureSlots[i] == *texture)
+			if (*s_Data->TextureSlots[i] == *texture)
 			{
 				texIndex = (float)i;
 				break;
@@ -537,11 +609,11 @@ namespace Hanabi
 
 		if (texIndex == 0.0f)
 		{
-			if (m_Data.TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
+			if (s_Data->TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
 				NextBatch();
-			texIndex = (float)m_Data.TextureSlotIndex;
-			m_Data.TextureSlots[m_Data.TextureSlotIndex] = texture;
-			m_Data.TextureSlotIndex++;
+			texIndex = (float)s_Data->TextureSlotIndex;
+			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
+			s_Data->TextureSlotIndex++;
 		}
 		return texIndex;
 	}
@@ -551,15 +623,15 @@ namespace Hanabi
 	{
 		for (size_t i = 0; i < 4; i++)
 		{
-			m_Data.QuadVertexBufferPtr->Position = transform * m_Data.QuadVertexPositions[i];
-			m_Data.QuadVertexBufferPtr->Color = color;
-			m_Data.QuadVertexBufferPtr->TexCoord = texCoord[i];
-			m_Data.QuadVertexBufferPtr->TexIndex = texIndex;
-			m_Data.QuadVertexBufferPtr->TilingFactor = tilingFactor;
-			m_Data.QuadVertexBufferPtr->EntityID = entityID;
-			m_Data.QuadVertexBufferPtr++;
+			s_Data->QuadVertexBufferPtr->Position = transform * s_Data->QuadVertexPositions[i];
+			s_Data->QuadVertexBufferPtr->Color = color;
+			s_Data->QuadVertexBufferPtr->TexCoord = texCoord[i];
+			s_Data->QuadVertexBufferPtr->TexIndex = texIndex;
+			s_Data->QuadVertexBufferPtr->TilingFactor = tilingFactor;
+			s_Data->QuadVertexBufferPtr->EntityID = entityID;
+			s_Data->QuadVertexBufferPtr++;
 		}
-		m_Data.QuadIndexCount += 6;
-		RendererStats.QuadCount++;
+		s_Data->QuadIndexCount += 6;
+		s_Data->RendererStats.QuadCount++;
 	}
 }

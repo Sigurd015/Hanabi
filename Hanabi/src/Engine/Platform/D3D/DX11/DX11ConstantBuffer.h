@@ -14,8 +14,9 @@ namespace Hanabi
 		DX11ConstantBuffer(uint32_t size, uint32_t binding);
 		~DX11ConstantBuffer();
 		void Bind() const override;
-		void SetData(const void* data, uint32_t size, uint32_t offset = 0) override;
+		void SetData(const void* data, uint32_t offset = 0) override;
 	private:
+		uint32_t m_DataSize;
 		uint32_t m_BindingID;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_ConstantBuffer;
 	};

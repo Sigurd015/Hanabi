@@ -45,7 +45,8 @@ project "Hanabi"
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.msdfgen}",
-		"%{IncludeDir.msdf_atlas_gen}"
+		"%{IncludeDir.msdf_atlas_gen}",
+		"%{IncludeDir.assimp}"
 	}
 
 	links 
@@ -57,6 +58,12 @@ project "Hanabi"
 		"Box2D",
 		"opengl32.lib",
 		"msdf_atlas_gen"
+	}
+
+	defines
+	{
+		"GLM_FORCE_LEFT_HANDED", 
+		"GLM_FORCE_DEPTH_ZERO_TO_ONE"
 	}
 	
 	filter "files:vendor/stb_image/**.cpp or vendor/ImGuizmo/**.cpp"
@@ -89,7 +96,8 @@ project "Hanabi"
 
 		links 
 		{ 
-			"%{Library.mono_Debug}"
+			"%{Library.mono_Debug}",
+			"%{Library.assimp_Debug}"
 		}
 
 	filter "configurations:Release"
@@ -99,7 +107,8 @@ project "Hanabi"
 
 		links 
 		{ 
-			"%{Library.mono_Release}"
+			"%{Library.mono_Release}",
+			"%{Library.assimp_Release}"
 		}
 
 	filter "configurations:Dist"
@@ -109,5 +118,6 @@ project "Hanabi"
 		
 		links 
 		{ 
-			"%{Library.mono_Release}"
+			"%{Library.mono_Release}",
+			"%{Library.assimp_Release}"
 		}

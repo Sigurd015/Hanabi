@@ -1,23 +1,5 @@
 Scene: Untitled
 Entities:
-  - Entity: 11330075669036878742
-    TagComponent:
-      Tag: Sphere
-    TransformComponent:
-      Translation: [-3.3836925, 0, 1.8095237]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    StaticMeshComponent:
-      MeshType: Sphere
-  - Entity: 4436371929942991818
-    TagComponent:
-      Tag: Cube
-    TransformComponent:
-      Translation: [0, 0, 1.83503294]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    StaticMeshComponent:
-      MeshType: Cube
   - Entity: 12183843591437764094
     TagComponent:
       Tag: Msg
@@ -82,19 +64,21 @@ Entities:
       Scale: [1, 1, 1]
     CameraComponent:
       Camera:
-        ProjectionType: 0
+        ProjectionType: 1
         PerspectiveFOV: 0.785398185
         PerspectiveNear: 0.00999999978
         PerspectiveFar: 1000
         OrthographicSize: 10
-        OrthographicNear: -1
+        OrthographicNear: -10
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
     ScriptComponent:
       ClassName: Sandbox.Camera
       ScriptFields:
-        []
+        - Name: DistanceFromPlayer
+          Type: Float
+          Data: 5
   - Entity: 15045535320033348975
     TagComponent:
       Tag: Player

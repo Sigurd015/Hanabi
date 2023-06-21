@@ -230,7 +230,7 @@ namespace Hanabi
 			DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
 			DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
 			DisplayAddComponentEntry<TextComponent>("Text Component");
-			DisplayAddComponentEntry<StaticMeshComponent>("StaticMesh Component");
+			DisplayAddComponentEntry<MeshComponent>("StaticMesh Component");
 			ImGui::EndPopup();
 		}
 
@@ -418,106 +418,106 @@ namespace Hanabi
 				ImGui::DragFloat2("UV End", glm::value_ptr(component.UVEnd), 0.01f, 0.0f, 1.0f);
 			});
 
-		DrawComponent<StaticMeshComponent>("StaticMesh", entity, [](auto& component)
+		DrawComponent<MeshComponent>("StaticMesh", entity, [](auto& component)
 			{
-				const char* StaticMeshTypeStrings[] = { "None","Cube", "Capsule", "Sphere" };
-				const char* currentStaticMeshTypeString = StaticMeshTypeStrings[(int)component.Type];
-				if (ImGui::BeginCombo("StaticMesh Type", currentStaticMeshTypeString))
-				{
-					for (int i = 0; i < 4; i++)
-					{
-						bool isSelected = currentStaticMeshTypeString == StaticMeshTypeStrings[i];
-						if (ImGui::Selectable(StaticMeshTypeStrings[i], isSelected))
-						{
-							currentStaticMeshTypeString = StaticMeshTypeStrings[i];
-							component.Type = (StaticMeshComponent::StaticMeshType)i;
-						}
+				//const char* StaticMeshTypeStrings[] = { "None","Cube", "Capsule", "Sphere" };
+				//const char* currentStaticMeshTypeString = StaticMeshTypeStrings[(int)component.Type];
+				//if (ImGui::BeginCombo("StaticMesh Type", currentStaticMeshTypeString))
+				//{
+				//	for (int i = 0; i < 4; i++)
+				//	{
+				//		bool isSelected = currentStaticMeshTypeString == StaticMeshTypeStrings[i];
+				//		if (ImGui::Selectable(StaticMeshTypeStrings[i], isSelected))
+				//		{
+				//			currentStaticMeshTypeString = StaticMeshTypeStrings[i];
+				//			component.Type = (MeshComponent::StaticMeshType)i;
+				//		}
 
-						if (isSelected)
-							ImGui::SetItemDefaultFocus();
-					}
+				//		if (isSelected)
+				//			ImGui::SetItemDefaultFocus();
+				//	}
 
-					ImGui::EndCombo();
-				}
+				//	ImGui::EndCombo();
+				//}
 
-				if (!component.Material)
-				{
-					component.Material = Material::Create(Renderer::GetShader("3DStaticMesh_Default"));
-				}
+				//if (!component.Material)
+				//{
+				//	component.Material = Material::Create(Renderer::GetShader("PhongLighting"));
+				//}
 
-				Ref<Texture2D> diffuse = component.Material->GetTexture(Material::TextureType::Diffuse);
-				Ref<Texture2D> specular = component.Material->GetTexture(Material::TextureType::Specular);
-				//Diffuse
-				ImGui::Text("Diffuse");
-				if (diffuse)
-				{
-					ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-				}
-				else
-				{
-					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-					ImGui::PopItemFlag();
-					ImGui::PopStyleColor();
-				}
+				//Ref<Texture2D> diffuse = component.Material->GetTexture(Material::TextureType::Diffuse);
+				//Ref<Texture2D> specular = component.Material->GetTexture(Material::TextureType::Specular);
+				////Diffuse
+				//ImGui::Text("Diffuse");
+				//if (diffuse)
+				//{
+				//	ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+				//}
+				//else
+				//{
+				//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				//	ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+				//	ImGui::PopItemFlag();
+				//	ImGui::PopStyleColor();
+				//}
 
-				if (ImGui::BeginDragDropTarget())
-				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-					{
-						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath(path);
-						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-						if (texture->IsLoaded())
-							component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Diffuse);
-						else
-							HNB_WARN("Could not load texture {0}", texturePath.filename().string());
-					}
-					ImGui::EndDragDropTarget();
-				}
+				//if (ImGui::BeginDragDropTarget())
+				//{
+				//	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				//	{
+				//		const wchar_t* path = (const wchar_t*)payload->Data;
+				//		std::filesystem::path texturePath(path);
+				//		Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+				//		if (texture->IsLoaded())
+				//			component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Diffuse);
+				//		else
+				//			HNB_WARN("Could not load texture {0}", texturePath.filename().string());
+				//	}
+				//	ImGui::EndDragDropTarget();
+				//}
 
-				ImGui::SameLine();
-				if (ImGui::Button("ReSet Diffuse"))
-				{
-					component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Diffuse);
-				}
+				//ImGui::SameLine();
+				//if (ImGui::Button("ReSet Diffuse"))
+				//{
+				//	component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Diffuse);
+				//}
 
-				//Specular
-				ImGui::Text("Specular");
-				if (specular)
-				{
-					ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-				}
-				else
-				{
-					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-					ImGui::PopItemFlag();
-					ImGui::PopStyleColor();
-				}
+				////Specular
+				//ImGui::Text("Specular");
+				//if (specular)
+				//{
+				//	ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+				//}
+				//else
+				//{
+				//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				//	ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+				//	ImGui::PopItemFlag();
+				//	ImGui::PopStyleColor();
+				//}
 
-				if (ImGui::BeginDragDropTarget())
-				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-					{
-						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath(path);
-						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-						if (texture->IsLoaded())
-							component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Specular);
-						else
-							HNB_WARN("Could not load texture {0}", texturePath.filename().string());
-					}
-					ImGui::EndDragDropTarget();
-				}
+				//if (ImGui::BeginDragDropTarget())
+				//{
+				//	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				//	{
+				//		const wchar_t* path = (const wchar_t*)payload->Data;
+				//		std::filesystem::path texturePath(path);
+				//		Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+				//		if (texture->IsLoaded())
+				//			component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Specular);
+				//		else
+				//			HNB_WARN("Could not load texture {0}", texturePath.filename().string());
+				//	}
+				//	ImGui::EndDragDropTarget();
+				//}
 
-				ImGui::SameLine();
-				if (ImGui::Button("ReSet Specular"))
-				{
-					component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Specular);
-				}
+				//ImGui::SameLine();
+				//if (ImGui::Button("ReSet Specular"))
+				//{
+				//	component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Specular);
+				//}
 			});
 
 		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)

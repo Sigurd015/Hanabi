@@ -84,16 +84,14 @@ namespace Hanabi
 		SpriteRendererComponent(const glm::vec4& color) : Color(color) {}
 	};
 
-	struct StaticMeshComponent
+	struct MeshComponent
 	{
-		//TEMP
-		enum class StaticMeshType { None = 0, Cube, Capsule, Sphere };
-		StaticMeshType Type = StaticMeshType::None;
-		Ref<StaticMesh> Mesh;
+		//TODO: 
+		Ref<Mesh> Mesh;
 		Ref<Material> Material;
 
-		StaticMeshComponent() = default;
-		StaticMeshComponent(const StaticMeshComponent&) = default;
+		MeshComponent() = default;
+		MeshComponent(const MeshComponent&) = default;
 	};
 
 	struct ScriptComponent
@@ -170,7 +168,7 @@ namespace Hanabi
 	using AllComponents =
 		ComponentGroup<
 		TransformComponent, SpriteRendererComponent, CircleRendererComponent,
-		StaticMeshComponent,
+		MeshComponent,
 		CameraComponent,
 		ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent,

@@ -207,6 +207,9 @@ namespace Hanabi
 			return;
 		}
 
+		if (width == m_Specification.Width && height == m_Specification.Height)
+			return;
+
 		m_Specification.Width = width;
 		m_Specification.Height = height;
 

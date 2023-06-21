@@ -22,13 +22,12 @@ namespace Hanabi
 		virtual void Init() = 0;
 		virtual void SetClearColor(const glm::vec4& color) = 0;
 		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
-		virtual void ResetToSwapChain() = 0;
 
-		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass) = 0;
+		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear) = 0;
 		virtual void EndRenderPass(const Ref<RenderPass>& renderPass) = 0;
 
-		virtual void SubmitStaticMesh(const Ref<StaticMesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline) = 0;
-		
+		virtual void SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform) = 0;
+
 		virtual void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 			const Ref<Pipeline>& pipeline, uint32_t indexCount) = 0;
 		virtual void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount) = 0;

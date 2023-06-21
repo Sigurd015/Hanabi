@@ -59,14 +59,8 @@ namespace Hanabi
 	{
 #pragma region Resize
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-
-		if (Hanabi::FramebufferSpecification spec = m_TargetFramebuffer->GetSpecification();
-			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
-			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
-		{
-			m_TargetFramebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-		}
+		m_TargetFramebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 #pragma endregion
 
 		Renderer::BeginRenderPass(m_TargetRenderPass);
@@ -139,7 +133,6 @@ namespace Hanabi
 		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background and handle the pass-thru hole, so we ask Begin() to not render a background.
 		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
 			window_flags |= ImGuiWindowFlags_NoBackground;
-#pragma endregion	
 
 		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
 		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive, 
@@ -164,6 +157,7 @@ namespace Hanabi
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
 		style.WindowMinSize.x = minWinSizeX;
+#pragma endregion	
 
 #pragma region Menu Bar	
 		if (ImGui::BeginMenuBar())

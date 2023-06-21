@@ -11,25 +11,24 @@ namespace Hanabi
 	class Renderer2D
 	{
 	public:
-		void Init();
-		void Shutdown();
+		static void Init();
+		static void Shutdown();
+		static void BeginScene(const glm::mat4& viewProjection);
+		static void EndScene();
 
-		void Renderer2D::SetViewProjection(const glm::mat4& viewProjection);
-		void Flush();
+		static Ref<RenderPass> GetTargetRenderPass();
+		static void SetTargetRenderPass(const Ref<RenderPass>& renderPass);
 
-		Ref<RenderPass> GetTargetRenderPass();
-		void SetTargetRenderPass(const Ref<RenderPass>& renderPass);
-
-		void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
-		void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
-			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
-		void DrawCircle(const glm::mat4& transform, const glm::vec4& color,
-			float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
-		void DrawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entityID = -1);
-		void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
-		void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
-		float GetLineWidth();
-		void SetLineWidth(float width);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
+			static 	const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
+		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color,
+			static 	float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
+		static void DrawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entityID = -1);
+		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
+		static void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+		static float GetLineWidth();
+		static void SetLineWidth(float width);
 
 		struct TextParams
 		{
@@ -37,8 +36,8 @@ namespace Hanabi
 			float Kerning = 0.0f;
 			float LineSpacing = 0.0f;
 		};
-		void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams, int entityID = -1);
-		void DrawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entityID = -1);
+		static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams, int entityID = -1);
+		static void DrawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entityID = -1);
 
 		struct Statistics
 		{
@@ -53,119 +52,11 @@ namespace Hanabi
 		static void ResetStats();
 		static Statistics GetStats();
 	private:
-		float GetTextureID(const Ref<Texture2D>& texture);
-		void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color,
+		static float GetTextureID(const Ref<Texture2D>& texture);
+		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color,
 			int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor);
-		void StartBatch();
-		void NextBatch();
-
-		struct QuadVertex
-		{
-			glm::vec3 Position;
-			glm::vec4 Color;
-			glm::vec2 TexCoord;
-			int TexIndex;
-			float TilingFactor;
-
-			// Editor-only
-			int EntityID;
-		};
-
-		struct CircleVertex
-		{
-			glm::vec3 WorldPosition;
-			glm::vec3 LocalPosition;
-			glm::vec4 Color;
-			float Thickness;
-			float Fade;
-
-			// Editor-only
-			int EntityID;
-		};
-
-		struct LineVertex
-		{
-			glm::vec3 Position;
-			glm::vec4 Color;
-
-			// Editor-only
-			int EntityID;
-		};
-
-		struct TextVertex
-		{
-			glm::vec3 Position;
-			glm::vec4 Color;
-			glm::vec2 TexCoord;
-
-			// TODO: bg color for outline/bg
-
-			// Editor-only
-			int EntityID;
-		};
-
-		struct Renderer2DData
-		{
-			static const uint32_t MaxQuads = 10000;
-			static const uint32_t MaxVertices = MaxQuads * 4;
-			static const uint32_t MaxIndices = MaxQuads * 6;
-			static const uint32_t MaxTextureSlots = 32;
-
-			Ref<Pipeline> QuadPipeline;
-			Ref<VertexBuffer> QuadVertexBuffer;
-			Ref<IndexBuffer> QuadIndexBuffer;
-			Ref<Material> QuadMaterial;
-			uint32_t QuadIndexCount = 0;
-			QuadVertex* QuadVertexBufferBase = nullptr;
-			QuadVertex* QuadVertexBufferPtr = nullptr;
-
-			Ref<Pipeline> CirclePipeline;
-			Ref<VertexBuffer> CircleVertexBuffer;
-			Ref<IndexBuffer> CircleIndexBuffer;
-			Ref<Material> CircleMaterial;
-			uint32_t CircleIndexCount = 0;
-			CircleVertex* CircleVertexBufferBase = nullptr;
-			CircleVertex* CircleVertexBufferPtr = nullptr;
-
-			Ref<Pipeline> LinePipeline;
-			Ref<VertexBuffer> LineVertexBuffer;
-			Ref<Material> LineMaterial;
-			uint32_t LineVertexCount = 0;
-			LineVertex* LineVertexBufferBase = nullptr;
-			LineVertex* LineVertexBufferPtr = nullptr;
-			float LineWidth = 2.0f;
-
-			Ref<Pipeline> TextPipeline;
-			Ref<VertexBuffer> TextVertexBuffer;
-			Ref<IndexBuffer> TextIndexBuffer;
-			Ref<Material> TextMaterial;
-			uint32_t TextIndexCount = 0;
-			TextVertex* TextVertexBufferBase = nullptr;
-			TextVertex* TextVertexBufferPtr = nullptr;
-
-			std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;// 0 is white texture
-			uint32_t TextureSlotIndex = 1;
-			Ref<Texture2D> FontAtlasTexture;
-			Ref<Texture2D> WhiteTexture;
-
-			glm::vec4 QuadVertexPositions[4] =
-			{ { -0.5f, -0.5f, 0.0f, 1.0f },
-			  {  0.5f, -0.5f, 0.0f, 1.0f },
-			  {  0.5f,  0.5f, 0.0f, 1.0f },
-			  { -0.5f,  0.5f, 0.0f, 1.0f } };
-			glm::vec2 QuadTexCoord[4] =
-			{ { 0.0f, 0.0f },
-			  { 1.0f, 0.0f },
-			  { 1.0f, 1.0f },
-			  { 0.0f, 1.0f } };
-
-			struct CameraData
-			{
-				glm::mat4 ViewProjection;
-			};
-			CameraData CameraBuffer;
-			Ref<ConstantBuffer> CameraConstantBuffer;
-		};
-		Renderer2DData m_Data;
+		static void StartBatch();
+		static void Flush();
+		static void NextBatch();
 	};
 }

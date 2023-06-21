@@ -13,7 +13,7 @@ namespace Hanabi
 	{
 		glm::vec3 Position;
 		glm::vec3 Normal;
-		glm::vec3 Texcoord;
+		glm::vec2 TexCoord;
 	};
 
 	struct Index
@@ -21,21 +21,34 @@ namespace Hanabi
 		uint32_t V1, V2, V3;
 	};
 
-	class StaticMesh
+	class MeshSource
 	{
 	public:
-		StaticMesh(const std::string& filename);
-		StaticMesh(std::vector<Vertex>& vertices, std::vector<Index>& indices);
-		~StaticMesh() = default;
+		MeshSource(const std::string& filename);
+		MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices);
 
-		void SetMaterial(const Ref<Material>& material) { m_Material = material; }
-		
+		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
+		const std::vector<Index>& GetIndices() const { return m_Indices; }
+	private:
+		std::vector<Vertex> m_Vertices;
+		std::vector<Index> m_Indices;
+	};
+
+	class Mesh
+	{
+	public:		
+		Mesh(Ref<MeshSource> source);
+		~Mesh() = default;
+
+		void Update(const glm::mat4& transform);
+
 		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
 		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
-		Ref<Material> GetMaterial() { return m_Material; }
 	private:	
+		std::vector<Vertex> m_Vertices;
+		std::vector<Index> m_Indices;
+
 		Ref<VertexBuffer> m_VertexBuffer;
 		Ref<IndexBuffer> m_IndexBuffer;
-		Ref<Material> m_Material;
 	};
 }
