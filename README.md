@@ -21,6 +21,18 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] DirectX 12
   - [ ] Metal
 
+- [x] Application Framework
+  - [x] Entry point
+  - [x] Logging
+  - [x] Change rendering API by command line args
+  - [x] Event system
+  - [x] Scene Serialize & Deserialize
+
+- [ ] Editor  
+  - [x] Play in editor
+  - [ ] .....
+
+
 ## Dependencies
 - [glfw](https://github.com/glfw/glfw)
 - [glad](https://github.com/Dav1dde/glad)
@@ -46,11 +58,20 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [ ] UI Renderer
 - [ ] Asset Manager
 - [ ] 3D Renderer
-  - [ ] Material System
   - [ ] Mesh System
+  - [ ] Material System
+  - [ ] Lighting (directional/point lights)
   - [ ] Physically based rendering (PBR)
   - [ ] Skyboxes
   - [ ] Shadow mapping
+    - [ ] Directional light shadows
+    - [ ] Point light shadows
+  - [ ] Screen space ambient occulsion
+  - [ ] Screen space reflection
+  - [ ] Deferred rendering
+  - [ ] Ray/Path tracing
+    - [ ] Vulkan & DX12
+- [ ] Metal support
 
 ## Getting Started
 

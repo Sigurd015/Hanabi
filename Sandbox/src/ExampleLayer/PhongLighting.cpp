@@ -53,13 +53,8 @@ void PhongLighting::OnDetach()
 void PhongLighting::OnUpdate(Hanabi::Timestep ts)
 {
 	// Resize
-	if (Hanabi::FramebufferSpecification spec = m_Framebuffer->GetSpecification();
-		m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
-		(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
-	{
-		m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_Camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-	}
+	m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+	m_Camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
 	m_Camera.OnUpdate(ts);
 	m_SceneData->ViewProj = m_Camera.GetViewProjection();
