@@ -13,7 +13,7 @@ namespace Hanabi
 	{
 		Ref<ShaderLibrary> ShaderLibrary;
 
-		RenderCommandQueue* s_CommandQueue;
+		RenderCommandQueue* CommandQueue;
 
 		std::unordered_map<std::string, Ref<Texture2D>> Textures;
 		std::unordered_map<std::string, Ref<Mesh>> Meshes;
@@ -24,7 +24,7 @@ namespace Hanabi
 	void Renderer::Init()
 	{
 		s_Data = new RendererData();
-		s_Data->s_CommandQueue = new RenderCommandQueue();
+		s_Data->CommandQueue = new RenderCommandQueue();
 		s_RendererAPI = RendererAPI::Create();
 		s_RendererAPI->Init();
 
@@ -110,12 +110,12 @@ namespace Hanabi
 
 	void Renderer::WaitAndRender()
 	{
-		s_Data->s_CommandQueue->Execute();
+		s_Data->CommandQueue->Execute();
 	}
 
 	RenderCommandQueue& Renderer::GetRenderCommandQueue()
 	{
-		return *s_Data->s_CommandQueue;
+		return *s_Data->CommandQueue;
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)

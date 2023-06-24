@@ -3,12 +3,18 @@
 
 struct SceneData
 {
-	glm::mat4 ViewProj;
+	glm::mat4 ViewProj;     //64 bytes
+	glm::vec3 CameraPosition;  //12 bytes
+
+	float AmbientIntensity;  //4 bytes
+	glm::vec3 AmbientColor;  //12 bytes
 
 	// DirectionalLight
-	glm::vec4 AmbientColor;
-	glm::vec3 Direction;
-	float Padding;
+	float DirectionalLightIntensity;  //4 bytes
+	glm::vec3 DirectionalLightDirection;  //16 bytes
+	glm::vec3 DirectionalLightColor;  //12 bytes
+
+	float padding[2];  //8 bytes
 };
 
 class PhongLighting :public Hanabi::Layer

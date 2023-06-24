@@ -39,10 +39,14 @@ void PhongLighting::OnAttach()
 	m_SceneDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(SceneData), 0);
 
 	m_SceneData = new SceneData();
-	m_SceneData->AmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
-	m_SceneData->Direction = { 0.0f, 0.0f, 0.0f };
-	m_Pipeline->SetConstantBuffer(m_SceneDataBuffer);
+	m_SceneData->AmbientColor = { 0.3f, 0.3f, 0.3f};
+	m_SceneData->AmbientIntensity = 1.0f;
+	m_SceneData->DirectionalLightDirection = { 1.0f, 0, 0 };
+	m_SceneData->DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
+	m_SceneData->DirectionalLightIntensity = 1.0f;
 
+	m_Pipeline->SetConstantBuffer(m_SceneDataBuffer);
+	HNB_INFO("SceneData Size: {0}", sizeof(SceneData));
 	Hanabi::Ref<Hanabi::ConstantBuffer> constantBuffer = Hanabi::ConstantBuffer::Create(sizeof(glm::mat4), 1);
 	m_Pipeline->SetConstantBuffer(constantBuffer);
 }
@@ -58,6 +62,7 @@ void PhongLighting::OnUpdate(Hanabi::Timestep ts)
 
 	m_Camera.OnUpdate(ts);
 	m_SceneData->ViewProj = m_Camera.GetViewProjection();
+	m_SceneData->CameraPosition = m_Camera.GetPosition();
 	m_SceneDataBuffer->SetData(m_SceneData);
 
 	Hanabi::Renderer::BeginRenderPass(m_RenderPass);
@@ -152,12 +157,29 @@ void PhongLighting::UI_Tool()
 	{
 		if (ImGui::Button("Reset"))
 		{
-			m_SceneData->AmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+			m_SceneData->AmbientColor = { 0.3f, 0.3f, 0.3f };
+			m_SceneData->AmbientIntensity = 1.0f;
+			m_SceneData->DirectionalLightDirection = { 1.0f, 0, 0 };
+			m_SceneData->DirectionalLightColor = { 1.0f, 1.0f, 1.0f  };
+			m_SceneData->DirectionalLightIntensity = 1.0f;
 		}
-		ImGui::DragFloat("##X", &m_SceneData->AmbientColor.x, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##Y", &m_SceneData->AmbientColor.y, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##Z", &m_SceneData->AmbientColor.z, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##W", &m_SceneData->AmbientColor.w, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::Text("Ambient Color");
+		ImGui::DragFloat("##AmbientColorX", &m_SceneData->AmbientColor.x, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##AmbientColorY", &m_SceneData->AmbientColor.y, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##AmbientColorZ", &m_SceneData->AmbientColor.z, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::Text("AmbientColor Intensity");
+		ImGui::DragFloat("##AmbientColorIntensity", &m_SceneData->AmbientIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
+
+		ImGui::Text("Directional Light Direction");
+		ImGui::DragFloat("##DirectionalLightDirX", &m_SceneData->DirectionalLightDirection.x, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightDirY", &m_SceneData->DirectionalLightDirection.y, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightDirZ", &m_SceneData->DirectionalLightDirection.z, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::Text("Directional Light Color");
+		ImGui::DragFloat("##DirectionalLightColorX", &m_SceneData->DirectionalLightColor.x, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightColorY", &m_SceneData->DirectionalLightColor.y, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightColorZ", &m_SceneData->DirectionalLightColor.z, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::Text("Directional Light Intensity");
+		ImGui::DragFloat("##DirectionalLightIntensity", &m_SceneData->DirectionalLightIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
 	}
 	ImGui::End();
 }

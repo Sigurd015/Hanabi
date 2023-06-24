@@ -44,11 +44,6 @@ namespace Hanabi
 		return { xFactor, yFactor };
 	}
 
-	float EditorCamera::RotationSpeed() const
-	{
-		return 0.8f;
-	}
-
 	float EditorCamera::ZoomSpeed() const
 	{
 		float distance = m_Distance * 0.2f;
@@ -72,6 +67,28 @@ namespace Hanabi
 				MouseRotate(delta);
 			else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
 				MouseZoom(delta.y);
+		}
+		else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
+		{
+			if (Input::IsKeyPressed(Key::W))
+				m_FocalPoint += GetForwardDirection() * m_MoveSpeed * 0.05f;
+			if (Input::IsKeyPressed(Key::S))
+				m_FocalPoint -= GetForwardDirection() * m_MoveSpeed * 0.05f;
+			if (Input::IsKeyPressed(Key::A))
+				m_FocalPoint -= GetRightDirection() * m_MoveSpeed * 0.05f;
+			if (Input::IsKeyPressed(Key::D))
+				m_FocalPoint += GetRightDirection() * m_MoveSpeed * 0.05f;
+			if (Input::IsKeyPressed(Key::Q))
+				m_FocalPoint += GetUpDirection() * m_MoveSpeed * 0.05f;
+			if (Input::IsKeyPressed(Key::E))
+				m_FocalPoint -= GetUpDirection() * m_MoveSpeed * 0.05f;
+
+			const glm::vec2& mouse = Input::GetMousePosition();
+			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+			m_InitialMousePosition = mouse;
+
+			if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
+				MouseRotate(delta);
 		}
 
 		UpdateView();
@@ -111,8 +128,8 @@ namespace Hanabi
 	void EditorCamera::MouseRotate(const glm::vec2& delta)
 	{
 		float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
-		m_Yaw += yawSign * delta.x * RotationSpeed();
-		m_Pitch += delta.y * RotationSpeed();
+		m_Yaw += yawSign * delta.x * m_RotationSpeed;
+		m_Pitch += delta.y * m_RotationSpeed;
 	}
 
 	void EditorCamera::MouseZoom(float delta)

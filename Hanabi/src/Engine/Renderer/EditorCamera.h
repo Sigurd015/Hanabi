@@ -46,7 +46,6 @@ namespace Hanabi
 		glm::vec3 CalculatePosition() const;
 
 		std::pair<float, float> PanSpeed() const;
-		float RotationSpeed() const;
 		float ZoomSpeed() const;
 	private:
 		float m_FOV = 45.0f, m_AspectRatio = 1.778f, m_NearClip = 0.1f, m_FarClip = 1000.0f;
@@ -59,6 +58,7 @@ namespace Hanabi
 
 		float m_Distance = 10.0f;
 		float m_Pitch = 0.0f, m_Yaw = 0.0f;
+		float m_RotationSpeed = 0.8f, m_MoveSpeed = 1.5f;
 
 		float m_ViewportWidth = 1280, m_ViewportHeight = 720;
 	};
