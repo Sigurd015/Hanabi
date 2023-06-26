@@ -88,7 +88,7 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, int modelCBBingID)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, uint32_t modelCBBingID)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(modelCBBingID);

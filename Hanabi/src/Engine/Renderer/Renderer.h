@@ -17,8 +17,6 @@ namespace Hanabi
 		static void SetClearColor(const glm::vec4& color);
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
-		static void ResetToSwapChain();
-
 		static void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear = true);
 		static void EndRenderPass(const Ref<RenderPass>& renderPass);
 
@@ -40,7 +38,7 @@ namespace Hanabi
 		}
 
 		//3D Objects
-		static void SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, int modelCBBingID = 0);
+		static void SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, uint32_t modelCBBingID = 0);
 
 		//2D Objects
 		static void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,

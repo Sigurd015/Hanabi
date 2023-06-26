@@ -212,6 +212,7 @@ namespace Hanabi
 
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
+		glm::vec3 cameraPos;
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
 		for (auto entity : view)
 		{
@@ -221,14 +222,17 @@ namespace Hanabi
 			{
 				mainCamera = &camera.Camera;
 				cameraTransform = transform.GetTransform();
+				cameraPos = transform.Translation;
 				break;
 			}
 		}
 
 		if (mainCamera)
 		{
+			// TODO: Lights 
 			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
-			SceneRenderer::BeginScene(viewProjection);
+			Environment sceneEnvironment = { cameraPos,viewProjection };
+			SceneRenderer::BeginScene(sceneEnvironment);
 
 			// Draw 3D Objects
 			{
@@ -289,7 +293,9 @@ namespace Hanabi
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender)
 	{
-		SceneRenderer::BeginScene(camera.GetViewProjection());
+		// TODO: Lights 
+		Environment sceneEnvironment = { camera.GetPosition(),camera.GetViewProjection() };
+		SceneRenderer::BeginScene(sceneEnvironment);
 
 		// Draw 3D Objects
 		{

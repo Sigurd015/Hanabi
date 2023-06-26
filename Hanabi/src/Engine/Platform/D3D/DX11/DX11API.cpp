@@ -98,7 +98,7 @@ namespace Hanabi
 		ResetToSwapChain();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, int modelCBBingID)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, uint32_t modelCBBingID)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();

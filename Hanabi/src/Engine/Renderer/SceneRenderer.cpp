@@ -6,20 +6,65 @@
 
 namespace Hanabi
 {
+	enum CBBingdID : uint32_t
+	{
+		MODEL = 0,
+		CAMERA = 1,
+		SCENE = 2,
+		POINT_LIGHT = 3,
+		SPOT_LIGHT = 4
+	};
+
 	struct SceneRendererData
 	{
-		struct SceneData
+		struct CBCamera
 		{
-			glm::mat4 ViewProjection;
+			glm::mat4 ViewProj;
+			glm::vec3 CameraPosition;
 
-			// DirectionalLight
-			glm::vec4 AmbientColor;
-			glm::vec3 Direction;
-			float Padding;
+			// Padding
+			float padding;
 		};
-		SceneData SceneBuffer;
-		Ref<ConstantBuffer> SceneConstantBuffer;
-		Ref<ConstantBuffer> ModelTransformConstantBuffer;
+
+		struct CBModel
+		{
+			glm::mat4 Transform;
+		};
+
+		struct CBScene
+		{
+			DirectionalLight Light;
+		};
+
+		struct CBPointLight
+		{
+			PointLight PointLights[MAX_POINT_LIGHT]{};
+			uint32_t Count{ 0 };
+
+			// Padding
+			float padding[3];
+		};
+
+		struct CBSpotLight
+		{
+			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
+			uint32_t Count{ 0 };
+
+			// Padding
+			float padding[3];
+		};
+
+		CBCamera CameraData;
+		CBModel ModelData;
+		CBScene SceneData;
+		CBPointLight PointLightData;
+		CBSpotLight SpotLightData;
+
+		Hanabi::Ref<Hanabi::ConstantBuffer> ModelDataBuffer;
+		Hanabi::Ref<Hanabi::ConstantBuffer> CameraDataBuffer;
+		Hanabi::Ref<Hanabi::ConstantBuffer> SceneDataBuffer;
+		Hanabi::Ref<Hanabi::ConstantBuffer> PointLightDataBuffer;
+		Hanabi::Ref<Hanabi::ConstantBuffer> SpotLightDataBuffer;
 
 		Ref<RenderPass> GeoPass;
 
@@ -28,15 +73,18 @@ namespace Hanabi
 	};
 	static SceneRendererData* s_Data;
 
-
 	void SceneRenderer::Init()
 	{
 		s_Data = new SceneRendererData();
-		s_Data->SceneConstantBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::SceneData), 0);
-		s_Data->ModelTransformConstantBuffer = ConstantBuffer::Create(sizeof(glm::mat4), 1); // 1 is the model transform slot by default
+
+		s_Data->ModelDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBModel), CBBingdID::MODEL);
+		s_Data->CameraDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBCamera), CBBingdID::CAMERA);
+		s_Data->SceneDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBScene), CBBingdID::SCENE);
+		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight), CBBingdID::POINT_LIGHT);
+		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight), CBBingdID::SPOT_LIGHT);
 
 		FramebufferSpecification geoFramebufferSpec;
-		geoFramebufferSpec.Attachments = { FramebufferTextureFormat::RGBA8F };
+		geoFramebufferSpec.Attachments = { FramebufferTextureFormat::RGBA8F,FramebufferTextureFormat::Depth };
 		geoFramebufferSpec.Width = 1920;
 		geoFramebufferSpec.Height = 1080;
 		RenderPassSpecification geoRenderPassSpec;
@@ -58,8 +106,12 @@ namespace Hanabi
 		spec.Topology = PrimitiveTopology::Triangles;
 		s_Data->m_DefaultPipeline = Pipeline::Create(spec);
 
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->SceneConstantBuffer);
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->ModelTransformConstantBuffer);
+		// Dont change the order of the constant buffers, this order is mathcing the binding order in the shader
+		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->ModelDataBuffer);
+		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->CameraDataBuffer);
+		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->SceneDataBuffer);
+		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->PointLightDataBuffer);
+		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->SpotLightDataBuffer);
 	}
 
 	void SceneRenderer::Shutdown()
@@ -76,24 +128,44 @@ namespace Hanabi
 		}
 	}
 
-	void SceneRenderer::BeginScene(const glm::mat4& viewProjection)
+	void SceneRenderer::BeginScene(const Environment& environment)
 	{
-		s_Data->SceneBuffer.ViewProjection = viewProjection;
+		s_Data->CameraData.ViewProj = environment.ViewProjection;
+		s_Data->CameraData.CameraPosition = environment.CameraPosition;
+		s_Data->CameraDataBuffer->SetData(&s_Data->CameraData);
 
-		//TODO: Temp
-		s_Data->SceneBuffer.AmbientColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f);
-		s_Data->SceneBuffer.Direction = glm::vec3(0.0f, 0.0f, 0.0f);
+		s_Data->SceneData.Light = environment.DirLight;
+		s_Data->SceneDataBuffer->SetData(&s_Data->SceneData);
 
-		s_Data->SceneConstantBuffer->SetData(&s_Data->SceneBuffer);
+		s_Data->PointLightData.Count = environment.PointLightCount;
+		for (uint32_t i = 0; i < environment.PointLightCount; i++)
+		{
+			s_Data->PointLightData.PointLights[i] = environment.PointLights[i];
+		}
+		s_Data->PointLightDataBuffer->SetData(&s_Data->PointLightData);
+
+		s_Data->SpotLightData.Count = environment.SpotLightCount;
+		for (uint32_t i = 0; i < environment.SpotLightCount; i++)
+		{
+			s_Data->SpotLightData.SpotLights[i] = environment.SpotLights[i];
+		}
+		s_Data->SpotLightDataBuffer->SetData(&s_Data->SpotLightData);
+
+		Renderer::BeginRenderPass(s_Data->GeoPass);
 	}
 
 	void SceneRenderer::EndScene()
 	{
+		Renderer::EndRenderPass(s_Data->GeoPass);
+	}
 
+	Ref<Framebuffer> SceneRenderer::GetFinalResult()
+	{
+		return s_Data->GeoPass->GetSpecification().TargetFramebuffer;
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID)
 	{
-		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterial, s_Data->m_DefaultPipeline, transform);
+		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterial, s_Data->m_DefaultPipeline, transform,CBBingdID::MODEL);
 	}
 }
