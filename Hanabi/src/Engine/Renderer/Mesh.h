@@ -40,8 +40,6 @@ namespace Hanabi
 		Mesh(Ref<MeshSource> source);
 		~Mesh() = default;
 
-		void Update(const glm::mat4& transform);
-
 		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
 		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
 	private:	

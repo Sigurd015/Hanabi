@@ -59,19 +59,47 @@ namespace Hanabi
 	std::unordered_map<ShaderType, std::string> DX11Shader::PreProcess(const std::string& source)
 	{
 		std::unordered_map<ShaderType, std::string> shaderSources;
-		const char* typeToken = "#type:";
-		size_t typeTokenLength = strlen(typeToken);
-		size_t pos = source.find(typeToken, 0); //Start of shader type declaration line
-		while (pos != std::string::npos)
+
+		// Split shader source code into shader type strings
 		{
-			size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
-			size_t begin = pos + typeTokenLength; //Start of shader type name (after "#type:" keyword)
-			std::string type = source.substr(begin, eol - begin);
-			size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
-			pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line
-			shaderSources[ShaderTypeFromString(type)] =
-				(pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+			const char* typeToken = "#type:";
+			size_t typeTokenLength = strlen(typeToken);
+			size_t pos = source.find(typeToken, 0); //Start of shader type declaration line
+			while (pos != std::string::npos)
+			{
+				size_t eol = source.find_first_of("\r\n", pos); //End of shader type declaration line
+				size_t begin = pos + typeTokenLength; //Start of shader type name (after "#type:" keyword)
+				std::string type = source.substr(begin, eol - begin);
+				size_t nextLinePos = source.find_first_not_of("\r\n", eol); //Start of shader code after shader type declaration line
+				pos = source.find(typeToken, nextLinePos); //Start of next shader type declaration line
+				shaderSources[ShaderTypeFromString(type)] =
+					(pos == std::string::npos) ? source.substr(nextLinePos) : source.substr(nextLinePos, pos - nextLinePos);
+			}
 		}
+
+		// Handle #include directives
+		{
+			const char* includeToken = "#include \"";
+			const char* fileType = ".hlsl\"";
+			size_t includeTokenLength = strlen(includeToken);
+			size_t fileTypeLength = strlen(fileType);
+			for (auto& code : shaderSources)
+			{
+				size_t pos = code.second.find(includeToken, 0);
+
+				while (pos != std::string::npos)
+				{
+					size_t eol = code.second.find_first_of("\r\n", pos);
+					size_t begin = pos + includeTokenLength;
+					std::string fileName = code.second.substr(begin, eol - begin - fileTypeLength);
+					size_t nextLinePos = code.second.find_first_not_of("\r\n", eol);
+					std::string includeSource = ReadFile("assets/shaders/DX11/include/" + fileName + ".hlsl");
+					code.second.replace(pos, eol - pos, includeSource);
+					pos = code.second.find(includeToken, nextLinePos);
+				}
+			}
+		}
+
 		return shaderSources;
 	}
 

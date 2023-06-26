@@ -98,11 +98,11 @@ namespace Hanabi
 		ResetToSwapChain();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, int modelCBBingID)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
-		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(1);// 1 is the slot for the transform ConstantBuffer by default
+		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(modelCBBingID);
 		transformBuffer->SetData(&transform);
 		pipeline->Bind();
 		material->Bind();

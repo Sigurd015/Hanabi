@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 
 PhongLighting::PhongLighting() :Layer("PhongLighting")
@@ -36,19 +37,48 @@ void PhongLighting::OnAttach()
 	m_Material->SetTexture(m_DiffuseTexture, 0); // 0 is Diffuse slot by default
 	m_Material->SetTexture(m_SpecularTexture, 1); // 1 is Specular slot by default
 
-	m_SceneDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(SceneData), 0);
+	HNB_INFO("CBModelData Size: {0}", sizeof(CBModel));
+	HNB_INFO("CBCameraData Size: {0}", sizeof(CBCamera));
+	HNB_INFO("CBSceneData Size: {0}", sizeof(CBScene));
+	HNB_INFO("CBPointLightData Size: {0}", sizeof(CBPointLight));
+	HNB_INFO("CBSpotLightData Size: {0}", sizeof(CBSpotLight));
 
-	m_SceneData = new SceneData();
-	m_SceneData->AmbientColor = { 0.3f, 0.3f, 0.3f};
-	m_SceneData->AmbientIntensity = 1.0f;
-	m_SceneData->DirectionalLightDirection = { 1.0f, 0, 0 };
-	m_SceneData->DirectionalLightColor = { 1.0f, 1.0f, 1.0f };
-	m_SceneData->DirectionalLightIntensity = 1.0f;
+	m_ModelDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(CBModel), CBBingdID::MODEL);
+	m_CameraDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(CBCamera), CBBingdID::CAMERA);
+	m_SceneDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(CBScene), CBBingdID::SCENE);
+	m_PointLightDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(CBPointLight), CBBingdID::POINT_LIGHT);
+	m_SpotLightDataBuffer = Hanabi::ConstantBuffer::Create(sizeof(CBSpotLight), CBBingdID::SPOT_LIGHT);
 
+	{
+		for (size_t i = 0; i < MAX_POINT_LIGHT; i++)
+		{
+			m_PointLightData.PointLights[i].Constant = 1.0f;
+			m_PointLightData.PointLights[i].Exp = 0.045f;
+			m_PointLightData.PointLights[i].Linear = 0.0075f;
+			m_PointLightData.PointLights[i].Color = { 1.0f, 1.0f, 1.0f };
+			m_PointLightData.PointLights[i].Intensity = 1.0f;
+			m_PointLightData.PointLights[i].Position = { 0.0f, 0.0f, 0.0f };
+		}
+	}
+
+	{
+		for (size_t i = 0; i < MAX_SPOT_LIGHT; i++)
+		{
+			m_SpotLightData.SpotLights[i].Color = { 1.0f, 1.0f, 1.0f };
+			m_SpotLightData.SpotLights[i].Intensity = 1.0f;
+			m_SpotLightData.SpotLights[i].Constant = 1.0f;
+			m_SpotLightData.SpotLights[i].Exp = 0.045f;
+			m_SpotLightData.SpotLights[i].Linear = 0.0075f;
+			m_SpotLightData.SpotLights[i].Cutoff = 0.8f;
+			m_SpotLightData.SpotLights[i].Direction = { 0.0f, 0.0f, 1.0f };
+		}
+	}
+
+	m_Pipeline->SetConstantBuffer(m_ModelDataBuffer);
+	m_Pipeline->SetConstantBuffer(m_CameraDataBuffer);
 	m_Pipeline->SetConstantBuffer(m_SceneDataBuffer);
-	HNB_INFO("SceneData Size: {0}", sizeof(SceneData));
-	Hanabi::Ref<Hanabi::ConstantBuffer> constantBuffer = Hanabi::ConstantBuffer::Create(sizeof(glm::mat4), 1);
-	m_Pipeline->SetConstantBuffer(constantBuffer);
+	m_Pipeline->SetConstantBuffer(m_PointLightDataBuffer);
+	m_Pipeline->SetConstantBuffer(m_SpotLightDataBuffer);
 }
 
 void PhongLighting::OnDetach()
@@ -61,9 +91,13 @@ void PhongLighting::OnUpdate(Hanabi::Timestep ts)
 	m_Camera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 
 	m_Camera.OnUpdate(ts);
-	m_SceneData->ViewProj = m_Camera.GetViewProjection();
-	m_SceneData->CameraPosition = m_Camera.GetPosition();
-	m_SceneDataBuffer->SetData(m_SceneData);
+	m_CameraData.ViewProj = m_Camera.GetViewProjection();
+	m_CameraData.CameraPosition = m_Camera.GetPosition();
+
+	m_CameraDataBuffer->SetData(&m_CameraData);
+	m_SceneDataBuffer->SetData(&m_SceneData);
+	m_PointLightDataBuffer->SetData(&m_PointLightData);
+	m_SpotLightDataBuffer->SetData(&m_SpotLightData);
 
 	Hanabi::Renderer::BeginRenderPass(m_RenderPass);
 
@@ -75,7 +109,7 @@ void PhongLighting::OnUpdate(Hanabi::Timestep ts)
 	{
 		float angle = i * angleIncrement;
 		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(radius * std::cos(angle), 0.0f, radius * std::sin(angle)));
-		Hanabi::Renderer::SubmitStaticMesh(m_Mesh, m_Material, m_Pipeline, trans);
+		Hanabi::Renderer::SubmitStaticMesh(m_Mesh, m_Material, m_Pipeline, trans, CBBingdID::MODEL);
 		//Hanabi::SceneRenderer::SubmitStaticMesh(m_Mesh, m_Material, trans);
 	}
 
@@ -155,31 +189,61 @@ void PhongLighting::UI_Tool()
 {
 	if (ImGui::Begin("Tools"))
 	{
-		if (ImGui::Button("Reset"))
-		{
-			m_SceneData->AmbientColor = { 0.3f, 0.3f, 0.3f };
-			m_SceneData->AmbientIntensity = 1.0f;
-			m_SceneData->DirectionalLightDirection = { 1.0f, 0, 0 };
-			m_SceneData->DirectionalLightColor = { 1.0f, 1.0f, 1.0f  };
-			m_SceneData->DirectionalLightIntensity = 1.0f;
-		}
-		ImGui::Text("Ambient Color");
-		ImGui::DragFloat("##AmbientColorX", &m_SceneData->AmbientColor.x, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##AmbientColorY", &m_SceneData->AmbientColor.y, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##AmbientColorZ", &m_SceneData->AmbientColor.z, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::Text("AmbientColor Intensity");
-		ImGui::DragFloat("##AmbientColorIntensity", &m_SceneData->AmbientIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
-
 		ImGui::Text("Directional Light Direction");
-		ImGui::DragFloat("##DirectionalLightDirX", &m_SceneData->DirectionalLightDirection.x, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##DirectionalLightDirY", &m_SceneData->DirectionalLightDirection.y, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##DirectionalLightDirZ", &m_SceneData->DirectionalLightDirection.z, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::Text("Directional Light Color");
-		ImGui::DragFloat("##DirectionalLightColorX", &m_SceneData->DirectionalLightColor.x, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##DirectionalLightColorY", &m_SceneData->DirectionalLightColor.y, 0.01f, 0.0f, 1.0f, "%.2f");
-		ImGui::DragFloat("##DirectionalLightColorZ", &m_SceneData->DirectionalLightColor.z, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightDirX", &m_SceneData.Light.Direction.x, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightDirY", &m_SceneData.Light.Direction.y, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightDirZ", &m_SceneData.Light.Direction.z, 0.01f, 0.0f, 1.0f, "%.2f");
 		ImGui::Text("Directional Light Intensity");
-		ImGui::DragFloat("##DirectionalLightIntensity", &m_SceneData->DirectionalLightIntensity, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::DragFloat("##DirectionalLightIntensity", &m_SceneData.Light.Intensity, 0.01f, 0.0f, 1.0f, "%.2f");
+		ImGui::Text("Directional Light Color");
+		ImGui::ColorEdit3("##DirectionalLightColor", glm::value_ptr(m_SceneData.Light.Color));
+
+		{
+			for (size_t i = 0; i < MAX_POINT_LIGHT; i++)
+			{
+				std::string positionLabel = "Point Light Position - " + std::to_string(i);
+				std::string intensityLabel = "Point Light Intensity - " + std::to_string(i);
+				std::string colorLabel = "Point Light Color - " + std::to_string(i);
+				std::string attenuationLabel = "Point Light Attenuation - " + std::to_string(i);
+
+				ImGui::Text(positionLabel.c_str());
+				ImGui::DragFloat(("##PointLightPosX" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Position.x, 0.01f, -10.0f, 10.0f, "%.2f");
+				ImGui::DragFloat(("##PointLightPosY" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Position.y, 0.01f, -10.0f, 10.0f, "%.2f");
+				ImGui::DragFloat(("##PointLightPosZ" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Position.z, 0.01f, -10.0f, 10.0f, "%.2f");
+				ImGui::Text(intensityLabel.c_str());
+				ImGui::DragFloat(("##PointLightIntensity" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Intensity, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::Text(colorLabel.c_str());
+				ImGui::ColorEdit3(("##PointLightColor" + std::to_string(i)).c_str(), glm::value_ptr(m_PointLightData.PointLights[i].Color));
+				ImGui::Text(attenuationLabel.c_str());
+				ImGui::DragFloat(("##PointLightAttenuationConstant" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Constant, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat(("##PointLightAttenuationExp" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Exp, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat(("##PointLightAttenuationLinear" + std::to_string(i)).c_str(), &m_PointLightData.PointLights[i].Linear, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::Separator();
+			}
+		}
+		{
+			for (size_t i = 0; i < MAX_SPOT_LIGHT; i++)
+			{
+				std::string positionLabel = "Spot Light Position - " + std::to_string(i);
+				std::string directionLabel = "Spot Light Direction - " + std::to_string(i);
+				std::string intensityLabel = "Spot Light Intensity - " + std::to_string(i);
+				std::string colorLabel = "Spot Light Color - " + std::to_string(i);
+
+				ImGui::Text(positionLabel.c_str());
+				ImGui::DragFloat(("##SpotLightPosX" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Position.x, 0.01f, -10.0f, 10.0f, "%.2f");
+				ImGui::DragFloat(("##SpotLightPosY" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Position.y, 0.01f, -10.0f, 10.0f, "%.2f");
+				ImGui::DragFloat(("##SpotLightPosZ" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Position.z, 0.01f, -10.0f, 10.0f, "%.2f");
+				ImGui::Text(directionLabel.c_str());
+				ImGui::DragFloat(("##SpotLightDirX" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Direction.x, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat(("##SpotLightDirY" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Direction.y, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::DragFloat(("##SpotLightDirZ" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Direction.z, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::Text(intensityLabel.c_str());
+				ImGui::DragFloat(("##SpotLightIntensity" + std::to_string(i)).c_str(), &m_SpotLightData.SpotLights[i].Intensity, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::Text(colorLabel.c_str());
+				ImGui::ColorEdit3(("##SpotLightColor" + std::to_string(i)).c_str(), glm::value_ptr(m_SpotLightData.SpotLights[i].Color));
+				ImGui::Separator();
+			}
+		}
 	}
 	ImGui::End();
 }

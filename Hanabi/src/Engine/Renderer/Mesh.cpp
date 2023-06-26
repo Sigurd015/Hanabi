@@ -63,16 +63,4 @@ namespace Hanabi
 
 		m_VertexBuffer->SetLayout(layout);
 	}
-
-	void Mesh::Update(const glm::mat4& transform)
-	{
-		//TODO: Why can't update vertices at CPU side? or is this function not correct?
-		//HNB_CORE_ASSERT(m_Vertices.size() != 0, "Vertices size cannot be 0");
-		//for (auto& vertex : m_Vertices)
-		//{
-		//	vertex.Position = transform * glm::vec4(vertex.Position, 1.0f);
-		//	vertex.Normal = transform * glm::vec4(vertex.Normal, 1.0f);
-		//}
-		//m_VertexBuffer->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex));
-	}
 }

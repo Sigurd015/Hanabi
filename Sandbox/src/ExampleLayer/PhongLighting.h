@@ -1,20 +1,90 @@
 #pragma once
 #include "Hanabi.h"
+#define MAX_POINT_LIGHT 2
+#define MAX_SPOT_LIGHT 2
 
-struct SceneData
+enum CBBingdID
 {
-	glm::mat4 ViewProj;     //64 bytes
-	glm::vec3 CameraPosition;  //12 bytes
+	MODEL = 0,
+	CAMERA = 1,
+	SCENE = 2,
+	POINT_LIGHT = 3,
+	SPOT_LIGHT = 4
+};
 
-	float AmbientIntensity;  //4 bytes
-	glm::vec3 AmbientColor;  //12 bytes
+struct DirectionalLight
+{
+	glm::vec3 Color = { 1.0f,1.0f,1.0f };
+	float Intensity = 1.0f;
+	glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
 
-	// DirectionalLight
-	float DirectionalLightIntensity;  //4 bytes
-	glm::vec3 DirectionalLightDirection;  //16 bytes
-	glm::vec3 DirectionalLightColor;  //12 bytes
+	// Padding
+	float padding;
+};
 
-	float padding[2];  //8 bytes
+struct PointLight
+{
+	glm::vec3 Color = { 1.0f,1.0f,1.0f };
+	float Intensity = 1.0f;
+	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+	float Constant = 1.0f;
+	float Linear = 0.045f;
+	float Exp = 0.0075f;
+
+	// Padding
+	float padding[2];
+};
+
+struct SpotLight
+{
+	glm::vec3 Color = { 1.0f,1.0f,1.0f };
+	float Intensity = 1.0f;
+	glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+	float Cutoff = 0.0f;
+	glm::vec3 Direction = { 0.0f, 0.0f, 1.0f };
+	float Constant = 1.0f;
+	float Linear = 0.045f;
+	float Exp = 0.0075f;
+
+	// Padding
+	float padding[2];
+};
+
+struct CBCamera
+{
+	glm::mat4 ViewProj;
+	glm::vec3 CameraPosition;
+
+	// Padding
+	float padding;
+};
+
+struct CBModel
+{
+	glm::mat4 Transform;
+};
+
+struct CBScene
+{
+	DirectionalLight Light;
+};
+
+struct CBPointLight
+{
+	PointLight PointLights[MAX_POINT_LIGHT]{};
+	uint32_t Count{ 0 };
+
+	// Padding
+	float padding[3];
+};
+
+struct CBSpotLight
+{
+	SpotLight SpotLights[MAX_SPOT_LIGHT]{};
+	uint32_t Count{ 0 };
+
+	// Padding
+	float padding[3];
 };
 
 class PhongLighting :public Hanabi::Layer
@@ -35,7 +105,6 @@ private:
 	Hanabi::EditorCamera m_Camera;
 
 	Hanabi::Ref<Hanabi::Framebuffer> m_Framebuffer;
-	Hanabi::Ref<Hanabi::ConstantBuffer> m_SceneDataBuffer;
 
 	Hanabi::Ref<Hanabi::Texture2D> m_DiffuseTexture;
 	Hanabi::Ref<Hanabi::Texture2D> m_SpecularTexture;
@@ -44,5 +113,17 @@ private:
 	Hanabi::Ref<Hanabi::RenderPass> m_RenderPass;
 	Hanabi::Ref<Hanabi::Pipeline> m_Pipeline;
 	Hanabi::Ref<Hanabi::Material> m_Material;
-	SceneData* m_SceneData;
+
+	CBCamera m_CameraData;
+	CBScene m_SceneData;
+	CBModel m_ModelData;
+	CBPointLight m_PointLightData;
+	CBSpotLight m_SpotLightData;
+
+	Hanabi::Ref<Hanabi::ConstantBuffer> m_ModelDataBuffer;
+	Hanabi::Ref<Hanabi::ConstantBuffer> m_CameraDataBuffer;
+	Hanabi::Ref<Hanabi::ConstantBuffer> m_SceneDataBuffer;
+	Hanabi::Ref<Hanabi::ConstantBuffer> m_PointLightDataBuffer;
+	Hanabi::Ref<Hanabi::ConstantBuffer> m_SpotLightDataBuffer;
+
 };
