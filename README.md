@@ -5,6 +5,8 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 
+![](https://github.com/Sigurd015/Hanabi/blob/main/images/preview.gif)
+
 ## Goals
 - Support multiple rendering APIs (such as DX12, Vulkan, Metal, etc.)
 - Support full workflow, you can use this to make a game.
@@ -54,13 +56,12 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [X] ~~DX11 Support~~
 - [ ] SPIR-V Shader System
 - [X] ~~C# Script Engine~~
-- [ ] Sprite Animation
 - [ ] UI Renderer
 - [ ] Asset Manager
 - [ ] 3D Renderer
-  - [ ] Mesh System
-  - [ ] Material System
-  - [ ] Lighting (directional/point lights)
+  - [X] Mesh System (WIP)
+  - [X] Material System (WIP)
+  - [X] Lighting (directional/point lights) (WIP - Phong lighting)
   - [ ] Physically based rendering (PBR)
   - [ ] Skyboxes
   - [ ] Shadow mapping

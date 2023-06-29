@@ -15,9 +15,9 @@ namespace Hanabi
 		// Depth/stencil
 		DEPTH24STENCIL8,
 
-		// Defaults
-		// Only for editor mouse picking
+		// TODO: Make a better way to do mouse picking
 		MousePick = RED8UI,
+		// Defaults
 		Depth = DEPTH24STENCIL8
 	};
 
@@ -46,7 +46,7 @@ namespace Hanabi
 		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		float DepthClearValue = 1.0f;
 
-		// Only for editor mouse picking
+		// TODO: Make a better way to do mouse picking
 		int MousePickClearValue = -1;
 
 		bool SwapChainTarget = false;

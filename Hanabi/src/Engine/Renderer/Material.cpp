@@ -12,8 +12,8 @@ namespace Hanabi
 	Material::Material(const Ref<Shader>& shader)
 	{
 		if (shader)
-			m_Shader= shader;
-		else 
+			m_Shader = shader;
+		else
 			m_Shader = Renderer::GetShader("3DStaticMesh_Default");
 	}
 
@@ -41,10 +41,8 @@ namespace Hanabi
 		}
 	}
 
-	Ref<Texture2D> Material::GetTexture(TextureType type)
+	Ref<Texture2D> Material::GetTexture(uint32_t index)
 	{
-		uint32_t index = static_cast<uint32_t>(type);
-
 		if (m_Textures.find(index) != m_Textures.end())
 			return m_Textures[index];
 

@@ -322,6 +322,8 @@ namespace Hanabi
 
 	void Renderer2D::Flush()
 	{
+		Renderer::BeginRenderPass(s_Data->TatgetRenderPass, false);
+
 		if (s_Data->QuadIndexCount)
 		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
@@ -366,6 +368,8 @@ namespace Hanabi
 			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->TextIndexBuffer, s_Data->TextMaterial, s_Data->TextPipeline, s_Data->TextIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
+
+		Renderer::EndRenderPass(s_Data->TatgetRenderPass);
 	}
 
 	void Renderer2D::NextBatch()

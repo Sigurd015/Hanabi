@@ -199,6 +199,22 @@ namespace Hanabi
 		}
 	}
 
+	template<typename UIFunction, typename LoadFunction>
+	static void DrawDragDropContent(UIFunction uiFunction, LoadFunction loadFunction)
+	{
+		uiFunction();
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* temp = (const wchar_t*)payload->Data;
+				std::filesystem::path path(temp);
+				loadFunction(path);
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -230,7 +246,9 @@ namespace Hanabi
 			DisplayAddComponentEntry<BoxCollider2DComponent>("Box Collider 2D");
 			DisplayAddComponentEntry<CircleCollider2DComponent>("Circle Collider 2D");
 			DisplayAddComponentEntry<TextComponent>("Text Component");
-			DisplayAddComponentEntry<MeshComponent>("StaticMesh Component");
+			DisplayAddComponentEntry<MeshComponent>("Mesh Component");
+			DisplayAddComponentEntry<MaterialComponent>("Material Component");
+			DisplayAddComponentEntry<LightComponent>("Light Component");
 			ImGui::EndPopup();
 		}
 
@@ -379,33 +397,30 @@ namespace Hanabi
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				if (component.Texture)
-				{
-					ImGui::Image(component.Texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-				}
-				else
-				{
-					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-					ImGui::PopItemFlag();
-					ImGui::PopStyleColor();
-				}
-
-				if (ImGui::BeginDragDropTarget())
-				{
-					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				DrawDragDropContent([&component]()
 					{
-						const wchar_t* path = (const wchar_t*)payload->Data;
-						std::filesystem::path texturePath(path);
-						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+						if (component.Texture)
+						{
+							ImGui::Image(component.Texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+						}
+						else
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+							ImGui::PopItemFlag();
+							ImGui::PopStyleColor();
+						}
+					},
+
+					[&component](auto& path)
+					{
+						Ref<Texture2D> texture = Texture2D::Create(path.string());
 						if (texture->IsLoaded())
 							component.Texture = texture;
 						else
-							HNB_WARN("Could not load texture {0}", texturePath.filename().string());
-					}
-					ImGui::EndDragDropTarget();
-				}
+							HNB_WARN("Could not load texture {0}", path.filename().string());
+					});
 
 				ImGui::SameLine();
 				if (ImGui::Button("ReSet"))
@@ -418,106 +433,152 @@ namespace Hanabi
 				ImGui::DragFloat2("UV End", glm::value_ptr(component.UVEnd), 0.01f, 0.0f, 1.0f);
 			});
 
-		DrawComponent<MeshComponent>("StaticMesh", entity, [](auto& component)
+		DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
-				//const char* StaticMeshTypeStrings[] = { "None","Cube", "Capsule", "Sphere" };
-				//const char* currentStaticMeshTypeString = StaticMeshTypeStrings[(int)component.Type];
-				//if (ImGui::BeginCombo("StaticMesh Type", currentStaticMeshTypeString))
-				//{
-				//	for (int i = 0; i < 4; i++)
-				//	{
-				//		bool isSelected = currentStaticMeshTypeString == StaticMeshTypeStrings[i];
-				//		if (ImGui::Selectable(StaticMeshTypeStrings[i], isSelected))
-				//		{
-				//			currentStaticMeshTypeString = StaticMeshTypeStrings[i];
-				//			component.Type = (MeshComponent::StaticMeshType)i;
-				//		}
+				DrawDragDropContent([&component]()
+					{
+						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
+						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+						if (component.Mesh)
+						{
+							std::string temp = component.Mesh->GetMeshSource()->GetPath();
+							ImGui::Button(temp.c_str(), ImVec2(300.0f, 30.0f));
+						}
+						else
+						{
+							ImGui::Button("Mesh", ImVec2(300.0f, 30.0f));
+						}
+						ImGui::PopItemFlag();
+						ImGui::PopStyleColor();
+					},
 
-				//		if (isSelected)
-				//			ImGui::SetItemDefaultFocus();
-				//	}
+					[&component](auto& path)
+					{
+						Ref<MeshSource> meshSource = CreateRef<MeshSource>(path.string());
+						Ref<Mesh> mesh = CreateRef<Mesh>(meshSource);
+						component.Mesh = mesh;
+					});
+			});
 
-				//	ImGui::EndCombo();
-				//}
+		DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
+			{
+				//TODO:
+				if (component.Material == nullptr)
+				{
+					component.Material = CreateRef<MaterialAsset>();
+				}
 
-				//if (!component.Material)
-				//{
-				//	component.Material = Material::Create(Renderer::GetShader("PhongLighting"));
-				//}
+				ImGui::Text("Diffuse Texture:");
+				DrawDragDropContent([&component]()
+					{
+						Ref<Texture2D> diffuse = component.Material->GetDiffuse();
+						if (diffuse)
+						{
+							ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+						}
+						else
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+							ImGui::PopItemFlag();
+							ImGui::PopStyleColor();
+						}
+					},
 
-				//Ref<Texture2D> diffuse = component.Material->GetTexture(Material::TextureType::Diffuse);
-				//Ref<Texture2D> specular = component.Material->GetTexture(Material::TextureType::Specular);
-				////Diffuse
-				//ImGui::Text("Diffuse");
-				//if (diffuse)
-				//{
-				//	ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-				//}
-				//else
-				//{
-				//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleColor();
-				//}
+					[&component](auto& path)
+					{
+						Ref<Texture2D> texture = Texture2D::Create(path.string());
+						if (texture->IsLoaded())
+							component.Material->SetDiffuse(texture);
+						else
+							HNB_WARN("Could not load texture {0}", path.filename().string());
+					});
+				ImGui::SameLine();
+				if (ImGui::Button("ReSet Diffuse Texture"))
+				{
+					component.Material->ClearDiffuse();
+				}
 
-				//if (ImGui::BeginDragDropTarget())
-				//{
-				//	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-				//	{
-				//		const wchar_t* path = (const wchar_t*)payload->Data;
-				//		std::filesystem::path texturePath(path);
-				//		Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-				//		if (texture->IsLoaded())
-				//			component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Diffuse);
-				//		else
-				//			HNB_WARN("Could not load texture {0}", texturePath.filename().string());
-				//	}
-				//	ImGui::EndDragDropTarget();
-				//}
+				ImGui::Text("Specular Texture:");
+				DrawDragDropContent([&component]()
+					{
+						Ref<Texture2D> specular = component.Material->GetSpecular();
+						if (specular)
+						{
+							ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+						}
+						else
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+							ImGui::PopItemFlag();
+							ImGui::PopStyleColor();
+						}
+					},
 
-				//ImGui::SameLine();
-				//if (ImGui::Button("ReSet Diffuse"))
-				//{
-				//	component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Diffuse);
-				//}
+					[&component](auto& path)
+					{
+						Ref<Texture2D> texture = Texture2D::Create(path.string());
+						if (texture->IsLoaded())
+							component.Material->SetSpecular(texture);
+						else
+							HNB_WARN("Could not load texture {0}", path.filename().string());
+					});
 
-				////Specular
-				//ImGui::Text("Specular");
-				//if (specular)
-				//{
-				//	ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-				//}
-				//else
-				//{
-				//	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-				//	ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				//	ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-				//	ImGui::PopItemFlag();
-				//	ImGui::PopStyleColor();
-				//}
+				ImGui::SameLine();
+				if (ImGui::Button("ReSet Specular Texture"))
+				{
+					component.Material->ClearSpecular();
+				}
+			});
 
-				//if (ImGui::BeginDragDropTarget())
-				//{
-				//	if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-				//	{
-				//		const wchar_t* path = (const wchar_t*)payload->Data;
-				//		std::filesystem::path texturePath(path);
-				//		Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
-				//		if (texture->IsLoaded())
-				//			component.Material->SetTexture(texture, (uint32_t)Material::TextureType::Specular);
-				//		else
-				//			HNB_WARN("Could not load texture {0}", texturePath.filename().string());
-				//	}
-				//	ImGui::EndDragDropTarget();
-				//}
+		DrawComponent<LightComponent>("Light", entity, [](auto& component)
+			{
+				const char* lightTypeStrings[] = { "None","Directional Light","Point Light", "Spot Light" };
+				const char* currentTypeString = lightTypeStrings[(int)component.Type];
+				if (ImGui::BeginCombo("Light Type", currentTypeString))
+				{
+					for (int i = 0; i < 4; i++)
+					{
+						bool isSelected = currentTypeString == lightTypeStrings[i];
+						if (ImGui::Selectable(lightTypeStrings[i], isSelected))
+						{
+							currentTypeString = lightTypeStrings[i];
+							component.Type = (LightComponent::LightType)i;
+						}
 
-				//ImGui::SameLine();
-				//if (ImGui::Button("ReSet Specular"))
-				//{
-				//	component.Material->SetTexture(nullptr, (uint32_t)Material::TextureType::Specular);
-				//}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				switch (component.Type)
+				{
+				case LightComponent::LightType::Directional:
+					ImGui::ColorEdit3("Directional Light Radiance", glm::value_ptr(component.Radiance));
+					ImGui::DragFloat("Directional Light Intensity", &component.Intensity, 0.1f, 0.0f, 1000.0f);
+					break;
+
+				case LightComponent::LightType::Point:
+					ImGui::ColorEdit3("Point Light Radiance", glm::value_ptr(component.Radiance));
+					ImGui::DragFloat("Point Light Intensity", &component.Intensity, 0.1f, 0.0f, 1000.0f);
+					ImGui::DragFloat("Point Light Radius", &component.Radius, 0.1f, 0.0f, std::numeric_limits<float>::max());
+					ImGui::DragFloat("Point Light Falloff", &component.Falloff, 0.005f, 0.0f, 1.0f);
+					break;
+
+				case LightComponent::LightType::Spot:
+					ImGui::ColorEdit3("Spot Light Radiance", glm::value_ptr(component.Radiance));
+					ImGui::DragFloat("Spot Light Intensity", &component.Intensity, 0.1f, 0.0f, 1000.0f);
+					ImGui::DragFloat("Spot Light Range", &component.Range, 0.1f, 0.0f, std::numeric_limits<float>::max());
+					ImGui::DragFloat("Spot Light Angle", &component.Angle, 0.05f, 0.1f, 180.0f);
+					ImGui::DragFloat("Spot Light Angle Attenuation", &component.AngleAttenuation, 0.01f, 0.0f, std::numeric_limits<float>::max());
+					ImGui::DragFloat("Spot Light Falloff", &component.Falloff, 0.005f, 0.0f, 1.0f);
+					break;
+				}
 			});
 
 		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)

@@ -5,6 +5,7 @@
 #include "RenderPass.h"
 #include "Mesh.h"
 #include "RenderCommandQueue.h"
+#include "MaterialAsset.h"
 
 namespace Hanabi
 {
@@ -50,6 +51,8 @@ namespace Hanabi
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);
 		static Ref<Texture2D> GetTexture(const std::string& name);
+		static Ref<Material> GetDefaultMaterial();
+		static Ref<MaterialAsset> GetDefaultMaterialAsset();
 	private:
 		static RenderCommandQueue& GetRenderCommandQueue();
 	};

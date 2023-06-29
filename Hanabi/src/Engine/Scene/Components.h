@@ -6,6 +6,7 @@
 #include "Engine/Renderer/UI/Font.h"
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Material.h"
+#include "Engine/Renderer/MaterialAsset.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/glm.hpp>
@@ -88,10 +89,34 @@ namespace Hanabi
 	{
 		//TODO: 
 		Ref<Mesh> Mesh;
-		Ref<Material> Material;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
+	};
+
+	struct MaterialComponent
+	{
+		Ref<MaterialAsset> Material;
+
+		MaterialComponent() = default;
+		MaterialComponent(const MaterialComponent&) = default;
+	};
+
+	struct LightComponent
+	{
+		enum class LightType { NONE = 0, Directional, Point, Spot };
+
+		LightType Type = LightType::NONE;
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float Intensity = 0.0f;
+		float Radius;
+		float Falloff;
+		float AngleAttenuation;
+		float Range;
+		float Angle;
+
+		LightComponent() = default;
+		LightComponent(const LightComponent&) = default;
 	};
 
 	struct ScriptComponent
@@ -159,6 +184,9 @@ namespace Hanabi
 		glm::vec4 Color{ 1.0f };
 		float Kerning = 0.0f;
 		float LineSpacing = 0.0f;
+
+		TextComponent() = default;
+		TextComponent(const TextComponent&) = default;
 	};
 
 	template<typename... Component>
@@ -168,7 +196,8 @@ namespace Hanabi
 	using AllComponents =
 		ComponentGroup<
 		TransformComponent, SpriteRendererComponent, CircleRendererComponent,
-		MeshComponent,
+		MeshComponent, MaterialComponent,
+		LightComponent,
 		CameraComponent,
 		ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent,

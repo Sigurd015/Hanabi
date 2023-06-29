@@ -4,15 +4,15 @@
 #include "Camera.h"
 #include "EditorCamera.h"
 
-#define MAX_POINT_LIGHT 2
-#define MAX_SPOT_LIGHT 2
+#define MAX_POINT_LIGHT 32
+#define MAX_SPOT_LIGHT 32
 
 namespace Hanabi
 {
 	struct DirectionalLight
 	{
-		glm::vec3 Color = { 1.0f,1.0f,1.0f };
-		float Intensity = 1.0f;
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float Intensity = 0.0f;
 		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
 
 		// Padding
@@ -21,27 +21,26 @@ namespace Hanabi
 
 	struct PointLight
 	{
-		glm::vec3 Color = { 1.0f,1.0f,1.0f };
-		float Intensity = 1.0f;
 		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-		float Constant = 1.0f;
-		float Linear = 0.045f;
-		float Exp = 0.0075f;
+		float Intensity = 0.0f;
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float Radius;
+		float Falloff;
 
 		// Padding
-		float padding[2];
+		float padding[3];
 	};
 
 	struct SpotLight
 	{
-		glm::vec3 Color = { 1.0f,1.0f,1.0f };
-		float Intensity = 1.0f;
 		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-		float Cutoff = 0.0f;
-		glm::vec3 Direction = { 0.0f, 0.0f, 1.0f };
-		float Constant = 1.0f;
-		float Linear = 0.045f;
-		float Exp = 0.0075f;
+		float Intensity = 0.0f;
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float AngleAttenuation;
+		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
+		float Range;
+		float Angle;
+		float Falloff;
 
 		// Padding
 		float padding[2];
@@ -71,7 +70,7 @@ namespace Hanabi
 		static void BeginScene(const Environment& environment);
 		static void EndScene();
 
-		static Ref<Framebuffer> GetFinalResult();
+		static Ref<RenderPass> GetFinalRenderPass();
 
 		static void SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID = -1);
 	};

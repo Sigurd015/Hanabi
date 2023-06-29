@@ -6,6 +6,7 @@
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Core/UUID.h"
 #include "Engine/Project/Project.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -141,6 +142,29 @@ namespace Hanabi
 		return out;
 	}
 
+	static std::string LightTypeToString(LightComponent::LightType lightType)
+	{
+		switch (lightType)
+		{
+		case LightComponent::LightType::Point:  return "Point";
+		case LightComponent::LightType::Spot:   return "Spot";
+		case LightComponent::LightType::Directional: return "Directional";
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown body type");
+		return {};
+	}
+
+	static LightComponent::LightType LightTypeFromString(const std::string& lightTypeString)
+	{
+		if (lightTypeString == "Point")    return LightComponent::LightType::Point;
+		if (lightTypeString == "Spot")   return LightComponent::LightType::Spot;
+		if (lightTypeString == "Directional") return LightComponent::LightType::Directional;
+
+		HNB_CORE_ASSERT(false, "Unknown body type");
+		return LightComponent::LightType::NONE;
+	}
+
 	static std::string RigidBody2DBodyTypeToString(Rigidbody2DComponent::BodyType bodyType)
 	{
 		switch (bodyType)
@@ -216,6 +240,40 @@ namespace Hanabi
 				out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
 				out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
 
+			});
+
+		SerializeComponent<MeshComponent>("MeshComponent", entity, out, [&]()
+			{
+				auto& meshComponent = entity.GetComponent<MeshComponent>();
+				auto& mesh = meshComponent.Mesh;
+				if (mesh)
+					out << YAML::Key << "MeshPath" << YAML::Value << mesh->GetMeshSource()->GetPath().c_str();
+			});
+
+		SerializeComponent<MaterialComponent>("MaterialComponent", entity, out, [&]()
+			{
+				auto& materialComponent = entity.GetComponent<MaterialComponent>();
+				auto& diffuse = materialComponent.Material->GetDiffuse();
+				auto& specular = materialComponent.Material->GetSpecular();
+
+				if (diffuse)
+					out << YAML::Key << "DiffuseTexturePath" << YAML::Value << diffuse->GetPath().c_str();
+
+				if (specular)
+					out << YAML::Key << "SpecularTexturePath" << YAML::Value << specular->GetPath().c_str();
+			});
+
+		SerializeComponent<LightComponent>("LightComponent", entity, out, [&]()
+			{
+				auto& lightComponent = entity.GetComponent<LightComponent>();
+				out << YAML::Key << "LightType" << YAML::Value << LightTypeToString(lightComponent.Type);
+				out << YAML::Key << "Intensity" << YAML::Value << lightComponent.Intensity;
+				out << YAML::Key << "Radiance" << YAML::Value << lightComponent.Radiance;
+				out << YAML::Key << "Radius" << YAML::Value << lightComponent.Radius;
+				out << YAML::Key << "Range" << YAML::Value << lightComponent.Range;
+				out << YAML::Key << "Angle" << YAML::Value << lightComponent.Angle;
+				out << YAML::Key << "AngleAttenuation" << YAML::Value << lightComponent.AngleAttenuation;
+				out << YAML::Key << "Falloff" << YAML::Value << lightComponent.Falloff;
 			});
 
 		SerializeComponent<ScriptComponent>("ScriptComponent", entity, out, [&]()
@@ -418,6 +476,53 @@ namespace Hanabi
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+				}
+
+				auto meshComponent = entity["MeshComponent"];
+				if (meshComponent)
+				{
+					auto& mc = deserializedEntity.AddComponent<MeshComponent>();
+
+					//TODO: this should handle by asset manager
+					if (meshComponent["MeshPath"])
+					{
+						std::string meshPath = meshComponent["MeshPath"].as<std::string>();
+						Ref<MeshSource> meshSource = CreateRef<MeshSource>(meshPath);
+						mc.Mesh = CreateRef<Mesh>(meshSource);
+					}
+				}
+
+				auto materialComponent = entity["MaterialComponent"];
+				if (materialComponent)
+				{
+					auto& mtc = deserializedEntity.AddComponent<MaterialComponent>();
+					mtc.Material = CreateRef<MaterialAsset>();
+					//TODO: this should handle by asset manager
+					if (materialComponent["DiffuseTexturePath"])
+					{
+						std::string diffusePath = materialComponent["DiffuseTexturePath"].as<std::string>();
+						mtc.Material->SetDiffuse(Texture2D::Create(diffusePath));
+					}
+
+					if (materialComponent["DiffuseTexturePath"])
+					{
+						std::string specularPath = materialComponent["SpecularTexturePath"].as<std::string>();
+						mtc.Material->SetSpecular(Texture2D::Create(specularPath));
+					}
+				}
+
+				auto lightComponent = entity["LightComponent"];
+				if (lightComponent)
+				{
+					auto& lc = deserializedEntity.AddComponent<LightComponent>();
+					lc.Type = LightTypeFromString(lightComponent["LightType"].as<std::string>());
+					lc.Intensity = lightComponent["Intensity"].as<float>();
+					lc.Radiance = lightComponent["Radiance"].as<glm::vec3>();
+					lc.Radius = lightComponent["Radius"].as<float>();
+					lc.Range = lightComponent["Range"].as<float>();
+					lc.Angle = lightComponent["Angle"].as<float>();
+					lc.AngleAttenuation = lightComponent["AngleAttenuation"].as<float>();
+					lc.Falloff = lightComponent["Falloff"].as<float>();
 				}
 
 				auto scriptComponent = entity["ScriptComponent"];

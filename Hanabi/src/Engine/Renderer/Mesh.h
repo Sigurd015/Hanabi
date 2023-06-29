@@ -24,25 +24,29 @@ namespace Hanabi
 	class MeshSource
 	{
 	public:
-		MeshSource(const std::string& filename);
+		MeshSource(const std::string& path);
 		MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices);
 
 		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 		const std::vector<Index>& GetIndices() const { return m_Indices; }
+		const std::string& GetPath() const { return m_Path; };
 	private:
+		std::string m_Path;
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
 	};
 
 	class Mesh
 	{
-	public:		
+	public:
 		Mesh(Ref<MeshSource> source);
 		~Mesh() = default;
 
 		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
 		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
-	private:	
+		const Ref<MeshSource>& GetMeshSource() const { return m_MeshSource; }
+	private:
+		Ref<MeshSource> m_MeshSource;
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
 

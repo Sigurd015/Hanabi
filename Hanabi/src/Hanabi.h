@@ -38,6 +38,8 @@
 #include "Engine/Renderer/ConstantBuffer.h"
 #include "Engine/Renderer/UI/Font.h"
 #include "Engine/Renderer/Mesh.h"
+#include "Engine/Renderer/Material.h"
+#include "Engine/Renderer/MaterialAsset.h"
 
 // ---Scene---------------------
 #include "Engine/Scene/Scene.h"

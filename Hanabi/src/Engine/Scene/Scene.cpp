@@ -229,85 +229,211 @@ namespace Hanabi
 
 		if (mainCamera)
 		{
-			// TODO: Lights 
 			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
-			Environment sceneEnvironment = { cameraPos,viewProjection };
-			SceneRenderer::BeginScene(sceneEnvironment);
+			RenderScene(cameraPos, viewProjection, selectedEntity, enableOverlayRender);
+			////----------------- 3D Scene Rendering -----------------//				
+			//// Lights
+			//{
+			//	auto view = m_Registry.view<TransformComponent, LightComponent>();
+			//	for (auto entity : view)
+			//	{
+			//		auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
+			//		switch (light.Type)
+			//		{
+			//		case LightComponent::LightType::Directional:
+			//		{
+			//			sceneEnvironment.DirLight = {
+			//				light.Radiance,
+			//				light.Intensity,
+			//				-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+			//			};
+			//			break;
+			//		}
+			//		case LightComponent::LightType::Point:
+			//		{
+			//			sceneEnvironment.PointLights[sceneEnvironment.PointLightCount] = {
+			//				transform.Translation,
+			//				light.Intensity,
+			//				light.Radiance,
+			//				light.Radius,
+			//				light.Falloff,
+			//			};
+			//			sceneEnvironment.PointLightCount++;
+			//			break;
+			//		}
+			//		case LightComponent::LightType::Spot:
+			//		{
+			//			sceneEnvironment.SpotLights[sceneEnvironment.SpotLightCount] = {
+			//				transform.Translation,
+			//				light.Intensity,
+			//				light.Radiance,
+			//				light.AngleAttenuation,
+			//				-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+			//				light.Range,
+			//				light.Angle,
+			//				light.Falloff,
+			//			};
+			//			sceneEnvironment.PointLightCount++;
+			//			break;
+			//		}
+			//		}
+			//	}
+			//}
 
-			// Draw 3D Objects
-			{
-				auto view = m_Registry.view<TransformComponent, MeshComponent>();
-				for (auto entity : view)
-				{
-					auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
-					//TODO
-				}
-			}
+			//SceneRenderer::BeginScene(sceneEnvironment);
 
-			Renderer2D::BeginScene(viewProjection);
+			//// Draw objects with materials
+			//{
+			//	auto view = m_Registry.view<TransformComponent, MeshComponent, MaterialComponent>();
+			//	for (auto entity : view)
+			//	{
+			//		auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
 
-			// Draw sprites
-			{
-				auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
-				for (auto entity : view)
-				{
-					auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
+			//		SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), transform.GetTransform());
+			//	}
+			//}
+			//// Draw objects without materials
+			//{
+			//	auto view = m_Registry.view<TransformComponent, MeshComponent>();
+			//	for (auto entity : view)
+			//	{
+			//		auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
 
-					if (sprite.Texture)
-						Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
-							sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
-					else
-						Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-				}
-			}
+			//		SceneRenderer::SubmitStaticMesh(mesh.Mesh, nullptr, transform.GetTransform());
+			//	}
+			//}
 
-			// Draw circles
-			{
-				auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-				for (auto entity : view)
-				{
-					auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
+			//Renderer2D::BeginScene(viewProjection);
+			//Renderer2D::SetTargetRenderPass(SceneRenderer::GetFinalRenderPass());
 
-					Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
-				}
-			}
+			//// Draw sprites
+			//{
+			//	auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
+			//	for (auto entity : view)
+			//	{
+			//		auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
 
-			// Draw text
-			{
-				auto view = m_Registry.view<TransformComponent, TextComponent>();
-				for (auto entity : view)
-				{
-					auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
+			//		if (sprite.Texture)
+			//			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
+			//				sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
+			//		else
+			//			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+			//	}
+			//}
 
-					Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
-				}
-			}
+			//// Draw circles
+			//{
+			//	auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
+			//	for (auto entity : view)
+			//	{
+			//		auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-			OnOverlayRender(enableOverlayRender, selectedEntity);
+			//		Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
+			//	}
+			//}
 
-			Renderer2D::EndScene();
+			//// Draw text
+			//{
+			//	auto view = m_Registry.view<TransformComponent, TextComponent>();
+			//	for (auto entity : view)
+			//	{
+			//		auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-			SceneRenderer::EndScene();
+			//		Renderer2D::DrawString(text.TextString, transform.GetTransform(), text);
+			//	}
+			//}
+
+			//OnOverlayRender(enableOverlayRender, selectedEntity);
+
+			//Renderer2D::EndScene();
+
+			//SceneRenderer::EndScene();
 		}
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender)
 	{
-		// TODO: Lights 
-		Environment sceneEnvironment = { camera.GetPosition(),camera.GetViewProjection() };
+		RenderScene(camera.GetPosition(), camera.GetViewProjection(), selectedEntity, enableOverlayRender);
+	}
+
+	void Scene::RenderScene(const glm::vec3& camPos, const glm::mat4& viewProj, Entity selectedEntity, bool enableOverlayRender)
+	{
+		Environment sceneEnvironment = { camPos,viewProj };
+
+		//----------------- 3D Scene Rendering -----------------//				
+		// Lights
+		{
+			auto view = m_Registry.view<TransformComponent, LightComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
+				switch (light.Type)
+				{
+				case LightComponent::LightType::Directional:
+				{
+					sceneEnvironment.DirLight = {
+						light.Radiance,
+						light.Intensity,
+						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+					};
+					break;
+				}
+				case LightComponent::LightType::Point:
+				{
+					sceneEnvironment.PointLights[sceneEnvironment.PointLightCount] = {
+						transform.Translation,
+						light.Intensity,
+						light.Radiance,
+						light.Radius,
+						light.Falloff,
+					};
+					sceneEnvironment.PointLightCount++;
+					break;
+				}
+				case LightComponent::LightType::Spot:
+				{
+					sceneEnvironment.SpotLights[sceneEnvironment.SpotLightCount] = {
+						transform.Translation,
+						light.Intensity,
+						light.Radiance,
+						light.AngleAttenuation,
+						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+						light.Range,
+						light.Angle,
+						light.Falloff,
+					};
+					sceneEnvironment.PointLightCount++;
+					break;
+				}
+				}
+			}
+		}
+
 		SceneRenderer::BeginScene(sceneEnvironment);
 
-		// Draw 3D Objects
+		// Draw objects with materials
+		{
+			auto view = m_Registry.view<TransformComponent, MeshComponent, MaterialComponent>();
+			for (auto entity : view)
+			{
+				auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
+				if (mesh.Mesh && material.Material)
+					SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), transform.GetTransform());
+			}
+		}
+		// Draw objects without materials
 		{
 			auto view = m_Registry.view<TransformComponent, MeshComponent>();
 			for (auto entity : view)
 			{
 				auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
-				//TODO
+				if (mesh.Mesh)
+					SceneRenderer::SubmitStaticMesh(mesh.Mesh, nullptr, transform.GetTransform());
 			}
 		}
 
-		Renderer2D::BeginScene(camera.GetViewProjection());
+		Renderer2D::BeginScene(viewProj);
+		Renderer2D::SetTargetRenderPass(SceneRenderer::GetFinalRenderPass());
 		// Draw sprites
 		{
 			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
@@ -351,8 +477,10 @@ namespace Hanabi
 		Renderer2D::EndScene();
 
 		SceneRenderer::EndScene();
+
 	}
 
+	//TODO: Make a better way to render overlays
 	void Scene::OnOverlayRender(bool enable, Entity selectedEntity)
 	{
 		if (enable)

@@ -12,22 +12,7 @@ namespace Hanabi
 
 	void EditorLayer::OnAttach()
 	{
-		//TODO: Move this to a better place
-		FramebufferSpecification framebufferSpec;
-		framebufferSpec.Attachments = {
-			FramebufferTextureFormat::RGBA8F,
-			FramebufferTextureFormat::MousePick,
-			FramebufferTextureFormat::Depth };
-		framebufferSpec.Samples = 1;
-		framebufferSpec.Width = 1920;
-		framebufferSpec.Height = 1080;
-		framebufferSpec.ClearColor = { 0.3f, 0.3f, 0.3f, 1.0f };
-		framebufferSpec.MousePickClearValue = -1;
-		m_TargetFramebuffer = Framebuffer::Create(framebufferSpec);
-
-		RenderPassSpecification renderPassSpec;
-		renderPassSpec.TargetFramebuffer = m_TargetFramebuffer;
-		m_TargetRenderPass = RenderPass::Create(renderPassSpec);
+		m_ViewportFramebuffer = SceneRenderer::GetFinalRenderPass()->GetSpecification().TargetFramebuffer;
 
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
@@ -59,11 +44,10 @@ namespace Hanabi
 	{
 #pragma region Resize
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_TargetFramebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		SceneRenderer::SetViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 #pragma endregion
 
-		Renderer::BeginRenderPass(m_TargetRenderPass);
 		// Update scene
 		switch (m_SceneState)
 		{
@@ -98,12 +82,10 @@ namespace Hanabi
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			int pixelData = m_TargetFramebuffer->ReadPixel(1, mouseX, mouseY);
+			int pixelData = m_ViewportFramebuffer->ReadPixel(1, mouseX, mouseY);
 			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
 #pragma endregion	
-
-		Renderer::EndRenderPass(m_TargetRenderPass);
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -314,11 +296,11 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPIType::OpenGL:
-			ImGui::Image(m_TargetFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 			break;
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			ImGui::Image(m_TargetFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 			break;
 #endif
 		}

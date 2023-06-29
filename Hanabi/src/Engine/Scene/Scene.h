@@ -44,6 +44,7 @@ namespace Hanabi
 			return m_Registry.view<Components...>();
 		}
 	private:
+		void RenderScene(const glm::vec3& camPos, const glm::mat4& viewProj, Entity selectedEntity, bool enableOverlayRender);
 		void OnOverlayRender(bool enable, Entity selectedEntity);
 		void OnPhysics2DStart();
 		void OnPhysics2DStop();

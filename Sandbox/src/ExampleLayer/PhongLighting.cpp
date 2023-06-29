@@ -4,7 +4,6 @@
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 
-
 PhongLighting::PhongLighting() :Layer("PhongLighting")
 {}
 
@@ -12,39 +11,38 @@ void PhongLighting::OnAttach()
 {
 	m_Camera = Hanabi::EditorCamera(30.0f, 1920.0f / 1080.0f, 0.1f, 1000.0f);
 
-	Hanabi::Ref<Hanabi::MeshSource> temp = Hanabi::CreateRef<Hanabi::MeshSource>("Box.fbx");
+	Hanabi::Ref<Hanabi::MeshSource> temp = Hanabi::CreateRef<Hanabi::MeshSource>("assets/models/Box.fbx");
 	m_Mesh = Hanabi::CreateRef<Hanabi::Mesh>(temp);
 
 	m_DiffuseTexture = Hanabi::Texture2D::Create("assets/textures/Container_Diffuse.png");
 	m_SpecularTexture = Hanabi::Texture2D::Create("assets/textures/Container_Specular.png");
 
-	m_Material = Hanabi::Material::Create(Hanabi::Renderer::GetShader("PhongLighting"));
-	m_Material->SetTexture(m_DiffuseTexture, 0); // 0 is Diffuse slot by default
-	m_Material->SetTexture(m_SpecularTexture, 1); // 1 is Specular slot by default
+	m_Material = Hanabi::CreateRef<Hanabi::MaterialAsset>();
+	m_Material->SetDiffuse(m_DiffuseTexture);
+	m_Material->SetSpecular(m_SpecularTexture);
 
 	m_Environment.PointLightCount = 2;
 	m_Environment.SpotLightCount = 2;
 	{
 		for (size_t i = 0; i < m_Environment.PointLightCount; i++)
 		{
-			m_Environment.PointLights[i].Constant = 1.0f;
-			m_Environment.PointLights[i].Exp = 0.045f;
-			m_Environment.PointLights[i].Linear = 0.0075f;
-			m_Environment.PointLights[i].Color = { 1.0f, 1.0f, 1.0f };
+			m_Environment.PointLights[i].Radius = 10.0f;
+			m_Environment.PointLights[i].Falloff = 1.0f;
 			m_Environment.PointLights[i].Intensity = 1.0f;
 			m_Environment.PointLights[i].Position = { 0.0f, 0.0f, 0.0f };
+			m_Environment.PointLights[i].Radiance = { 1.0f, 1.0f, 1.0f };
 		}
 	}
 
 	{
 		for (size_t i = 0; i < m_Environment.SpotLightCount; i++)
 		{
-			m_Environment.SpotLights[i].Color = { 1.0f, 1.0f, 1.0f };
+			m_Environment.SpotLights[i].Range = 10.0f;
+			m_Environment.SpotLights[i].Angle = 45.0f;
+			m_Environment.SpotLights[i].Falloff = 1.0f;
+			m_Environment.SpotLights[i].AngleAttenuation = 1.0f;
+			m_Environment.SpotLights[i].Radiance = { 1.0f, 1.0f, 1.0f };
 			m_Environment.SpotLights[i].Intensity = 1.0f;
-			m_Environment.SpotLights[i].Constant = 1.0f;
-			m_Environment.SpotLights[i].Exp = 0.045f;
-			m_Environment.SpotLights[i].Linear = 0.0075f;
-			m_Environment.SpotLights[i].Cutoff = 0.8f;
 			m_Environment.SpotLights[i].Direction = { 0.0f, 0.0f, 1.0f };
 		}
 	}
@@ -75,7 +73,7 @@ void PhongLighting::OnUpdate(Hanabi::Timestep ts)
 
 	for (auto& trans : m_ModelMatrices)
 	{
-		Hanabi::SceneRenderer::SubmitStaticMesh(m_Mesh, m_Material, trans);
+		Hanabi::SceneRenderer::SubmitStaticMesh(m_Mesh, m_Material->GetMaterial(), trans);
 	}
 
 	Hanabi::SceneRenderer::EndScene();
@@ -142,7 +140,7 @@ void PhongLighting::OnImGuiRender()
 	Hanabi::Application::Get().GetImGuiLayer()->BlockEvents(!ImGui::IsWindowHovered());
 	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 	m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-	ImGui::Image(Hanabi::SceneRenderer::GetFinalResult()->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+	ImGui::Image(Hanabi::SceneRenderer::GetFinalRenderPass()->GetSpecification().TargetFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 	ImGui::End();
 
 	ImGui::End();
@@ -159,7 +157,7 @@ void PhongLighting::UI_Tool()
 		ImGui::Text("Directional Light Intensity");
 		ImGui::DragFloat("##DirectionalLightIntensity", &m_Environment.DirLight.Intensity, 0.01f, 0.0f, 1.0f, "%.2f");
 		ImGui::Text("Directional Light Color");
-		ImGui::ColorEdit3("##DirectionalLightColor", glm::value_ptr(m_Environment.DirLight.Color));
+		ImGui::ColorEdit3("##DirectionalLightColor", glm::value_ptr(m_Environment.DirLight.Radiance));
 
 		{
 			for (size_t i = 0; i < m_Environment.PointLightCount; i++)
@@ -167,8 +165,8 @@ void PhongLighting::UI_Tool()
 				std::string positionLabel = "Point Light Position - " + std::to_string(i);
 				std::string intensityLabel = "Point Light Intensity - " + std::to_string(i);
 				std::string colorLabel = "Point Light Color - " + std::to_string(i);
-				std::string attenuationLabel = "Point Light Attenuation - " + std::to_string(i);
-
+				std::string radiusLabel = "Point Light Radius - " + std::to_string(i);
+				std::string cutoffLabel = "Point Light Cutoff - " + std::to_string(i);
 				ImGui::Text(positionLabel.c_str());
 				ImGui::DragFloat(("##PointLightPosX" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Position.x, 0.01f, -10.0f, 10.0f, "%.2f");
 				ImGui::DragFloat(("##PointLightPosY" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Position.y, 0.01f, -10.0f, 10.0f, "%.2f");
@@ -176,11 +174,11 @@ void PhongLighting::UI_Tool()
 				ImGui::Text(intensityLabel.c_str());
 				ImGui::DragFloat(("##PointLightIntensity" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Intensity, 0.01f, 0.0f, 1.0f, "%.2f");
 				ImGui::Text(colorLabel.c_str());
-				ImGui::ColorEdit3(("##PointLightColor" + std::to_string(i)).c_str(), glm::value_ptr(m_Environment.PointLights[i].Color));
-				ImGui::Text(attenuationLabel.c_str());
-				ImGui::DragFloat(("##PointLightAttenuationConstant" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Constant, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat(("##PointLightAttenuationExp" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Exp, 0.01f, 0.0f, 1.0f, "%.2f");
-				ImGui::DragFloat(("##PointLightAttenuationLinear" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Linear, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::ColorEdit3(("##PointLightColor" + std::to_string(i)).c_str(), glm::value_ptr(m_Environment.PointLights[i].Radiance));
+				ImGui::Text(radiusLabel.c_str());
+				ImGui::DragFloat(("##PointLightRadius" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Radius, 0.01f, 0.0f, 20.0f, "%.2f");
+				ImGui::Text(cutoffLabel.c_str());
+				ImGui::DragFloat(("##PointLightFalloff" + std::to_string(i)).c_str(), &m_Environment.PointLights[i].Falloff, 0.01f, 0.0f, 1.0f, "%.2f");
 				ImGui::Separator();
 			}
 		}
@@ -191,7 +189,10 @@ void PhongLighting::UI_Tool()
 				std::string directionLabel = "Spot Light Direction - " + std::to_string(i);
 				std::string intensityLabel = "Spot Light Intensity - " + std::to_string(i);
 				std::string colorLabel = "Spot Light Color - " + std::to_string(i);
-
+				std::string attenuationLabel = "Spot Light Attenuation - " + std::to_string(i);
+				std::string cutoffLabel = "Spot Light Cutoff - " + std::to_string(i);
+				std::string rangeLabel = "Spot Light Range - " + std::to_string(i);
+				std::string angelLabel = "Spot Light Angel - " + std::to_string(i);
 				ImGui::Text(positionLabel.c_str());
 				ImGui::DragFloat(("##SpotLightPosX" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].Position.x, 0.01f, -10.0f, 10.0f, "%.2f");
 				ImGui::DragFloat(("##SpotLightPosY" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].Position.y, 0.01f, -10.0f, 10.0f, "%.2f");
@@ -203,7 +204,15 @@ void PhongLighting::UI_Tool()
 				ImGui::Text(intensityLabel.c_str());
 				ImGui::DragFloat(("##SpotLightIntensity" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].Intensity, 0.01f, 0.0f, 1.0f, "%.2f");
 				ImGui::Text(colorLabel.c_str());
-				ImGui::ColorEdit3(("##SpotLightColor" + std::to_string(i)).c_str(), glm::value_ptr(m_Environment.SpotLights[i].Color));
+				ImGui::ColorEdit3(("##SpotLightColor" + std::to_string(i)).c_str(), glm::value_ptr(m_Environment.SpotLights[i].Radiance));
+				ImGui::Text(rangeLabel.c_str());
+				ImGui::DragFloat(("##SpotLightRange" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].Range, 0.01f, 0.0f, 45.0f, "%.2f");
+				ImGui::Text(angelLabel.c_str());
+				ImGui::DragFloat(("##SpotLightAngle" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].Angle, 0.01f, 0.0f, 180.0f, "%.2f");
+				ImGui::Text(attenuationLabel.c_str());
+				ImGui::DragFloat(("##SpotLightAngleAttenuation" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].AngleAttenuation, 0.01f, 0.0f, 1.0f, "%.2f");
+				ImGui::Text(cutoffLabel.c_str());
+				ImGui::DragFloat(("##SpotLightFalloff" + std::to_string(i)).c_str(), &m_Environment.SpotLights[i].Falloff, 0.01f, 0.0f, 1.0f, "%.2f");
 				ImGui::Separator();
 			}
 		}

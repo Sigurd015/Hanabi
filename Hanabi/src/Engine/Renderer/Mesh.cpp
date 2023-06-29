@@ -7,10 +7,10 @@
 
 namespace Hanabi
 {
-	MeshSource::MeshSource(const std::string& filename)
+	MeshSource::MeshSource(const std::string& path) :m_Path(path)
 	{
 		Assimp::Importer importer;
-		auto pAssimpScene = importer.ReadFile("assets/models/" + filename,
+		auto pAssimpScene = importer.ReadFile(path,
 			aiProcess_ConvertToLeftHanded |
 			aiProcess_Triangulate |
 			aiProcess_SortByPType |
@@ -48,7 +48,7 @@ namespace Hanabi
 	MeshSource::MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices) :m_Vertices(vertices), m_Indices(indices)
 	{}
 
-	Mesh::Mesh(Ref<MeshSource> source) : m_Vertices(source->GetVertices()), m_Indices(source->GetIndices())
+	Mesh::Mesh(Ref<MeshSource> source) : m_Vertices(source->GetVertices()), m_Indices(source->GetIndices()), m_MeshSource(source)
 	{
 		m_VertexBuffer = VertexBuffer::Create(m_Vertices.size() * sizeof(Vertex));
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), m_Indices.size() * sizeof(Index));

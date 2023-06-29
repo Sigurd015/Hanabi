@@ -6,7 +6,7 @@
 
 namespace Hanabi
 {
-	enum CBBingdID : uint32_t
+	enum CBBingSlot : uint32_t
 	{
 		MODEL = 0,
 		CAMERA = 1,
@@ -39,7 +39,7 @@ namespace Hanabi
 		struct CBPointLight
 		{
 			PointLight PointLights[MAX_POINT_LIGHT]{};
-			uint32_t Count{ 0 };
+			uint32_t Count = 0;
 
 			// Padding
 			float padding[3];
@@ -48,7 +48,7 @@ namespace Hanabi
 		struct CBSpotLight
 		{
 			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
-			uint32_t Count{ 0 };
+			uint32_t Count = 0;
 
 			// Padding
 			float padding[3];
@@ -77,22 +77,29 @@ namespace Hanabi
 	{
 		s_Data = new SceneRendererData();
 
-		s_Data->ModelDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBModel), CBBingdID::MODEL);
-		s_Data->CameraDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBCamera), CBBingdID::CAMERA);
-		s_Data->SceneDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBScene), CBBingdID::SCENE);
-		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight), CBBingdID::POINT_LIGHT);
-		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight), CBBingdID::SPOT_LIGHT);
+		s_Data->ModelDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBModel), CBBingSlot::MODEL);
+		s_Data->CameraDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBCamera), CBBingSlot::CAMERA);
+		s_Data->SceneDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBScene), CBBingSlot::SCENE);
+		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight), CBBingSlot::POINT_LIGHT);
+		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight), CBBingSlot::SPOT_LIGHT);
 
 		FramebufferSpecification geoFramebufferSpec;
-		geoFramebufferSpec.Attachments = { FramebufferTextureFormat::RGBA8F,FramebufferTextureFormat::Depth };
+		geoFramebufferSpec.Attachments = {
+			FramebufferTextureFormat::RGBA8F,
+			FramebufferTextureFormat::MousePick,
+			FramebufferTextureFormat::Depth };
 		geoFramebufferSpec.Width = 1920;
 		geoFramebufferSpec.Height = 1080;
+		// TODO: Make a better way to do mouse picking
+		// TODO: Make a better way to clear the framebuffer and use the different clear values for editor and game
+		geoFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		geoFramebufferSpec.MousePickClearValue = -1;
+
 		RenderPassSpecification geoRenderPassSpec;
 		geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
 		s_Data->GeoPass = RenderPass::Create(geoRenderPassSpec);
 
-		//TODO: Temp
-		s_Data->m_DefaultMaterial = Material::Create(Renderer::GetShader("PhongLighting"));
+		s_Data->m_DefaultMaterial = Renderer::GetDefaultMaterial();
 
 		//TODO: Make layout dynamic
 		VertexBufferLayout layout = {
@@ -159,13 +166,13 @@ namespace Hanabi
 		Renderer::EndRenderPass(s_Data->GeoPass);
 	}
 
-	Ref<Framebuffer> SceneRenderer::GetFinalResult()
+	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 	{
-		return s_Data->GeoPass->GetSpecification().TargetFramebuffer;
+		return s_Data->GeoPass;
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID)
 	{
-		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterial, s_Data->m_DefaultPipeline, transform,CBBingdID::MODEL);
+		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterial, s_Data->m_DefaultPipeline, transform, CBBingSlot::MODEL);
 	}
 }

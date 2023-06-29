@@ -56,8 +56,7 @@ namespace Hanabi
 		bool m_ShowPhysicsColliders = false;
 		bool m_EnableVsyn = false;
 		Ref<Scene> m_ActiveScene;
-		Ref<RenderPass> m_TargetRenderPass;
-		Ref<Framebuffer> m_TargetFramebuffer;
+		Ref<Framebuffer> m_ViewportFramebuffer;
 		Entity m_HoveredEntity;
 		// Editor resources
 		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconPause, m_IconStep;

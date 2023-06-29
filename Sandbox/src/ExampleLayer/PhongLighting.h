@@ -22,7 +22,7 @@ private:
 	Hanabi::Ref<Hanabi::Texture2D> m_SpecularTexture;
 
 	Hanabi::Ref<Hanabi::Mesh> m_Mesh;
-	Hanabi::Ref<Hanabi::Material> m_Material;
+	Hanabi::Ref<Hanabi::MaterialAsset> m_Material;
 
 	std::vector<glm::mat4> m_ModelMatrices;
 

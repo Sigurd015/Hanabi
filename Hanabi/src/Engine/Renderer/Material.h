@@ -15,19 +15,9 @@ namespace Hanabi
 		void Bind() const;
 
 		void SetTexture(const Ref<Texture2D>& texture, uint32_t index);
+		Ref<Texture2D> GetTexture(uint32_t index);
 
 		Ref<Shader> GetShader() { return m_Shader; }
-
-		// Phong Lighting Model for now
-		enum class TextureType
-		{
-			Diffuse = 0,
-			Specular = 1,
-		};
-		/// <summary>
-		/// Notice: For Phong Lighting Model, 0 is Diffuse, 1 is Specular
-		/// </summary>
-		Ref<Texture2D> GetTexture(TextureType type);
 
 		static Ref<Material> Create(const Ref<Shader>& shader);
 	private:

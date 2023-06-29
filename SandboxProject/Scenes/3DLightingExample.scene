@@ -1,0 +1,134 @@
+Scene: Untitled
+Entities:
+  - Entity: 2520661167971211209
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [-7.66967821, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 915092837425999096
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [-7.66967821, 8.67380047, 6.87376595]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 10620220410946036738
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [5.49549389, 6.88386536, 8.83653545]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 4023006607451520671
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [5.04088163, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 8097539372491770338
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [0, 5.68874502, -6.49438]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 4231145719980805368
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [0, 0, 4.57696724]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 5094219979506434728
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [-4.03389072, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
+      SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+  - Entity: 12617901559031326774
+    TagComponent:
+      Tag: SpotLight
+    TransformComponent:
+      Translation: [0.293302894, 4.70798731, -1.52972865]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Spot
+      Intensity: 1
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 1.79999995
+      Angle: 3.45000005
+      AngleAttenuation: 0.600000024
+      Falloff: 0.170000002
+  - Entity: 18384714307737700554
+    TagComponent:
+      Tag: PointLight
+    TransformComponent:
+      Translation: [2.75939751, 5.33929205, 6.04378319]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 0.100000001, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 1
+      Radiance: [1, 1, 1]
+      Radius: 10
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 1
+  - Entity: 12268700654339359860
+    TagComponent:
+      Tag: DirectionalLight
+    TransformComponent:
+      Translation: [0, 0, 3.18891859]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Directional
+      Intensity: 0
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 0
