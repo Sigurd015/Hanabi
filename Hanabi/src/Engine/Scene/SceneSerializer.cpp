@@ -255,12 +255,13 @@ namespace Hanabi
 				auto& materialComponent = entity.GetComponent<MaterialComponent>();
 				auto& diffuse = materialComponent.Material->GetDiffuse();
 				auto& specular = materialComponent.Material->GetSpecular();
+				std::string diffusePath = diffuse->GetPath();
+				std::string specularPath = specular->GetPath();
+				if (diffuse && diffusePath != "")
+					out << YAML::Key << "DiffuseTexturePath" << YAML::Value << diffusePath.c_str();
 
-				if (diffuse)
-					out << YAML::Key << "DiffuseTexturePath" << YAML::Value << diffuse->GetPath().c_str();
-
-				if (specular)
-					out << YAML::Key << "SpecularTexturePath" << YAML::Value << specular->GetPath().c_str();
+				if (specular && specularPath != "")
+					out << YAML::Key << "SpecularTexturePath" << YAML::Value << specularPath.c_str();
 			});
 
 		SerializeComponent<LightComponent>("LightComponent", entity, out, [&]()

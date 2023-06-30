@@ -231,123 +231,6 @@ namespace Hanabi
 		{
 			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
 			RenderScene(cameraPos, viewProjection, selectedEntity, enableOverlayRender);
-			////----------------- 3D Scene Rendering -----------------//				
-			//// Lights
-			//{
-			//	auto view = m_Registry.view<TransformComponent, LightComponent>();
-			//	for (auto entity : view)
-			//	{
-			//		auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
-			//		switch (light.Type)
-			//		{
-			//		case LightComponent::LightType::Directional:
-			//		{
-			//			sceneEnvironment.DirLight = {
-			//				light.Radiance,
-			//				light.Intensity,
-			//				-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
-			//			};
-			//			break;
-			//		}
-			//		case LightComponent::LightType::Point:
-			//		{
-			//			sceneEnvironment.PointLights[sceneEnvironment.PointLightCount] = {
-			//				transform.Translation,
-			//				light.Intensity,
-			//				light.Radiance,
-			//				light.Radius,
-			//				light.Falloff,
-			//			};
-			//			sceneEnvironment.PointLightCount++;
-			//			break;
-			//		}
-			//		case LightComponent::LightType::Spot:
-			//		{
-			//			sceneEnvironment.SpotLights[sceneEnvironment.SpotLightCount] = {
-			//				transform.Translation,
-			//				light.Intensity,
-			//				light.Radiance,
-			//				light.AngleAttenuation,
-			//				-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
-			//				light.Range,
-			//				light.Angle,
-			//				light.Falloff,
-			//			};
-			//			sceneEnvironment.PointLightCount++;
-			//			break;
-			//		}
-			//		}
-			//	}
-			//}
-
-			//SceneRenderer::BeginScene(sceneEnvironment);
-
-			//// Draw objects with materials
-			//{
-			//	auto view = m_Registry.view<TransformComponent, MeshComponent, MaterialComponent>();
-			//	for (auto entity : view)
-			//	{
-			//		auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
-
-			//		SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), transform.GetTransform());
-			//	}
-			//}
-			//// Draw objects without materials
-			//{
-			//	auto view = m_Registry.view<TransformComponent, MeshComponent>();
-			//	for (auto entity : view)
-			//	{
-			//		auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
-
-			//		SceneRenderer::SubmitStaticMesh(mesh.Mesh, nullptr, transform.GetTransform());
-			//	}
-			//}
-
-			//Renderer2D::BeginScene(viewProjection);
-			//Renderer2D::SetTargetRenderPass(SceneRenderer::GetFinalRenderPass());
-
-			//// Draw sprites
-			//{
-			//	auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
-			//	for (auto entity : view)
-			//	{
-			//		auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
-
-			//		if (sprite.Texture)
-			//			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Texture,
-			//				sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor);
-			//		else
-			//			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-			//	}
-			//}
-
-			//// Draw circles
-			//{
-			//	auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-			//	for (auto entity : view)
-			//	{
-			//		auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
-
-			//		Renderer2D::DrawCircle(transform.GetTransform(), circle.Color, circle.Thickness, circle.Fade);
-			//	}
-			//}
-
-			//// Draw text
-			//{
-			//	auto view = m_Registry.view<TransformComponent, TextComponent>();
-			//	for (auto entity : view)
-			//	{
-			//		auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
-
-			//		Renderer2D::DrawString(text.TextString, transform.GetTransform(), text);
-			//	}
-			//}
-
-			//OnOverlayRender(enableOverlayRender, selectedEntity);
-
-			//Renderer2D::EndScene();
-
-			//SceneRenderer::EndScene();
 		}
 	}
 
@@ -380,29 +263,27 @@ namespace Hanabi
 				}
 				case LightComponent::LightType::Point:
 				{
-					sceneEnvironment.PointLights[sceneEnvironment.PointLightCount] = {
+					sceneEnvironment.PointLights.push_back({
 						transform.Translation,
 						light.Intensity,
 						light.Radiance,
 						light.Radius,
 						light.Falloff,
-					};
-					sceneEnvironment.PointLightCount++;
+						});
 					break;
 				}
 				case LightComponent::LightType::Spot:
 				{
-					sceneEnvironment.SpotLights[sceneEnvironment.SpotLightCount] = {
+					sceneEnvironment.SpotLights.push_back({
 						transform.Translation,
 						light.Intensity,
 						light.Radiance,
 						light.AngleAttenuation,
-						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+						glm::normalize(glm::rotate(transform.GetRotation(), glm::vec3(1.0f, 0.0f, 0.0f))),
 						light.Range,
 						light.Angle,
 						light.Falloff,
-					};
-					sceneEnvironment.PointLightCount++;
+						});
 					break;
 				}
 				}
@@ -421,7 +302,8 @@ namespace Hanabi
 					SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), transform.GetTransform());
 			}
 		}
-		// Draw objects without materials
+
+		// Draw objects with default material
 		{
 			auto view = m_Registry.view<TransformComponent, MeshComponent>();
 			for (auto entity : view)
@@ -432,6 +314,9 @@ namespace Hanabi
 			}
 		}
 
+		SceneRenderer::EndScene();
+
+		//----------------- 2D Scene Rendering -----------------//
 		Renderer2D::BeginScene(viewProj);
 		Renderer2D::SetTargetRenderPass(SceneRenderer::GetFinalRenderPass());
 		// Draw sprites
@@ -475,9 +360,6 @@ namespace Hanabi
 		OnOverlayRender(enableOverlayRender, selectedEntity);
 
 		Renderer2D::EndScene();
-
-		SceneRenderer::EndScene();
-
 	}
 
 	//TODO: Make a better way to render overlays

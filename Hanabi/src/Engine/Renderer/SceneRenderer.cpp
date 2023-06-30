@@ -68,7 +68,7 @@ namespace Hanabi
 
 		Ref<RenderPass> GeoPass;
 
-		Ref<Material> m_DefaultMaterial;
+		Ref<MaterialAsset> m_DefaultMaterialAsset;
 		Ref<Pipeline> m_DefaultPipeline;
 	};
 	static SceneRendererData* s_Data;
@@ -99,7 +99,7 @@ namespace Hanabi
 		geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
 		s_Data->GeoPass = RenderPass::Create(geoRenderPassSpec);
 
-		s_Data->m_DefaultMaterial = Renderer::GetDefaultMaterial();
+		s_Data->m_DefaultMaterialAsset = Renderer::GetDefaultMaterialAsset();
 
 		//TODO: Make layout dynamic
 		VertexBufferLayout layout = {
@@ -144,15 +144,15 @@ namespace Hanabi
 		s_Data->SceneData.Light = environment.DirLight;
 		s_Data->SceneDataBuffer->SetData(&s_Data->SceneData);
 
-		s_Data->PointLightData.Count = environment.PointLightCount;
-		for (uint32_t i = 0; i < environment.PointLightCount; i++)
+		s_Data->PointLightData.Count = environment.PointLights.size();
+		for (uint32_t i = 0; i < s_Data->PointLightData.Count; i++)
 		{
 			s_Data->PointLightData.PointLights[i] = environment.PointLights[i];
 		}
 		s_Data->PointLightDataBuffer->SetData(&s_Data->PointLightData);
 
-		s_Data->SpotLightData.Count = environment.SpotLightCount;
-		for (uint32_t i = 0; i < environment.SpotLightCount; i++)
+		s_Data->SpotLightData.Count = environment.SpotLights.size();
+		for (uint32_t i = 0; i < s_Data->SpotLightData.Count; i++)
 		{
 			s_Data->SpotLightData.SpotLights[i] = environment.SpotLights[i];
 		}
@@ -173,6 +173,6 @@ namespace Hanabi
 
 	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID)
 	{
-		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterial, s_Data->m_DefaultPipeline, transform, CBBingSlot::MODEL);
+		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterialAsset->GetMaterial(), s_Data->m_DefaultPipeline, transform, CBBingSlot::MODEL);
 	}
 }

@@ -8,6 +8,7 @@ namespace Hanabi
 	public:
 		MaterialAsset();
 		MaterialAsset(Ref<Material> material);
+		MaterialAsset(const Ref<MaterialAsset>& other);
 		~MaterialAsset() = default;
 
 		//TODO : For now(Phong lighting model) we only need diffuse and specular textures

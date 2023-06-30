@@ -53,11 +53,8 @@ namespace Hanabi
 
 		DirectionalLight DirLight;
 
-		uint32_t PointLightCount = 0;
-		PointLight PointLights[MAX_POINT_LIGHT];
-
-		uint32_t SpotLightCount = 0;
-		SpotLight SpotLights[MAX_SPOT_LIGHT];
+		std::vector<PointLight> PointLights;
+		std::vector<SpotLight> SpotLights;
 	};
 
 	class SceneRenderer

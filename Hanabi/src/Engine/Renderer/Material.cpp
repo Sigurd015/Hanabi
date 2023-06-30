@@ -9,12 +9,16 @@ namespace Hanabi
 		return CreateRef<Material>(shader);
 	}
 
+	Ref<Material> Material::Copy(const Ref<Material>& other)
+	{
+		Ref<Material> material = CreateRef<Material>(other->GetShader());
+		material->m_Textures = other->m_Textures;
+		return material;
+	}
+
 	Material::Material(const Ref<Shader>& shader)
 	{
-		if (shader)
-			m_Shader = shader;
-		else
-			m_Shader = Renderer::GetShader("3DStaticMesh_Default");
+		m_Shader = shader;
 	}
 
 	Material::~Material()

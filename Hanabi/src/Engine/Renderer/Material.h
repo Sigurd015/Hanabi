@@ -20,6 +20,7 @@ namespace Hanabi
 		Ref<Shader> GetShader() { return m_Shader; }
 
 		static Ref<Material> Create(const Ref<Shader>& shader);
+		static Ref<Material> Copy(const Ref<Material>& other);
 	private:
 		void BindTextures() const;
 

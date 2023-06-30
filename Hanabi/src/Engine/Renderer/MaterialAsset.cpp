@@ -13,11 +13,18 @@ namespace Hanabi
 
 	MaterialAsset::MaterialAsset()
 	{
-		m_Material = Renderer::GetDefaultMaterial();
+		*this = Renderer::GetDefaultMaterialAsset();
 	}
 
-	MaterialAsset::MaterialAsset(Ref<Material> material) : m_Material(material)
-	{}
+	MaterialAsset::MaterialAsset(Ref<Material> material)
+	{
+		m_Material = Material::Copy(material);
+	}
+
+	MaterialAsset::MaterialAsset(const Ref<MaterialAsset>& other)
+	{
+		m_Material = Material::Copy(other->GetMaterial());
+	}
 
 	Ref<Texture2D> MaterialAsset::GetDiffuse()
 	{
@@ -34,7 +41,7 @@ namespace Hanabi
 	void MaterialAsset::ClearDiffuse()
 	{
 		uint32_t index = static_cast<uint32_t>(TextureType::Diffuse);
-		m_Material->SetTexture(nullptr, index);
+		m_Material->SetTexture(Renderer::GetTexture("White"), index);
 	}
 
 	Ref<Texture2D> MaterialAsset::GetSpecular()
@@ -52,6 +59,6 @@ namespace Hanabi
 	void MaterialAsset::ClearSpecular()
 	{
 		uint32_t index = static_cast<uint32_t>(TextureType::Specular);
-		m_Material->SetTexture(nullptr, index);
+		m_Material->SetTexture(Renderer::GetTexture("White"), index);
 	}
 }
