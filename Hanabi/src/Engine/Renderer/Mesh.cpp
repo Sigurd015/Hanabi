@@ -16,7 +16,8 @@ namespace Hanabi
 			aiProcess_SortByPType |
 			aiProcess_JoinIdenticalVertices |
 			aiProcess_GenNormals |
-			aiProcess_GenUVCoords
+			aiProcess_GenUVCoords |
+			aiProcess_CalcTangentSpace
 		);
 
 		if (pAssimpScene && !(pAssimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) && pAssimpScene->HasMeshes())
@@ -28,10 +29,14 @@ namespace Hanabi
 				aiVector3D vertex = pMesh->mVertices[i];
 				aiVector3D normal = pMesh->mNormals[i];
 				aiVector3D texCoord = pMesh->mTextureCoords[0][i];
+				aiVector3D tangent = pMesh->mTangents[i];
+				aiVector3D bitangent = pMesh->mBitangents[i];
 				m_Vertices.push_back({
 					{vertex.x, vertex.y, vertex.z},
 					{normal.x, normal.y, normal.z},
-					{texCoord.x, texCoord.y}
+					{tangent.x,tangent.y,tangent.z},
+					{bitangent.x,bitangent.y,bitangent.z},
+					{texCoord.x, texCoord.y},
 					});
 			}
 
@@ -58,6 +63,8 @@ namespace Hanabi
 		VertexBufferLayout layout = {
 		  { ShaderDataType::Float3, "a_Position" },
 		  { ShaderDataType::Float3, "a_Normal" },
+		  { ShaderDataType::Float3, "a_Tangent" },
+		  { ShaderDataType::Float3, "a_Bitangent" },
 		  { ShaderDataType::Float2, "a_TexCoord" },
 		};
 

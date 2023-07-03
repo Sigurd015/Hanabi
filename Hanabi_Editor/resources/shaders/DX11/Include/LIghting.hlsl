@@ -12,12 +12,15 @@ float3 CalcDirectionalLight(Material material, float3 worldNormal, float3 pixelT
 {
     float3 result = float3(0, 0, 0);
     
+    if (u_DirLight.Intensity == 0)
+        return result;
+    
     float3 lightDir = normalize(u_DirLight.Direction);
     
     float3 ambientColor = u_DirLight.Radiance * u_DirLight.Intensity * material.DiffuseColor;
 
     float diffuseFactor = max(dot(worldNormal, -lightDir), 0);
-    float3 diffuseColor = diffuseFactor * u_DirLight.Intensity * u_DirLight.Radiance * material.SpecularColor;
+    float3 diffuseColor = diffuseFactor * u_DirLight.Intensity * u_DirLight.Radiance * material.DiffuseColor;
 
     float3 lightReflect = normalize(reflect(lightDir, worldNormal));
     float specularFactor = max(dot(pixelToCamera, lightReflect), 0);
@@ -30,7 +33,7 @@ float3 CalcDirectionalLight(Material material, float3 worldNormal, float3 pixelT
 float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamera, float3 worldPos)
 {
     float3 result = float3(0, 0, 0);
-    for (int i = 0; i < MAX_POINT_LIGHT; i++)
+    for (int i = 0; i < u_PointLightsCount; i++)
     {
         if (u_PointLights[i].Intensity == 0)
             continue;
@@ -44,13 +47,13 @@ float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamer
         float3 ambientColor = pointLight.Radiance * pointLight.Intensity * material.DiffuseColor;
 
         float diffuseFactor = max(dot(worldNormal, -lightDirection), 0);
-        float3 diffuseColor = diffuseFactor * pointLight.Intensity * pointLight.Radiance * material.SpecularColor;
+        float3 diffuseColor = diffuseFactor * pointLight.Intensity * pointLight.Radiance * material.DiffuseColor;
 
         float3 lightReflect = normalize(reflect(lightDirection, worldNormal));
         float specularFactor = max(dot(pixelToCamera, lightReflect), 0);
         float3 specularColor = specularFactor * pointLight.Intensity * material.SpecularColor;
 
-        float3 color = (ambientColor + diffuseColor + specularColor);        
+        float3 color = (ambientColor + diffuseColor + specularColor);
         
         float attenuation = clamp(1.0 - (distance * distance) / (pointLight.Radius * pointLight.Radius), 0.0, 1.0);
         attenuation *= lerp(attenuation, 1.0, pointLight.Falloff);
@@ -63,7 +66,7 @@ float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamer
 float3 CalcSpotLight(Material material, float3 worldNormal, float3 pixelToCamera, float3 worldPos)
 {
     float3 result = float3(0, 0, 0);
-    for (int i = 0; i < MAX_SPOT_LIGHT; i++)
+    for (int i = 0; i < u_SpotLightsCount; i++)
     {
         if (u_SpotLights[i].Intensity == 0)
             continue;
@@ -76,12 +79,15 @@ float3 CalcSpotLight(Material material, float3 worldNormal, float3 pixelToCamera
        
         float spotFactor = dot(lightToWorldPos, normalize(spotLight.Direction));
 
+        if (spotFactor < 0)
+            continue;
+        
         float3 lightDirection = normalize(spotLight.Direction);
             
         float3 ambientColor = spotLight.Radiance * spotLight.Intensity * material.DiffuseColor;
 
         float diffuseFactor = max(dot(worldNormal, -lightDirection), 0);
-        float3 diffuseColor = diffuseFactor * spotLight.Intensity * spotLight.Radiance * material.SpecularColor;
+        float3 diffuseColor = diffuseFactor * spotLight.Intensity * spotLight.Radiance * material.DiffuseColor;
 
         float3 lightReflect = normalize(reflect(lightDirection, worldNormal));
         float specularFactor = max(dot(pixelToCamera, lightReflect), 0);

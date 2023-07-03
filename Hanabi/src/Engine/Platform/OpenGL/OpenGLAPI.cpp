@@ -88,14 +88,15 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, uint32_t modelCBBingID)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const void* modelData, uint32_t modelCBBingID)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(modelCBBingID);
-		transformBuffer->SetData(&transform);
+		transformBuffer->SetData(modelData);
 		pipeline->Bind();
 		mesh->GetIndexBuffer()->Bind();
 		material->Bind();
+		delete modelData;
 
 		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}

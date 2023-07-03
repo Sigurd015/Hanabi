@@ -57,6 +57,15 @@ namespace Hanabi
 		std::vector<SpotLight> SpotLights;
 	};
 
+	struct CBModel
+	{
+		glm::mat4 Transform;
+		bool UseNormalMap = false;
+
+		// Padding
+		float padding[3];
+	};
+
 	class SceneRenderer
 	{
 	public:
@@ -69,6 +78,6 @@ namespace Hanabi
 
 		static Ref<RenderPass> GetFinalRenderPass();
 
-		static void SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID = -1);
+		static void SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const CBModel& modelData, int entityID = -1);
 	};
 }

@@ -90,11 +90,11 @@ namespace Hanabi
 			});
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, uint32_t modelCBBingID)
+	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const void* modelData, uint32_t modelCBBingID)
 	{
-		Renderer::Submit([mesh, material, pipeline, transform, modelCBBingID]()
+		Renderer::Submit([mesh, material, pipeline, modelData, modelCBBingID]()
 			{
-				s_RendererAPI->SubmitStaticMesh(mesh, material, pipeline, transform, modelCBBingID);
+				s_RendererAPI->SubmitStaticMesh(mesh, material, pipeline, modelData, modelCBBingID);
 			});
 	}
 

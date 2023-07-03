@@ -532,6 +532,44 @@ namespace Hanabi
 				{
 					component.Material->ClearSpecular();
 				}
+
+				ImGui::Text("Normal Texture:");
+				DrawDragDropContent([&component]()
+					{
+						Ref<Texture2D> normal = component.Material->GetNormal();
+						if (normal)
+						{
+							ImGui::Image(normal->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+						}
+						else
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+							ImGui::PopItemFlag();
+							ImGui::PopStyleColor();
+						}
+					},
+
+					[&component](auto& path)
+					{
+						Ref<Texture2D> texture = Texture2D::Create(path.string());
+						if (texture->IsLoaded())
+							component.Material->SetNormal(texture);
+						else
+							HNB_WARN("Could not load texture {0}", path.filename().string());
+					});
+				ImGui::SameLine();
+				if (ImGui::Button("ReSet Normal Texture"))
+				{
+					component.Material->ClearNormal();
+				}
+
+				component.UseNormalMap = component.Material->IsUsingNormalMap();
+				if (ImGui::Checkbox("Use Normal Map", &component.UseNormalMap))
+				{
+					component.Material->SetUseNormalMap(component.UseNormalMap);
+				}
 			});
 
 		DrawComponent<LightComponent>("Light", entity, [](auto& component)

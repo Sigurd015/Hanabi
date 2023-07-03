@@ -11,39 +11,42 @@ void PhongLighting::OnAttach()
 {
 	m_Camera = Hanabi::EditorCamera(30.0f, 1920.0f / 1080.0f, 0.1f, 1000.0f);
 
-	Hanabi::Ref<Hanabi::MeshSource> temp = Hanabi::CreateRef<Hanabi::MeshSource>("assets/models/Box.fbx");
+	Hanabi::Ref<Hanabi::MeshSource> temp = Hanabi::CreateRef<Hanabi::MeshSource>("temp/models/Box.fbx");
 	m_Mesh = Hanabi::CreateRef<Hanabi::Mesh>(temp);
 
-	m_DiffuseTexture = Hanabi::Texture2D::Create("assets/textures/Container_Diffuse.png");
-	m_SpecularTexture = Hanabi::Texture2D::Create("assets/textures/Container_Specular.png");
+	m_DiffuseTexture = Hanabi::Texture2D::Create("temp/textures/Container_Diffuse.png");
+	m_SpecularTexture = Hanabi::Texture2D::Create("temp/textures/Container_Specular.png");
 
 	m_Material = Hanabi::CreateRef<Hanabi::MaterialAsset>();
 	m_Material->SetDiffuse(m_DiffuseTexture);
 	m_Material->SetSpecular(m_SpecularTexture);
 
-	m_Environment.PointLightCount = 2;
-	m_Environment.SpotLightCount = 2;
 	{
-		for (size_t i = 0; i < m_Environment.PointLightCount; i++)
+		for (size_t i = 0; i < 2; i++)
 		{
-			m_Environment.PointLights[i].Radius = 10.0f;
-			m_Environment.PointLights[i].Falloff = 1.0f;
-			m_Environment.PointLights[i].Intensity = 1.0f;
-			m_Environment.PointLights[i].Position = { 0.0f, 0.0f, 0.0f };
-			m_Environment.PointLights[i].Radiance = { 1.0f, 1.0f, 1.0f };
+			m_Environment.PointLights.push_back({
+						{ 0.0f, 0.0f, 0.0f },
+						1.0f,
+						{ 1.0f, 1.0f, 1.0f },
+						10.0f,
+						1.0f,
+				});
 		}
 	}
 
 	{
-		for (size_t i = 0; i < m_Environment.SpotLightCount; i++)
+		for (size_t i = 0; i < 2; i++)
 		{
-			m_Environment.SpotLights[i].Range = 10.0f;
-			m_Environment.SpotLights[i].Angle = 45.0f;
-			m_Environment.SpotLights[i].Falloff = 1.0f;
-			m_Environment.SpotLights[i].AngleAttenuation = 1.0f;
-			m_Environment.SpotLights[i].Radiance = { 1.0f, 1.0f, 1.0f };
-			m_Environment.SpotLights[i].Intensity = 1.0f;
-			m_Environment.SpotLights[i].Direction = { 0.0f, 0.0f, 1.0f };
+			m_Environment.SpotLights.push_back({
+						{ 0.0f, 0.0f, 0.0f },
+						1.0f,
+						{ 1.0f, 1.0f, 1.0f },
+						1.0f,
+						{ 0.0f, 0.0f, 1.0f },
+						10.0f,
+						45.0f,
+						1.0f,
+				});
 		}
 	}
 
@@ -73,7 +76,9 @@ void PhongLighting::OnUpdate(Hanabi::Timestep ts)
 
 	for (auto& trans : m_ModelMatrices)
 	{
-		Hanabi::SceneRenderer::SubmitStaticMesh(m_Mesh, m_Material->GetMaterial(), trans);
+		Hanabi::CBModel* model = new Hanabi::CBModel();
+		model->Transform = trans;
+		Hanabi::SceneRenderer::SubmitStaticMesh(m_Mesh, m_Material->GetMaterial(), *model);
 	}
 
 	Hanabi::SceneRenderer::EndScene();
@@ -160,7 +165,7 @@ void PhongLighting::UI_Tool()
 		ImGui::ColorEdit3("##DirectionalLightColor", glm::value_ptr(m_Environment.DirLight.Radiance));
 
 		{
-			for (size_t i = 0; i < m_Environment.PointLightCount; i++)
+			for (size_t i = 0; i < 2; i++)
 			{
 				std::string positionLabel = "Point Light Position - " + std::to_string(i);
 				std::string intensityLabel = "Point Light Intensity - " + std::to_string(i);
@@ -183,7 +188,7 @@ void PhongLighting::UI_Tool()
 			}
 		}
 		{
-			for (size_t i = 0; i < m_Environment.SpotLightCount; i++)
+			for (size_t i = 0; i < 2; i++)
 			{
 				std::string positionLabel = "Spot Light Position - " + std::to_string(i);
 				std::string directionLabel = "Spot Light Direction - " + std::to_string(i);

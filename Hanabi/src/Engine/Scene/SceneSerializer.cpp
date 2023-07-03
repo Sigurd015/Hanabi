@@ -255,13 +255,29 @@ namespace Hanabi
 				auto& materialComponent = entity.GetComponent<MaterialComponent>();
 				auto& diffuse = materialComponent.Material->GetDiffuse();
 				auto& specular = materialComponent.Material->GetSpecular();
-				std::string diffusePath = diffuse->GetPath();
-				std::string specularPath = specular->GetPath();
-				if (diffuse && diffusePath != "")
+				auto& normal = materialComponent.Material->GetNormal();
+
+				std::string diffusePath = "";
+				std::string specularPath = "";
+				std::string normalPath = "";
+
+				if (diffuse)
+					diffusePath = diffuse->GetPath();
+				if (specular)
+					specularPath = specular->GetPath();
+				if (normal)
+					normalPath = normal->GetPath();
+
+				if (diffusePath != "")
 					out << YAML::Key << "DiffuseTexturePath" << YAML::Value << diffusePath.c_str();
 
-				if (specular && specularPath != "")
+				if (specularPath != "")
 					out << YAML::Key << "SpecularTexturePath" << YAML::Value << specularPath.c_str();
+
+				if (normalPath != "")
+					out << YAML::Key << "NormalTexturePath" << YAML::Value << normalPath.c_str();
+
+				out << YAML::Key << "UseNormalMap" << YAML::Value << materialComponent.Material->IsUsingNormalMap();
 			});
 
 		SerializeComponent<LightComponent>("LightComponent", entity, out, [&]()
@@ -505,10 +521,22 @@ namespace Hanabi
 						mtc.Material->SetDiffuse(Texture2D::Create(diffusePath));
 					}
 
-					if (materialComponent["DiffuseTexturePath"])
+					if (materialComponent["SpecularTexturePath"])
 					{
 						std::string specularPath = materialComponent["SpecularTexturePath"].as<std::string>();
 						mtc.Material->SetSpecular(Texture2D::Create(specularPath));
+					}
+
+					if (materialComponent["NormalTexturePath"])
+					{
+						std::string normalPath = materialComponent["NormalTexturePath"].as<std::string>();
+						mtc.Material->SetNormal(Texture2D::Create(normalPath));
+					}
+
+					if (materialComponent["UseNormalMap"])
+					{
+						bool useNormalMap = materialComponent["UseNormalMap"].as<bool>();
+						mtc.Material->SetUseNormalMap(useNormalMap);
 					}
 				}
 

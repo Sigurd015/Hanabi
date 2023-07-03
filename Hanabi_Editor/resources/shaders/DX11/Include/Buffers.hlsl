@@ -34,6 +34,7 @@ struct SpotLight
 cbuffer CBModel : register(b0)
 {
     float4x4 u_Transform;
+    bool u_UseNormalMap;
 };
 
 cbuffer CBCamera : register(b1)
@@ -49,13 +50,13 @@ cbuffer CBScene : register(b2)
 
 cbuffer CBPointLight : register(b3)
 {
-    PointLight u_PointLights[MAX_POINT_LIGHT];
     uint u_PointLightsCount;
+    PointLight u_PointLights[MAX_POINT_LIGHT];
 };
 
 cbuffer CBSpotLight : register(b4)
 {
-    SpotLight u_SpotLights[MAX_SPOT_LIGHT];
     uint u_SpotLightsCount;
+    SpotLight u_SpotLights[MAX_SPOT_LIGHT];
 };
 #endif

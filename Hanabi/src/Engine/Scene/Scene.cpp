@@ -298,8 +298,11 @@ namespace Hanabi
 			for (auto entity : view)
 			{
 				auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
+				CBModel* model = new CBModel();
+				model->Transform = transform.GetTransform();
+				model->UseNormalMap = material.UseNormalMap;
 				if (mesh.Mesh && material.Material)
-					SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), transform.GetTransform());
+					SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), *model);
 			}
 		}
 
@@ -309,8 +312,11 @@ namespace Hanabi
 			for (auto entity : view)
 			{
 				auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
+				CBModel* model = new CBModel();
+				model->Transform = transform.GetTransform();
+				model->UseNormalMap = false;
 				if (mesh.Mesh)
-					SceneRenderer::SubmitStaticMesh(mesh.Mesh, nullptr, transform.GetTransform());
+					SceneRenderer::SubmitStaticMesh(mesh.Mesh, nullptr, *model);
 			}
 		}
 

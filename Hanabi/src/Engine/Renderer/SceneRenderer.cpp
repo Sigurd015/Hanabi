@@ -26,11 +26,6 @@ namespace Hanabi
 			float padding;
 		};
 
-		struct CBModel
-		{
-			glm::mat4 Transform;
-		};
-
 		struct CBScene
 		{
 			DirectionalLight Light;
@@ -38,20 +33,22 @@ namespace Hanabi
 
 		struct CBPointLight
 		{
-			PointLight PointLights[MAX_POINT_LIGHT]{};
 			uint32_t Count = 0;
 
 			// Padding
 			float padding[3];
+
+			PointLight PointLights[MAX_POINT_LIGHT]{};
 		};
 
 		struct CBSpotLight
 		{
-			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
 			uint32_t Count = 0;
 
 			// Padding
 			float padding[3];
+
+			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
 		};
 
 		CBCamera CameraData;
@@ -77,7 +74,7 @@ namespace Hanabi
 	{
 		s_Data = new SceneRendererData();
 
-		s_Data->ModelDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBModel), CBBingSlot::MODEL);
+		s_Data->ModelDataBuffer = ConstantBuffer::Create(sizeof(CBModel), CBBingSlot::MODEL);
 		s_Data->CameraDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBCamera), CBBingSlot::CAMERA);
 		s_Data->SceneDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBScene), CBBingSlot::SCENE);
 		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight), CBBingSlot::POINT_LIGHT);
@@ -105,6 +102,8 @@ namespace Hanabi
 		VertexBufferLayout layout = {
 		  { ShaderDataType::Float3, "a_Position" },
 		  { ShaderDataType::Float3, "a_Normal" },
+		  { ShaderDataType::Float3, "a_Tangent" },
+		  { ShaderDataType::Float3, "a_Bitangent" },
 		  { ShaderDataType::Float2, "a_TexCoord" },
 		};
 		PipelineSpecification spec;
@@ -171,8 +170,8 @@ namespace Hanabi
 		return s_Data->GeoPass;
 	}
 
-	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const glm::mat4& transform, int entityID)
+	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const CBModel& modelData, int entityID)
 	{
-		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterialAsset->GetMaterial(), s_Data->m_DefaultPipeline, transform, CBBingSlot::MODEL);
+		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterialAsset->GetMaterial(), s_Data->m_DefaultPipeline, &modelData, CBBingSlot::MODEL);
 	}
 }

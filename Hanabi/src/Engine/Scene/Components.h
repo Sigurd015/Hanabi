@@ -105,6 +105,7 @@ namespace Hanabi
 	struct MaterialComponent
 	{
 		Ref<MaterialAsset> Material;
+		bool UseNormalMap = false;
 
 		MaterialComponent() = default;
 		MaterialComponent(const MaterialComponent&) = default;

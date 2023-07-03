@@ -10,7 +10,7 @@ Entities:
     MeshComponent:
       MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
     MaterialComponent:
-      {}
+      UseNormalMap: false
   - Entity: 14867977816448977551
     TagComponent:
       Tag: Wall
@@ -21,7 +21,7 @@ Entities:
     MeshComponent:
       MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
     MaterialComponent:
-      {}
+      UseNormalMap: false
   - Entity: 15053316189963316882
     TagComponent:
       Tag: Wall
@@ -32,7 +32,7 @@ Entities:
     MeshComponent:
       MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
     MaterialComponent:
-      {}
+      UseNormalMap: false
   - Entity: 9740645524881611525
     TagComponent:
       Tag: Text
@@ -65,7 +65,7 @@ Entities:
     TagComponent:
       Tag: PointLight
     TransformComponent:
-      Translation: [-9.24749565, 5.33929205, -4.02297783]
+      Translation: [-11.5083351, 4.31021261, -4.02297783]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 0.100000001, 1]
     LightComponent:
@@ -105,6 +105,7 @@ Entities:
     MaterialComponent:
       DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
       SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+      UseNormalMap: false
   - Entity: 4231145719980805368
     TagComponent:
       Tag: Box
@@ -115,7 +116,7 @@ Entities:
     MeshComponent:
       MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
     MaterialComponent:
-      {}
+      UseNormalMap: false
   - Entity: 8097539372491770338
     TagComponent:
       Tag: Box
@@ -128,6 +129,7 @@ Entities:
     MaterialComponent:
       DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
       SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+      UseNormalMap: false
   - Entity: 4023006607451520671
     TagComponent:
       Tag: Box
@@ -140,6 +142,7 @@ Entities:
     MaterialComponent:
       DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
       SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+      UseNormalMap: false
   - Entity: 10620220410946036738
     TagComponent:
       Tag: Box
@@ -152,6 +155,7 @@ Entities:
     MaterialComponent:
       DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
       SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+      UseNormalMap: false
   - Entity: 915092837425999096
     TagComponent:
       Tag: Box
@@ -164,6 +168,7 @@ Entities:
     MaterialComponent:
       DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Container_Diffuse.png
       SpecularTexturePath: ..\SandboxProject\Assets\Textures\Container_Specular.png
+      UseNormalMap: false
   - Entity: 2520661167971211209
     TagComponent:
       Tag: Box
@@ -174,17 +179,17 @@ Entities:
     MeshComponent:
       MeshPath: ..\SandboxProject\Assets\Models\Box.fbx
     MaterialComponent:
-      {}
+      UseNormalMap: false
   - Entity: 7885237720320880870
     TagComponent:
       Tag: PointLight
     TransformComponent:
-      Translation: [10.6514425, 5.33929205, -6.60401964]
+      Translation: [17.3314056, -0.167945862, -7.64701939]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 0.100000001, 1]
     LightComponent:
       LightType: Point
-      Intensity: 3.20000005
+      Intensity: 1
       Radiance: [1, 1, 1]
       Radius: 15
       Range: 0
@@ -225,3 +230,16 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
+  - Entity: 15303339349717631431
+    TagComponent:
+      Tag: Plane
+    TransformComponent:
+      Translation: [12.9481764, 0, -7.12601376]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshPath: ..\SandboxProject\Assets\Models\Plane.fbx
+    MaterialComponent:
+      DiffuseTexturePath: ..\SandboxProject\Assets\Textures\Brickwall_Diffuse.jpg
+      NormalTexturePath: ..\SandboxProject\Assets\Textures\Brickwall_Normal.png
+      UseNormalMap: true

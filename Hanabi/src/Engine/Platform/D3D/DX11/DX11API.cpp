@@ -98,14 +98,15 @@ namespace Hanabi
 		ResetToSwapChain();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const glm::mat4& transform, uint32_t modelCBBingID)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const void* modelData, uint32_t modelCBBingID)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
 		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(modelCBBingID);
-		transformBuffer->SetData(&transform);
+		transformBuffer->SetData(modelData);
 		pipeline->Bind();
 		material->Bind();
+		delete modelData;
 
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);
