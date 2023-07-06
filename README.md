@@ -23,12 +23,17 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] DirectX 12
   - [ ] Metal
 
-- [x] Application Framework
+- [x] Core
   - [x] Entry point
-  - [x] Logging
-  - [x] Change rendering API by command line args
+  - [x] Logging System
   - [x] Event system
-  - [x] Scene Serialize & Deserialize
+  - [x] Scripting System
+    - [x] C# Script Engine
+  - [x] Serialize & Deserialize System (YAML)
+  - [x] ECS System (entt)
+  - [ ] Renderer 
+    - [x] 2D Batch Renderer
+    - [ ] .....
 
 - [ ] Editor  
   - [x] Play in editor
@@ -53,23 +58,24 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 
 ## Roadmap
-- [X] ~~DX11 Support~~
+- [X] DX11 Support
+- [X] C# Script Engine
 - [ ] SPIR-V Shader System
-- [X] ~~C# Script Engine~~
 - [ ] UI Renderer
 - [ ] Asset Manager
 - [ ] 3D Renderer
   - [X] Mesh System (WIP)
   - [X] Material System (WIP)
-  - [X] Lighting (directional/point lights) (WIP - Phong lighting)
-  - [ ] Physically based rendering (PBR)
-  - [ ] Skyboxes
+  - [X] Lighting (WIP - Phong lighting)
   - [ ] Shadow mapping
     - [ ] Directional light shadows
     - [ ] Point light shadows
+    - [ ] Cascaded Shadow Maps
+    - [ ] Omnidirectional Shadow Maps
+  - [ ] Skyboxes
+  - [ ] Physically based rendering (PBR)
   - [ ] Screen space ambient occulsion
   - [ ] Screen space reflection
-  - [ ] Deferred rendering
   - [ ] Ray/Path tracing
     - [ ] Vulkan & DX12
 - [ ] Metal support

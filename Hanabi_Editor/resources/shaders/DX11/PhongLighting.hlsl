@@ -38,6 +38,7 @@ VertexOutput main(VertexInput Input)
 }
 
 #type:pixel
+#include "Buffers.hlsl"
 #include "Lighting.hlsl"
 
 struct PixelInput
@@ -82,9 +83,7 @@ PixelOutput main(PixelInput Input)
 
         float3 normalSample = u_Normal.Sample(u_NormalSamplerState, Input.TexCoord).xyz;
         normal = normalSample * 2.0f - 1.0f; // from RGB[0, 1] to [-1, 1]
-        // Notice: Flip y, for now, using opengl normal map from LearnOpenGL tutorial
-        normal.y = -normal.y;
-        normal = mul(mat, normal);
+        normal = normalize(mul(mat, normal));
     }
     else
         normal = Input.Normal;

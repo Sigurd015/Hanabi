@@ -535,8 +535,7 @@ namespace Hanabi
 
 					if (materialComponent["UseNormalMap"])
 					{
-						bool useNormalMap = materialComponent["UseNormalMap"].as<bool>();
-						mtc.Material->SetUseNormalMap(useNormalMap);
+						mtc.UseNormalMap = materialComponent["UseNormalMap"].as<bool>();
 					}
 				}
 

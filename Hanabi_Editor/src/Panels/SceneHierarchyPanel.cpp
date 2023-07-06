@@ -565,7 +565,6 @@ namespace Hanabi
 					component.Material->ClearNormal();
 				}
 
-				component.UseNormalMap = component.Material->IsUsingNormalMap();
 				if (ImGui::Checkbox("Use Normal Map", &component.UseNormalMap))
 				{
 					component.Material->SetUseNormalMap(component.UseNormalMap);
