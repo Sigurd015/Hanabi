@@ -106,7 +106,9 @@ namespace Hanabi
 		transformBuffer->SetData(modelData);
 		pipeline->Bind();
 		material->Bind();
-		delete modelData;
+
+		//TODO: Make a better way to handle this, and remember to delete the modelData
+		//delete modelData;
 
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);

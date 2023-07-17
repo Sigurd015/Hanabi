@@ -40,6 +40,7 @@ VertexOutput main(VertexInput Input)
 #type:pixel
 #include "Buffers.hlsl"
 #include "Lighting.hlsl"
+#include "Textures.hlsl"
 
 struct PixelInput
 {
@@ -55,15 +56,6 @@ struct PixelOutput
 {
     float4 Color : SV_Target0;
 };
-
-Texture2D u_Diffuse : register(t0);
-SamplerState u_DiffuseSamplerState : register(s0);
-
-Texture2D u_Specular : register(t1);
-SamplerState u_SpecularSamplerState : register(s1);
-
-Texture2D u_Normal : register(t2);
-SamplerState u_NormalSamplerState : register(s2);
 
 PixelOutput main(PixelInput Input)
 {

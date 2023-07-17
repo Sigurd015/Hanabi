@@ -43,7 +43,7 @@ namespace Hanabi
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class  KeyTypedEvent :public KeyEvent
+	class KeyTypedEvent :public KeyEvent
 	{
 	public:
 		KeyTypedEvent(const KeyCode keycode) : KeyEvent(keycode) {}

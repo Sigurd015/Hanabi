@@ -10,7 +10,22 @@
 
 namespace Hanabi
 {
-	void CreateTexDesc(D3D11_USAGE usage, int cpuAccess, uint32_t width, uint32_t height,
+	namespace Utils
+	{
+		static DXGI_FORMAT ImageFormatToDXDataFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::RGB8:  return DXGI_FORMAT_R8G8B8A8_UNORM;
+			case ImageFormat::RGBA8: return DXGI_FORMAT_R8G8B8A8_UNORM;
+			}
+
+			HNB_CORE_ASSERT(false);
+			return DXGI_FORMAT_UNKNOWN;
+		}
+	}
+
+	void CreateTexture(D3D11_USAGE usage, int cpuAccess, uint32_t width, uint32_t height,
 		DXGI_FORMAT format, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Texture2D** ppTexture2D)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc = { 0 };
@@ -59,12 +74,12 @@ namespace Hanabi
 			m_IsLoaded = true;
 			m_Width = width;
 			m_Height = height;
-			m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 			D3D11_SUBRESOURCE_DATA subresourceData = {};
 			subresourceData.pSysMem = data;
 			subresourceData.SysMemPitch = m_Width * 4;
-			CreateTexDesc(D3D11_USAGE_DEFAULT, 0, m_Width, m_Height, m_DataFormat, &subresourceData, m_Texture.GetAddressOf());
+			CreateTexture(D3D11_USAGE_DEFAULT, 0, m_Width, m_Height, m_DataFormat, &subresourceData, m_Texture.GetAddressOf());
 			CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureView.GetAddressOf());
 			CreateSamplerState(m_SamplerState.GetAddressOf());
 			stbi_image_free(data);
@@ -74,8 +89,8 @@ namespace Hanabi
 	DX11Texture2D::DX11Texture2D(const TextureSpecification& specification) :m_Specification(specification),
 		m_Width(specification.Width), m_Height(specification.Height)
 	{
-		m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-		CreateTexDesc(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
+		m_DataFormat = Utils::ImageFormatToDXDataFormat(specification.Format);
+		CreateTexture(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
 		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureView.GetAddressOf());
 		CreateSamplerState(m_SamplerState.GetAddressOf());
 	}

@@ -5,7 +5,6 @@ build/
 *.vcxproj
 *.sln
 Hanabi_Editor/resources/scripts
-Hanabi_Editor/temp
 Sandbox/imgui.ini
 *.log
 *.json

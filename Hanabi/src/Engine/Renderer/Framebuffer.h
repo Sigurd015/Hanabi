@@ -1,32 +1,15 @@
 #pragma once
 #include "Engine/Core/Base.h"
+#include "Image.h"
 
 namespace Hanabi
 {
-	enum class FramebufferTextureFormat
-	{
-		None = 0,
-
-		// Color
-		RGBA8F,
-
-		RED8UI,
-
-		// Depth/stencil
-		DEPTH24STENCIL8,
-
-		// TODO: Make a better way to do mouse picking
-		MousePick = RED8UI,
-		// Defaults
-		Depth = DEPTH24STENCIL8
-	};
-
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
-		FramebufferTextureSpecification(FramebufferTextureFormat format) :TextureFormat(format) {}
+		FramebufferTextureSpecification(ImageFormat format) :TextureFormat(format) {}
 
-		FramebufferTextureFormat TextureFormat;
+		ImageFormat TextureFormat;
 		// TODO: filtering/wrap
 	};
 

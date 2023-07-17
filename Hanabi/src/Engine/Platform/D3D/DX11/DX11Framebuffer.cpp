@@ -29,33 +29,67 @@ namespace Hanabi
 			return sampleDesc;
 		}
 
-		static DXGI_FORMAT FBTextureFormatToDX11(FramebufferTextureFormat format)
+		static DXGI_FORMAT FBTextureFormatToDX11(ImageFormat format)
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::RGBA8F:       return DXGI_FORMAT_R32G32B32A32_FLOAT;
-			case FramebufferTextureFormat::RED8UI:       return DXGI_FORMAT_R32_SINT;
-			case FramebufferTextureFormat::DEPTH24STENCIL8: return DXGI_FORMAT_R24G8_TYPELESS;
+			case ImageFormat::RGBA8F:       return DXGI_FORMAT_R32G32B32A32_FLOAT;
+			case ImageFormat::RED8UI:       return DXGI_FORMAT_R32_SINT;
+			case ImageFormat::DEPTH24STENCIL8: return DXGI_FORMAT_R24G8_TYPELESS;
+			case ImageFormat::DEPTH32F: return DXGI_FORMAT_R32_TYPELESS;
 			}
 
 			return DXGI_FORMAT_UNKNOWN;
 		}
 
-		static bool IsDepthFormat(FramebufferTextureFormat format)
+		static DXGI_FORMAT DepthStencilViewFormatToDX11(ImageFormat format)
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::DEPTH24STENCIL8:  return true;
+			case ImageFormat::DEPTH24STENCIL8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
+			case ImageFormat::DEPTH32F: return DXGI_FORMAT_D32_FLOAT;
+			}
+
+			return DXGI_FORMAT_UNKNOWN;
+		}
+
+		static DXGI_FORMAT ShadowResourceViewFormatToDX11(ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::DEPTH24STENCIL8: return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			case ImageFormat::DEPTH32F: return DXGI_FORMAT_R32_FLOAT;
+			}
+
+			return DXGI_FORMAT_UNKNOWN;
+		}
+
+		static bool IsDepthFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::DEPTH24STENCIL8:  return true;
+			case ImageFormat::DEPTH32F:  return true;
 			}
 
 			return false;
 		}
 
-		static bool IsMousePickFormat(FramebufferTextureFormat format)
+		static bool IsShadowMap(ImageFormat format)
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::RED8UI:  return true;
+			case ImageFormat::DEPTH32F:  return true;
+			}
+
+			return false;
+		}
+
+		static bool IsMousePickFormat(ImageFormat format)
+		{
+			switch (format)
+			{
+			case ImageFormat::RED8UI:  return true;
 			}
 
 			return false;
@@ -145,8 +179,10 @@ namespace Hanabi
 				m_ColorAttachmentSRV.push_back(shaderResourceView);
 			}
 		}
-		if (m_DepthAttachmentSpecification.TextureFormat != FramebufferTextureFormat::None)
+		if (m_DepthAttachmentSpecification.TextureFormat != ImageFormat::None)
 		{
+			bool isShadowMap = Utils::IsShadowMap(m_DepthAttachmentSpecification.TextureFormat);
+
 			D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 			depthStencilDesc.Width = m_Specification.Width;
 			depthStencilDesc.Height = m_Specification.Height;
@@ -155,28 +191,40 @@ namespace Hanabi
 			depthStencilDesc.Format = Utils::FBTextureFormatToDX11(m_DepthAttachmentSpecification.TextureFormat);
 			depthStencilDesc.SampleDesc = Utils::Multisample(m_Specification.Samples, depthStencilDesc.Format);
 			depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+			depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+			if (isShadowMap)
+				depthStencilDesc.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
 			depthStencilDesc.CPUAccessFlags = 0;
 			depthStencilDesc.MiscFlags = 0;
-			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilAttachmentsTexture.GetAddressOf()));
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&depthStencilDesc, nullptr,
+				m_DepthStencilAttachmentsTexture.GetAddressOf()));
+
 			D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-			depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			depthStencilViewDesc.Format = Utils::DepthStencilViewFormatToDX11(m_DepthAttachmentSpecification.TextureFormat);
 			depthStencilViewDesc.Flags = 0;
 			depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			depthStencilViewDesc.Texture2D.MipSlice = 0;
-			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateDepthStencilView(m_DepthStencilAttachmentsTexture.Get(), &depthStencilViewDesc, m_DepthStencilAttachment.GetAddressOf()));
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateDepthStencilView(m_DepthStencilAttachmentsTexture.Get(), &depthStencilViewDesc,
+				m_DepthStencilAttachment.GetAddressOf()));
 
-			D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceDesc = {};
-			shaderResourceDesc.Format = depthStencilDesc.Format;
-			shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			shaderResourceDesc.Texture2D.MipLevels = 1;
-			DX11Context::GetDevice()->CreateShaderResourceView(m_DepthStencilAttachmentsTexture.Get(), &shaderResourceDesc, m_DepthStencilSRV.GetAddressOf());
+			if (isShadowMap)
+			{
+				D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceDesc = {};
+				shaderResourceDesc.Format = Utils::ShadowResourceViewFormatToDX11(m_DepthAttachmentSpecification.TextureFormat);
+				shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				shaderResourceDesc.Texture2D.MipLevels = 1;
+				DX11Context::GetDevice()->CreateShaderResourceView(m_DepthStencilAttachmentsTexture.Get(), &shaderResourceDesc,
+					m_DepthStencilSRV.GetAddressOf());
+			}
 		}
 	}
 
 	void DX11Framebuffer::Bind()
 	{
-		DX11Context::GetDeviceContext()->OMSetRenderTargets(m_ColorAttachmentRTV.size(), m_ColorAttachmentRTV.data()->GetAddressOf(), m_DepthStencilAttachment.Get());
+		DX11Context::GetDeviceContext()->OMSetRenderTargets(m_ColorAttachmentRTV.size(), m_ColorAttachmentRTV.data()->GetAddressOf(),
+			m_DepthStencilAttachment.Get());
 	}
 
 	void DX11Framebuffer::Unbind()
@@ -196,7 +244,8 @@ namespace Hanabi
 			else
 				DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[i].Get(), &m_Specification.ClearColor.x);
 		}
-		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DepthStencilAttachment.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, m_Specification.DepthClearValue, 0);
+		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DepthStencilAttachment.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			m_Specification.DepthClearValue, 0);
 	}
 
 	void DX11Framebuffer::Resize(uint32_t width, uint32_t height)
@@ -224,7 +273,6 @@ namespace Hanabi
 
 		Invalidate();
 	}
-
 
 	int DX11Framebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 	{
@@ -265,6 +313,8 @@ namespace Hanabi
 
 	void* DX11Framebuffer::GetDepthAttachment() const
 	{
+		HNB_CORE_ASSERT(Utils::IsShadowMap(m_DepthAttachmentSpecification.TextureFormat));
+
 		return m_DepthStencilSRV.Get();
 	}
 }

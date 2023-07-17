@@ -1,6 +1,5 @@
 ﻿#include "Hanabi.h"
 #include "Engine/EntryPoint.h"
-#include "ExampleLayer/PhongLighting.h"
 
 #include <imgui.h>
 
@@ -9,7 +8,7 @@ class Sandbox :public Hanabi::Application
 public:
 	Sandbox(const Hanabi::ApplicationSpecification& specification) : Hanabi::Application(specification)
 	{
-		PushLayer(new PhongLighting());
+		
 	}
 	~Sandbox()
 	{

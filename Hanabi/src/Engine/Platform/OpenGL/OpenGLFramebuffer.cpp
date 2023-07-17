@@ -67,33 +67,33 @@ namespace Hanabi
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
 
-		static bool IsDepthFormat(FramebufferTextureFormat format)
+		static bool IsDepthFormat(ImageFormat format)
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::DEPTH24STENCIL8:  return true;
+			case ImageFormat::DEPTH24STENCIL8:  return true;
 			}
 
 			return false;
 		}
 
-		static GLenum FBTextureFormatToGL(FramebufferTextureFormat format)
+		static GLenum FBTextureFormatToGL(ImageFormat format)
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::RGBA8F:       return GL_RGBA8;
-			case FramebufferTextureFormat::RED8UI: return GL_RED_INTEGER;
+			case ImageFormat::RGBA8F:       return GL_RGBA8;
+			case ImageFormat::RED8UI: return GL_RED_INTEGER;
 			}
 
 			HNB_CORE_ASSERT(false);
 			return 0;
 		}
 
-		static bool IsMousePickFormat(FramebufferTextureFormat format)
+		static bool IsMousePickFormat(ImageFormat format)
 		{
 			switch (format)
 			{
-			case FramebufferTextureFormat::RED8UI:  return true;
+			case ImageFormat::RED8UI:  return true;
 			}
 
 			return false;
@@ -148,11 +148,11 @@ namespace Hanabi
 				Utils::BindTexture(multisample, m_ColorAttachments[i]);
 				switch (m_ColorAttachmentSpecifications[i].TextureFormat)
 				{
-				case FramebufferTextureFormat::RGBA8F:
+				case ImageFormat::RGBA8F:
 					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
 						GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);
 					break;
-				case FramebufferTextureFormat::RED8UI:
+				case ImageFormat::RED8UI:
 					Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples,
 						GL_R32I, GL_RED_INTEGER, m_Specification.Width, m_Specification.Height, i);
 					break;
@@ -160,13 +160,13 @@ namespace Hanabi
 			}
 		}
 
-		if (m_DepthAttachmentSpecification.TextureFormat != FramebufferTextureFormat::None)
+		if (m_DepthAttachmentSpecification.TextureFormat != ImageFormat::None)
 		{
 			Utils::CreateTextures(multisample, &m_DepthAttachment, 1);
 			Utils::BindTexture(multisample, m_DepthAttachment);
 			switch (m_DepthAttachmentSpecification.TextureFormat)
 			{
-			case FramebufferTextureFormat::DEPTH24STENCIL8:
+			case ImageFormat::DEPTH24STENCIL8:
 				Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8,
 					GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 				break;

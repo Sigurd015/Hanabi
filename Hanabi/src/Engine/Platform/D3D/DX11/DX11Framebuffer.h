@@ -30,7 +30,7 @@ namespace Hanabi
 
 		FramebufferSpecification m_Specification;
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
-		FramebufferTextureSpecification m_DepthAttachmentSpecification = FramebufferTextureFormat::None;
+		FramebufferTextureSpecification m_DepthAttachmentSpecification = ImageFormat::None;
 		std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> m_ColorAttachmentRTV;
 		std::vector<Microsoft::WRL::ComPtr<ID3D11Texture2D>> m_ColorAttachmentTextures;
 		std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> m_ColorAttachmentSRV;

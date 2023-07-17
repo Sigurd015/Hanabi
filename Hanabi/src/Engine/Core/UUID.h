@@ -20,6 +20,7 @@ namespace Hanabi
 		uint64_t m_UUID;
 	};
 }
+
 namespace std
 {
 	template<>
@@ -30,5 +31,4 @@ namespace std
 			return (uint64_t)uuid;
 		}
 	};
-
 }

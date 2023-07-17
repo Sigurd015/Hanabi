@@ -63,10 +63,20 @@ namespace Hanabi
 		Hanabi::Ref<Hanabi::ConstantBuffer> PointLightDataBuffer;
 		Hanabi::Ref<Hanabi::ConstantBuffer> SpotLightDataBuffer;
 
+		Ref<RenderPass> ShadowPass;
 		Ref<RenderPass> GeoPass;
 
 		Ref<MaterialAsset> m_DefaultMaterialAsset;
 		Ref<Pipeline> m_DefaultPipeline;
+
+		struct DrawCommand
+		{
+			Ref<Mesh> Mesh;
+			Ref<Material> Material;
+
+			const CBModel* ModelData;
+		};
+		std::vector<DrawCommand> DrawCommands;
 	};
 	static SceneRendererData* s_Data;
 
@@ -80,21 +90,35 @@ namespace Hanabi
 		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight), CBBingSlot::POINT_LIGHT);
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight), CBBingSlot::SPOT_LIGHT);
 
-		FramebufferSpecification geoFramebufferSpec;
-		geoFramebufferSpec.Attachments = {
-			FramebufferTextureFormat::RGBA8F,
-			FramebufferTextureFormat::MousePick,
-			FramebufferTextureFormat::Depth };
-		geoFramebufferSpec.Width = 1920;
-		geoFramebufferSpec.Height = 1080;
-		// TODO: Make a better way to do mouse picking
-		// TODO: Make a better way to clear the framebuffer and use the different clear values for editor and game
-		geoFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		geoFramebufferSpec.MousePickClearValue = -1;
+		{
+			FramebufferSpecification geoFramebufferSpec;
+			geoFramebufferSpec.Attachments = {
+				ImageFormat::RGBA8F,
+				ImageFormat::MousePick,
+				ImageFormat::Depth };
+			geoFramebufferSpec.Width = 1920;
+			geoFramebufferSpec.Height = 1080;
+			// TODO: Make a better way to do mouse picking
+			// TODO: Make a better way to clear the framebuffer and use the different clear values for editor and game
+			geoFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+			geoFramebufferSpec.MousePickClearValue = -1;
 
-		RenderPassSpecification geoRenderPassSpec;
-		geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
-		s_Data->GeoPass = RenderPass::Create(geoRenderPassSpec);
+			RenderPassSpecification geoRenderPassSpec;
+			geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
+			s_Data->GeoPass = RenderPass::Create(geoRenderPassSpec);
+		}
+
+		{
+			FramebufferSpecification shadowFramebufferSpec;
+			shadowFramebufferSpec.Attachments = {
+				ImageFormat::ShadowMap };
+			shadowFramebufferSpec.Width = 1920;
+			shadowFramebufferSpec.Height = 1080;
+
+			RenderPassSpecification shadowRenderPassSpec;
+			shadowRenderPassSpec.TargetFramebuffer = Framebuffer::Create(shadowFramebufferSpec);
+			s_Data->ShadowPass = RenderPass::Create(shadowRenderPassSpec);
+		}
 
 		s_Data->m_DefaultMaterialAsset = Renderer::GetDefaultMaterialAsset();
 
@@ -156,12 +180,25 @@ namespace Hanabi
 			s_Data->SpotLightData.SpotLights[i] = environment.SpotLights[i];
 		}
 		s_Data->SpotLightDataBuffer->SetData(&s_Data->SpotLightData);
-
-		Renderer::BeginRenderPass(s_Data->GeoPass);
+		s_Data->DrawCommands.clear();
 	}
 
 	void SceneRenderer::EndScene()
 	{
+		Renderer::BeginRenderPass(s_Data->ShadowPass);
+		for (auto& command : s_Data->DrawCommands)
+		{
+			Renderer::SubmitStaticMesh(command.Mesh, command.Material ? command.Material : s_Data->m_DefaultMaterialAsset->GetMaterial(),
+				s_Data->m_DefaultPipeline, command.ModelData, CBBingSlot::MODEL);
+		}
+		Renderer::EndRenderPass(s_Data->ShadowPass);
+
+		Renderer::BeginRenderPass(s_Data->GeoPass);
+		for (auto& command : s_Data->DrawCommands)
+		{
+			Renderer::SubmitStaticMesh(command.Mesh, command.Material ? command.Material : s_Data->m_DefaultMaterialAsset->GetMaterial(),
+				s_Data->m_DefaultPipeline, command.ModelData, CBBingSlot::MODEL);
+		}
 		Renderer::EndRenderPass(s_Data->GeoPass);
 	}
 
@@ -172,6 +209,7 @@ namespace Hanabi
 
 	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const CBModel& modelData, int entityID)
 	{
-		Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterialAsset->GetMaterial(), s_Data->m_DefaultPipeline, &modelData, CBBingSlot::MODEL);
+		s_Data->DrawCommands.push_back({ staticMesh ,material ,&modelData });
+		//Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterialAsset->GetMaterial(), s_Data->m_DefaultPipeline, &modelData, CBBingSlot::MODEL);
 	}
 }

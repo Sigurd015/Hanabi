@@ -1,19 +1,11 @@
 #pragma once
 #include "Engine/Core/Base.h"
+#include "Image.h"
 
 #include <string>
 
 namespace Hanabi
 {
-	enum class ImageFormat
-	{
-		None = 0,
-		R8,
-		RGB8,
-		RGBA8,
-		RGBA32F
-	};
-
 	struct TextureSpecification
 	{
 		uint32_t Width = 1;
@@ -36,6 +28,7 @@ namespace Hanabi
 		virtual const std::string& GetPath() const = 0;
 		virtual bool operator==(const Texture& other) const = 0;
 	};
+
 	class Texture2D : public Texture
 	{
 	public:
