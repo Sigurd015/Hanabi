@@ -57,11 +57,11 @@ namespace Hanabi
 		CBPointLight PointLightData;
 		CBSpotLight SpotLightData;
 
-		Hanabi::Ref<Hanabi::ConstantBuffer> ModelDataBuffer;
-		Hanabi::Ref<Hanabi::ConstantBuffer> CameraDataBuffer;
-		Hanabi::Ref<Hanabi::ConstantBuffer> SceneDataBuffer;
-		Hanabi::Ref<Hanabi::ConstantBuffer> PointLightDataBuffer;
-		Hanabi::Ref<Hanabi::ConstantBuffer> SpotLightDataBuffer;
+		Ref<ConstantBuffer> ModelDataBuffer;
+		Ref<ConstantBuffer> CameraDataBuffer;
+		Ref<ConstantBuffer> SceneDataBuffer;
+		Ref<ConstantBuffer> PointLightDataBuffer;
+		Ref<ConstantBuffer> SpotLightDataBuffer;
 
 		Ref<RenderPass> ShadowPass;
 		Ref<RenderPass> GeoPass;

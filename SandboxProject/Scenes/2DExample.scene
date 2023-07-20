@@ -70,7 +70,7 @@ Entities:
         PerspectiveFar: 1000
         OrthographicSize: 10
         OrthographicNear: -10
-        OrthographicFar: 1
+        OrthographicFar: 10
       Primary: true
       FixedAspectRatio: false
     ScriptComponent:
@@ -78,7 +78,7 @@ Entities:
       ScriptFields:
         - Name: DistanceFromPlayer
           Type: Float
-          Data: 5
+          Data: -5
   - Entity: 15045535320033348975
     TagComponent:
       Tag: Player

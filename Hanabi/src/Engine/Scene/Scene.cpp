@@ -174,10 +174,9 @@ namespace Hanabi
 
 	void Scene::OnUpdateRuntime(Timestep ts, Entity selectedEntity, bool enableOverlayRender)
 	{
-		//Update scripts
 		if (!m_IsPaused || m_StepFrames-- > 0)
 		{
-			// C# Entity OnUpdate
+			// Update scripts
 			{
 				auto view = m_Registry.view<ScriptComponent>();
 				for (auto e : view)
@@ -187,7 +186,7 @@ namespace Hanabi
 				}
 			}
 
-			// Physics
+			// Update Physics
 			{
 				const int32_t velocityIterations = 6;
 				const int32_t positionIterations = 2;

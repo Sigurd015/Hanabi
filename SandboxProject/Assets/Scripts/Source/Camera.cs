@@ -4,7 +4,7 @@ namespace Sandbox
 {
     public class Camera : Entity
     {
-        public float DistanceFromPlayer = 5.0f;
+        public float DistanceFromPlayer = -5.0f;
 
         private Entity m_Player;
 
