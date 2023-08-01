@@ -1,5 +1,7 @@
 #include "hnbpch.h"
 
+#if defined(HNB_PLATFORM_WINDOWS)
+
 namespace Hanabi
 {
 	void CheckD3DError(HRESULT result)
@@ -45,3 +47,4 @@ namespace Hanabi
 		}
 	}
 }
+#endif

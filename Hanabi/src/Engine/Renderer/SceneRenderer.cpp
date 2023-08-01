@@ -185,13 +185,13 @@ namespace Hanabi
 
 	void SceneRenderer::EndScene()
 	{
-		Renderer::BeginRenderPass(s_Data->ShadowPass);
-		for (auto& command : s_Data->DrawCommands)
-		{
-			Renderer::SubmitStaticMesh(command.Mesh, command.Material ? command.Material : s_Data->m_DefaultMaterialAsset->GetMaterial(),
-				s_Data->m_DefaultPipeline, command.ModelData, CBBingSlot::MODEL);
-		}
-		Renderer::EndRenderPass(s_Data->ShadowPass);
+		//Renderer::BeginRenderPass(s_Data->ShadowPass);
+		//for (auto& command : s_Data->DrawCommands)
+		//{
+		//	Renderer::SubmitStaticMesh(command.Mesh, command.Material ? command.Material : s_Data->m_DefaultMaterialAsset->GetMaterial(),
+		//		s_Data->m_DefaultPipeline, command.ModelData, CBBingSlot::MODEL);
+		//}
+		//Renderer::EndRenderPass(s_Data->ShadowPass);
 
 		Renderer::BeginRenderPass(s_Data->GeoPass);
 		for (auto& command : s_Data->DrawCommands)
