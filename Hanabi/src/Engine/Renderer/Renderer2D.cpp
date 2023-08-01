@@ -74,7 +74,6 @@ namespace Hanabi
 
 		Ref<Pipeline> CirclePipeline;
 		Ref<VertexBuffer> CircleVertexBuffer;
-		Ref<IndexBuffer> CircleIndexBuffer;
 		Ref<Material> CircleMaterial;
 		uint32_t CircleIndexCount = 0;
 		CircleVertex* CircleVertexBufferBase = nullptr;
@@ -90,7 +89,6 @@ namespace Hanabi
 
 		Ref<Pipeline> TextPipeline;
 		Ref<VertexBuffer> TextVertexBuffer;
-		Ref<IndexBuffer> TextIndexBuffer;
 		Ref<Material> TextMaterial;
 		uint32_t TextIndexCount = 0;
 		TextVertex* TextVertexBufferBase = nullptr;
@@ -181,8 +179,6 @@ namespace Hanabi
 			s_Data->CircleVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(CircleVertex));
 			s_Data->CircleVertexBuffer->SetLayout(layout);
 
-			s_Data->CircleIndexBuffer = s_Data->QuadIndexBuffer;
-
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Circle");
@@ -225,23 +221,6 @@ namespace Hanabi
 			};
 			s_Data->TextVertexBuffer = VertexBuffer::Create(s_Data->MaxVertices * sizeof(TextVertex));
 			s_Data->TextVertexBuffer->SetLayout(layout);
-
-			uint32_t* indices = new uint32_t[s_Data->MaxIndices];
-			uint32_t offset = 0;
-			for (uint32_t i = 0; i < s_Data->MaxIndices; i += 6)
-			{
-				indices[i + 0] = offset + 0;
-				indices[i + 1] = offset + 1;
-				indices[i + 2] = offset + 2;
-
-				indices[i + 3] = offset + 2;
-				indices[i + 4] = offset + 3;
-				indices[i + 5] = offset + 0;
-
-				offset += 4;
-			}
-			s_Data->TextIndexBuffer = IndexBuffer::Create(indices, s_Data->MaxIndices);
-			delete[] indices;
 
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
@@ -343,7 +322,7 @@ namespace Hanabi
 			s_Data->CircleVertexBuffer->SetData(s_Data->CircleVertexBufferBase, dataSize);
 
 			// Use quad QuadIndexBuffer
-			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->CircleIndexBuffer, s_Data->CircleMaterial, s_Data->CirclePipeline, s_Data->CircleIndexCount);
+			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->QuadIndexBuffer, s_Data->CircleMaterial, s_Data->CirclePipeline, s_Data->CircleIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
 
@@ -365,7 +344,7 @@ namespace Hanabi
 			// TODO: Bind multiple font atlas texture
 			s_Data->TextMaterial->SetTexture(s_Data->FontAtlasTexture, 0);
 
-			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->TextIndexBuffer, s_Data->TextMaterial, s_Data->TextPipeline, s_Data->TextIndexCount);
+			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->QuadIndexBuffer, s_Data->TextMaterial, s_Data->TextPipeline, s_Data->TextIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
 
@@ -485,13 +464,13 @@ namespace Hanabi
 
 			double al, ab, ar, at;
 			glyph->getQuadAtlasBounds(al, ab, ar, at);
-			glm::vec2 texCoordMin((float)al, (float)ab);
-			glm::vec2 texCoordMax((float)ar, (float)at);
+			glm::vec2 texCoordMin((float)al, (float)at);
+			glm::vec2 texCoordMax((float)ar, (float)ab);
 
 			double pl, pb, pr, pt;
 			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
-			glm::vec2 quadMin((float)pl, (float)pb);
-			glm::vec2 quadMax((float)pr, (float)pt);
+			glm::vec2 quadMin((float)pl, (float)pt);
+			glm::vec2 quadMax((float)pr, (float)pb);
 
 			quadMin *= fsScale, quadMax *= fsScale;
 			quadMin += glm::vec2(x, y);
