@@ -642,6 +642,7 @@ namespace Hanabi
 				}
 
 				ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
+				ImGui::DragFloat("Gravity Scale", &component.GravityScale, 0.01f, -1.0f, 1.0f);
 			});
 
 		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)

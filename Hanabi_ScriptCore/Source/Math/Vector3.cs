@@ -39,7 +39,7 @@
 
         public override string ToString()
         {
-            return string.Format($"(Vector3: {X}, {Y}, {Z}");
+            return string.Format($"(Vector3: {X}, {Y}, {Z})");
         }
 
         public static Vector3 operator +(Vector3 a, Vector3 b)

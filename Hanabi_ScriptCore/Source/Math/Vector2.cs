@@ -20,7 +20,7 @@
 
         public override string ToString()
         {
-            return string.Format($"(Vector2: {X}, {Y}");
+            return string.Format($"(Vector2: {X}, {Y})");
         }
 
         public static Vector2 operator +(Vector2 a, Vector2 b)

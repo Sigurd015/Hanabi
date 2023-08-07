@@ -360,6 +360,7 @@ namespace Hanabi
 				auto& rb2dComponent = entity.GetComponent<Rigidbody2DComponent>();
 				out << YAML::Key << "BodyType" << YAML::Value << RigidBody2DBodyTypeToString(rb2dComponent.Type);
 				out << YAML::Key << "FixedRotation" << YAML::Value << rb2dComponent.FixedRotation;
+				out << YAML::Key << "GravityScale" << YAML::Value << rb2dComponent.GravityScale;
 			});
 
 		SerializeComponent<BoxCollider2DComponent>("BoxCollider2DComponent", entity, out, [&]()
@@ -641,6 +642,7 @@ namespace Hanabi
 					auto& rb2d = deserializedEntity.AddComponent<Rigidbody2DComponent>();
 					rb2d.Type = RigidBody2DBodyTypeFromString(rigidbody2DComponent["BodyType"].as<std::string>());
 					rb2d.FixedRotation = rigidbody2DComponent["FixedRotation"].as<bool>();
+					rb2d.GravityScale = rigidbody2DComponent["GravityScale"].as<float>();
 				}
 
 				auto boxCollider2DComponent = entity["BoxCollider2DComponent"];

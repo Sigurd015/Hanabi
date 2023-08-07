@@ -436,6 +436,7 @@ namespace Hanabi
 
 			b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
 			body->SetFixedRotation(rb2d.FixedRotation);
+			body->SetGravityScale(rb2d.GravityScale);
 			rb2d.RuntimeBody = body;
 
 			if (entity.HasComponent<BoxCollider2DComponent>())
