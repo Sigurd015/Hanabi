@@ -7,6 +7,7 @@
 #include "Engine/Core/UUID.h"
 #include "Engine/Project/Project.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Asset/TextureImporter.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -108,12 +109,12 @@ namespace YAML
 namespace Hanabi
 {
 
-#define WRITE_SCRIPT_FIELD(FieldType, Type)           \
+	#define WRITE_SCRIPT_FIELD(FieldType, Type)           \
 			case ScriptFieldType::FieldType:          \
 				out << scriptField.GetValue<Type>();  \
 				break
 
-#define READ_SCRIPT_FIELD(FieldType, Type)             \
+	#define READ_SCRIPT_FIELD(FieldType, Type)             \
 	case ScriptFieldType::FieldType:                   \
 	{                                                  \
 		Type data = scriptField["Data"].as<Type>();    \
@@ -250,7 +251,7 @@ namespace Hanabi
 					out << YAML::Key << "MeshPath" << YAML::Value << mesh->GetMeshSource()->GetPath().c_str();
 			});
 
-		SerializeComponent<MaterialComponent>("MaterialComponent", entity, out, [&]()
+		/*SerializeComponent<MaterialComponent>("MaterialComponent", entity, out, [&]()
 			{
 				auto& materialComponent = entity.GetComponent<MaterialComponent>();
 				auto& diffuse = materialComponent.Material->GetDiffuse();
@@ -278,7 +279,7 @@ namespace Hanabi
 					out << YAML::Key << "NormalTexturePath" << YAML::Value << normalPath.c_str();
 
 				out << YAML::Key << "UseNormalMap" << YAML::Value << materialComponent.Material->IsUsingNormalMap();
-			});
+			});*/
 
 		SerializeComponent<LightComponent>("LightComponent", entity, out, [&]()
 			{
@@ -347,9 +348,9 @@ namespace Hanabi
 			{
 				auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
 				out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
-				if (spriteRendererComponent.Texture)
-					out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.Texture->GetPath();
-
+				//if (spriteRendererComponent.Texture)
+				//	out << YAML::Key << "TexturePath" << YAML::Value << spriteRendererComponent.Texture->GetPath();
+				out << YAML::Key << "TextureHandle" << YAML::Value << spriteRendererComponent.Texture;
 				out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
 				out << YAML::Key << "UVStart" << YAML::Value << spriteRendererComponent.UVStart;
 				out << YAML::Key << "UVEnd" << YAML::Value << spriteRendererComponent.UVEnd;
@@ -510,35 +511,35 @@ namespace Hanabi
 					}
 				}
 
-				auto materialComponent = entity["MaterialComponent"];
-				if (materialComponent)
-				{
-					auto& mtc = deserializedEntity.AddComponent<MaterialComponent>();
-					mtc.Material = CreateRef<MaterialAsset>();
-					//TODO: this should handle by asset manager
-					if (materialComponent["DiffuseTexturePath"])
-					{
-						std::string diffusePath = materialComponent["DiffuseTexturePath"].as<std::string>();
-						mtc.Material->SetDiffuse(Texture2D::Create(diffusePath));
-					}
+				//auto materialComponent = entity["MaterialComponent"];
+				//if (materialComponent)
+				//{
+				//	auto& mtc = deserializedEntity.AddComponent<MaterialComponent>();
+				//	mtc.Material = CreateRef<MaterialAsset>();
+				//	//TODO: this should handle by asset manager
+				//	if (materialComponent["DiffuseTexturePath"])
+				//	{
+				//		std::string diffusePath = materialComponent["DiffuseTexturePath"].as<std::string>();
+				//		mtc.Material->SetDiffuse(Texture2D::Create(diffusePath));
+				//	}
 
-					if (materialComponent["SpecularTexturePath"])
-					{
-						std::string specularPath = materialComponent["SpecularTexturePath"].as<std::string>();
-						mtc.Material->SetSpecular(Texture2D::Create(specularPath));
-					}
+				//	if (materialComponent["SpecularTexturePath"])
+				//	{
+				//		std::string specularPath = materialComponent["SpecularTexturePath"].as<std::string>();
+				//		mtc.Material->SetSpecular(Texture2D::Create(specularPath));
+				//	}
 
-					if (materialComponent["NormalTexturePath"])
-					{
-						std::string normalPath = materialComponent["NormalTexturePath"].as<std::string>();
-						mtc.Material->SetNormal(Texture2D::Create(normalPath));
-					}
+				//	if (materialComponent["NormalTexturePath"])
+				//	{
+				//		std::string normalPath = materialComponent["NormalTexturePath"].as<std::string>();
+				//		mtc.Material->SetNormal(Texture2D::Create(normalPath));
+				//	}
 
-					if (materialComponent["UseNormalMap"])
-					{
-						mtc.UseNormalMap = materialComponent["UseNormalMap"].as<bool>();
-					}
-				}
+				//	if (materialComponent["UseNormalMap"])
+				//	{
+				//		mtc.UseNormalMap = materialComponent["UseNormalMap"].as<bool>();
+				//	}
+				//}
 
 				auto lightComponent = entity["LightComponent"];
 				if (lightComponent)
@@ -612,13 +613,16 @@ namespace Hanabi
 				{
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
-					if (spriteRendererComponent["TexturePath"])
-					{
-						//TODO: move to asset manger
-						std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
-						src.Texture = Texture2D::Create(texturePath);
-					}
+					//if (spriteRendererComponent["TexturePath"])
+					//{
+					//	//TODO: move to asset manger
+					//	std::string texturePath = spriteRendererComponent["TexturePath"].as<std::string>();
+					//	Ref<Texture2D> temp = TextureImporter::LoadTexture2D(texturePath);
+					//	src.Texture = temp->Handle;
+					//}
 
+					if (spriteRendererComponent["TextureHandle"])
+						src.Texture = spriteRendererComponent["TextureHandle"].as<AssetHandle>();
 					if (spriteRendererComponent["TilingFactor"])
 						src.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
 					if (spriteRendererComponent["UVStart"])

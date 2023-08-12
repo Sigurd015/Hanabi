@@ -31,10 +31,10 @@ namespace Hanabi
 
 		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 
-		m_IconPlay = Texture2D::Create("resources/icons/PlayButton.png");
-		m_IconStop = Texture2D::Create("resources/icons/StopButton.png");
-		m_IconPause = Texture2D::Create("resources/icons/PauseButton.png");
-		m_IconStep = Texture2D::Create("resources/icons/StepButton.png");
+		m_IconPlay = TextureImporter::LoadTexture2D("resources/icons/PlayButton.png");
+		m_IconStop = TextureImporter::LoadTexture2D("resources/icons/StopButton.png");
+		m_IconPause = TextureImporter::LoadTexture2D("resources/icons/PauseButton.png");
+		m_IconStep = TextureImporter::LoadTexture2D("resources/icons/StepButton.png");
 	}
 
 	void EditorLayer::OnDetach()
@@ -42,11 +42,11 @@ namespace Hanabi
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
-#pragma region Resize
+		#pragma region Resize
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		SceneRenderer::SetViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-#pragma endregion
+		#pragma endregion
 
 		// Update scene
 		switch (m_SceneState)
@@ -64,7 +64,7 @@ namespace Hanabi
 		}
 		}
 
-#pragma region Mouse Pick Up
+		#pragma region Mouse Pick Up
 		ImVec2 mousePos = ImGui::GetMousePos();
 		mousePos.x -= m_ViewportBounds[0].x;
 		mousePos.y -= m_ViewportBounds[0].y;
@@ -85,13 +85,13 @@ namespace Hanabi
 			int pixelData = m_ViewportFramebuffer->ReadPixel(1, mouseX, mouseY);
 			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
 		}
-#pragma endregion	
+		#pragma endregion	
 	}
 
 	void EditorLayer::OnImGuiRender()
 	{
 
-#pragma region Dockspace Settings
+		#pragma region Dockspace Settings
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
 		bool opt_fullscreen = opt_fullscreen_persistant;
@@ -139,9 +139,9 @@ namespace Hanabi
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
 		style.WindowMinSize.x = minWinSizeX;
-#pragma endregion	
+		#pragma endregion	
 
-#pragma region Menu Bar	
+		#pragma region Menu Bar	
 		if (ImGui::BeginMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -179,10 +179,10 @@ namespace Hanabi
 
 			ImGui::EndMenuBar();
 		}
-#pragma endregion	
+		#pragma endregion	
 
 		m_SceneHierarchyPanel.OnImGuiRender();
-		m_ContentBrowserPanel.OnImGuiRender();
+		m_ContentBrowserPanel->OnImGuiRender();
 		UI_StatisticsPanel();
 		UI_ViewportPanel();
 
@@ -201,6 +201,7 @@ namespace Hanabi
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 		dispatcher.Dispatch<MouseButtonPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+		dispatcher.Dispatch<WindowDropEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnWindowDrop));
 	}
 
 	void EditorLayer::UI_StatisticsPanel()
@@ -226,7 +227,7 @@ namespace Hanabi
 
 	void EditorLayer::UI_ViewportPanel()
 	{
-#pragma region Viewport_Toolbar	
+		#pragma region Viewport_Toolbar	
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -282,7 +283,7 @@ namespace Hanabi
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
 		ImGui::End();
-#pragma endregion	
+		#pragma endregion	
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Viewport");
@@ -298,11 +299,11 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 			break;
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 			break;
-#endif
+			#endif
 		}
 
 		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
@@ -442,6 +443,15 @@ namespace Hanabi
 		return false;
 	}
 
+	bool EditorLayer::OnWindowDrop(WindowDropEvent& e)
+	{
+		// TODO: if a project is dropped in, probably open it
+
+		//AssetManager::ImportAsset();
+
+		return true;
+	}
+
 	bool EditorLayer::OpenProject()
 	{
 		std::string filepath = FileDialogs::OpenFile("Hanabi Project (*.hproj)\0*.hproj\0");
@@ -459,8 +469,9 @@ namespace Hanabi
 			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
 			auto startScenePath = Project::GetProjectDirectory() / Project::GetActive()->GetConfig().StartScene;
 			OpenScene(startScenePath);
-			m_ContentBrowserPanel.SetProjectPath(Project::GetProjectDirectory());
+			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
+
 		}
 	}
 

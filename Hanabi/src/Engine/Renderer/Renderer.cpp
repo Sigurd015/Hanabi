@@ -41,7 +41,7 @@ namespace Hanabi
 		//Setup textures
 		Ref<Texture2D> whiteTexture = Texture2D::Create(TextureSpecification());
 		uint32_t whiteTextureData = 0xffffffff;
-		whiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
+		whiteTexture->SetData(Buffer(&whiteTextureData, sizeof(uint32_t)));
 		s_Data->Textures["White"] = whiteTexture;
 
 		//Load default meshes

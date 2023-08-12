@@ -1,33 +1,61 @@
 Scene: Untitled
 Entities:
-  - Entity: 15045535320033348975
+  - Entity: 12183843591437764094
     TagComponent:
-      Tag: Player
+      Tag: Msg
     TransformComponent:
-      Translation: [1.96902084, 0.840087414, 0.0225147791]
+      Translation: [-3.86357307, -0.71830368, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1.35854316, 0.848135769]
-    ScriptComponent:
-      ClassName: Sandbox.Player
-      ScriptFields:
-        - Name: Speed
-          Type: Float
-          Data: 10
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
-      TexturePath: ..\SandboxProject\Assets\Textures\SpriteAnimation.png
-      TilingFactor: 1
-      UVStart: [0, 0.5]
-      UVEnd: [0.100000001, 1]
+      Scale: [1, 1, 1]
+    TextComponent:
+      TextString: This is a test message
+      Color: [0.779922783, 0.240902811, 0.240902811, 1]
+      Kerning: 0
+      LineSpacing: 0
+  - Entity: 7385146648431404497
+    TagComponent:
+      Tag: Circle
+    TransformComponent:
+      Translation: [0, 0.70383358, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
     Rigidbody2DComponent:
       BodyType: Dynamic
-      FixedRotation: true
+      FixedRotation: false
+      GravityScale: 1
+    CircleRendererComponent:
+      Color: [0.891891897, 0.0826463252, 0.0826463252, 1]
+      Thickness: 0.25
+      Fade: 0.0399999991
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.5
+      Restitution: 0
+      RestitutionThreshold: 0.5
+  - Entity: 16672940118998907085
+    TagComponent:
+      Tag: Floor
+    TransformComponent:
+      Translation: [0.878449142, -2.40333867, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1000, 0.46067813, 1]
+    SpriteRendererComponent:
+      Color: [0.949806929, 0.455301404, 0.0660097376, 1]
+      TextureHandle: 0
+      TilingFactor: 1
+      UVStart: [0, 0]
+      UVEnd: [1, 1]
+    Rigidbody2DComponent:
+      BodyType: Static
+      FixedRotation: false
       GravityScale: 1
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 0.879999995
-      Friction: 0
+      Density: 1
+      Friction: 0.5
       Restitution: 0
       RestitutionThreshold: 0.5
   - Entity: 4793924497264767156
@@ -54,60 +82,33 @@ Entities:
         - Name: DistanceFromPlayer
           Type: Float
           Data: -5
-  - Entity: 16672940118998907085
+  - Entity: 15045535320033348975
     TagComponent:
-      Tag: Floor
+      Tag: Player
     TransformComponent:
-      Translation: [0.878449142, -2.40333867, 0]
+      Translation: [1.96902084, 0.840087414, 0.0225147791]
       Rotation: [0, 0, 0]
-      Scale: [1000, 0.46067813, 1]
+      Scale: [1, 1.35854316, 0.848135769]
+    ScriptComponent:
+      ClassName: Sandbox.Player
+      ScriptFields:
+        - Name: Speed
+          Type: Float
+          Data: 10
     SpriteRendererComponent:
-      Color: [0.949806929, 0.455301404, 0.0660097376, 1]
+      Color: [1, 1, 1, 1]
+      TextureHandle: 14594112406493172031
       TilingFactor: 1
-      UVStart: [0, 0]
-      UVEnd: [1, 1]
+      UVStart: [0, 0.5]
+      UVEnd: [0.100000001, 1]
     Rigidbody2DComponent:
-      BodyType: Static
-      FixedRotation: false
+      BodyType: Dynamic
+      FixedRotation: true
       GravityScale: 1
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [0.5, 0.5]
-      Density: 1
-      Friction: 0.5
+      Density: 0.879999995
+      Friction: 0
       Restitution: 0
       RestitutionThreshold: 0.5
-  - Entity: 7385146648431404497
-    TagComponent:
-      Tag: Circle
-    TransformComponent:
-      Translation: [0, 0.70383358, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    Rigidbody2DComponent:
-      BodyType: Dynamic
-      FixedRotation: false
-      GravityScale: 1
-    CircleRendererComponent:
-      Color: [0.891891897, 0.0826463252, 0.0826463252, 1]
-      Thickness: 0.25
-      Fade: 0.0399999991
-    CircleCollider2DComponent:
-      Offset: [0, 0]
-      Radius: 0.5
-      Density: 1
-      Friction: 0.5
-      Restitution: 0
-      RestitutionThreshold: 0.5
-  - Entity: 12183843591437764094
-    TagComponent:
-      Tag: Msg
-    TransformComponent:
-      Translation: [-3.86357307, -0.71830368, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    TextComponent:
-      TextString: This is a test message
-      Color: [0.779922783, 0.240902811, 0.240902811, 1]
-      Kerning: 0
-      LineSpacing: 0

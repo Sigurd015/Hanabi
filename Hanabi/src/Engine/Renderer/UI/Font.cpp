@@ -30,7 +30,7 @@ namespace Hanabi
 		spec.GenerateMips = false;
 
 		Ref<Texture2D> texture = Texture2D::Create(spec);
-		texture->SetData((void*)bitmap.pixels, bitmap.width * bitmap.height * 3);
+		texture->SetData(Buffer((void*)bitmap.pixels, bitmap.width * bitmap.height * 3));
 		return texture;
 	}
 
@@ -95,10 +95,10 @@ namespace Hanabi
 		atlasPacker.getDimensions(width, height);
 		emSize = atlasPacker.getScale();
 
-#define DEFAULT_ANGLE_THRESHOLD 3.0
-#define LCG_MULTIPLIER 6364136223846793005ull
-#define LCG_INCREMENT 1442695040888963407ull
-#define THREAD_COUNT 8
+		#define DEFAULT_ANGLE_THRESHOLD 3.0
+		#define LCG_MULTIPLIER 6364136223846793005ull
+		#define LCG_INCREMENT 1442695040888963407ull
+		#define THREAD_COUNT 8
 		// if MSDF || MTSDF
 
 		uint64_t coloringSeed = 0;

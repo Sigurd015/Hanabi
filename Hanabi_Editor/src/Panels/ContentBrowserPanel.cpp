@@ -18,15 +18,13 @@ namespace Hanabi
 		}
 	}
 
-	ContentBrowserPanel::ContentBrowserPanel()
+	ContentBrowserPanel::ContentBrowserPanel() :m_ProjectDirectory(Project::GetProjectDirectory())
 	{
-		m_DirectoryIcon = Texture2D::Create("resources/icons/ContentBrowser/DirectoryIcon.png");
-		m_FileIcon = Texture2D::Create("resources/icons/ContentBrowser/FileIcon.png");
-	}
+		m_DirectoryIcon = TextureImporter::LoadTexture2D("resources/icons/ContentBrowser/DirectoryIcon.png");
+		m_FileIcon = TextureImporter::LoadTexture2D("resources/icons/ContentBrowser/FileIcon.png");
+		m_ImportedFileIcon = TextureImporter::LoadTexture2D("resources/icons/ContentBrowser/ImportedFileIcon.png");
 
-	void ContentBrowserPanel::SetProjectPath(std::filesystem::path projPath)
-	{
-		m_ProjectDirectory = projPath;
+		RefreshAssetsMap();
 	}
 
 	void ContentBrowserPanel::OnImGuiRender()
@@ -136,24 +134,48 @@ namespace Hanabi
 			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
 			Ref<Texture> Icon;
-			if (directoryEntry.is_directory())
+
+			bool isDirectory = directoryEntry.is_directory();
+			bool isAsset = false;
+			auto relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
+
+			if (!isDirectory)
+				isAsset = IsAlreadyImported(relativePath);
+
+			if (isDirectory)
 				Icon = m_DirectoryIcon;
+			else if (isAsset)
+				Icon = m_ImportedFileIcon;
 			else
 				Icon = m_FileIcon;
 
 			ImGui::ImageButton(Icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
-			if (ImGui::BeginDragDropSource())
+			if (!isDirectory && !isAsset)
 			{
-				std::filesystem::path relativePath(path);
-				const wchar_t* itemPath = relativePath.c_str();
-				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
-				ImGui::EndDragDropSource();
+				if (ImGui::BeginPopupContextItem())
+				{
+					if (ImGui::MenuItem("Import"))
+						m_ImportedFiles[relativePath] = Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);
+
+					ImGui::EndPopup();
+				}
 			}
+
+			if (isAsset)
+			{
+				if (ImGui::BeginDragDropSource())
+				{
+					AssetHandle temp = m_ImportedFiles[relativePath];
+					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", &temp, sizeof(AssetHandle));
+					ImGui::EndDragDropSource();
+				}
+			}
+
 			ImGui::PopStyleColor();
 			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 			{
-				if (directoryEntry.is_directory())
+				if (isDirectory)
 					m_SelectedDirectory /= path.filename();
 			}
 			ImGui::TextWrapped(filenameString.c_str());
@@ -163,5 +185,22 @@ namespace Hanabi
 		ImGui::Columns(1);
 		//ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);
 		//ImGui::SliderFloat("Padding", &padding, 0, 32);
+	}
+
+	void ContentBrowserPanel::RefreshAssetsMap()
+	{
+		const auto& assetRegistry = Project::GetActive()->GetEditorAssetManager()->GetAssetRegistry();
+		for (const auto& [handle, metadata] : assetRegistry)
+		{
+			auto& path = metadata.FilePath;
+			m_ImportedFiles[path] = handle;
+		}
+	}
+
+	bool ContentBrowserPanel::IsAlreadyImported(const std::filesystem::path& path)
+	{
+		if (m_ImportedFiles.find(path) != m_ImportedFiles.end())
+			return m_ImportedFiles.at(path);
+		return false;
 	}
 }

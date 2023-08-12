@@ -330,12 +330,7 @@ namespace Hanabi
 			for (auto entity : view)
 			{
 				auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
-
-				if (sprite.Texture)
-					Renderer2D::DrawQuad(transform.GetTransform(),
-						sprite.Texture, sprite.UVStart, sprite.UVEnd, sprite.Color, sprite.TilingFactor, (int)entity);
-				else
-					Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 			}
 		}
 
@@ -508,5 +503,18 @@ namespace Hanabi
 				return Entity{ entity, this };
 		}
 		return {};
+	}
+
+	template<typename T>
+	void Scene::OnComponentAdded(Entity entity, T& component)
+	{
+		//static_assert(sizeof(T) == 0);
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component)
+	{
+		if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
+			component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
 }

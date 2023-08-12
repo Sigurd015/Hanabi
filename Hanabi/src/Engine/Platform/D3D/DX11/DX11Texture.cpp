@@ -63,36 +63,15 @@ namespace Hanabi
 		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, ppSamplerState));
 	}
 
-	DX11Texture2D::DX11Texture2D(const std::string& path) : m_Path(path)
-	{
-		int width, height, channels;
-		stbi_set_flip_vertically_on_load(1);
-		stbi_uc* data = stbi_load(path.c_str(), &width, &height, &channels, 4);
-
-		if (data)
-		{
-			m_IsLoaded = true;
-			m_Width = width;
-			m_Height = height;
-			m_DataFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-			D3D11_SUBRESOURCE_DATA subresourceData = {};
-			subresourceData.pSysMem = data;
-			subresourceData.SysMemPitch = m_Width * 4;
-			CreateTexture(D3D11_USAGE_DEFAULT, 0, m_Width, m_Height, m_DataFormat, &subresourceData, m_Texture.GetAddressOf());
-			CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureView.GetAddressOf());
-			CreateSamplerState(m_SamplerState.GetAddressOf());
-			stbi_image_free(data);
-		}
-	}
-
-	DX11Texture2D::DX11Texture2D(const TextureSpecification& specification) :m_Specification(specification),
+	DX11Texture2D::DX11Texture2D(const TextureSpecification& specification, Buffer data) :m_Specification(specification),
 		m_Width(specification.Width), m_Height(specification.Height)
 	{
 		m_DataFormat = Utils::ImageFormatToDXDataFormat(specification.Format);
 		CreateTexture(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
 		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureView.GetAddressOf());
 		CreateSamplerState(m_SamplerState.GetAddressOf());
+
+		SetData(data);
 	}
 
 	DX11Texture2D::~DX11Texture2D()
@@ -102,7 +81,7 @@ namespace Hanabi
 		m_SamplerState.Reset();
 	}
 
-	void DX11Texture2D::SetData(void* data, uint32_t size)
+	void DX11Texture2D::SetData(Buffer data)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
@@ -111,10 +90,10 @@ namespace Hanabi
 		if (m_Specification.Format == ImageFormat::RGB8)
 		{
 			uint8_t* targetData = static_cast<uint8_t*>(mappedResource.pData);
-			uint8_t* srcData = static_cast<uint8_t*>(data);
+			uint8_t* srcData = static_cast<uint8_t*>(data.Data);
 
 			// Set Alpha to 255	
-			for (uint32_t i = 0; i < size / 3; i++)
+			for (uint32_t i = 0; i < data.Size / 3; i++)
 			{
 				targetData[i * 4] = srcData[i * 3];     // R
 				targetData[i * 4 + 1] = srcData[i * 3 + 1]; // G
@@ -123,7 +102,7 @@ namespace Hanabi
 			}
 		}
 		else
-			memcpy(mappedResource.pData, data, size);
+			memcpy(mappedResource.pData, data.Data, data.Size);
 
 		DX11Context::GetDeviceContext()->Unmap(m_Texture.Get(), 0);
 	}

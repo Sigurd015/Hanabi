@@ -7,6 +7,128 @@
 
 namespace Hanabi
 {
+	namespace Utils
+	{
+		static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			auto boldFont = io.Fonts->Fonts[0];
+
+			ImGui::PushID(label.c_str());
+
+			ImGui::Columns(2);
+			ImGui::SetColumnWidth(0, columnWidth);
+			ImGui::Text(label.c_str());
+			ImGui::NextColumn();
+
+			ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+			ImGui::PushFont(boldFont);
+			if (ImGui::Button("X", buttonSize))
+				values.x = resetValue;
+			ImGui::PopFont();
+			ImGui::PopStyleColor(3);
+
+			ImGui::SameLine();
+			ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+			ImGui::PushFont(boldFont);
+			if (ImGui::Button("Y", buttonSize))
+				values.y = resetValue;
+			ImGui::PopFont();
+			ImGui::PopStyleColor(3);
+
+			ImGui::SameLine();
+			ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+
+			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+			ImGui::PushFont(boldFont);
+			if (ImGui::Button("Z", buttonSize))
+				values.z = resetValue;
+			ImGui::PopFont();
+			ImGui::PopStyleColor(3);
+
+			ImGui::SameLine();
+			ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::PopItemWidth();
+
+			ImGui::PopStyleVar();
+
+			ImGui::Columns(1);
+
+			ImGui::PopID();
+		}
+
+		template<typename T, typename UIFunction>
+		static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool removable = true)
+		{
+			const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+			if (entity.HasComponent<T>())
+			{
+				auto& component = entity.GetComponent<T>();
+				ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
+				float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+				ImGui::Separator();
+				bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
+				ImGui::PopStyleVar();
+				if (removable)
+				{
+					ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
+					if (ImGui::Button("X", ImVec2{ lineHeight, lineHeight }))
+					{
+						entity.RemoveComponent<T>();
+					}
+				}
+				if (open)
+				{
+					uiFunction(component);
+					ImGui::TreePop();
+				}
+			}
+		}
+
+		template<typename UIFunction>
+		static void DrawDragDropContent(UIFunction uiFunction, AssetHandle& handle, AssetType validType)
+		{
+			uiFunction();
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+				{
+					AssetHandle tempHandle = *(AssetHandle*)payload->Data;
+					if (AssetManager::GetAssetType(tempHandle) == validType)
+					{
+						handle = tempHandle;
+					}
+					else
+					{
+						//TODO: Show message to user
+						HNB_CORE_ERROR("Wrong asset type!");
+					}
+				}
+				ImGui::EndDragDropTarget();
+			}
+		}
+	}
+
 	template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 	{
@@ -103,118 +225,6 @@ namespace Hanabi
 		}
 	}
 
-	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		auto boldFont = io.Fonts->Fonts[0];
-
-		ImGui::PushID(label.c_str());
-
-		ImGui::Columns(2);
-		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
-		ImGui::NextColumn();
-
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("X", buttonSize))
-			values.x = resetValue;
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Y", buttonSize))
-			values.y = resetValue;
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Z", buttonSize))
-			values.z = resetValue;
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		ImGui::PopStyleVar();
-
-		ImGui::Columns(1);
-
-		ImGui::PopID();
-	}
-
-	template<typename T, typename UIFunction>
-	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool removable = true)
-	{
-		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-		if (entity.HasComponent<T>())
-		{
-			auto& component = entity.GetComponent<T>();
-			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
-
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImGui::Separator();
-			bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-			ImGui::PopStyleVar();
-			if (removable)
-			{
-				ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-				if (ImGui::Button("X", ImVec2{ lineHeight, lineHeight }))
-				{
-					entity.RemoveComponent<T>();
-				}
-			}
-			if (open)
-			{
-				uiFunction(component);
-				ImGui::TreePop();
-			}
-		}
-	}
-
-	template<typename UIFunction, typename LoadFunction>
-	static void DrawDragDropContent(UIFunction uiFunction, LoadFunction loadFunction)
-	{
-		uiFunction();
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-			{
-				const wchar_t* temp = (const wchar_t*)payload->Data;
-				std::filesystem::path path(temp);
-				loadFunction(path);
-			}
-			ImGui::EndDragDropTarget();
-		}
-	}
-
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -254,16 +264,16 @@ namespace Hanabi
 
 		ImGui::PopItemWidth();
 
-		DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
+		Utils::DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 			{
-				DrawVec3Control("Translation", component.Translation);
+				Utils::DrawVec3Control("Translation", component.Translation);
 				glm::vec3 rotation = glm::degrees(component.Rotation);
-				DrawVec3Control("Rotation", rotation);
+				Utils::DrawVec3Control("Rotation", rotation);
 				component.Rotation = glm::radians(rotation);
-				DrawVec3Control("Scale", component.Scale, 1.0f);
+				Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
 			}, false);
 
-		DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
+		Utils::DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 			{
 				auto& camera = component.Camera;
 
@@ -318,7 +328,7 @@ namespace Hanabi
 				}
 			});
 
-		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
+		Utils::DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
 			{
 				bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
@@ -394,15 +404,18 @@ namespace Hanabi
 				}
 			});
 
-		DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
+		Utils::DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				DrawDragDropContent([&component]()
+				Utils::DrawDragDropContent([&component]()
 					{
-						if (component.Texture)
+						if (component.Texture != 0
+							&& AssetManager::IsAssetHandleValid(component.Texture)
+							&& AssetManager::GetAssetType(component.Texture) == AssetType::Texture2D)
 						{
-							ImGui::Image(component.Texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+							Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(component.Texture);
+							ImGui::Image(texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 						}
 						else
 						{
@@ -412,167 +425,143 @@ namespace Hanabi
 							ImGui::PopItemFlag();
 							ImGui::PopStyleColor();
 						}
-					},
-
-					[&component](auto& path)
-					{
-						Ref<Texture2D> texture = Texture2D::Create(path.string());
-						if (texture->IsLoaded())
-							component.Texture = texture;
-						else
-							HNB_WARN("Could not load texture {0}", path.filename().string());
-					});
-
-				ImGui::SameLine();
-				if (ImGui::Button("ReSet"))
-				{
-					component.Texture = nullptr;
-				}
+					}, component.Texture, AssetType::Texture2D);
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat2("UV End", glm::value_ptr(component.UVEnd), 0.01f, 0.0f, 1.0f);
 			});
 
-		DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
-			{
-				DrawDragDropContent([&component]()
-					{
-						ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
-						ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-						if (component.Mesh)
-						{
-							std::string temp = component.Mesh->GetMeshSource()->GetPath();
-							ImGui::Button(temp.c_str(), ImVec2(300.0f, 30.0f));
-						}
-						else
-						{
-							ImGui::Button("Mesh", ImVec2(300.0f, 30.0f));
-						}
-						ImGui::PopItemFlag();
-						ImGui::PopStyleColor();
-					},
+		//Utils::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
+		//	{
+		//		Utils::DrawDragDropContent([&component]()
+		//			{
+		//				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
+		//				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		//				if (component.Mesh)
+		//				{
+		//					std::string temp = component.Mesh->GetMeshSource()->GetPath();
+		//					ImGui::Button(temp.c_str(), ImVec2(300.0f, 30.0f));
+		//				}
+		//				else
+		//				{
+		//					ImGui::Button("Mesh", ImVec2(300.0f, 30.0f));
+		//				}
+		//				ImGui::PopItemFlag();
+		//				ImGui::PopStyleColor();
+		//			},
 
-					[&component](auto& path)
-					{
-						Ref<MeshSource> meshSource = CreateRef<MeshSource>(path.string());
-						Ref<Mesh> mesh = CreateRef<Mesh>(meshSource);
-						component.Mesh = mesh;
-					});
-			});
+		//			[&component](auto& path)
+		//			{
+		//				Ref<MeshSource> meshSource = CreateRef<MeshSource>(path.string());
+		//				Ref<Mesh> mesh = CreateRef<Mesh>(meshSource);
+		//				component.Mesh = mesh;
+		//			});
+		//	});
 
-		DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
-			{
-				//TODO:
-				if (component.Material == nullptr)
-				{
-					component.Material = CreateRef<MaterialAsset>();
-				}
+		//Utils::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
+		//	{
+		//		//TODO:
+		//		if (component.Material == nullptr)
+		//		{
+		//			component.Material = CreateRef<MaterialAsset>();
+		//		}
 
-				ImGui::Text("Diffuse Texture:");
-				DrawDragDropContent([&component]()
-					{
-						Ref<Texture2D> diffuse = component.Material->GetDiffuse();
-						if (diffuse)
-						{
-							ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-						}
-						else
-						{
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-							ImGui::PopItemFlag();
-							ImGui::PopStyleColor();
-						}
-					},
+		//		ImGui::Text("Diffuse Texture:");
+		//		Utils::DrawDragDropContent([&component]()
+		//			{
+		//				Ref<Texture2D> diffuse = component.Material->GetDiffuse();
+		//				if (diffuse)
+		//				{
+		//					ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		//				}
+		//				else
+		//				{
+		//					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		//					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		//					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+		//					ImGui::PopItemFlag();
+		//					ImGui::PopStyleColor();
+		//				}
+		//			}, );
+		//		ImGui::SameLine();
+		//		if (ImGui::Button("ReSet Diffuse Texture"))
+		//		{
+		//			component.Material->ClearDiffuse();
+		//		}
 
-					[&component](auto& path)
-					{
-						Ref<Texture2D> texture = Texture2D::Create(path.string());
-						if (texture->IsLoaded())
-							component.Material->SetDiffuse(texture);
-						else
-							HNB_WARN("Could not load texture {0}", path.filename().string());
-					});
-				ImGui::SameLine();
-				if (ImGui::Button("ReSet Diffuse Texture"))
-				{
-					component.Material->ClearDiffuse();
-				}
+		//		ImGui::Text("Specular Texture:");
+		//		DrawDragDropContent([&component]()
+		//			{
+		//				Ref<Texture2D> specular = component.Material->GetSpecular();
+		//				if (specular)
+		//				{
+		//					ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		//				}
+		//				else
+		//				{
+		//					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		//					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		//					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+		//					ImGui::PopItemFlag();
+		//					ImGui::PopStyleColor();
+		//				}
+		//			},
 
-				ImGui::Text("Specular Texture:");
-				DrawDragDropContent([&component]()
-					{
-						Ref<Texture2D> specular = component.Material->GetSpecular();
-						if (specular)
-						{
-							ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-						}
-						else
-						{
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-							ImGui::PopItemFlag();
-							ImGui::PopStyleColor();
-						}
-					},
+		//			[&component](auto& path)
+		//			{
+		//				Ref<Texture2D> texture = Texture2D::Create(path.string());
+		//				if (texture->IsLoaded())
+		//					component.Material->SetSpecular(texture);
+		//				else
+		//					HNB_WARN("Could not load texture {0}", path.filename().string());
+		//			});
 
-					[&component](auto& path)
-					{
-						Ref<Texture2D> texture = Texture2D::Create(path.string());
-						if (texture->IsLoaded())
-							component.Material->SetSpecular(texture);
-						else
-							HNB_WARN("Could not load texture {0}", path.filename().string());
-					});
+		//		ImGui::SameLine();
+		//		if (ImGui::Button("ReSet Specular Texture"))
+		//		{
+		//			component.Material->ClearSpecular();
+		//		}
 
-				ImGui::SameLine();
-				if (ImGui::Button("ReSet Specular Texture"))
-				{
-					component.Material->ClearSpecular();
-				}
+		//		ImGui::Text("Normal Texture:");
+		//		DrawDragDropContent([&component]()
+		//			{
+		//				Ref<Texture2D> normal = component.Material->GetNormal();
+		//				if (normal)
+		//				{
+		//					ImGui::Image(normal->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		//				}
+		//				else
+		//				{
+		//					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+		//					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+		//					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+		//					ImGui::PopItemFlag();
+		//					ImGui::PopStyleColor();
+		//				}
+		//			},
 
-				ImGui::Text("Normal Texture:");
-				DrawDragDropContent([&component]()
-					{
-						Ref<Texture2D> normal = component.Material->GetNormal();
-						if (normal)
-						{
-							ImGui::Image(normal->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-						}
-						else
-						{
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-							ImGui::PopItemFlag();
-							ImGui::PopStyleColor();
-						}
-					},
+		//			[&component](auto& path)
+		//			{
+		//				Ref<Texture2D> texture = Texture2D::Create(path.string());
+		//				if (texture->IsLoaded())
+		//					component.Material->SetNormal(texture);
+		//				else
+		//					HNB_WARN("Could not load texture {0}", path.filename().string());
+		//			});
+		//		ImGui::SameLine();
+		//		if (ImGui::Button("ReSet Normal Texture"))
+		//		{
+		//			component.Material->ClearNormal();
+		//		}
 
-					[&component](auto& path)
-					{
-						Ref<Texture2D> texture = Texture2D::Create(path.string());
-						if (texture->IsLoaded())
-							component.Material->SetNormal(texture);
-						else
-							HNB_WARN("Could not load texture {0}", path.filename().string());
-					});
-				ImGui::SameLine();
-				if (ImGui::Button("ReSet Normal Texture"))
-				{
-					component.Material->ClearNormal();
-				}
+		//		if (ImGui::Checkbox("Use Normal Map", &component.UseNormalMap))
+		//		{
+		//			component.Material->SetUseNormalMap(component.UseNormalMap);
+		//		}
+		//	});
 
-				if (ImGui::Checkbox("Use Normal Map", &component.UseNormalMap))
-				{
-					component.Material->SetUseNormalMap(component.UseNormalMap);
-				}
-			});
-
-		DrawComponent<LightComponent>("Light", entity, [](auto& component)
+		Utils::DrawComponent<LightComponent>("Light", entity, [](auto& component)
 			{
 				const char* lightTypeStrings[] = { "None","Directional Light","Point Light", "Spot Light" };
 				const char* currentTypeString = lightTypeStrings[(int)component.Type];
@@ -619,7 +608,7 @@ namespace Hanabi
 				}
 			});
 
-		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
+		Utils::DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
 			{
 				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
 				const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
@@ -645,7 +634,7 @@ namespace Hanabi
 				ImGui::DragFloat("Gravity Scale", &component.GravityScale, 0.01f, -1.0f, 1.0f);
 			});
 
-		DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
+		Utils::DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
 				ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
@@ -655,14 +644,14 @@ namespace Hanabi
 				ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 			});
 
-		DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
+		Utils::DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 				ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
 				ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
 			});
 
-		DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& component)
+		Utils::DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& component)
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
 				ImGui::DragFloat("Radius", &component.Radius);
@@ -672,7 +661,7 @@ namespace Hanabi
 				ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 			});
 
-		DrawComponent<TextComponent>("Text Renderer", entity, [](auto& component)
+		Utils::DrawComponent<TextComponent>("Text Renderer", entity, [](auto& component)
 			{
 				ImGui::InputTextMultiline("Text String", &component.TextString);
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));

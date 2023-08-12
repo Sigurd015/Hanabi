@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "ConstantBuffer.h"
 #include "UI/MSDFData.h"
+#include "Engine/Asset/AssetManager.h"
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -238,6 +239,11 @@ namespace Hanabi
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
 		s_Data->CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
+
+		s_Data->QuadPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->CirclePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->LinePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->TextPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
 	}
 
 	void Renderer2D::Shutdown()
@@ -557,6 +563,19 @@ namespace Hanabi
 		s_Data->RendererStats.QuadCount++;
 	}
 
+	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
+	{
+		if (src.Texture)
+		{
+			Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(src.Texture);
+			DrawQuad(transform, texture, src.UVStart, src.UVEnd, src.Color, src.TilingFactor, entityID);
+		}
+		else
+		{
+			DrawQuad(transform, src.Color, entityID);
+		}
+	}
+
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)
 	{
 		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
@@ -573,6 +592,8 @@ namespace Hanabi
 	{
 		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
+
+		HNB_CORE_VERIFY(texture);
 
 		glm::vec2 textureCoords[] = { uv0, { uv1.x, uv0.y }, uv1, { uv0.x, uv1.y } };
 		SetQuadVertex(transform, tintColor, entityID, textureCoords, GetTextureID(texture), tilingFactor);

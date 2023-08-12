@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Core/Base.h"
+#include "Engine/Core/Assert.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Core/Log.h"
 #include "Engine/Core/Timestep.h"
@@ -20,6 +21,14 @@
 // ---Event---------------------	
 #include "Engine/Events/KeyEvent.h"
 #include "Engine/Events/MouseEvent.h"
+
+// ---Asset---------------------
+#include "Engine/Asset/Asset.h"
+#include "Engine/Asset/AssetManagerBase.h"
+#include "Engine/Asset/AssetManager.h"
+#include "Engine/Asset/AssetImporter.h"
+#include "Engine/Asset/AssetMetadata.h"
+#include "Engine/Asset/TextureImporter.h"
 
 // ---Renderer---------------------
 #include "Engine/Renderer/RenderPass.h"

@@ -1,0 +1,16 @@
+AssetRegistry:
+  - Handle: 3301359757521532587
+    FilePath: Textures/wall-10-brick/wall-10-brick-NORM.jpg
+    Type: AssetType::Texture2D
+  - Handle: 3830939339728664841
+    FilePath: Textures/Checkerboard.png
+    Type: AssetType::Texture2D
+  - Handle: 4559566493173355299
+    FilePath: Textures/Container_Diffuse.png
+    Type: AssetType::Texture2D
+  - Handle: 8249847587482819021
+    FilePath: Textures/Container_Specular.png
+    Type: AssetType::Texture2D
+  - Handle: 14594112406493172031
+    FilePath: Textures/SpriteAnimation.png
+    Type: AssetType::Texture2D

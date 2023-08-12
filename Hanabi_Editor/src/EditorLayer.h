@@ -21,6 +21,7 @@ namespace Hanabi
 		void OnScenePause(bool pause);
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
+		bool OnWindowDrop(WindowDropEvent& e);
 		bool OpenProject();
 		void OpenProject(const std::filesystem::path& path);
 		void SaveProject();
@@ -43,7 +44,7 @@ namespace Hanabi
 		SceneState m_SceneState = SceneState::Edit;
 
 		SceneHierarchyPanel m_SceneHierarchyPanel;
-		ContentBrowserPanel m_ContentBrowserPanel;
+		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
 
 		EditorCamera m_EditorCamera;
 		int m_GizmoType = -1;

@@ -18,7 +18,7 @@ namespace Hanabi
 
 		static Ref<RenderPass> GetTargetRenderPass();
 		static void SetTargetRenderPass(const Ref<RenderPass>& renderPass);
-
+		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
 			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);

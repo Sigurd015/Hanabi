@@ -10,25 +10,20 @@ namespace Hanabi
 	class DX11Texture2D : public Texture2D
 	{
 	public:
-		DX11Texture2D(const std::string& path);
-		DX11Texture2D(const TextureSpecification& specification);
+		DX11Texture2D(const TextureSpecification& specification, Buffer data = Buffer());
 		~DX11Texture2D();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
 		void* GetRendererID() const override { return m_TextureView.Get(); }
-		virtual bool IsLoaded() const override { return m_IsLoaded; }
 		void Bind(uint32_t slot = 0) const override;
-		void SetData(void* data, uint32_t size) override;
-		virtual const std::string& GetPath() const override { return m_Path; }
+		void SetData(Buffer data) override;
 		bool operator==(const Texture& other) const override;
 	private:
 		TextureSpecification m_Specification;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureView;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_SamplerState;
-		std::string m_Path;
-		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
 		DXGI_FORMAT m_DataFormat;
 	};

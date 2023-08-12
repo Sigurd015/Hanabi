@@ -52,10 +52,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateScope<OpenGLRendererAPI>();
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateScope<DX11RendererAPI>();
-#endif
+			#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -86,10 +86,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateScope<DX11Context>(static_cast<HWND*>(window));
-#endif
+			#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -106,10 +106,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLShader>(fileName);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Shader>(fileName);
-#endif
+			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -125,10 +125,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLVertexBuffer>(size);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11VertexBuffer>(size);
-#endif
+			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -144,10 +144,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLVertexBuffer>(vertices, size);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11VertexBuffer>(vertices, size);
-#endif
+			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -163,16 +163,16 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLIndexBuffer>(indices, count);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11IndexBuffer>(indices, count);
-#endif
+			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(const std::string& path)
+	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification, Buffer data)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -180,31 +180,12 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return  CreateRef<OpenGLTexture2D>(path);
+			return CreateRef<OpenGLTexture2D>(specification, data);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateRef<DX11Texture2D>(path);
-#endif
-		}
-		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
-	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::None:
-			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLTexture2D>(specification);
-
-#if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPIType::DX11:
-			return CreateRef<DX11Texture2D>(specification);
-#endif
+			return CreateRef<DX11Texture2D>(specification, data);
+			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -220,10 +201,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLFramebuffer>(spec);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Framebuffer>(spec);
-#endif
+			#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -240,10 +221,10 @@ namespace Hanabi
 		case RendererAPIType::OpenGL:
 			return CreateRef<OpenGLUniformBuffer>(size, binding);
 
-#if defined(HNB_PLATFORM_WINDOWS)
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11ConstantBuffer>(size, binding);
-#endif
+			#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
