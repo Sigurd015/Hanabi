@@ -15,7 +15,10 @@ namespace Hanabi
 		std::filesystem::path StartScene;
 
 		std::filesystem::path AssetDirectory;
-		std::filesystem::path AssetRegistryPath; // Relative to AssetDirectory
+
+		// Relative to AssetDirectory
+		std::filesystem::path AssetRegistryPath;
+		std::filesystem::path MaterialPath; 
 		std::filesystem::path ScriptModulePath;
 	};
 
@@ -40,19 +43,18 @@ namespace Hanabi
 			return GetAssetDirectory() / s_ActiveProject->m_Config.AssetRegistryPath;
 		}
 
-		// TODO: move to asset manager
-		static std::filesystem::path GetAssetFileSystemPath(const std::filesystem::path& path)
+		static std::filesystem::path GetMaterialPath()
 		{
 			HNB_CORE_ASSERT(s_ActiveProject);
-			return GetAssetDirectory() / path;
+			return GetAssetDirectory() / s_ActiveProject->m_Config.MaterialPath;
 		}
 
 		ProjectConfig& GetConfig() { return m_Config; }
 		static Ref<Project> GetActive() { return s_ActiveProject; }
 
-		std::shared_ptr<AssetManagerBase> GetAssetManager() { return m_AssetManager; }
-		std::shared_ptr<RuntimeAssetManager> GetRuntimeAssetManager() { return std::static_pointer_cast<RuntimeAssetManager>(m_AssetManager); }
-		std::shared_ptr<EditorAssetManager> GetEditorAssetManager() { return std::static_pointer_cast<EditorAssetManager>(m_AssetManager); }
+		inline static Ref<AssetManagerBase> GetAssetManager() { return s_AssetManager; }
+		inline static Ref<RuntimeAssetManager> GetRuntimeAssetManager() { return std::static_pointer_cast<RuntimeAssetManager>(s_AssetManager); }
+		inline static Ref<EditorAssetManager> GetEditorAssetManager() { return std::static_pointer_cast<EditorAssetManager>(s_AssetManager); }
 
 		static Ref<Project> Load(const std::filesystem::path& path);
 		static bool Save(const std::filesystem::path& path);
@@ -60,8 +62,8 @@ namespace Hanabi
 	private:
 		ProjectConfig m_Config;
 		std::filesystem::path m_ProjectDirectory;
-		std::shared_ptr<AssetManagerBase> m_AssetManager;
 
+		inline static Ref<AssetManagerBase> s_AssetManager;
 		inline static Ref<Project> s_ActiveProject;
 	};
 }

@@ -13,6 +13,6 @@ namespace Hanabi
 		{ ".jpeg", AssetType::Texture2D },
 
 		//Materials
-		{ ".mat", AssetType::Material },
+		{ ".hmat", AssetType::Material },
 	};
 }

@@ -3,4 +3,5 @@ Project:
   StartScene: "Scenes/2DExample.scene"
   AssetDirectory: "Assets"
   AssetRegistryPath: "AssetRegistry.areg"
+  MaterialPath: "Materials"
   ScriptModulePath: "Scripts/Binaries/Sandbox.dll"

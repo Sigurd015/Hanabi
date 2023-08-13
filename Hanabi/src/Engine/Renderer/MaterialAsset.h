@@ -3,7 +3,7 @@
 
 namespace Hanabi
 {
-	class MaterialAsset
+	class MaterialAsset : public Asset
 	{
 	public:
 		// Phong Lighting Model for now
@@ -16,31 +16,42 @@ namespace Hanabi
 
 		MaterialAsset();
 		MaterialAsset(Ref<Material> material);
-		MaterialAsset(const Ref<MaterialAsset>& other);
 		~MaterialAsset() = default;
 
 		//TODO : For now(Phong lighting model) we only need diffuse and specular textures
-		Ref<Texture2D> GetDiffuse() { return m_Material->GetTexture(static_cast<uint32_t>(TextureType::Diffuse)); }
-		void SetDiffuse(Ref<Texture2D> texture) { SetTexture(texture, static_cast<uint32_t>(TextureType::Diffuse)); }
-		void ClearDiffuse() { ClearTexture(static_cast<uint32_t>(TextureType::Diffuse)); }
+		Ref<Texture2D> GetDiffuse();
+		Ref<Texture2D> GetSpecular();
+		Ref<Texture2D> GetNormal();
 
-		Ref<Texture2D> GetSpecular() { return m_Material->GetTexture(static_cast<uint32_t>(TextureType::Specular)); }
-		void SetSpecular(Ref<Texture2D> texture) { SetTexture(texture, static_cast<uint32_t>(TextureType::Specular)); }
-		void ClearSpecular() { ClearTexture(static_cast<uint32_t>(TextureType::Specular)); }
+		void ClearDiffuse();
+		void ClearSpecular();
+		void ClearNormal();
 
-		Ref<Texture2D> GetNormal() { return m_Material->GetTexture(static_cast<uint32_t>(TextureType::Normal)); }
-		void SetNormal(Ref<Texture2D> texture) { SetTexture(texture, static_cast<uint32_t>(TextureType::Normal)); }
-		bool IsUsingNormalMap() { return m_UseNormalMap; }
+		void SetDiffuse(AssetHandle handle);
+		void SetSpecular(AssetHandle handle);
+		void SetNormal(AssetHandle handle);
 		void SetUseNormalMap(bool value) { m_UseNormalMap = value; }
-		void ClearNormal() { ClearTexture(static_cast<uint32_t>(TextureType::Normal)); }
+
+		AssetHandle GetDiffuseHandle() const { return m_DiffuseTexture; }
+		AssetHandle GetSpecularHandle() const { return m_SpecularTexture; }
+		AssetHandle GetNormalHandle() const { return m_NormalTexture; }
+		bool IsUsingNormalMap() const { return m_UseNormalMap; }
 
 		Ref<Material> GetMaterial() const { return m_Material; }
 		void SetMaterial(Ref<Material> material) { m_Material = material; }
+
+		static AssetType GetStaticType() { return AssetType::Material; }
+		virtual AssetType GetType() const override { return GetStaticType(); }
 	private:
 		void SetTexture(Ref<Texture2D> texture, uint32_t index);
 		void ClearTexture(uint32_t index);
 
 		Ref<Material> m_Material;
+
+		AssetHandle m_DiffuseTexture = 0;
+		AssetHandle m_SpecularTexture = 0;
+		AssetHandle m_NormalTexture = 0;
+
 		bool m_UseNormalMap = false;
 	};
 }

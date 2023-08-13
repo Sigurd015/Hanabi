@@ -83,7 +83,7 @@ namespace Hanabi
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
-		AssetHandle Texture = 0;
+		AssetHandle TextureHandle = 0;
 		float TilingFactor = 1.0f;
 		glm::vec2 UVStart = { 0.0f, 0.0f };
 		glm::vec2 UVEnd = { 1.0f,1.0f };
@@ -104,12 +104,9 @@ namespace Hanabi
 
 	struct MaterialComponent
 	{
-		Ref<MaterialAsset> Material;
+		AssetHandle MaterialAssetHandle = 0;
+		//Ref<MaterialAsset> Material;
 		//AssetHandle Material = 0;
-		AssetHandle DiffuseTexture = 0;
-		AssetHandle SpecularTexture = 0;
-		AssetHandle NormalTexture = 0;
-		bool UseNormalMap = false;
 
 		MaterialComponent() = default;
 		MaterialComponent(const MaterialComponent&) = default;

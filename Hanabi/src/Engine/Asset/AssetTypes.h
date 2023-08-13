@@ -10,6 +10,7 @@ namespace Hanabi
 		Scene,
 		Texture2D,
 		Material,
+		Mesh,
 	};
 
 	namespace Utils
@@ -21,6 +22,8 @@ namespace Hanabi
 			case AssetType::None:      return "AssetType::None";
 			case AssetType::Scene:     return "AssetType::Scene";
 			case AssetType::Texture2D: return "AssetType::Texture2D";
+			case AssetType::Material: return "AssetType::Material";
+			case AssetType::Mesh: return "AssetType::Mesh";
 			}
 
 			return "AssetType::<Invalid>";
@@ -31,6 +34,8 @@ namespace Hanabi
 			if (assetType == "AssetType::None")      return AssetType::None;
 			if (assetType == "AssetType::Scene")     return AssetType::Scene;
 			if (assetType == "AssetType::Texture2D") return AssetType::Texture2D;
+			if (assetType == "AssetType::Material") return AssetType::Material;
+			if (assetType == "AssetType::Mesh") return AssetType::Mesh;
 
 			return AssetType::None;
 		}

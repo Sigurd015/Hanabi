@@ -3,6 +3,7 @@
 #include "RendererAPI.h"
 #include "Renderer2D.h"
 #include "Renderer.h"
+#include "Engine/Asset/AssetManager.h"
 
 namespace Hanabi
 {
@@ -52,7 +53,6 @@ namespace Hanabi
 		};
 
 		CBCamera CameraData;
-		CBModel ModelData;
 		CBScene SceneData;
 		CBPointLight PointLightData;
 		CBSpotLight SpotLightData;
@@ -66,7 +66,7 @@ namespace Hanabi
 		Ref<RenderPass> ShadowPass;
 		Ref<RenderPass> GeoPass;
 
-		Ref<MaterialAsset> m_DefaultMaterialAsset;
+		Ref<Material> m_DefaultMaterial;
 		Ref<Pipeline> m_DefaultPipeline;
 
 		struct DrawCommand
@@ -74,7 +74,7 @@ namespace Hanabi
 			Ref<Mesh> Mesh;
 			Ref<Material> Material;
 
-			const CBModel* ModelData;
+			CBModel ModelData;
 		};
 		std::vector<DrawCommand> DrawCommands;
 	};
@@ -120,7 +120,7 @@ namespace Hanabi
 			s_Data->ShadowPass = RenderPass::Create(shadowRenderPassSpec);
 		}
 
-		s_Data->m_DefaultMaterialAsset = Renderer::GetDefaultMaterialAsset();
+		s_Data->m_DefaultMaterial = Renderer::GetDefaultMaterial();
 
 		//TODO: Make layout dynamic
 		VertexBufferLayout layout = {
@@ -196,8 +196,8 @@ namespace Hanabi
 		Renderer::BeginRenderPass(s_Data->GeoPass);
 		for (auto& command : s_Data->DrawCommands)
 		{
-			Renderer::SubmitStaticMesh(command.Mesh, command.Material ? command.Material : s_Data->m_DefaultMaterialAsset->GetMaterial(),
-				s_Data->m_DefaultPipeline, command.ModelData, CBBingSlot::MODEL);
+			Renderer::SubmitStaticMesh(command.Mesh, command.Material,
+				s_Data->m_DefaultPipeline, &command.ModelData, CBBingSlot::MODEL);
 		}
 		Renderer::EndRenderPass(s_Data->GeoPass);
 	}
@@ -207,9 +207,21 @@ namespace Hanabi
 		return s_Data->GeoPass;
 	}
 
-	void SceneRenderer::SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const CBModel& modelData, int entityID)
+	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& staticMesh, const Ref<MaterialAsset>& material)
 	{
-		s_Data->DrawCommands.push_back({ staticMesh ,material ,&modelData });
-		//Renderer::SubmitStaticMesh(staticMesh, material ? material : s_Data->m_DefaultMaterialAsset->GetMaterial(), s_Data->m_DefaultPipeline, &modelData, CBBingSlot::MODEL);
+		s_Data->DrawCommands.push_back({ staticMesh ,material->GetMaterial() ,{ transform,material->IsUsingNormalMap() } });
+	}
+
+	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& mesh, AssetHandle materialAssetHandle)
+	{
+		if (materialAssetHandle)
+		{
+			Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(materialAssetHandle);
+			SubmitStaticMesh(transform, mesh.Mesh, materialAsset);
+		}
+		else
+		{
+			s_Data->DrawCommands.push_back({ mesh.Mesh,s_Data->m_DefaultMaterial, { transform,false} });
+		}
 	}
 }

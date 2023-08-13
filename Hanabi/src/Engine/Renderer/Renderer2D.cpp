@@ -526,9 +526,9 @@ namespace Hanabi
 		}
 	}
 
-	void Renderer2D::DrawString(const std::string& string, const glm::mat4& transform, const TextComponent& component, int entityID)
+	void Renderer2D::DrawString(const glm::mat4& transform, const TextComponent& tc, int entityID)
 	{
-		DrawString(string, component.FontAsset, transform, { component.Color, component.Kerning, component.LineSpacing }, entityID);
+		DrawString(tc.TextString, tc.FontAsset, transform, { tc.Color, tc.Kerning, tc.LineSpacing }, entityID);
 	}
 
 	float Renderer2D::GetLineWidth()
@@ -565,15 +565,20 @@ namespace Hanabi
 
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID)
 	{
-		if (src.Texture)
+		if (src.TextureHandle)
 		{
-			Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(src.Texture);
+			Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(src.TextureHandle);
 			DrawQuad(transform, texture, src.UVStart, src.UVEnd, src.Color, src.TilingFactor, entityID);
 		}
 		else
 		{
 			DrawQuad(transform, src.Color, entityID);
 		}
+	}
+
+	void Renderer2D::DrawCircle(const glm::mat4& transform, CircleRendererComponent& crc, int entityID)
+	{
+		DrawCircle(transform, crc.Color, crc.Thickness, crc.Fade, entityID);
 	}
 
 	void Renderer2D::DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID)

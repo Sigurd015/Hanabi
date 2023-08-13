@@ -1,6 +1,7 @@
 #include "Hanabi.h"
 #include "EditorLayer.h"
 #include "Engine/EntryPoint.h"
+#include "EditorResources.h"
 
 namespace Hanabi
 {
@@ -9,11 +10,15 @@ namespace Hanabi
 	public:
 		HanabiEditor(const Hanabi::ApplicationSpecification& specification) : Hanabi::Application(specification)
 		{
+			EditorResources::Init();
+
 			PushLayer(new EditorLayer());
 		}
 
 		~HanabiEditor()
-		{}
+		{
+			EditorResources::Shutdown();
+		}
 	};
 }
 

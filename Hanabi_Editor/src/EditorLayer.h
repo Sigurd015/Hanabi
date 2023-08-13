@@ -60,7 +60,7 @@ namespace Hanabi
 		Ref<Framebuffer> m_ViewportFramebuffer;
 		Entity m_HoveredEntity;
 		// Editor resources
-		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconPause, m_IconStep;
+		Ref<Texture2D> m_PlayIcon, m_StopIcon, m_PauseIcon, m_StepIcon;
 
 		//Debug
 		bool m_ImGuiDebugWndDraw = false;

@@ -15,6 +15,18 @@ namespace Hanabi
 		return out;
 	}
 
+	EditorAssetManager::EditorAssetManager()
+	{
+		AssetImporter::Init();
+
+		DeserializeAssetRegistry();
+	}
+
+	EditorAssetManager::~EditorAssetManager()
+	{
+		//SerializeAssetRegistry();
+	}
+
 	bool EditorAssetManager::IsAssetHandleValid(AssetHandle handle) const
 	{
 		return handle != 0 && m_AssetRegistry.find(handle) != m_AssetRegistry.end();

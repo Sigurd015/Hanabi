@@ -1,4 +1,5 @@
 #include "ContentBrowserPanel.h"
+#include "EditorResources.h"
 
 #include <imgui.h>
 #include <stack>
@@ -20,9 +21,9 @@ namespace Hanabi
 
 	ContentBrowserPanel::ContentBrowserPanel() :m_ProjectDirectory(Project::GetProjectDirectory())
 	{
-		m_DirectoryIcon = TextureImporter::LoadTexture2D("resources/icons/ContentBrowser/DirectoryIcon.png");
-		m_FileIcon = TextureImporter::LoadTexture2D("resources/icons/ContentBrowser/FileIcon.png");
-		m_ImportedFileIcon = TextureImporter::LoadTexture2D("resources/icons/ContentBrowser/ImportedFileIcon.png");
+		m_DirectoryIcon = EditorResources::DirectoryIcon;
+		m_FileIcon = EditorResources::FileIcon;
+		m_ImportedFileIcon = EditorResources::ImportedFileIcon;
 
 		RefreshAssetsMap();
 	}
@@ -52,6 +53,16 @@ namespace Hanabi
 
 			if (ImGui::BeginChild("CONTENT_BROWSER_CONTENT"))
 			{
+				if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+				{
+					if (ImGui::MenuItem("Create Material"))
+					{
+						Ref<MaterialAsset> material = CreateRef<MaterialAsset>();
+						//TODO: Implement memory only assets support in asset manager, and then save the material to disk
+					}
+					ImGui::EndPopup();
+				}
+
 				DrawContents();
 			}
 			ImGui::EndChild();
@@ -62,9 +73,6 @@ namespace Hanabi
 	void ContentBrowserPanel::DrawDirectoryTree()
 	{
 		DrawDirectoryTree(m_ProjectDirectory);
-
-		//TODO: Maybe add Engine asset directory	
-		//ImGui::Separator();
 	}
 
 	void ContentBrowserPanel::DrawDirectoryTree(const std::filesystem::path& directoryPath)
@@ -156,7 +164,7 @@ namespace Hanabi
 				if (ImGui::BeginPopupContextItem())
 				{
 					if (ImGui::MenuItem("Import"))
-						m_ImportedFiles[relativePath] = Project::GetActive()->GetEditorAssetManager()->ImportAsset(relativePath);
+						m_ImportedFiles[relativePath] = Project::GetEditorAssetManager()->ImportAsset(relativePath);
 
 					ImGui::EndPopup();
 				}
@@ -189,7 +197,7 @@ namespace Hanabi
 
 	void ContentBrowserPanel::RefreshAssetsMap()
 	{
-		const auto& assetRegistry = Project::GetActive()->GetEditorAssetManager()->GetAssetRegistry();
+		const auto& assetRegistry = Project::GetEditorAssetManager()->GetAssetRegistry();
 		for (const auto& [handle, metadata] : assetRegistry)
 		{
 			auto& path = metadata.FilePath;

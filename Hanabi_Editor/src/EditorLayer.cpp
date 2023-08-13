@@ -1,4 +1,5 @@
 #include "EditorLayer.h"
+#include "EditorResources.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -31,10 +32,10 @@ namespace Hanabi
 
 		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 
-		m_IconPlay = TextureImporter::LoadTexture2D("resources/icons/PlayButton.png");
-		m_IconStop = TextureImporter::LoadTexture2D("resources/icons/StopButton.png");
-		m_IconPause = TextureImporter::LoadTexture2D("resources/icons/PauseButton.png");
-		m_IconStep = TextureImporter::LoadTexture2D("resources/icons/StepButton.png");
+		m_PlayIcon = EditorResources::PlayIcon;
+		m_StopIcon = EditorResources::StopIcon;
+		m_PauseIcon = EditorResources::PauseIcon;
+		m_StepIcon = EditorResources::StepIcon;
 	}
 
 	void EditorLayer::OnDetach()
@@ -248,7 +249,7 @@ namespace Hanabi
 		float size = ImGui::GetWindowHeight() - 4.0f;
 		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
 
-		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_PlayIcon : m_StopIcon;
 		if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 		{
 			if (m_SceneState == SceneState::Edit)
@@ -261,7 +262,7 @@ namespace Hanabi
 		{
 			ImGui::SameLine();
 			bool isPaused = m_ActiveScene->IsPaused();
-			Ref<Texture2D> icon = isPaused ? m_IconPlay : m_IconPause;
+			Ref<Texture2D> icon = isPaused ? m_PlayIcon : m_PauseIcon;
 			if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
 				OnScenePause(!isPaused);
@@ -271,7 +272,7 @@ namespace Hanabi
 			{
 				ImGui::SameLine();
 				{
-					Ref<Texture2D> icon = m_IconStep;
+					Ref<Texture2D> icon = m_StepIcon;
 					if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 					{
 						m_ActiveScene->Step();

@@ -106,7 +106,7 @@ namespace Hanabi
 		}
 
 		template<typename UIFunction>
-		static void DrawDragDropContent(UIFunction uiFunction, AssetHandle& handle, AssetType validType)
+		static void DrawDragDropContent(AssetHandle& handle, AssetType validType, UIFunction uiFunction)
 		{
 			uiFunction();
 			if (ImGui::BeginDragDropTarget())
@@ -125,6 +125,39 @@ namespace Hanabi
 					}
 				}
 				ImGui::EndDragDropTarget();
+			}
+		}
+
+		static void DrawTextureControl(const std::string& name, AssetHandle& handle)
+		{
+			if (ImGui::CollapsingHeader(name.c_str(), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				DrawDragDropContent(handle, AssetType::Texture2D, [&handle]()
+					{
+						std::string label = "None";
+						if (handle != 0
+							&& AssetManager::IsAssetHandleValid(handle)
+							&& AssetManager::GetAssetType(handle) == AssetType::Texture2D)
+						{
+							Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
+							ImGui::Image(texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+							const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(handle);
+							label = metadata.FilePath.filename().string();
+						}
+						else
+						{
+							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
+							ImGui::PopItemFlag();
+							ImGui::PopStyleColor();
+						}
+						ImGui::SameLine();
+						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
+						{
+							handle = 0;
+						}
+					});
 			}
 		}
 	}
@@ -408,24 +441,7 @@ namespace Hanabi
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				Utils::DrawDragDropContent([&component]()
-					{
-						if (component.Texture != 0
-							&& AssetManager::IsAssetHandleValid(component.Texture)
-							&& AssetManager::GetAssetType(component.Texture) == AssetType::Texture2D)
-						{
-							Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(component.Texture);
-							ImGui::Image(texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-						}
-						else
-						{
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-							ImGui::PopItemFlag();
-							ImGui::PopStyleColor();
-						}
-					}, component.Texture, AssetType::Texture2D);
+				Utils::DrawTextureControl("Texture", component.TextureHandle);
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
@@ -459,107 +475,50 @@ namespace Hanabi
 		//			});
 		//	});
 
-		//Utils::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
-		//	{
-		//		//TODO:
-		//		if (component.Material == nullptr)
-		//		{
-		//			component.Material = CreateRef<MaterialAsset>();
-		//		}
+		Utils::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
+			{
+				Ref<MaterialAsset> materialAsset = nullptr;
+				std::string label = "None";
+				if (component.MaterialAssetHandle != 0
+					&& AssetManager::IsAssetHandleValid(component.MaterialAssetHandle)
+					&& AssetManager::GetAssetType(component.MaterialAssetHandle) == AssetType::Material)
+				{
+					materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);
+					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.MaterialAssetHandle);
+					label = metadata.FilePath.filename().string();
+				}
 
-		//		ImGui::Text("Diffuse Texture:");
-		//		Utils::DrawDragDropContent([&component]()
-		//			{
-		//				Ref<Texture2D> diffuse = component.Material->GetDiffuse();
-		//				if (diffuse)
-		//				{
-		//					ImGui::Image(diffuse->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-		//				}
-		//				else
-		//				{
-		//					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-		//					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		//					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-		//					ImGui::PopItemFlag();
-		//					ImGui::PopStyleColor();
-		//				}
-		//			}, );
-		//		ImGui::SameLine();
-		//		if (ImGui::Button("ReSet Diffuse Texture"))
-		//		{
-		//			component.Material->ClearDiffuse();
-		//		}
+				Utils::DrawDragDropContent(component.MaterialAssetHandle, AssetType::Material, [&]()
+					{
+						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
+						{
+							component.MaterialAssetHandle = 0;
+							materialAsset = nullptr;
+						}
+					});
 
-		//		ImGui::Text("Specular Texture:");
-		//		DrawDragDropContent([&component]()
-		//			{
-		//				Ref<Texture2D> specular = component.Material->GetSpecular();
-		//				if (specular)
-		//				{
-		//					ImGui::Image(specular->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-		//				}
-		//				else
-		//				{
-		//					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-		//					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		//					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-		//					ImGui::PopItemFlag();
-		//					ImGui::PopStyleColor();
-		//				}
-		//			},
+				if (materialAsset != nullptr)
+				{
+					AssetHandle diffuseHandle = materialAsset->GetDiffuseHandle();
+					AssetHandle specularHandle = materialAsset->GetSpecularHandle();
+					AssetHandle normalHandle = materialAsset->GetNormalHandle();
 
-		//			[&component](auto& path)
-		//			{
-		//				Ref<Texture2D> texture = Texture2D::Create(path.string());
-		//				if (texture->IsLoaded())
-		//					component.Material->SetSpecular(texture);
-		//				else
-		//					HNB_WARN("Could not load texture {0}", path.filename().string());
-		//			});
+					Utils::DrawTextureControl("Diffuse Texture", diffuseHandle);
+					Utils::DrawTextureControl("Specular Texture", specularHandle);
+					Utils::DrawTextureControl("Normal Texture", normalHandle);
 
-		//		ImGui::SameLine();
-		//		if (ImGui::Button("ReSet Specular Texture"))
-		//		{
-		//			component.Material->ClearSpecular();
-		//		}
+					ImGui::SameLine();
+					bool useNormalMap = materialAsset->IsUsingNormalMap();
+					if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
+					{
+						materialAsset->SetUseNormalMap(useNormalMap);
+					}
 
-		//		ImGui::Text("Normal Texture:");
-		//		DrawDragDropContent([&component]()
-		//			{
-		//				Ref<Texture2D> normal = component.Material->GetNormal();
-		//				if (normal)
-		//				{
-		//					ImGui::Image(normal->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-		//				}
-		//				else
-		//				{
-		//					ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-		//					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		//					ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-		//					ImGui::PopItemFlag();
-		//					ImGui::PopStyleColor();
-		//				}
-		//			},
-
-		//			[&component](auto& path)
-		//			{
-		//				Ref<Texture2D> texture = Texture2D::Create(path.string());
-		//				if (texture->IsLoaded())
-		//					component.Material->SetNormal(texture);
-		//				else
-		//					HNB_WARN("Could not load texture {0}", path.filename().string());
-		//			});
-		//		ImGui::SameLine();
-		//		if (ImGui::Button("ReSet Normal Texture"))
-		//		{
-		//			component.Material->ClearNormal();
-		//		}
-
-		//		if (ImGui::Checkbox("Use Normal Map", &component.UseNormalMap))
-		//		{
-		//			component.Material->SetUseNormalMap(component.UseNormalMap);
-		//		}
-		//	});
+					materialAsset->SetDiffuse(diffuseHandle);
+					materialAsset->SetSpecular(specularHandle);
+					materialAsset->SetNormal(normalHandle);
+				}
+			});
 
 		Utils::DrawComponent<LightComponent>("Light", entity, [](auto& component)
 			{

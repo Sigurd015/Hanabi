@@ -51,7 +51,7 @@ namespace Hanabi
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);
 		static Ref<Texture2D> GetTexture(const std::string& name);
-		static Ref<MaterialAsset> GetDefaultMaterialAsset();
+		static Ref<Material> GetDefaultMaterial();
 	private:
 		static RenderCommandQueue& GetRenderCommandQueue();
 	};

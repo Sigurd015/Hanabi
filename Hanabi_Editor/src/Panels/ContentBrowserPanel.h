@@ -18,9 +18,7 @@ namespace Hanabi
 		bool IsAlreadyImported(const std::filesystem::path& path);
 		std::filesystem::path m_ProjectDirectory;
 		std::filesystem::path m_SelectedDirectory;
-		Ref<Texture2D> m_DirectoryIcon;
-		Ref<Texture2D> m_FileIcon;
-		Ref<Texture2D> m_ImportedFileIcon;
+		Ref<Texture2D> m_DirectoryIcon, m_FileIcon, m_ImportedFileIcon;
 		std::unordered_map<std::filesystem::path, AssetHandle> m_ImportedFiles;
 	};
 }

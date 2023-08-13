@@ -11,6 +11,8 @@ namespace Hanabi
 	class EditorAssetManager : public AssetManagerBase
 	{
 	public:
+		EditorAssetManager();
+		~EditorAssetManager();
 		virtual Ref<Asset> GetAsset(AssetHandle handle) const override;
 
 		virtual bool IsAssetHandleValid(AssetHandle handle) const override;

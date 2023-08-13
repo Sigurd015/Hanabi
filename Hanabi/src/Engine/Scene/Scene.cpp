@@ -297,11 +297,7 @@ namespace Hanabi
 			for (auto entity : view)
 			{
 				auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
-				CBModel* model = new CBModel();
-				model->Transform = transform.GetTransform();
-				model->UseNormalMap = material.UseNormalMap;
-				if (mesh.Mesh && material.Material)
-					SceneRenderer::SubmitStaticMesh(mesh.Mesh, material.Material->GetMaterial(), *model);
+				SceneRenderer::SubmitStaticMesh(transform.GetTransform(), mesh, material.MaterialAssetHandle);
 			}
 		}
 
@@ -311,11 +307,7 @@ namespace Hanabi
 			for (auto entity : view)
 			{
 				auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
-				CBModel* model = new CBModel();
-				model->Transform = transform.GetTransform();
-				model->UseNormalMap = false;
-				if (mesh.Mesh)
-					SceneRenderer::SubmitStaticMesh(mesh.Mesh, nullptr, *model);
+				SceneRenderer::SubmitStaticMesh(transform.GetTransform(), mesh);
 			}
 		}
 
@@ -341,8 +333,7 @@ namespace Hanabi
 			{
 				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-				Renderer2D::DrawCircle(transform.GetTransform(), circle.Color,
-					circle.Thickness, circle.Fade, (int)entity);
+				Renderer2D::DrawCircle(transform.GetTransform(), circle, (int)entity);
 			}
 		}
 
@@ -353,7 +344,7 @@ namespace Hanabi
 			{
 				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-				Renderer2D::DrawString(text.TextString, transform.GetTransform(), text, (int)entity);
+				Renderer2D::DrawString(transform.GetTransform(), text, (int)entity);
 			}
 		}
 

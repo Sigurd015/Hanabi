@@ -14,6 +14,7 @@ project "Hanabi_Editor"
 	
 	includedirs
 	{
+		"src",
 		"%{wks.location}/Hanabi/src",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.spdlog}",

@@ -78,6 +78,7 @@ namespace Hanabi
 
 		static Ref<RenderPass> GetFinalRenderPass();
 
-		static void SubmitStaticMesh(const Ref<Mesh>& staticMesh, const Ref<Material>& material, const CBModel& modelData, int entityID = -1);
+		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& staticMesh, const Ref<MaterialAsset>& material);
+		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& mesh, AssetHandle materialAssetHandle = 0);
 	};
 }

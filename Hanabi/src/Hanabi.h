@@ -28,7 +28,7 @@
 #include "Engine/Asset/AssetManager.h"
 #include "Engine/Asset/AssetImporter.h"
 #include "Engine/Asset/AssetMetadata.h"
-#include "Engine/Asset/TextureImporter.h"
+#include "Engine/Asset/AssetSerializer.h"
 
 // ---Renderer---------------------
 #include "Engine/Renderer/RenderPass.h"
