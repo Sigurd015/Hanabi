@@ -7,107 +7,12 @@
 #include "Engine/Core/UUID.h"
 #include "Engine/Project/Project.h"
 #include "Engine/Renderer/Renderer.h"
+#include "Engine/Utils/YAMLHelpers.h"
 
 #include <yaml-cpp/yaml.h>
 
-namespace YAML
-{
-	template<>
-	struct convert<Hanabi::UUID>
-	{
-		static Node encode(const Hanabi::UUID& uuid)
-		{
-			Node node;
-			node.push_back((uint64_t)uuid);
-			return node;
-		}
-
-		static bool decode(const Node& node, Hanabi::UUID& uuid)
-		{
-			uuid = node.as<uint64_t>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec2>
-	{
-		static Node encode(const glm::vec2& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec2& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 2)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec3>
-	{
-		static Node encode(const glm::vec3& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec3& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 3)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			return true;
-		}
-	};
-
-	template<>
-	struct convert<glm::vec4>
-	{
-		static Node encode(const glm::vec4& rhs)
-		{
-			Node node;
-			node.push_back(rhs.x);
-			node.push_back(rhs.y);
-			node.push_back(rhs.z);
-			node.push_back(rhs.w);
-			node.SetStyle(EmitterStyle::Flow);
-			return node;
-		}
-
-		static bool decode(const Node& node, glm::vec4& rhs)
-		{
-			if (!node.IsSequence() || node.size() != 4)
-				return false;
-
-			rhs.x = node[0].as<float>();
-			rhs.y = node[1].as<float>();
-			rhs.z = node[2].as<float>();
-			rhs.w = node[3].as<float>();
-			return true;
-		}
-	};
-}
-
 namespace Hanabi
 {
-
 	#define WRITE_SCRIPT_FIELD(FieldType, Type)           \
 			case ScriptFieldType::FieldType:          \
 				out << scriptField.GetValue<Type>();  \
@@ -245,9 +150,7 @@ namespace Hanabi
 		SerializeComponent<MeshComponent>("MeshComponent", entity, out, [&]()
 			{
 				auto& meshComponent = entity.GetComponent<MeshComponent>();
-				auto& mesh = meshComponent.Mesh;
-				if (mesh)
-					out << YAML::Key << "MeshPath" << YAML::Value << mesh->GetMeshSource()->GetPath().c_str();
+				out << YAML::Key << "MeshSourceHandle" << YAML::Value << meshComponent.MeshSourceHandle;
 			});
 
 		SerializeComponent<MaterialComponent>("MaterialComponent", entity, out, [&]()
@@ -474,14 +377,8 @@ namespace Hanabi
 				if (meshComponent)
 				{
 					auto& mc = deserializedEntity.AddComponent<MeshComponent>();
-
-					//TODO: this should handle by asset manager
-					if (meshComponent["MeshPath"])
-					{
-						std::string meshPath = meshComponent["MeshPath"].as<std::string>();
-						Ref<MeshSource> meshSource = CreateRef<MeshSource>(meshPath);
-						mc.Mesh = CreateRef<Mesh>(meshSource);
-					}
+					if(meshComponent["MeshSourceHandle"])
+						mc.MeshSourceHandle = meshComponent["MeshSourceHandle"].as<AssetHandle>();
 				}
 
 				auto materialComponent = entity["MaterialComponent"];
@@ -489,9 +386,7 @@ namespace Hanabi
 				{
 					auto& mtc = deserializedEntity.AddComponent<MaterialComponent>();
 					if (materialComponent["MaterialAssetHandle"])
-					{
 						mtc.MaterialAssetHandle = materialComponent["MaterialAssetHandle"].as<AssetHandle>();
-					}
 				}
 
 				auto lightComponent = entity["LightComponent"];

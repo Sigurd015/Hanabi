@@ -11,11 +11,12 @@ namespace Hanabi
 		Texture2D,
 		Material,
 		Mesh,
+		MeshSource,
 	};
 
 	namespace Utils
 	{
-		inline std::string_view AssetTypeToString(AssetType type)
+		inline std::string AssetTypeToString(AssetType type)
 		{
 			switch (type)
 			{
@@ -24,18 +25,20 @@ namespace Hanabi
 			case AssetType::Texture2D: return "AssetType::Texture2D";
 			case AssetType::Material: return "AssetType::Material";
 			case AssetType::Mesh: return "AssetType::Mesh";
+			case AssetType::MeshSource: return "AssetType::MeshSource";
 			}
 
 			return "AssetType::<Invalid>";
 		}
 
-		inline AssetType AssetTypeFromString(std::string_view assetType)
+		inline AssetType AssetTypeFromString(const std::string& assetType)
 		{
 			if (assetType == "AssetType::None")      return AssetType::None;
 			if (assetType == "AssetType::Scene")     return AssetType::Scene;
 			if (assetType == "AssetType::Texture2D") return AssetType::Texture2D;
 			if (assetType == "AssetType::Material") return AssetType::Material;
 			if (assetType == "AssetType::Mesh") return AssetType::Mesh;
+			if (assetType == "AssetType::MeshSource") return AssetType::MeshSource;
 
 			return AssetType::None;
 		}

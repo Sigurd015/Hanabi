@@ -1,0 +1,5 @@
+Material:
+  DiffuseTextureHandle: 0
+  SpecularTextureHandle: 0
+  NormalTextureHandle: 0
+  UseNormalMap: false

@@ -207,21 +207,37 @@ namespace Hanabi
 		return s_Data->GeoPass;
 	}
 
-	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& staticMesh, const Ref<MaterialAsset>& material)
+	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material)
 	{
-		s_Data->DrawCommands.push_back({ staticMesh ,material->GetMaterial() ,{ transform,material->IsUsingNormalMap() } });
+		s_Data->DrawCommands.push_back({ mesh ,material->GetMaterial() ,{ transform,material->IsUsingNormalMap() } });
 	}
 
-	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& mesh, AssetHandle materialAssetHandle)
+	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
-		if (materialAssetHandle)
+		s_Data->DrawCommands.push_back({ mesh ,s_Data->m_DefaultMaterial ,{ transform,false } });
+	}
+
+	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle)
+	{
+		if (meshComponent.MeshSourceHandle)
 		{
-			Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(materialAssetHandle);
-			SubmitStaticMesh(transform, mesh.Mesh, materialAsset);
-		}
-		else
-		{
-			s_Data->DrawCommands.push_back({ mesh.Mesh,s_Data->m_DefaultMaterial, { transform,false} });
+			if (!AssetManager::IsAssetHandleValid(meshComponent.MeshHandle))
+			{
+				Ref<MeshSource> meshSource = AssetManager::GetAsset<MeshSource>(meshComponent.MeshSourceHandle);
+				meshComponent.MeshHandle = AssetManager::CreateMemoryOnlyAsset<Mesh>(meshSource);
+			}
+
+			Ref<Mesh> mesh = AssetManager::GetAsset<Mesh>(meshComponent.MeshHandle);
+
+			if (materialAssetHandle)
+			{
+				Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(materialAssetHandle);
+				SubmitStaticMesh(transform, mesh, materialAsset);
+			}
+			else
+			{
+				SubmitStaticMesh(transform, mesh);
+			}
 		}
 	}
 }

@@ -68,7 +68,7 @@ namespace Hanabi
 	{
 		m_DataFormat = Utils::ImageFormatToDXDataFormat(specification.Format);
 		CreateTexture(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
-		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureView.GetAddressOf());
+		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureSRV.GetAddressOf());
 		CreateSamplerState(m_SamplerState.GetAddressOf());
 
 		SetData(data);
@@ -77,7 +77,7 @@ namespace Hanabi
 	DX11Texture2D::~DX11Texture2D()
 	{
 		m_Texture.Reset();
-		m_TextureView.Reset();
+		m_TextureSRV.Reset();
 		m_SamplerState.Reset();
 	}
 
@@ -111,7 +111,7 @@ namespace Hanabi
 	{
 		ID3D11Resource* resource1;
 		ID3D11Resource* resource2;
-		m_TextureView->GetResource(&resource1);
+		m_TextureSRV->GetResource(&resource1);
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> temp = static_cast<ID3D11ShaderResourceView*>(other.GetRendererID());
 		temp->GetResource(&resource2);
 		return resource1 == resource2;
@@ -120,7 +120,7 @@ namespace Hanabi
 	void DX11Texture2D::Bind(uint32_t slot) const
 	{
 		DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
-		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureView.GetAddressOf());
+		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureSRV.GetAddressOf());
 	}
 }
 #endif

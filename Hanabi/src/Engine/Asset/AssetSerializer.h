@@ -2,7 +2,7 @@
 #include "Asset.h"
 #include "AssetMetadata.h"
 #include "Engine/Renderer/MaterialAsset.h"
-
+#include "Engine/Renderer/Mesh.h"
 
 namespace Hanabi
 {
@@ -10,29 +10,35 @@ namespace Hanabi
 	{
 	public:
 		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const = 0;
+		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const = 0;
+	};
 
-		// AssetMetadata filepath is relative to project asset directory
-		virtual Ref<Asset> ImportData(AssetHandle handle, const AssetMetadata& metadata) const = 0;
+	class MeshSourceSerializer : public AssetSerializer
+	{
+	public:
+		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override {}
+		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
+
+	private:
+		static Ref<MeshSource> LoadMeshSource(const std::filesystem::path& path);
 	};
 
 	class MaterialAssetSerializer : public AssetSerializer
 	{
 	public:
 		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override;
-
-		virtual Ref<Asset> ImportData(AssetHandle handle, const AssetMetadata& metadata) const override;
+		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
 
 	private:
 		std::string SerializeToYAML(Ref<MaterialAsset> materialAsset) const;
-		Ref<MaterialAsset> DeserializeFromYAML(const std::filesystem::path& path) const;
+		bool DeserializeFromYAML(const std::string& yamlString, Ref<MaterialAsset>& targetMaterialAsset) const;
 	};
 
 	class TextureSerializer : public AssetSerializer
 	{
 	public:
 		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override {}
-
-		virtual Ref<Asset> ImportData(AssetHandle handle, const AssetMetadata& metadata) const override;
+		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
 
 		// Reads file directly from filesystem
 		// (i.e. path has to be relative / absolute to working directory)

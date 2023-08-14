@@ -5,6 +5,9 @@ AssetRegistry:
   - Handle: 1661060954224083329
     FilePath: Materials/mat1.hmat
     Type: AssetType::Material
+  - Handle: 2624174774841656376
+    FilePath: Materials/New_Material.hmat
+    Type: AssetType::Material
   - Handle: 3301359757521532587
     FilePath: Textures/wall-10-brick/wall-10-brick-NORM.jpg
     Type: AssetType::Texture2D
@@ -23,6 +26,18 @@ AssetRegistry:
   - Handle: 9328707022816709312
     FilePath: Textures/wall-10-brick/wall-10-brick-DISP.jpg
     Type: AssetType::Texture2D
+  - Handle: 12612701025111133498
+    FilePath: Materials/New_Material.hmat
+    Type: AssetType::Material
+  - Handle: 14535960835168578140
+    FilePath: Models/Box.fbx
+    Type: AssetType::MeshSource
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
+  - Handle: 14773429574428799842
+    FilePath: Materials/New_Material.hmat
+    Type: AssetType::Material
+  - Handle: 17320140235110981838
+    FilePath: Materials/New_Material.hmat
+    Type: AssetType::Material

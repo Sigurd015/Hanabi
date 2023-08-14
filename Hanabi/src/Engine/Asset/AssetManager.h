@@ -29,5 +29,18 @@ namespace Hanabi
 		{
 			return Project::GetAssetManager()->GetAssetType(handle);
 		}
+
+		template<typename TAsset, typename... TArgs>
+		static AssetHandle CreateMemoryOnlyAsset(TArgs&&... args)
+		{
+			static_assert(std::is_base_of<Asset, TAsset>::value, "CreateMemoryOnlyAsset only works for types derived from Asset");
+
+			Ref<TAsset> asset = CreateRef<TAsset>(std::forward<TArgs>(args)...);
+			asset->Handle = AssetHandle();
+
+			Project::GetAssetManager()->AddMemoryOnlyAsset(asset);
+			return asset->Handle;
+
+		}
 	};
 }

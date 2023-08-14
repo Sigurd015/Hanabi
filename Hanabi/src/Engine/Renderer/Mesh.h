@@ -23,22 +23,22 @@ namespace Hanabi
 		uint32_t V1, V2, V3;
 	};
 
-	class MeshSource
+	class MeshSource :public Asset
 	{
 	public:
-		MeshSource(const std::string& path);
 		MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices);
 
 		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 		const std::vector<Index>& GetIndices() const { return m_Indices; }
-		const std::string& GetPath() const { return m_Path; };
+
+		static AssetType GetStaticType() { return AssetType::MeshSource; }
+		virtual AssetType GetType() const override { return GetStaticType(); }
 	private:
-		std::string m_Path;
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
 	};
 
-	class Mesh
+	class Mesh :public Asset
 	{
 	public:
 		Mesh(Ref<MeshSource> source);
@@ -47,6 +47,9 @@ namespace Hanabi
 		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
 		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
 		const Ref<MeshSource>& GetMeshSource() const { return m_MeshSource; }
+
+		static AssetType GetStaticType() { return AssetType::Mesh; }
+		virtual AssetType GetType() const override { return GetStaticType(); }
 	private:
 		Ref<MeshSource> m_MeshSource;
 		std::vector<Vertex> m_Vertices;

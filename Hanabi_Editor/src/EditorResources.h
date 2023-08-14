@@ -36,5 +36,4 @@ namespace Hanabi
 			return TextureSerializer::LoadTexture2D(relativePath);
 		}
 	};
-
 }

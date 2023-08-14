@@ -95,8 +95,8 @@ namespace Hanabi
 
 	struct MeshComponent
 	{
-		//TODO: 
-		Ref<Mesh> Mesh;
+		AssetHandle MeshSourceHandle = 0;
+		AssetHandle MeshHandle = 0;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
@@ -105,8 +105,6 @@ namespace Hanabi
 	struct MaterialComponent
 	{
 		AssetHandle MaterialAssetHandle = 0;
-		//Ref<MaterialAsset> Material;
-		//AssetHandle Material = 0;
 
 		MaterialComponent() = default;
 		MaterialComponent(const MaterialComponent&) = default;

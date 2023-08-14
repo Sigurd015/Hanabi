@@ -140,6 +140,7 @@ namespace Hanabi
 							&& AssetManager::GetAssetType(handle) == AssetType::Texture2D)
 						{
 							Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
+							//TODO: UV flip for directx 11
 							ImGui::Image(texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 							const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(handle);
 							label = metadata.FilePath.filename().string();
@@ -448,32 +449,32 @@ namespace Hanabi
 				ImGui::DragFloat2("UV End", glm::value_ptr(component.UVEnd), 0.01f, 0.0f, 1.0f);
 			});
 
-		//Utils::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
-		//	{
-		//		Utils::DrawDragDropContent([&component]()
-		//			{
-		//				ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.1f, 0.1f, 0.1f, 0.5f));
-		//				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-		//				if (component.Mesh)
-		//				{
-		//					std::string temp = component.Mesh->GetMeshSource()->GetPath();
-		//					ImGui::Button(temp.c_str(), ImVec2(300.0f, 30.0f));
-		//				}
-		//				else
-		//				{
-		//					ImGui::Button("Mesh", ImVec2(300.0f, 30.0f));
-		//				}
-		//				ImGui::PopItemFlag();
-		//				ImGui::PopStyleColor();
-		//			},
+		Utils::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
+			{
+				std::string label = "None";
+				if (component.MeshSourceHandle != 0
+					&& AssetManager::IsAssetHandleValid(component.MeshSourceHandle)
+					&& AssetManager::GetAssetType(component.MeshSourceHandle) == AssetType::MeshSource)
+				{
+					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.MeshSourceHandle);
+					label = metadata.FilePath.filename().string();
+				}
 
-		//			[&component](auto& path)
-		//			{
-		//				Ref<MeshSource> meshSource = CreateRef<MeshSource>(path.string());
-		//				Ref<Mesh> mesh = CreateRef<Mesh>(meshSource);
-		//				component.Mesh = mesh;
-		//			});
-		//	});
+				AssetHandle meshSourceHandle = component.MeshSourceHandle;
+
+				Utils::DrawDragDropContent(component.MeshSourceHandle, AssetType::MeshSource, [&]()
+					{
+						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
+						{
+							component.MeshSourceHandle = 0;
+						}
+					});
+
+				if (meshSourceHandle != component.MeshSourceHandle)
+				{
+					component.MeshHandle = 0;
+				}
+			});
 
 		Utils::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
 			{
@@ -503,9 +504,13 @@ namespace Hanabi
 					AssetHandle specularHandle = materialAsset->GetSpecularHandle();
 					AssetHandle normalHandle = materialAsset->GetNormalHandle();
 
-					Utils::DrawTextureControl("Diffuse Texture", diffuseHandle);
-					Utils::DrawTextureControl("Specular Texture", specularHandle);
-					Utils::DrawTextureControl("Normal Texture", normalHandle);
+					AssetHandle tempDiffuseHandle = diffuseHandle;
+					AssetHandle tempSpecularHandle = specularHandle;
+					AssetHandle tempNormalHandle = normalHandle;
+
+					Utils::DrawTextureControl("Diffuse Texture", tempDiffuseHandle);
+					Utils::DrawTextureControl("Specular Texture", tempSpecularHandle);
+					Utils::DrawTextureControl("Normal Texture", tempNormalHandle);
 
 					ImGui::SameLine();
 					bool useNormalMap = materialAsset->IsUsingNormalMap();
@@ -514,9 +519,21 @@ namespace Hanabi
 						materialAsset->SetUseNormalMap(useNormalMap);
 					}
 
-					materialAsset->SetDiffuse(diffuseHandle);
-					materialAsset->SetSpecular(specularHandle);
-					materialAsset->SetNormal(normalHandle);
+					bool diffuseChanged = tempDiffuseHandle != diffuseHandle;
+					bool specularChanged = tempSpecularHandle != specularHandle;
+					bool normalChanged = tempNormalHandle != normalHandle;
+
+					if (diffuseChanged)
+						materialAsset->SetDiffuse(tempDiffuseHandle);
+
+					if (specularChanged)
+						materialAsset->SetSpecular(tempSpecularHandle);
+
+					if (normalChanged)
+						materialAsset->SetNormal(tempNormalHandle);
+
+					if (diffuseChanged || specularChanged || normalChanged)
+						AssetImporter::Serialize(materialAsset);
 				}
 			});
 

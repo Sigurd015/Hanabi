@@ -15,14 +15,14 @@ namespace Hanabi
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
-		void* GetRendererID() const override { return m_TextureView.Get(); }
+		void* GetRendererID() const override { return m_TextureSRV.Get(); }
 		void Bind(uint32_t slot = 0) const override;
 		void SetData(Buffer data) override;
 		bool operator==(const Texture& other) const override;
 	private:
 		TextureSpecification m_Specification;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureView;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_SamplerState;
 		uint32_t m_Width, m_Height;
 		DXGI_FORMAT m_DataFormat;

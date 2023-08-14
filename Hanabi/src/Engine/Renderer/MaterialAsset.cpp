@@ -22,9 +22,6 @@ namespace Hanabi
 
 	void MaterialAsset::SetDiffuse(AssetHandle handle)
 	{
-		if (m_DiffuseTexture == handle)
-			return;
-
 		m_DiffuseTexture = handle;
 		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
 		SetTexture(texture, static_cast<uint32_t>(TextureType::Diffuse));
@@ -43,9 +40,6 @@ namespace Hanabi
 
 	void MaterialAsset::SetSpecular(AssetHandle handle)
 	{
-		if (m_SpecularTexture == handle)
-			return;
-
 		m_SpecularTexture = handle;
 		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
 		SetTexture(texture, static_cast<uint32_t>(TextureType::Specular));
@@ -64,9 +58,6 @@ namespace Hanabi
 
 	void MaterialAsset::SetNormal(AssetHandle handle)
 	{
-		if (m_NormalTexture == handle)
-			return;
-
 		m_NormalTexture = handle;
 		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
 		SetTexture(texture, static_cast<uint32_t>(TextureType::Normal));

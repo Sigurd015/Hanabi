@@ -12,7 +12,11 @@ namespace Hanabi
 		{ ".jpg", AssetType::Texture2D },
 		{ ".jpeg", AssetType::Texture2D },
 
-		//Materials
+		// Materials
 		{ ".hmat", AssetType::Material },
+
+		// MeshSource
+		{ ".fbx", AssetType::MeshSource },
+		{ ".obj", AssetType::MeshSource },
 	};
 }

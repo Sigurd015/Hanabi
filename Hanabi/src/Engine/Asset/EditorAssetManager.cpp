@@ -9,11 +9,7 @@
 
 namespace Hanabi
 {
-	YAML::Emitter& operator<<(YAML::Emitter& out, const std::string_view& v)
-	{
-		out << std::string(v.data(), v.size());
-		return out;
-	}
+	static AssetMetadata s_NullMetadata;
 
 	EditorAssetManager::EditorAssetManager()
 	{
@@ -29,7 +25,12 @@ namespace Hanabi
 
 	bool EditorAssetManager::IsAssetHandleValid(AssetHandle handle) const
 	{
-		return handle != 0 && m_AssetRegistry.find(handle) != m_AssetRegistry.end();
+		return IsMemoryAsset(handle) || GetMetadata(handle).IsValid();
+	}
+
+	bool EditorAssetManager::IsMemoryAsset(AssetHandle handle) const
+	{
+		return m_MemoryAssets.find(handle) != m_MemoryAssets.end();
 	}
 
 	bool EditorAssetManager::IsAssetLoaded(AssetHandle handle) const
@@ -52,27 +53,48 @@ namespace Hanabi
 		return s_AssetExtensionMap.at(extension.c_str());
 	}
 
+	AssetType EditorAssetManager::GetAssetTypeFromPath(const std::filesystem::path& path)
+	{
+		return GetAssetTypeFromExtension(path.extension().string());
+	}
+
 	AssetHandle EditorAssetManager::ImportAsset(const std::filesystem::path& filepath)
 	{
-		AssetHandle handle; // generate new handle
+		std::filesystem::path path = GetRelativePath(filepath);
+
+		if (auto& metadata = GetMetadata(path); metadata.IsValid())
+			return metadata.Handle;
+
+		AssetType type = GetAssetTypeFromPath(path);
+		if (type == AssetType::None)
+			return 0;
+
 		AssetMetadata metadata;
-		metadata.FilePath = filepath;
-		metadata.Type = GetAssetTypeFromExtension(filepath.extension().string());
-		Ref<Asset> asset = AssetImporter::ImportAsset(handle, metadata);
-		asset->Handle = handle;
-		if (asset)
-		{
-			m_LoadedAssets[handle] = asset;
-			m_AssetRegistry[handle] = metadata;
-			SerializeAssetRegistry();
-			return handle;
-		}
-		return 0;
+		metadata.Handle = AssetHandle();
+		metadata.FilePath = path;
+		metadata.Type = type;
+		m_AssetRegistry[metadata.Handle] = metadata;
+
+		//TODO: Call this at ~EditorAssetManager is the best way, but it will cause crash when close the editor
+		SerializeAssetRegistry();
+
+		return metadata.Handle;
+	}
+
+	void EditorAssetManager::AddMemoryOnlyAsset(Ref<Asset> asset)
+	{
+		AssetMetadata metadata;
+		metadata.Handle = asset->Handle;
+		metadata.IsDataLoaded = true;
+		metadata.Type = asset->GetType();
+		metadata.IsMemoryAsset = true;
+		m_AssetRegistry[metadata.Handle] = metadata;
+
+		m_MemoryAssets[asset->Handle] = asset;
 	}
 
 	const AssetMetadata& EditorAssetManager::GetMetadata(AssetHandle handle) const
 	{
-		static AssetMetadata s_NullMetadata;
 		auto it = m_AssetRegistry.find(handle);
 		if (it == m_AssetRegistry.end())
 			return s_NullMetadata;
@@ -80,31 +102,81 @@ namespace Hanabi
 		return it->second;
 	}
 
-	Ref<Asset> EditorAssetManager::GetAsset(AssetHandle handle) const
+	const AssetMetadata& EditorAssetManager::GetMetadata(const std::filesystem::path& filepath)
 	{
-		// 1. check if handle is valid
+		const auto relativePath = GetRelativePath(filepath);
+
+		for (auto& [handle, metadata] : m_AssetRegistry)
+		{
+			if (metadata.FilePath == relativePath)
+				return metadata;
+		}
+
+		return s_NullMetadata;
+	}
+
+	const AssetMetadata& EditorAssetManager::GetMetadata(const Ref<Asset>& asset)
+	{
+		return GetMetadata(asset->Handle);
+	}
+
+	Ref<Asset> EditorAssetManager::GetAsset(AssetHandle handle)
+	{
 		if (!IsAssetHandleValid(handle))
 			return nullptr;
 
-		// 2. check if asset needs load (and if so, load)
-		Ref<Asset> asset;
-		if (IsAssetLoaded(handle))
+		if (IsMemoryAsset(handle))
+			return m_MemoryAssets[handle];
+
+		auto& metadata = GetMetadataInternal(handle);
+		if (!metadata.IsValid())
+			return nullptr;
+
+		Ref<Asset> asset = nullptr;
+		if (!metadata.IsDataLoaded)
 		{
-			asset = m_LoadedAssets.at(handle);
+			metadata.IsDataLoaded = AssetImporter::TryLoadData(metadata, asset);
+			if (!metadata.IsDataLoaded)
+				return nullptr;
+
+			m_LoadedAssets[handle] = asset;
 		}
 		else
 		{
-			// load asset
-			const AssetMetadata& metadata = GetMetadata(handle);
-			asset = AssetImporter::ImportAsset(handle, metadata);
-			if (!asset)
+			asset = m_LoadedAssets[handle];
+		}
+
+		return asset;
+	}
+
+	std::filesystem::path EditorAssetManager::GetRelativePath(const std::filesystem::path& filepath)
+	{
+		std::filesystem::path relativePath = filepath.lexically_normal();
+		std::string temp = filepath.string();
+		if (temp.find(Project::GetAssetDirectory().string()) != std::string::npos)
+		{
+			relativePath = std::filesystem::relative(filepath, Project::GetAssetDirectory());
+			if (relativePath.empty())
 			{
-				// import failed
-				HNB_CORE_ERROR("EditorAssetManager::GetAsset - asset import failed!");
+				relativePath = filepath.lexically_normal();
 			}
 		}
-		// 3. return asset
-		return asset;
+		return relativePath;
+	}
+
+	std::filesystem::path EditorAssetManager::GetFileSystemPath(const AssetMetadata& metadata)
+	{
+		return Project::GetAssetDirectory() / metadata.FilePath;
+	}
+
+	std::filesystem::path EditorAssetManager::GetFileSystemPath(AssetHandle handle)
+	{
+		return GetFileSystemPathString(GetMetadata(handle));
+	}
+
+	std::string EditorAssetManager::GetFileSystemPathString(const AssetMetadata& metadata)
+	{
+		return GetFileSystemPath(metadata).string();
 	}
 
 	void EditorAssetManager::SerializeAssetRegistry()
@@ -119,6 +191,9 @@ namespace Hanabi
 			out << YAML::BeginSeq;
 			for (const auto& [handle, metadata] : m_AssetRegistry)
 			{
+				if (metadata.IsMemoryAsset)
+					continue;
+
 				out << YAML::BeginMap;
 				out << YAML::Key << "Handle" << YAML::Value << handle;
 				std::string filepathStr = metadata.FilePath.generic_string();
@@ -155,10 +230,20 @@ namespace Hanabi
 		{
 			AssetHandle handle = node["Handle"].as<uint64_t>();
 			auto& metadata = m_AssetRegistry[handle];
+			metadata.Handle = handle;
 			metadata.FilePath = node["FilePath"].as<std::string>();
 			metadata.Type = Utils::AssetTypeFromString(node["Type"].as<std::string>());
 		}
 
 		return true;
+	}
+
+	AssetMetadata& EditorAssetManager::GetMetadataInternal(AssetHandle handle)
+	{
+		auto it = m_AssetRegistry.find(handle);
+		if (it == m_AssetRegistry.end())
+			return s_NullMetadata;
+
+		return it->second;
 	}
 }

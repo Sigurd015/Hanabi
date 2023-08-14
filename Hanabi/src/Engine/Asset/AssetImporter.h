@@ -12,7 +12,8 @@ namespace Hanabi
 		static void Init();
 		static void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset);
 		static void Serialize(const Ref<Asset>& asset);
+		static bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset);
 
-		static Ref<Asset> ImportAsset(AssetHandle handle, const AssetMetadata& metadata);
+		// TODO: Serialize to asset pack and load from asset pack
 	};
 }

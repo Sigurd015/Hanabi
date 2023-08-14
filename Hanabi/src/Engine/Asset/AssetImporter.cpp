@@ -13,6 +13,7 @@ namespace Hanabi
 		s_Serializers.clear();
 		s_Serializers[AssetType::Texture2D] = CreateScope<TextureSerializer>();
 		s_Serializers[AssetType::Material] = CreateScope<MaterialAssetSerializer>();
+		s_Serializers[AssetType::MeshSource] = CreateScope<MeshSourceSerializer>();
 	}
 
 	void AssetImporter::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset)
@@ -23,7 +24,7 @@ namespace Hanabi
 			return;
 		}
 
-		s_Serializers[asset->GetType()]->Serialize(metadata, asset);
+		s_Serializers[metadata.Type]->Serialize(metadata, asset);
 	}
 
 	void AssetImporter::Serialize(const Ref<Asset>& asset)
@@ -32,14 +33,14 @@ namespace Hanabi
 		Serialize(metadata, asset);
 	}
 
-	Ref<Asset> AssetImporter::ImportAsset(AssetHandle handle, const AssetMetadata& metadata)
+	bool AssetImporter::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset)
 	{
 		if (s_Serializers.find(metadata.Type) == s_Serializers.end())
 		{
 			HNB_CORE_ERROR("No importer available for asset type: {}", (uint16_t)metadata.Type);
-			return nullptr;
+			return false;
 		}
 
-		return s_Serializers.at(metadata.Type)->ImportData(handle, metadata);
+		return s_Serializers.at(metadata.Type)->TryLoadData(metadata, asset);
 	}
 }

@@ -21,10 +21,6 @@ namespace Hanabi
 
 	ContentBrowserPanel::ContentBrowserPanel() :m_ProjectDirectory(Project::GetProjectDirectory())
 	{
-		m_DirectoryIcon = EditorResources::DirectoryIcon;
-		m_FileIcon = EditorResources::FileIcon;
-		m_ImportedFileIcon = EditorResources::ImportedFileIcon;
-
 		RefreshAssetsMap();
 	}
 
@@ -53,17 +49,19 @@ namespace Hanabi
 
 			if (ImGui::BeginChild("CONTENT_BROWSER_CONTENT"))
 			{
-				if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
+				if (!m_SelectedDirectory.empty())
 				{
-					if (ImGui::MenuItem("Create Material"))
+					if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
 					{
-						Ref<MaterialAsset> material = CreateRef<MaterialAsset>();
-						//TODO: Implement memory only assets support in asset manager, and then save the material to disk
+						if (ImGui::MenuItem("Create Material"))
+						{
+							//TODO: Popup a input box to get the name of the material, then create it, then save to the disk
+						}
+						ImGui::EndPopup();
 					}
-					ImGui::EndPopup();
-				}
 
-				DrawContents();
+					DrawContents();
+				}
 			}
 			ImGui::EndChild();
 		}
@@ -98,7 +96,7 @@ namespace Hanabi
 			m_SelectedDirectory = directoryPath;
 
 		ImGui::SameLine();
-		ImGui::Image(m_DirectoryIcon->GetRendererID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 });
+		ImGui::Image(EditorResources::DirectoryIcon->GetRendererID(), { 20.0f, 20.0f }, { 0, 1 }, { 1, 0 });
 		ImGui::SameLine();
 		ImGui::Text(directoryPath.filename().string().c_str());
 
@@ -119,9 +117,6 @@ namespace Hanabi
 
 	void ContentBrowserPanel::DrawContents()
 	{
-		if (m_SelectedDirectory.empty())
-			return;
-
 		static float padding = 8.0f;
 		static float thumbnailSize = 128.0f;
 		float cellSize = thumbnailSize + padding;
@@ -151,11 +146,11 @@ namespace Hanabi
 				isAsset = IsAlreadyImported(relativePath);
 
 			if (isDirectory)
-				Icon = m_DirectoryIcon;
+				Icon = EditorResources::DirectoryIcon;
 			else if (isAsset)
-				Icon = m_ImportedFileIcon;
+				Icon = EditorResources::ImportedFileIcon;
 			else
-				Icon = m_FileIcon;
+				Icon = EditorResources::FileIcon;
 
 			ImGui::ImageButton(Icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
 
