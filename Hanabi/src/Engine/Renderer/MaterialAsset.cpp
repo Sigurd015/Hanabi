@@ -1,19 +1,15 @@
 #include "hnbpch.h"
 #include "MaterialAsset.h"
 #include "Renderer.h"
-#include "Engine/Asset/AssetManager.h"
+#include "Engine/Asset/AssetManager/AssetManager.h"
 
 namespace Hanabi
 {
-	MaterialAsset::MaterialAsset()
-	{
-		m_Material = Material::Copy(Renderer::GetDefaultMaterial());
-	}
+	MaterialAsset::MaterialAsset() :m_Material(Renderer::GetDefaultMaterial())
+	{}
 
-	MaterialAsset::MaterialAsset(Ref<Material> material)
-	{
-		m_Material = Material::Copy(material);
-	}
+	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))
+	{}
 
 	Ref<Texture2D> MaterialAsset::GetDiffuse()
 	{

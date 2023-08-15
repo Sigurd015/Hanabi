@@ -1,6 +1,7 @@
 #include "hnbpch.h"
 #include "AssetImporter.h"
 #include "Engine/Project/Project.h"
+#include "AssetSerializer/AssetSerializer.h"
 
 #include <map>
 
@@ -14,6 +15,7 @@ namespace Hanabi
 		s_Serializers[AssetType::Texture2D] = CreateScope<TextureSerializer>();
 		s_Serializers[AssetType::Material] = CreateScope<MaterialAssetSerializer>();
 		s_Serializers[AssetType::MeshSource] = CreateScope<MeshSourceSerializer>();
+		s_Serializers[AssetType::Scene] = CreateScope<SceneSerializer>();
 	}
 
 	void AssetImporter::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset)

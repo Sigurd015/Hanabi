@@ -27,10 +27,10 @@ namespace Hanabi
 		void SaveProject();
 		void NewScene();
 		void OpenScene(const std::filesystem::path& path);
+		void OpenScene(AssetHandle handle);
 		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();
-		void SerializeScene(Ref<Scene> scene, const std::filesystem::path& path);
 		void OnDuplicateEntity();
 
 		//UI
@@ -52,7 +52,6 @@ namespace Hanabi
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };
 		glm::vec2 m_ViewportBounds[2];
 		Ref<Scene> m_EditorScene;
-		std::filesystem::path m_EditorScenePath;
 		bool m_PrimaryCamera = true;
 		bool m_ShowPhysicsColliders = false;
 		bool m_EnableVsyn = false;

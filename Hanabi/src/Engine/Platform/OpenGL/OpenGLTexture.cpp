@@ -47,7 +47,8 @@ namespace Hanabi
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		SetData(data);
+		if (!data.Size)
+			SetData(data);
 	}
 
 	OpenGLTexture2D::~OpenGLTexture2D()

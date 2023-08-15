@@ -1,15 +1,11 @@
 #include "hnbpch.h"
-#include "Engine/Scene/SceneCamera.h"
-#include "Engine/Scene/SceneSerializer.h"
-#include "Engine/Scene/Entity.h"
-#include "Engine/Scene/Components.h"
-#include "Engine/Scripting/ScriptEngine.h"
-#include "Engine/Core/UUID.h"
+#include "AssetSerializer.h"
 #include "Engine/Project/Project.h"
-#include "Engine/Renderer/Renderer.h"
 #include "Engine/Utils/YAMLHelpers.h"
-
-#include <yaml-cpp/yaml.h>
+#include "Engine/Scene/Components.h"
+#include "Engine/Scene/Scene.h"
+#include "Engine/Scene/Entity.h"
+#include "Engine/Scripting/ScriptEngine.h"
 
 namespace Hanabi
 {
@@ -283,15 +279,17 @@ namespace Hanabi
 		out << YAML::EndMap; // Entity
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const
 	{
+		Ref<Scene> screen = std::static_pointer_cast<Scene>(asset);
+
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-		m_Scene->m_Registry.each([&](auto entityID)
+		screen->m_Registry.each([&](auto entityID)
 			{
-				Entity entity = { entityID, m_Scene.get() };
+				Entity entity = { entityID, screen.get() };
 				if (!entity)
 					return;
 
@@ -300,25 +298,32 @@ namespace Hanabi
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
-		std::ofstream fout(filepath);
+		std::ofstream fout(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
 		fout << out.c_str();
 	}
 
-	void SceneSerializer::SerializeRuntime(const std::string& filepath)
+	bool SceneSerializer::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const
 	{
-		// Not implemented
-		HNB_CORE_ASSERT(false);
+		asset = LoadScene(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
+		if (asset)
+		{
+			asset->Handle = metadata.Handle;
+			return true;
+		}
+		
+		return false;
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	Ref<Scene> SceneSerializer::LoadScene(const std::filesystem::path& path)
 	{
+		Ref<Scene> scene = CreateRef<Scene>();
 		YAML::Node data;
 		try
 		{
-			data = YAML::LoadFile(filepath);
+			data = YAML::LoadFile(path.string());
 		} catch (YAML::ParserException e)
 		{
-			HNB_CORE_ERROR("Failed to load .Hanabi file '{0}'\n     {1}", filepath, e.what());
+			HNB_CORE_ERROR("Failed to load .Hanabi file '{0}'\n     {1}", path.string(), e.what());
 			return false;
 		}
 		if (!data["Scene"])
@@ -341,7 +346,7 @@ namespace Hanabi
 
 				HNB_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
+				Entity deserializedEntity = scene->CreateEntityWithUUID(uuid, name);
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
@@ -377,7 +382,7 @@ namespace Hanabi
 				if (meshComponent)
 				{
 					auto& mc = deserializedEntity.AddComponent<MeshComponent>();
-					if(meshComponent["MeshSourceHandle"])
+					if (meshComponent["MeshSourceHandle"])
 						mc.MeshSourceHandle = meshComponent["MeshSourceHandle"].as<AssetHandle>();
 				}
 
@@ -526,13 +531,6 @@ namespace Hanabi
 			}
 		}
 
-		return true;
-	}
-
-	bool SceneSerializer::DeserializeRuntime(const std::string& filepath)
-	{
-		// Not implemented
-		HNB_CORE_ASSERT(false);
-		return false;
+		return scene;
 	}
 }

@@ -3,7 +3,7 @@
 #include "RendererAPI.h"
 #include "Renderer2D.h"
 #include "Renderer.h"
-#include "Engine/Asset/AssetManager.h"
+#include "Engine/Asset/AssetManager/AssetManager.h"
 
 namespace Hanabi
 {

@@ -1,7 +1,6 @@
 Project:
   Name: Sandbox
-  StartScene: "Scenes/2DExample.scene"
+  StartScene: 5775838104344894305
   AssetDirectory: "Assets"
   AssetRegistryPath: "AssetRegistry.areg"
-  MaterialPath: "Materials"
   ScriptModulePath: "Scripts/Binaries/Sandbox.dll"

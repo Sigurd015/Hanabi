@@ -128,7 +128,8 @@ namespace Hanabi
 			}
 		}
 
-		static void DrawTextureControl(const std::string& name, AssetHandle& handle)
+		template<typename UIFunction>
+		static void DrawTextureControl(const std::string& name, AssetHandle& handle, UIFunction uiFunction)
 		{
 			if (ImGui::CollapsingHeader(name.c_str(), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -159,6 +160,7 @@ namespace Hanabi
 							handle = 0;
 						}
 					});
+				uiFunction();
 			}
 		}
 	}
@@ -442,7 +444,7 @@ namespace Hanabi
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				Utils::DrawTextureControl("Texture", component.TextureHandle);
+				Utils::DrawTextureControl("Texture", component.TextureHandle, []() {});
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
@@ -507,21 +509,24 @@ namespace Hanabi
 					AssetHandle tempDiffuseHandle = diffuseHandle;
 					AssetHandle tempSpecularHandle = specularHandle;
 					AssetHandle tempNormalHandle = normalHandle;
+					bool tempUseNormalMap = materialAsset->IsUsingNormalMap();
 
-					Utils::DrawTextureControl("Diffuse Texture", tempDiffuseHandle);
-					Utils::DrawTextureControl("Specular Texture", tempSpecularHandle);
-					Utils::DrawTextureControl("Normal Texture", tempNormalHandle);
-
-					ImGui::SameLine();
-					bool useNormalMap = materialAsset->IsUsingNormalMap();
-					if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
-					{
-						materialAsset->SetUseNormalMap(useNormalMap);
-					}
+					Utils::DrawTextureControl("Diffuse Texture", tempDiffuseHandle, []() {});
+					Utils::DrawTextureControl("Specular Texture", tempSpecularHandle, []() {});
+					Utils::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
+						{
+							ImGui::SameLine();
+							bool useNormalMap = materialAsset->IsUsingNormalMap();
+							if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
+							{
+								materialAsset->SetUseNormalMap(useNormalMap);
+							}
+						});
 
 					bool diffuseChanged = tempDiffuseHandle != diffuseHandle;
 					bool specularChanged = tempSpecularHandle != specularHandle;
 					bool normalChanged = tempNormalHandle != normalHandle;
+					bool useNormalMapChanged = tempUseNormalMap != materialAsset->IsUsingNormalMap();
 
 					if (diffuseChanged)
 						materialAsset->SetDiffuse(tempDiffuseHandle);
@@ -532,7 +537,7 @@ namespace Hanabi
 					if (normalChanged)
 						materialAsset->SetNormal(tempNormalHandle);
 
-					if (diffuseChanged || specularChanged || normalChanged)
+					if (diffuseChanged || specularChanged || normalChanged || useNormalMapChanged)
 						AssetImporter::Serialize(materialAsset);
 				}
 			});

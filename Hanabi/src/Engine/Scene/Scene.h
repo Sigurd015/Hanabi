@@ -11,7 +11,7 @@ class b2World;
 namespace Hanabi
 {
 	class Entity;
-	class Scene
+	class Scene : public Asset
 	{
 	public:
 		Scene();
@@ -43,6 +43,9 @@ namespace Hanabi
 		{
 			return m_Registry.view<Components...>();
 		}
+
+		static AssetType GetStaticType() { return AssetType::Scene; }
+		virtual AssetType GetType() const { return GetStaticType(); }
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);

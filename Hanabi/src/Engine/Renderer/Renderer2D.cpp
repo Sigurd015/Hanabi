@@ -6,7 +6,7 @@
 #include "Renderer.h"
 #include "ConstantBuffer.h"
 #include "UI/MSDFData.h"
-#include "Engine/Asset/AssetManager.h"
+#include "Engine/Asset/AssetManager/AssetManager.h"
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -252,6 +252,8 @@ namespace Hanabi
 		delete[] s_Data->CircleVertexBufferBase;
 		delete[] s_Data->LineVertexBufferBase;
 		delete[] s_Data->TextVertexBufferBase;
+
+		delete s_Data;
 	}
 
 	void Renderer2D::BeginScene(const glm::mat4& viewProjection)

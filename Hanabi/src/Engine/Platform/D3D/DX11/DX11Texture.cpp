@@ -67,11 +67,19 @@ namespace Hanabi
 		m_Width(specification.Width), m_Height(specification.Height)
 	{
 		m_DataFormat = Utils::ImageFormatToDXDataFormat(specification.Format);
-		CreateTexture(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
+		if (!data.Size)
+		{
+			CreateTexture(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());
+		}
+		else
+		{
+			D3D11_SUBRESOURCE_DATA subresourceData = {};
+			subresourceData.pSysMem = data.Data;
+			subresourceData.SysMemPitch = m_Width * 4;  // size of one row in bytes
+			CreateTexture(D3D11_USAGE_DEFAULT, 0, m_Width, m_Height, m_DataFormat, &subresourceData, m_Texture.GetAddressOf());
+		}
 		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureSRV.GetAddressOf());
 		CreateSamplerState(m_SamplerState.GetAddressOf());
-
-		SetData(data);
 	}
 
 	DX11Texture2D::~DX11Texture2D()

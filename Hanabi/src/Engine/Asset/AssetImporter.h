@@ -2,7 +2,6 @@
 #include "Engine/Core/Base.h"
 #include "AssetMetadata.h"
 #include "Asset.h"
-#include "AssetSerializer.h"
 
 namespace Hanabi
 {

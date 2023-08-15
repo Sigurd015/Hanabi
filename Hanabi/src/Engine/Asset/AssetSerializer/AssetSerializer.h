@@ -1,8 +1,9 @@
 #pragma once
-#include "Asset.h"
-#include "AssetMetadata.h"
+#include "Engine/Asset/Asset.h"
+#include "Engine/Asset/AssetMetadata.h"
 #include "Engine/Renderer/MaterialAsset.h"
 #include "Engine/Renderer/Mesh.h"
+#include "Engine/Scene/Scene.h"
 
 namespace Hanabi
 {
@@ -11,6 +12,15 @@ namespace Hanabi
 	public:
 		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const = 0;
 		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const = 0;
+	};
+
+	class SceneSerializer : public AssetSerializer
+	{
+	public:
+		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override;
+		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
+
+		static Ref<Scene> LoadScene(const std::filesystem::path& path);
 	};
 
 	class MeshSourceSerializer : public AssetSerializer

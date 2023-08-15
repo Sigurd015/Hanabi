@@ -12,7 +12,11 @@ namespace Hanabi
 	Ref<Material> Material::Copy(const Ref<Material>& other)
 	{
 		Ref<Material> material = CreateRef<Material>(other->GetShader());
-		material->m_Textures = other->m_Textures;
+
+		for (auto& texture : other->m_Textures)
+		{
+			material->m_Textures[texture.first] = texture.second;
+		}
 		return material;
 	}
 

@@ -1,8 +1,8 @@
 #include "hnbpch.h"
 #include "AssetManager.h"
-#include "AssetImporter.h"
+#include "Engine/Asset/AssetImporter.h"
 #include "EditorAssetManager.h"
-#include "AssetExtensions.h"
+#include "Engine/Asset/AssetExtensions.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Base.h"	
-#include "Engine/Asset/RuntimeAssetManager.h"
-#include "Engine/Asset/EditorAssetManager.h"
+#include "Engine/Asset/AssetManager/RuntimeAssetManager.h"
+#include "Engine/Asset/AssetManager/EditorAssetManager.h"
 
 #include <string>
 #include <filesystem>
@@ -12,13 +12,12 @@ namespace Hanabi
 	{
 		std::string Name = "Untitled";
 
-		std::filesystem::path StartScene;
+		AssetHandle StartScene;
 
 		std::filesystem::path AssetDirectory;
 
 		// Relative to AssetDirectory
 		std::filesystem::path AssetRegistryPath;
-		std::filesystem::path MaterialPath; 
 		std::filesystem::path ScriptModulePath;
 	};
 
@@ -41,12 +40,6 @@ namespace Hanabi
 		{
 			HNB_CORE_ASSERT(s_ActiveProject);
 			return GetAssetDirectory() / s_ActiveProject->m_Config.AssetRegistryPath;
-		}
-
-		static std::filesystem::path GetMaterialPath()
-		{
-			HNB_CORE_ASSERT(s_ActiveProject);
-			return GetAssetDirectory() / s_ActiveProject->m_Config.MaterialPath;
 		}
 
 		ProjectConfig& GetConfig() { return m_Config; }

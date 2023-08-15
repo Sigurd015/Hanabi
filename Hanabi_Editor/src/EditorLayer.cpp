@@ -463,11 +463,10 @@ namespace Hanabi
 		if (Project::Load(path))
 		{
 			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
-			auto startScenePath = Project::GetProjectDirectory() / Project::GetActive()->GetConfig().StartScene;
+			AssetHandle startScenePath = Project::GetActive()->GetConfig().StartScene;
 			OpenScene(startScenePath);
 			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
-
 		}
 	}
 
@@ -480,14 +479,6 @@ namespace Hanabi
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-		m_EditorScenePath = std::filesystem::path();
-	}
-
-	void EditorLayer::OpenScene()
-	{
-		std::string filepath = FileDialogs::OpenFile("Scenes (*.scene)\0*.scene\0");
-		if (!filepath.empty())
-			OpenScene(filepath);
 	}
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path)
@@ -501,24 +492,48 @@ namespace Hanabi
 			return;
 		}
 
-		Ref<Scene> newScene = CreateRef<Scene>();
-		SceneSerializer serializer(newScene);
-		if (serializer.Deserialize(path.string()))
+		Ref<Scene> newScene = SceneSerializer::LoadScene(path);
+
+		if (newScene != nullptr)
 		{
 			m_EditorScene = newScene;
-			m_SceneHierarchyPanel.SetContext(m_EditorScene);
-
 			m_ActiveScene = m_EditorScene;
-			m_EditorScenePath = path;
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+		}
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		std::string filepath = FileDialogs::OpenFile("Scenes (*.scene)\0*.scene\0");
+		if (!filepath.empty())
+			OpenScene(filepath);
+	}
+
+	void EditorLayer::OpenScene(AssetHandle handle)
+	{
+		Ref<Scene> newScene = nullptr;
+		if (handle != 0
+			&& AssetManager::IsAssetHandleValid(handle)
+			&& AssetManager::GetAssetType(handle) == AssetType::Scene)
+		{
+			newScene = AssetManager::GetAsset<Scene>(handle);
+		}
+
+		if (newScene != nullptr)
+		{
+			m_EditorScene = newScene;
+			m_ActiveScene = m_EditorScene;
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+		}
+		else
+		{
+			OpenScene();
 		}
 	}
 
 	void EditorLayer::SaveScene()
 	{
-		if (!m_EditorScenePath.empty())
-			SerializeScene(m_ActiveScene, m_EditorScenePath);
-		else
-			SaveSceneAs();
+		AssetImporter::Serialize(m_ActiveScene);
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -526,15 +541,8 @@ namespace Hanabi
 		std::string filepath = FileDialogs::SaveFile("Scenes (*.scene)\0*.scene\0");
 		if (!filepath.empty())
 		{
-			SerializeScene(m_ActiveScene, filepath);
-			m_EditorScenePath = filepath;
+			// TODO: Change the file path at the asset manager, then save the scene
 		}
-	}
-
-	void EditorLayer::SerializeScene(Ref<Scene> scene, const std::filesystem::path& path)
-	{
-		SceneSerializer serializer(scene);
-		serializer.Serialize(path.string());
 	}
 
 	void EditorLayer::OnScenePlay()
@@ -546,6 +554,7 @@ namespace Hanabi
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
+
 	void EditorLayer::OnSceneStop()
 	{
 		HNB_CORE_ASSERT(m_SceneState == SceneState::Play);

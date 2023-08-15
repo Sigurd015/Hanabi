@@ -96,6 +96,7 @@ namespace Hanabi
 	struct MeshComponent
 	{
 		AssetHandle MeshSourceHandle = 0;
+		// Storage for runtime memory only asset, not need to serialize
 		AssetHandle MeshHandle = 0;
 
 		MeshComponent() = default;
