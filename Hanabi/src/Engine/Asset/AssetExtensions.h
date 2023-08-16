@@ -5,7 +5,7 @@ namespace Hanabi
 {
 	inline static std::unordered_map<std::string, AssetType> s_AssetExtensionMap =
 	{
-		{ ".scene", AssetType::Scene },
+		{ ".hscene", AssetType::Scene },
 
 		// Textures
 		{ ".png", AssetType::Texture2D },

@@ -18,6 +18,8 @@ namespace Hanabi
 		virtual bool IsAssetHandleValid(AssetHandle handle) const override;
 		virtual bool IsMemoryAsset(AssetHandle handle) const override;
 		virtual bool IsAssetLoaded(AssetHandle handle) const override;
+		virtual bool ReloadData(AssetHandle assetHandle) override;
+
 		virtual AssetType GetAssetType(AssetHandle handle) const override;
 
 		AssetType GetAssetTypeFromExtension(const std::string& extension);

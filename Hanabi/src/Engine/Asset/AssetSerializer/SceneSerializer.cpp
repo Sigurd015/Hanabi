@@ -281,40 +281,24 @@ namespace Hanabi
 
 	void SceneSerializer::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const
 	{
-		Ref<Scene> screen = std::static_pointer_cast<Scene>(asset);
+		Ref<Scene> scene = std::static_pointer_cast<Scene>(asset);
 
-		YAML::Emitter out;
-		out << YAML::BeginMap;
-		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
-		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-		screen->m_Registry.each([&](auto entityID)
-			{
-				Entity entity = { entityID, screen.get() };
-				if (!entity)
-					return;
-
-				SerializeEntity(out, entity);
-			});
-		out << YAML::EndSeq;
-		out << YAML::EndMap;
-
-		std::ofstream fout(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
-		fout << out.c_str();
+		SerializeToYAML(Project::GetEditorAssetManager()->GetFileSystemPath(metadata), scene);
 	}
 
 	bool SceneSerializer::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const
 	{
-		asset = LoadScene(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
+		asset = DeserializeFromYAML(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
 		if (asset)
 		{
 			asset->Handle = metadata.Handle;
 			return true;
 		}
-		
+
 		return false;
 	}
 
-	Ref<Scene> SceneSerializer::LoadScene(const std::filesystem::path& path)
+	Ref<Scene> SceneSerializer::DeserializeFromYAML(const std::filesystem::path& path)
 	{
 		Ref<Scene> scene = CreateRef<Scene>();
 		YAML::Node data;
@@ -324,10 +308,10 @@ namespace Hanabi
 		} catch (YAML::ParserException e)
 		{
 			HNB_CORE_ERROR("Failed to load .Hanabi file '{0}'\n     {1}", path.string(), e.what());
-			return false;
+			return nullptr;
 		}
 		if (!data["Scene"])
-			return false;
+			return nullptr;
 
 		std::string sceneName = data["Scene"].as<std::string>();
 		HNB_CORE_TRACE("Deserializing scene '{0}'", sceneName);
@@ -532,5 +516,26 @@ namespace Hanabi
 		}
 
 		return scene;
+	}
+
+	void SceneSerializer::SerializeToYAML(const std::filesystem::path& path, const Ref<Scene>& scene)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+		scene->m_Registry.each([&](auto entityID)
+			{
+				Entity entity = { entityID, scene.get() };
+				if (!entity)
+					return;
+
+				SerializeEntity(out, entity);
+			});
+		out << YAML::EndSeq;
+		out << YAML::EndMap;
+
+		std::ofstream fout(path);
+		fout << out.c_str();
 	}
 }

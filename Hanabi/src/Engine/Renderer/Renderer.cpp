@@ -17,8 +17,6 @@ namespace Hanabi
 
 		std::unordered_map<std::string, Ref<Texture2D>> Textures;
 		std::unordered_map<std::string, Ref<Mesh>> Meshes;
-
-		Ref<Material> DefaultMaterial;
 	};
 
 	static RendererData* s_Data = nullptr;
@@ -48,11 +46,6 @@ namespace Hanabi
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });
 		//s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
 		//s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
-
-		//Setup default material
-		s_Data->DefaultMaterial = CreateRef<Material>(s_Data->ShaderLibrary->Get("PhongLighting"));
-		s_Data->DefaultMaterial->SetTexture(s_Data->Textures["White"], static_cast<uint32_t>(MaterialAsset::TextureType::Diffuse));
-		s_Data->DefaultMaterial->SetTexture(s_Data->Textures["White"], static_cast<uint32_t>(MaterialAsset::TextureType::Specular));
 
 		Renderer2D::Init();
 		SceneRenderer::Init();
@@ -146,8 +139,8 @@ namespace Hanabi
 		return s_Data->Textures[name];
 	}
 
-	Ref<Material> Renderer::GetDefaultMaterial()
+	Ref<Shader> Renderer::GetDefaultShader()
 	{
-		return s_Data->DefaultMaterial;
+		return s_Data->ShaderLibrary->Get("PhongLighting");
 	}
 }

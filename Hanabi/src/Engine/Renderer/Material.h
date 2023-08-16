@@ -10,7 +10,7 @@ namespace Hanabi
 	class Material
 	{
 	public:
-		Material(const Ref<Shader>& shader = nullptr);
+		Material(const Ref<Shader>& shader);
 		virtual ~Material();
 		void Bind() const;
 

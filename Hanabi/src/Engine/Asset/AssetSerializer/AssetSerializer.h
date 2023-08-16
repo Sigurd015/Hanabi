@@ -20,7 +20,8 @@ namespace Hanabi
 		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override;
 		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
 
-		static Ref<Scene> LoadScene(const std::filesystem::path& path);
+		static void SerializeToYAML(const std::filesystem::path& path, const Ref<Scene>& scene);
+		static Ref<Scene> DeserializeFromYAML(const std::filesystem::path& path);
 	};
 
 	class MeshSourceSerializer : public AssetSerializer
@@ -39,9 +40,11 @@ namespace Hanabi
 		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override;
 		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
 
+		// Use for creating new material assets
+		static void SerializeToYAML(const std::filesystem::path& path);
 	private:
-		std::string SerializeToYAML(Ref<MaterialAsset> materialAsset) const;
-		bool DeserializeFromYAML(const std::string& yamlString, Ref<MaterialAsset>& targetMaterialAsset) const;
+		static std::string SerializeToYAML(Ref<MaterialAsset> materialAsset);
+		static bool DeserializeFromYAML(const std::string& yamlString, Ref<MaterialAsset>& targetMaterialAsset);
 	};
 
 	class TextureSerializer : public AssetSerializer

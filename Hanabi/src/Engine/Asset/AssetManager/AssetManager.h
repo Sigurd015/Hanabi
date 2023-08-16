@@ -20,6 +20,11 @@ namespace Hanabi
 			return Project::GetAssetManager()->IsAssetHandleValid(handle);
 		}
 
+		static bool ReloadData(AssetHandle assetHandle)
+		{ 
+			return Project::GetAssetManager()->ReloadData(assetHandle); 
+		}
+
 		static bool IsAssetLoaded(AssetHandle handle)
 		{
 			return Project::GetAssetManager()->IsAssetLoaded(handle);
@@ -40,7 +45,6 @@ namespace Hanabi
 
 			Project::GetAssetManager()->AddMemoryOnlyAsset(asset);
 			return asset->Handle;
-
 		}
 	};
 }

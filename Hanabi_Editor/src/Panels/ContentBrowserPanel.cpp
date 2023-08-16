@@ -55,7 +55,12 @@ namespace Hanabi
 					{
 						if (ImGui::MenuItem("Create Material"))
 						{
-							//TODO: Popup a input box to get the name of the material, then create it, then save to the disk
+							std::string filepath = FileDialogs::SaveFile("Material (*.hmat)\0*.hmat\0");
+							if (!filepath.empty())
+							{
+								ImportAsset(filepath);
+								MaterialAssetSerializer::SerializeToYAML(filepath);
+							}
 						}
 						ImGui::EndPopup();
 					}
@@ -66,6 +71,13 @@ namespace Hanabi
 			ImGui::EndChild();
 		}
 		ImGui::End();
+	}
+
+	AssetHandle ContentBrowserPanel::ImportAsset(const std::filesystem::path& path)
+	{
+		auto relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
+		m_ImportedFiles[relativePath] = Project::GetEditorAssetManager()->ImportAsset(relativePath);
+		return m_ImportedFiles[relativePath];
 	}
 
 	void ContentBrowserPanel::DrawDirectoryTree()

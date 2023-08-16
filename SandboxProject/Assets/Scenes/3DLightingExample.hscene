@@ -87,7 +87,7 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 5025462131848195016
     MaterialComponent:
-      MaterialAssetHandle: 17320140235110981838
+      MaterialAssetHandle: 15452597858793361030
   - Entity: 1514165854352143360
     TagComponent:
       Tag: Wall
@@ -98,7 +98,7 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 5025462131848195016
     MaterialComponent:
-      MaterialAssetHandle: 17320140235110981838
+      MaterialAssetHandle: 15452597858793361030
   - Entity: 10459819922746361433
     TagComponent:
       Tag: Wall
@@ -109,7 +109,7 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 5025462131848195016
     MaterialComponent:
-      MaterialAssetHandle: 17320140235110981838
+      MaterialAssetHandle: 15452597858793361030
   - Entity: 14705402661947822433
     TagComponent:
       Tag: Box

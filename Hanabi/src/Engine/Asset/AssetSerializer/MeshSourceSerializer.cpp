@@ -12,7 +12,10 @@ namespace Hanabi
 	{
 		asset = LoadMeshSource(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
 		if (asset)
+		{
+			asset->Handle = metadata.Handle;
 			return true;
+		}
 		return false;
 	}
 

@@ -8,6 +8,12 @@
 
 namespace Hanabi
 {
+	static std::string s_DefaultMaterialYAML = R"(Material:
+  DiffuseTextureHandle: 0
+  SpecularTextureHandle: 0
+  NormalTextureHandle: 0
+  UseNormalMap: false)";
+
 	void MaterialAssetSerializer::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const
 	{
 		Ref<MaterialAsset> material = std::static_pointer_cast<MaterialAsset>(asset);
@@ -35,7 +41,13 @@ namespace Hanabi
 		return true;
 	}
 
-	std::string MaterialAssetSerializer::SerializeToYAML(Ref<MaterialAsset> materialAsset) const
+	void MaterialAssetSerializer::SerializeToYAML(const std::filesystem::path& path)
+	{
+		std::ofstream fout(path);
+		fout << s_DefaultMaterialYAML;
+	}
+
+	std::string MaterialAssetSerializer::SerializeToYAML(Ref<MaterialAsset> materialAsset)
 	{
 		YAML::Emitter out;
 		{
@@ -55,7 +67,7 @@ namespace Hanabi
 		return std::string(out.c_str());
 	}
 
-	bool MaterialAssetSerializer::DeserializeFromYAML(const std::string& yamlString, Ref<MaterialAsset>& targetMaterialAsset) const
+	bool MaterialAssetSerializer::DeserializeFromYAML(const std::string& yamlString, Ref<MaterialAsset>& targetMaterialAsset)
 	{
 		YAML::Node root = YAML::Load(yamlString);
 		YAML::Node materialNode = root["Material"];

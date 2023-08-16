@@ -136,8 +136,7 @@ namespace Hanabi
 				DrawDragDropContent(handle, AssetType::Texture2D, [&handle]()
 					{
 						std::string label = "None";
-						if (handle != 0
-							&& AssetManager::IsAssetHandleValid(handle)
+						if (AssetManager::IsAssetHandleValid(handle)
 							&& AssetManager::GetAssetType(handle) == AssetType::Texture2D)
 						{
 							Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
@@ -454,8 +453,7 @@ namespace Hanabi
 		Utils::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
 				std::string label = "None";
-				if (component.MeshSourceHandle != 0
-					&& AssetManager::IsAssetHandleValid(component.MeshSourceHandle)
+				if (AssetManager::IsAssetHandleValid(component.MeshSourceHandle)
 					&& AssetManager::GetAssetType(component.MeshSourceHandle) == AssetType::MeshSource)
 				{
 					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.MeshSourceHandle);
@@ -482,8 +480,7 @@ namespace Hanabi
 			{
 				Ref<MaterialAsset> materialAsset = nullptr;
 				std::string label = "None";
-				if (component.MaterialAssetHandle != 0
-					&& AssetManager::IsAssetHandleValid(component.MaterialAssetHandle)
+				if (AssetManager::IsAssetHandleValid(component.MaterialAssetHandle)
 					&& AssetManager::GetAssetType(component.MaterialAssetHandle) == AssetType::Material)
 				{
 					materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);

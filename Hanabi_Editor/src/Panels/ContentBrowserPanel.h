@@ -10,6 +10,8 @@ namespace Hanabi
 	public:
 		ContentBrowserPanel();
 		void OnImGuiRender();
+
+		AssetHandle ImportAsset(const std::filesystem::path& path);
 	private:
 		void DrawDirectoryTree();
 		void DrawDirectoryTree(const std::filesystem::path& directoryPath);

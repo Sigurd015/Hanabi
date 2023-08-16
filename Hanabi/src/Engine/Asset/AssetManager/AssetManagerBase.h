@@ -16,6 +16,7 @@ namespace Hanabi
 		virtual bool IsAssetHandleValid(AssetHandle handle) const = 0;
 		virtual bool IsMemoryAsset(AssetHandle handle) const = 0;
 		virtual bool IsAssetLoaded(AssetHandle handle) const = 0;
+		virtual bool ReloadData(AssetHandle assetHandle) = 0;
 		virtual AssetType GetAssetType(AssetHandle handle) const = 0;
 	};
 }

@@ -26,9 +26,7 @@ namespace Hanabi
 		void OpenProject(const std::filesystem::path& path);
 		void SaveProject();
 		void NewScene();
-		void OpenScene(const std::filesystem::path& path);
 		void OpenScene(AssetHandle handle);
-		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();
 		void OnDuplicateEntity();

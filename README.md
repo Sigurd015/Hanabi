@@ -33,7 +33,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [x] ECS System (entt)
   - [ ] Renderer 
     - [x] 2D Batch Renderer
-    - [ ] .....
+    - [ ] 3D Renderer
 
 - [ ] Editor  
   - [x] Play in editor
@@ -62,7 +62,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [X] C# Script Engine
 - [ ] SPIR-V Shader System
 - [ ] UI Renderer
-- [ ] Asset Manager
+- [X] Asset Manager
 - [ ] 3D Renderer
   - [X] Mesh System (WIP)
   - [X] Material System (WIP)
@@ -79,6 +79,8 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] Ray/Path tracing
     - [ ] Vulkan & DX12
 - [ ] Metal support
+- [ ] Runtime
+  - [ ] Asset Package Serialize & Deserialize
 
 ## Getting Started
 

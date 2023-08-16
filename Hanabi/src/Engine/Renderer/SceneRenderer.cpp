@@ -120,7 +120,8 @@ namespace Hanabi
 			s_Data->ShadowPass = RenderPass::Create(shadowRenderPassSpec);
 		}
 
-		s_Data->m_DefaultMaterial = Renderer::GetDefaultMaterial();
+		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
+		s_Data->m_DefaultMaterial = defaultMaterialAsset->GetMaterial();
 
 		//TODO: Make layout dynamic
 		VertexBufferLayout layout = {

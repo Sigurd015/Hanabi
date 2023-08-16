@@ -38,6 +38,24 @@ namespace Hanabi
 		return m_LoadedAssets.find(handle) != m_LoadedAssets.end();
 	}
 
+	bool EditorAssetManager::ReloadData(AssetHandle assetHandle)
+	{
+		auto& metadata = GetMetadataInternal(assetHandle);
+		if (!metadata.IsValid())
+		{
+			HNB_CORE_ERROR("Trying to reload invalid asset");
+			return false;
+		}
+
+		Ref<Asset> asset;
+		metadata.IsDataLoaded = AssetImporter::TryLoadData(metadata, asset);
+		if (metadata.IsDataLoaded)
+		{
+			m_LoadedAssets[assetHandle] = asset;
+		}
+		return metadata.IsDataLoaded;
+	}
+
 	AssetType EditorAssetManager::GetAssetType(AssetHandle handle) const
 	{
 		if (!IsAssetHandleValid(handle))

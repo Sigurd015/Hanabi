@@ -312,8 +312,16 @@ namespace Hanabi
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 			{
-				const wchar_t* path = (const wchar_t*)payload->Data;
-				OpenScene(path);
+				AssetHandle tempHandle = *(AssetHandle*)payload->Data;
+				if (AssetManager::GetAssetType(tempHandle) == AssetType::Scene)
+				{
+					OpenScene(tempHandle);
+				}
+				else
+				{
+					//TODO: Show message to user
+					HNB_CORE_ERROR("Wrong asset type!");
+				}
 			}
 			ImGui::EndDragDropTarget();
 		}
@@ -463,8 +471,8 @@ namespace Hanabi
 		if (Project::Load(path))
 		{
 			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
-			AssetHandle startScenePath = Project::GetActive()->GetConfig().StartScene;
-			OpenScene(startScenePath);
+			AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
+			OpenScene(startSceneHandle);
 			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
 		}
@@ -481,39 +489,10 @@ namespace Hanabi
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
-	void EditorLayer::OpenScene(const std::filesystem::path& path)
-	{
-		if (m_SceneState != SceneState::Edit)
-			OnSceneStop();
-
-		if (path.extension().string() != ".scene")
-		{
-			HNB_WARN("Could not load {0} - not a scene file", path.filename().string());
-			return;
-		}
-
-		Ref<Scene> newScene = SceneSerializer::LoadScene(path);
-
-		if (newScene != nullptr)
-		{
-			m_EditorScene = newScene;
-			m_ActiveScene = m_EditorScene;
-			m_SceneHierarchyPanel.SetContext(m_EditorScene);
-		}
-	}
-
-	void EditorLayer::OpenScene()
-	{
-		std::string filepath = FileDialogs::OpenFile("Scenes (*.scene)\0*.scene\0");
-		if (!filepath.empty())
-			OpenScene(filepath);
-	}
-
 	void EditorLayer::OpenScene(AssetHandle handle)
 	{
 		Ref<Scene> newScene = nullptr;
-		if (handle != 0
-			&& AssetManager::IsAssetHandleValid(handle)
+		if (AssetManager::IsAssetHandleValid(handle)
 			&& AssetManager::GetAssetType(handle) == AssetType::Scene)
 		{
 			newScene = AssetManager::GetAsset<Scene>(handle);
@@ -525,23 +504,29 @@ namespace Hanabi
 			m_ActiveScene = m_EditorScene;
 			m_SceneHierarchyPanel.SetContext(m_EditorScene);
 		}
-		else
-		{
-			OpenScene();
-		}
 	}
 
 	void EditorLayer::SaveScene()
 	{
-		AssetImporter::Serialize(m_ActiveScene);
+		if (AssetManager::IsAssetHandleValid(m_ActiveScene->Handle))
+		{
+			AssetImporter::Serialize(m_ActiveScene);
+		}
+		else
+		{
+			SaveSceneAs();
+		}
 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
-		std::string filepath = FileDialogs::SaveFile("Scenes (*.scene)\0*.scene\0");
+		std::string filepath = FileDialogs::SaveFile("Scenes (*.hscene)\0*.hscene\0");
 		if (!filepath.empty())
 		{
-			// TODO: Change the file path at the asset manager, then save the scene
+			if (AssetManager::IsAssetHandleValid(m_ActiveScene->Handle))
+				Project::GetEditorAssetManager()->ReloadData(m_ActiveScene->Handle);
+			m_ActiveScene->Handle = m_ContentBrowserPanel->ImportAsset(filepath);
+			return SaveScene();
 		}
 	}
 

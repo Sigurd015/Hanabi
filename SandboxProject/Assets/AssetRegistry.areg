@@ -5,9 +5,6 @@ AssetRegistry:
   - Handle: 1661060954224083329
     FilePath: Materials/mat1.hmat
     Type: AssetType::Material
-  - Handle: 2624174774841656376
-    FilePath: Materials/New_Material.hmat
-    Type: AssetType::Material
   - Handle: 3301359757521532587
     FilePath: Textures/wall-10-brick/wall-10-brick-NORM.jpg
     Type: AssetType::Texture2D
@@ -24,10 +21,10 @@ AssetRegistry:
     FilePath: Models/Plane.fbx
     Type: AssetType::MeshSource
   - Handle: 5775838104344894305
-    FilePath: Scenes/3DLightingExample.scene
+    FilePath: Scenes/3DLightingExample.hscene
     Type: AssetType::Scene
   - Handle: 8012010214947151524
-    FilePath: Scenes/2DExample.scene
+    FilePath: Scenes/2DExample.hscene
     Type: AssetType::Scene
   - Handle: 8249847587482819021
     FilePath: Textures/Container_Specular.png
@@ -38,21 +35,15 @@ AssetRegistry:
   - Handle: 12104991068264146629
     FilePath: Models/Sphere.fbx
     Type: AssetType::MeshSource
-  - Handle: 12612701025111133498
-    FilePath: Materials/New_Material.hmat
-    Type: AssetType::Material
   - Handle: 14535960835168578140
     FilePath: Models/Box.fbx
     Type: AssetType::MeshSource
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
-  - Handle: 14773429574428799842
-    FilePath: Materials/New_Material.hmat
+  - Handle: 15452597858793361030
+    FilePath: Materials/mat3.hmat
     Type: AssetType::Material
   - Handle: 17058150480603569601
     FilePath: Models/Cylinder.fbx
     Type: AssetType::MeshSource
-  - Handle: 17320140235110981838
-    FilePath: Materials/New_Material.hmat
-    Type: AssetType::Material

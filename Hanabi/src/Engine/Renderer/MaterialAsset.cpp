@@ -5,11 +5,20 @@
 
 namespace Hanabi
 {
-	MaterialAsset::MaterialAsset() :m_Material(Renderer::GetDefaultMaterial())
-	{}
+	MaterialAsset::MaterialAsset()
+	{
+		m_Material = CreateRef<Material>(Renderer::GetDefaultShader());
+		ClearDiffuse();
+		ClearSpecular();
+		ClearNormal();
+	}
 
 	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))
-	{}
+	{
+		ClearDiffuse();
+		ClearSpecular();
+		ClearNormal();
+	}
 
 	Ref<Texture2D> MaterialAsset::GetDiffuse()
 	{
