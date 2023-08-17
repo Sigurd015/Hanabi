@@ -70,19 +70,6 @@ namespace Hanabi
 		}
 	}
 
-	void Application::RenderImGui()
-	{
-		if (m_Specification.EnableImGui)
-		{
-			m_ImGuiLayer->Begin();
-			{
-				for (Layer* layer : m_LayerStack)
-					layer->OnImGuiRender();
-			}
-			m_ImGuiLayer->End();
-		}
-	}
-
 	void Application::Run()
 	{
 		while (m_Running)
@@ -98,13 +85,15 @@ namespace Hanabi
 				for (Layer* layer : m_LayerStack)
 					layer->OnUpdate(timestep);
 
-				Application* app = this;
-				Renderer::Submit([app]
+				if (m_Specification.EnableImGui)
+				{
+					m_ImGuiLayer->Begin();
 					{
-						app->RenderImGui();
-					});
-
-				Renderer::WaitAndRender();
+						for (Layer* layer : m_LayerStack)
+							layer->OnImGuiRender();
+					}
+					m_ImGuiLayer->End();
+				}
 			}
 
 			m_Window->OnUpdate();

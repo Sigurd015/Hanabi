@@ -37,7 +37,7 @@ namespace Hanabi
 		m_ClearColor = color;
 	}
 
-	void DX11RendererAPI::ResetToSwapChain()
+	void DX11RendererAPI::Clear()
 	{
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
@@ -88,22 +88,20 @@ namespace Hanabi
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
 		if (clear)
-			renderPass->GetSpecification().TargetFramebuffer->ClearAttachment();
+			renderPass->GetSpecification().TargetFramebuffer->ClearAttachment(m_ClearColor);
 		renderPass->GetSpecification().TargetFramebuffer->Bind();
 	}
 
 	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
-		ResetToSwapChain();
+		Clear();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const void* modelData, uint32_t modelCBBingID)
+	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
-		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(modelCBBingID);
-		transformBuffer->SetData(modelData);
 		pipeline->Bind();
 		material->Bind();
 
@@ -129,7 +127,6 @@ namespace Hanabi
 		pipeline->Bind();
 		material->Bind();
 
-		//TODO: Set Line Width here
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->Draw(vertexCount, 0);
 	}

@@ -16,7 +16,7 @@ namespace Hanabi
 
 		void Bind() override;
 		void Unbind() override;
-		void ClearAttachment() override;
+		void ClearAttachment(const glm::vec4& color) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
 		void* GetColorAttachment(uint32_t attachmentIndex = 0) const override;

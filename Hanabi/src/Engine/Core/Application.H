@@ -39,7 +39,6 @@ namespace Hanabi
 	public:
 		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
-		void RenderImGui();
 		void Run();
 		void OnEvent(Event& e);
 		void PushLayer(Layer* layer);

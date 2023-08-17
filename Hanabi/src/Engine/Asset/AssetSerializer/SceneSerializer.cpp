@@ -52,7 +52,7 @@ namespace Hanabi
 		case LightComponent::LightType::Directional: return "Directional";
 		}
 
-		HNB_CORE_ASSERT(false, "Unknown body type");
+		HNB_CORE_ASSERT(false, "Unknown light type");
 		return {};
 	}
 
@@ -62,8 +62,29 @@ namespace Hanabi
 		if (lightTypeString == "Spot")   return LightComponent::LightType::Spot;
 		if (lightTypeString == "Directional") return LightComponent::LightType::Directional;
 
-		HNB_CORE_ASSERT(false, "Unknown body type");
-		return LightComponent::LightType::NONE;
+		HNB_CORE_ASSERT(false, "Unknown light type");
+		return LightComponent::LightType::None;
+	}
+
+	static std::string ClearMethodTypeToString(CameraComponent::ClearMethod clearMethod)
+	{
+		switch (clearMethod)
+		{
+		case CameraComponent::ClearMethod::Soild_Color:  return "Soild Color";
+		case CameraComponent::ClearMethod::Skybox:   return "Skybox";
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown Clear Method type");
+		return {};
+	}
+
+	static CameraComponent::ClearMethod ClearMethodTypeFromString(const std::string& clearMethodString)
+	{
+		if (clearMethodString == "Soild Color")    return CameraComponent::ClearMethod::Soild_Color;
+		if (clearMethodString == "Skybox")   return CameraComponent::ClearMethod::Skybox;
+
+		HNB_CORE_ASSERT(false, "Unknown Clear Method type");
+		return CameraComponent::ClearMethod::None;
 	}
 
 	static std::string RigidBody2DBodyTypeToString(Rigidbody2DComponent::BodyType bodyType)
@@ -141,6 +162,12 @@ namespace Hanabi
 				out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
 				out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
 
+				out << YAML::Key << "ClearMethod" << YAML::Value;
+				out << YAML::BeginMap; // Camera
+				out << YAML::Key << "Type" << YAML::Value << ClearMethodTypeToString(cameraComponent.ClearType);
+				out << YAML::Key << "ClearColor" << YAML::Value << cameraComponent.ClearColor;
+				out << YAML::Key << "SkyboxHandle" << YAML::Value << cameraComponent.SkyboxHandle;
+				out << YAML::EndMap; // Camera
 			});
 
 		SerializeComponent<MeshComponent>("MeshComponent", entity, out, [&]()
@@ -360,6 +387,11 @@ namespace Hanabi
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+
+					auto& clearMethod = cameraComponent["ClearMethod"];
+					cc.ClearType = ClearMethodTypeFromString(clearMethod["Type"].as<std::string>());
+					cc.ClearColor = clearMethod["ClearColor"].as<glm::vec4>();
+					cc.SkyboxHandle = clearMethod["SkyboxHandle"].as<AssetHandle>();
 				}
 
 				auto meshComponent = entity["MeshComponent"];

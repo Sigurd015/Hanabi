@@ -128,8 +128,8 @@ namespace Hanabi
 			}
 		}
 
-		template<typename UIFunction>
-		static void DrawTextureControl(const std::string& name, AssetHandle& handle, UIFunction uiFunction)
+		template<typename UIFunction = std::function<void()>>
+		static void DrawTextureControl(const std::string& name, AssetHandle& handle, UIFunction uiFunction = []() {})
 		{
 			if (ImGui::CollapsingHeader(name.c_str(), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
@@ -160,6 +160,29 @@ namespace Hanabi
 						}
 					});
 				uiFunction();
+			}
+		}
+
+		template<typename T>
+		static void DrawComboControl(const std::string& name, const char** typeStrings, uint32_t typeCount, T& type)
+		{
+			const char* currentTypeString = typeStrings[(int)type];
+			if (ImGui::BeginCombo(name.c_str(), currentTypeString))
+			{
+				for (int i = 0; i < typeCount; i++)
+				{
+					bool isSelected = currentTypeString == typeStrings[i];
+					if (ImGui::Selectable(typeStrings[i], isSelected))
+					{
+						currentTypeString = typeStrings[i];
+						type = (T)i;
+					}
+
+					if (isSelected)
+						ImGui::SetItemDefaultFocus();
+				}
+
+				ImGui::EndCombo();
 			}
 		}
 	}
@@ -313,23 +336,13 @@ namespace Hanabi
 				auto& camera = component.Camera;
 
 				ImGui::Checkbox("Primary", &component.Primary);
+
 				const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
-				const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
-				if (ImGui::BeginCombo("Projection", currentProjectionTypeString))
-				{
-					for (int i = 0; i < 2; i++)
-					{
-						bool isSelected = currentProjectionTypeString == projectionTypeStrings[i];
-						if (ImGui::Selectable(projectionTypeStrings[i], isSelected))
-						{
-							currentProjectionTypeString = projectionTypeStrings[i];
-							camera.SetProjectionType((SceneCamera::ProjectionType)i);
-						}
-						if (isSelected)
-							ImGui::SetItemDefaultFocus();
-					}
-					ImGui::EndCombo();
-				}
+				SceneCamera::ProjectionType type = camera.GetProjectionType();
+				SceneCamera::ProjectionType tempType = type;
+				Utils::DrawComboControl("Projection", projectionTypeStrings, 2, tempType);
+				if (tempType != type)
+					camera.SetProjectionType(tempType);
 
 				if (camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective)
 				{
@@ -360,6 +373,19 @@ namespace Hanabi
 					if (ImGui::DragFloat("Far", &orthoFar))
 						camera.SetOrthographicFarClip(orthoFar);
 					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
+				}
+
+				const char* clearMethodTypeStrings[] = { "None","Soild Color", "Skybox" };
+				Utils::DrawComboControl("Clear Method", clearMethodTypeStrings, 3, component.ClearType);
+
+				if (component.ClearType == CameraComponent::ClearMethod::Soild_Color)
+				{
+					ImGui::ColorEdit4("Clear Color", glm::value_ptr(component.ClearColor));
+				}
+
+				if (component.ClearType == CameraComponent::ClearMethod::Skybox)
+				{
+					Utils::DrawTextureControl("Skybox", component.SkyboxHandle);
 				}
 			});
 
@@ -443,7 +469,7 @@ namespace Hanabi
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				Utils::DrawTextureControl("Texture", component.TextureHandle, []() {});
+				Utils::DrawTextureControl("Texture", component.TextureHandle);
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
@@ -508,8 +534,8 @@ namespace Hanabi
 					AssetHandle tempNormalHandle = normalHandle;
 					bool tempUseNormalMap = materialAsset->IsUsingNormalMap();
 
-					Utils::DrawTextureControl("Diffuse Texture", tempDiffuseHandle, []() {});
-					Utils::DrawTextureControl("Specular Texture", tempSpecularHandle, []() {});
+					Utils::DrawTextureControl("Diffuse Texture", tempDiffuseHandle);
+					Utils::DrawTextureControl("Specular Texture", tempSpecularHandle);
 					Utils::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
 						{
 							ImGui::SameLine();
@@ -526,13 +552,40 @@ namespace Hanabi
 					bool useNormalMapChanged = tempUseNormalMap != materialAsset->IsUsingNormalMap();
 
 					if (diffuseChanged)
-						materialAsset->SetDiffuse(tempDiffuseHandle);
+					{
+						if (tempDiffuseHandle)
+						{
+							materialAsset->SetDiffuse(tempDiffuseHandle);
+						}
+						else
+						{
+							materialAsset->ClearDiffuse();
+						}
+					}
 
 					if (specularChanged)
-						materialAsset->SetSpecular(tempSpecularHandle);
+					{
+						if (tempSpecularHandle)
+						{
+							materialAsset->SetSpecular(tempSpecularHandle);
+						}
+						else
+						{
+							materialAsset->ClearSpecular();
+						}
+					}
 
 					if (normalChanged)
-						materialAsset->SetNormal(tempNormalHandle);
+					{
+						if (tempNormalHandle)
+						{
+							materialAsset->SetNormal(tempNormalHandle);
+						}
+						else
+						{
+							materialAsset->ClearNormal();
+						}
+					}
 
 					if (diffuseChanged || specularChanged || normalChanged || useNormalMapChanged)
 						AssetImporter::Serialize(materialAsset);
@@ -542,24 +595,7 @@ namespace Hanabi
 		Utils::DrawComponent<LightComponent>("Light", entity, [](auto& component)
 			{
 				const char* lightTypeStrings[] = { "None","Directional Light","Point Light", "Spot Light" };
-				const char* currentTypeString = lightTypeStrings[(int)component.Type];
-				if (ImGui::BeginCombo("Light Type", currentTypeString))
-				{
-					for (int i = 0; i < 4; i++)
-					{
-						bool isSelected = currentTypeString == lightTypeStrings[i];
-						if (ImGui::Selectable(lightTypeStrings[i], isSelected))
-						{
-							currentTypeString = lightTypeStrings[i];
-							component.Type = (LightComponent::LightType)i;
-						}
-
-						if (isSelected)
-							ImGui::SetItemDefaultFocus();
-					}
-
-					ImGui::EndCombo();
-				}
+				Utils::DrawComboControl("Light Type", lightTypeStrings, 4, component.Type);
 
 				switch (component.Type)
 				{

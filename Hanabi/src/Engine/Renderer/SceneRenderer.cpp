@@ -99,8 +99,6 @@ namespace Hanabi
 			geoFramebufferSpec.Width = 1920;
 			geoFramebufferSpec.Height = 1080;
 			// TODO: Make a better way to do mouse picking
-			// TODO: Make a better way to clear the framebuffer and use the different clear values for editor and game
-			geoFramebufferSpec.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 			geoFramebufferSpec.MousePickClearValue = -1;
 
 			RenderPassSpecification geoRenderPassSpec;
@@ -182,6 +180,15 @@ namespace Hanabi
 		}
 		s_Data->SpotLightDataBuffer->SetData(&s_Data->SpotLightData);
 		s_Data->DrawCommands.clear();
+
+		if (environment.ClearType == CameraComponent::ClearMethod::Soild_Color)
+		{
+			Renderer::SetClearColor(environment.ClearColor);
+		}
+		else if (environment.ClearType == CameraComponent::ClearMethod::Skybox)
+		{
+			//TODO: Implement skybox
+		}
 	}
 
 	void SceneRenderer::EndScene()
@@ -189,16 +196,21 @@ namespace Hanabi
 		//Renderer::BeginRenderPass(s_Data->ShadowPass);
 		//for (auto& command : s_Data->DrawCommands)
 		//{
-		//	Renderer::SubmitStaticMesh(command.Mesh, command.Material ? command.Material : s_Data->m_DefaultMaterialAsset->GetMaterial(),
-		//		s_Data->m_DefaultPipeline, command.ModelData, CBBingSlot::MODEL);
 		//}
 		//Renderer::EndRenderPass(s_Data->ShadowPass);
 
 		Renderer::BeginRenderPass(s_Data->GeoPass);
 		for (auto& command : s_Data->DrawCommands)
 		{
-			Renderer::SubmitStaticMesh(command.Mesh, command.Material,
-				s_Data->m_DefaultPipeline, &command.ModelData, CBBingSlot::MODEL);
+			// TODO: Why only heap allocation can get the correct result?
+			Ref<CBModel> modelData = CreateRef<CBModel>();
+			modelData->Transform = command.ModelData.Transform;
+			modelData->UseNormalMap = command.ModelData.UseNormalMap;
+
+			Ref<ConstantBuffer> transformBuffer = s_Data->m_DefaultPipeline->GetConstantBuffer(CBBingSlot::MODEL);
+			transformBuffer->SetData(modelData.get());
+
+			Renderer::SubmitStaticMesh(command.Mesh, command.Material, s_Data->m_DefaultPipeline);
 		}
 		Renderer::EndRenderPass(s_Data->GeoPass);
 	}

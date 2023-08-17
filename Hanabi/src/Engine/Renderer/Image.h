@@ -25,4 +25,26 @@ namespace Hanabi
 		Depth = DEPTH24STENCIL8,
 		ShadowMap = DEPTH32F
 	};
+
+	enum class TextureWrap
+	{
+		None = 0,
+		Clamp,
+		Repeat
+	};
+
+	enum class TextureFilter
+	{
+		None = 0,
+		Linear,
+		Nearest,
+		Cubic
+	};
+
+	enum class TextureType
+	{
+		None = 0,
+		Texture2D,
+		TextureCube
+	};
 }

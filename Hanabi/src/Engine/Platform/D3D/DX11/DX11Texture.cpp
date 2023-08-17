@@ -5,6 +5,7 @@
 #include "DX11Context.h"
 #include "Engine/Core/UUID.h"
 #include "Engine/Platform/D3D/DXCommon.h"
+#include "DX11RenderStates.h"
 
 #include <stb_image.h>
 
@@ -53,16 +54,6 @@ namespace Hanabi
 		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(pResource, &resourceView, ppSRView));
 	}
 
-	void CreateSamplerState(ID3D11SamplerState** ppSamplerState)
-	{
-		D3D11_SAMPLER_DESC samplerDesc = {};
-		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, ppSamplerState));
-	}
-
 	DX11Texture2D::DX11Texture2D(const TextureSpecification& specification, Buffer data) :m_Specification(specification),
 		m_Width(specification.Width), m_Height(specification.Height)
 	{
@@ -79,14 +70,12 @@ namespace Hanabi
 			CreateTexture(D3D11_USAGE_DEFAULT, 0, m_Width, m_Height, m_DataFormat, &subresourceData, m_Texture.GetAddressOf());
 		}
 		CreateShaderView(m_DataFormat, m_Texture.Get(), m_TextureSRV.GetAddressOf());
-		CreateSamplerState(m_SamplerState.GetAddressOf());
 	}
 
 	DX11Texture2D::~DX11Texture2D()
 	{
 		m_Texture.Reset();
 		m_TextureSRV.Reset();
-		m_SamplerState.Reset();
 	}
 
 	void DX11Texture2D::SetData(Buffer data)
@@ -127,7 +116,19 @@ namespace Hanabi
 
 	void DX11Texture2D::Bind(uint32_t slot) const
 	{
-		DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, m_SamplerState.GetAddressOf());
+		switch (m_Specification.SamplerFilter)
+		{
+		case TextureFilter::Linear:
+		{
+			if (m_Specification.SamplerWrap == TextureWrap::Repeat)
+				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+
+			if (m_Specification.SamplerWrap == TextureWrap::Clamp)
+				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
+
+			break;
+		}
+		}
 		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureSRV.GetAddressOf());
 	}
 }

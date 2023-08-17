@@ -32,7 +32,7 @@ namespace Hanabi
 		const std::vector<Index>& GetIndices() const { return m_Indices; }
 
 		static AssetType GetStaticType() { return AssetType::MeshSource; }
-		virtual AssetType GetType() const override { return GetStaticType(); }
+		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
@@ -49,7 +49,7 @@ namespace Hanabi
 		const Ref<MeshSource>& GetMeshSource() const { return m_MeshSource; }
 
 		static AssetType GetStaticType() { return AssetType::Mesh; }
-		virtual AssetType GetType() const override { return GetStaticType(); }
+		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
 		Ref<MeshSource> m_MeshSource;
 		std::vector<Vertex> m_Vertices;

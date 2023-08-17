@@ -23,9 +23,18 @@ namespace Hanabi
 		TextureSpecification m_Specification;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_SamplerState;
 		uint32_t m_Width, m_Height;
 		DXGI_FORMAT m_DataFormat;
+	};
+
+	class DX11TextureCube : public TextureCube
+	{
+	public:
+		DX11TextureCube(const TextureSpecification& specification, Buffer data = Buffer());
+		~DX11TextureCube();
+		const TextureSpecification& GetSpecification() const override { return m_Specification; }
+	private:
+		TextureSpecification m_Specification;
 	};
 }
 #endif

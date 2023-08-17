@@ -26,7 +26,6 @@ namespace Hanabi
 	struct FramebufferSpecification
 	{
 		uint32_t Width = 0, Height = 0;
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		float DepthClearValue = 1.0f;
 
 		// TODO: Make a better way to do mouse picking
@@ -44,7 +43,7 @@ namespace Hanabi
 		virtual void Bind() = 0;
 		virtual void Unbind() = 0;
 
-		virtual void ClearAttachment() = 0;
+		virtual void ClearAttachment(const glm::vec4& color) = 0;
 		virtual void* GetColorAttachment(uint32_t attachmentIndex = 0) const = 0;
 		virtual void* GetDepthAttachment() const = 0;
 

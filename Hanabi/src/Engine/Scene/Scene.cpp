@@ -15,6 +15,8 @@
 
 namespace Hanabi
 {
+	static glm::vec4 s_EditorClearColor = { 0.3f, 0.3f, 0.3f, 1.0f };
+
 	template<typename... Component>
 	static void CopyComponent(entt::registry& dst, entt::registry& src,
 		const std::unordered_map<UUID, entt::entity>& enttMap)
@@ -211,7 +213,7 @@ namespace Hanabi
 
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
-		glm::vec3 cameraPos;
+		Environment sceneEnvironment;
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
 		for (auto entity : view)
 		{
@@ -221,7 +223,10 @@ namespace Hanabi
 			{
 				mainCamera = &camera.Camera;
 				cameraTransform = transform.GetTransform();
-				cameraPos = transform.Translation;
+				sceneEnvironment.CameraPosition = transform.Translation;
+				sceneEnvironment.ClearType = camera.ClearType;
+				sceneEnvironment.ClearColor = camera.ClearColor;
+				sceneEnvironment.SkyboxAssetHandle = camera.SkyboxHandle;
 				break;
 			}
 		}
@@ -229,19 +234,21 @@ namespace Hanabi
 		if (mainCamera)
 		{
 			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
-			RenderScene(cameraPos, viewProjection, selectedEntity, enableOverlayRender);
+			sceneEnvironment.ViewProjection = viewProjection;
+			RenderScene(sceneEnvironment, selectedEntity, enableOverlayRender);
 		}
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender)
 	{
-		RenderScene(camera.GetPosition(), camera.GetViewProjection(), selectedEntity, enableOverlayRender);
+		Environment sceneEnvironment = { camera.GetPosition() , camera.GetViewProjection() };
+		sceneEnvironment.ClearType = CameraComponent::ClearMethod::Soild_Color;
+		sceneEnvironment.ClearColor = s_EditorClearColor;
+		RenderScene(sceneEnvironment, selectedEntity, enableOverlayRender);
 	}
 
-	void Scene::RenderScene(const glm::vec3& camPos, const glm::mat4& viewProj, Entity selectedEntity, bool enableOverlayRender)
+	void Scene::RenderScene(Environment& sceneEnvironment, Entity selectedEntity, bool enableOverlayRender)
 	{
-		Environment sceneEnvironment = { camPos,viewProj };
-
 		//----------------- 3D Scene Rendering -----------------//				
 		// Lights
 		{
@@ -314,7 +321,7 @@ namespace Hanabi
 		SceneRenderer::EndScene();
 
 		//----------------- 2D Scene Rendering -----------------//
-		Renderer2D::BeginScene(viewProj);
+		Renderer2D::BeginScene(sceneEnvironment.ViewProjection);
 		Renderer2D::SetTargetRenderPass(SceneRenderer::GetFinalRenderPass());
 		// Draw sprites
 		{

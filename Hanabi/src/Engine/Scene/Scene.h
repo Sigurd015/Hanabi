@@ -45,12 +45,12 @@ namespace Hanabi
 		}
 
 		static AssetType GetStaticType() { return AssetType::Scene; }
-		virtual AssetType GetType() const { return GetStaticType(); }
+		virtual AssetType GetAssetType() const { return GetStaticType(); }
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
 
-		void RenderScene(const glm::vec3& camPos, const glm::mat4& viewProj, Entity selectedEntity, bool enableOverlayRender);
+		void RenderScene(Environment& sceneEnvironment, Entity selectedEntity, bool enableOverlayRender);
 		void OnOverlayRender(bool enable, Entity selectedEntity);
 		void OnPhysics2DStart();
 		void OnPhysics2DStop();

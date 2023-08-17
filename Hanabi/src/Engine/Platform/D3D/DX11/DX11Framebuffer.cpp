@@ -7,6 +7,8 @@
 #include "DX11Framebuffer.h"
 #include "Engine/Platform/D3D/DXCommon.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Hanabi
 {
 	static const uint32_t s_MaxFramebufferSize = 8192;
@@ -232,7 +234,7 @@ namespace Hanabi
 		DX11Context::GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
 	}
 
-	void DX11Framebuffer::ClearAttachment()
+	void DX11Framebuffer::ClearAttachment(const glm::vec4& color)
 	{
 		for (size_t i = 0; i < m_ColorAttachmentRTV.size(); i++)
 		{
@@ -242,7 +244,7 @@ namespace Hanabi
 				DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[i].Get(), temp);
 			}
 			else
-				DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[i].Get(), &m_Specification.ClearColor.x);
+				DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[i].Get(), glm::value_ptr(color));
 		}
 		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DepthStencilAttachment.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 			m_Specification.DepthClearValue, 0);

@@ -30,8 +30,19 @@ namespace Hanabi
 		HNB_CORE_ASSERT(spec.Layout.GetElements().size(), "Vertex Buffer has no layout!");
 
 		m_Specification = spec;
-		glCreateVertexArrays(1, &m_RendererID);
+		glGenVertexArrays(1, &m_RendererID);
 		glBindVertexArray(m_RendererID);
+	}
+
+	OpenGLPipeline::~OpenGLPipeline()
+	{
+		glDeleteVertexArrays(1, &m_RendererID);
+	}
+
+	void OpenGLPipeline::Bind()
+	{
+		glBindVertexArray(m_RendererID);
+
 		size_t index = 0;
 		for (const auto& element : m_Specification.Layout)
 		{
@@ -89,16 +100,7 @@ namespace Hanabi
 				HNB_CORE_ASSERT(false, "Unknown ShaderDataType!");
 			}
 		}
-	}
 
-	OpenGLPipeline::~OpenGLPipeline()
-	{
-		glDeleteVertexArrays(1, &m_RendererID);
-	}
-
-	void OpenGLPipeline::Bind()
-	{
-		glBindVertexArray(m_RendererID);
 		if (m_UniformBuffers.size())
 		{
 			for (auto& constantBuffer : m_UniformBuffers)

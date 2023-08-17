@@ -104,7 +104,7 @@ namespace Hanabi
 		AssetMetadata metadata;
 		metadata.Handle = asset->Handle;
 		metadata.IsDataLoaded = true;
-		metadata.Type = asset->GetType();
+		metadata.Type = asset->GetAssetType();
 		metadata.IsMemoryAsset = true;
 		m_AssetRegistry[metadata.Handle] = metadata;
 

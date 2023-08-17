@@ -18,6 +18,10 @@ Entities:
         OrthographicFar: 100
       Primary: true
       FixedAspectRatio: false
+      ClearMethod:
+        Type: Soild Color
+        ClearColor: [0, 0, 0, 1]
+        SkyboxHandle: 0
   - Entity: 15379224362395118360
     TagComponent:
       Tag: PointLight

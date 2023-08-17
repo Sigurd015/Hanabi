@@ -41,7 +41,7 @@ namespace Hanabi
 		void SetMaterial(Ref<Material> material) { m_Material = material; }
 
 		static AssetType GetStaticType() { return AssetType::Material; }
-		virtual AssetType GetType() const override { return GetStaticType(); }
+		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
 		void SetTexture(Ref<Texture2D> texture, uint32_t index);
 		void ClearTexture(uint32_t index);

@@ -1,3 +1,4 @@
+#if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/Pipeline.h"
 #include "Engine/Renderer/IndexBuffer.h"
@@ -25,3 +26,4 @@ namespace Hanabi
 		std::vector<Ref<ConstantBuffer>> m_ConstantBuffers;
 	};
 }
+#endif

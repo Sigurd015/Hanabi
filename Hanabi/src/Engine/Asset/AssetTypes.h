@@ -12,6 +12,7 @@ namespace Hanabi
 		Material,
 		Mesh,
 		MeshSource,
+		EnvMap
 	};
 
 	namespace Utils

@@ -11,6 +11,6 @@ namespace Hanabi
 	public:
 		AssetHandle Handle; // Generate handle
 
-		virtual AssetType GetType() const = 0;
+		virtual AssetType GetAssetType() const = 0;
 	};
 }

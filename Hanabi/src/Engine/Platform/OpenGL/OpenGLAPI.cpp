@@ -36,13 +36,13 @@ namespace Hanabi
 
 	void OpenGLRendererAPI::Init()
 	{
-#ifdef HNB_DEBUG
+		#ifdef HNB_DEBUG
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 
 		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
-#endif
+		#endif
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -77,9 +77,8 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Bind();
 		if (clear)
 		{
-			const glm::vec4& clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
-			SetClearColor(clearColor);
 			Clear();
+			renderPass->GetSpecification().TargetFramebuffer->ClearAttachment(m_ClearColor);
 		}
 	}
 
@@ -88,15 +87,12 @@ namespace Hanabi
 		renderPass->GetSpecification().TargetFramebuffer->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline, const void* modelData, uint32_t modelCBBingID)
+	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
-		Ref<ConstantBuffer> transformBuffer = pipeline->GetConstantBuffer(modelCBBingID);
-		transformBuffer->SetData(modelData);
-		pipeline->Bind();
 		mesh->GetIndexBuffer()->Bind();
+		pipeline->Bind();
 		material->Bind();
-		delete modelData;
 
 		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
@@ -104,8 +100,8 @@ namespace Hanabi
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
-		pipeline->Bind();
 		indexBuffer->Bind();
+		pipeline->Bind();
 		material->Bind();
 
 		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), indexCount, GL_UNSIGNED_INT, nullptr);

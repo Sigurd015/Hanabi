@@ -66,6 +66,11 @@ namespace Hanabi
 		bool Primary = true; // TODO: think about moving to Scene
 		bool FixedAspectRatio = false;
 
+		enum class ClearMethod { None = 0, Soild_Color, Skybox };
+		ClearMethod ClearType = ClearMethod::None;
+		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		AssetHandle SkyboxHandle = 0;
+
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
 	};
@@ -113,9 +118,8 @@ namespace Hanabi
 
 	struct LightComponent
 	{
-		enum class LightType { NONE = 0, Directional, Point, Spot };
-
-		LightType Type = LightType::NONE;
+		enum class LightType { None = 0, Directional, Point, Spot };
+		LightType Type = LightType::None;
 		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
 		float Intensity = 0.0f;
 		float Radius;
