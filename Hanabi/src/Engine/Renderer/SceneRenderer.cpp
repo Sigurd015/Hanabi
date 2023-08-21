@@ -3,6 +3,7 @@
 #include "RendererAPI.h"
 #include "Renderer2D.h"
 #include "Renderer.h"
+#include "EnvMapAsset.h"
 #include "Engine/Asset/AssetManager/AssetManager.h"
 
 namespace Hanabi
@@ -63,11 +64,16 @@ namespace Hanabi
 		Ref<ConstantBuffer> PointLightDataBuffer;
 		Ref<ConstantBuffer> SpotLightDataBuffer;
 
+		Ref<RenderPass> SkyboxPass;
 		Ref<RenderPass> ShadowPass;
 		Ref<RenderPass> GeoPass;
 
-		Ref<Material> m_DefaultMaterial;
-		Ref<Pipeline> m_DefaultPipeline;
+		Ref<Material> DefaultMaterial;
+		Ref<Material> SkyboxMaterial;
+
+		Ref<Pipeline> ShadowPipeline;
+		Ref<Pipeline> GeoPipeline;
+		Ref<Pipeline> SkyboxPipeline;
 
 		struct DrawCommand
 		{
@@ -77,6 +83,8 @@ namespace Hanabi
 			CBModel ModelData;
 		};
 		std::vector<DrawCommand> DrawCommands;
+
+		bool SkyboxDrawRequested = false;
 	};
 	static SceneRendererData* s_Data;
 
@@ -90,57 +98,97 @@ namespace Hanabi
 		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight), CBBingSlot::POINT_LIGHT);
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight), CBBingSlot::SPOT_LIGHT);
 
+		Ref<Framebuffer> geoFramebuffer;
 		{
-			FramebufferSpecification geoFramebufferSpec;
-			geoFramebufferSpec.Attachments = {
-				ImageFormat::RGBA8F,
-				ImageFormat::MousePick,
-				ImageFormat::Depth };
-			geoFramebufferSpec.Width = 1920;
-			geoFramebufferSpec.Height = 1080;
+			FramebufferSpecification spec;
+			spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::MousePick,ImageFormat::Depth };
+			spec.Width = 1920;
+			spec.Height = 1080;
 			// TODO: Make a better way to do mouse picking
-			geoFramebufferSpec.MousePickClearValue = -1;
-
-			RenderPassSpecification geoRenderPassSpec;
-			geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
-			s_Data->GeoPass = RenderPass::Create(geoRenderPassSpec);
+			spec.MousePickClearValue = -1;
+			geoFramebuffer = Framebuffer::Create(spec);
 		}
 
+		Ref<Framebuffer> shadowFramebuffer;
 		{
-			FramebufferSpecification shadowFramebufferSpec;
-			shadowFramebufferSpec.Attachments = {
-				ImageFormat::ShadowMap };
-			shadowFramebufferSpec.Width = 1920;
-			shadowFramebufferSpec.Height = 1080;
+			FramebufferSpecification spec;
+			spec.Attachments = { ImageFormat::ShadowMap };
+			spec.Width = 1920;
+			spec.Height = 1080;
+			shadowFramebuffer = Framebuffer::Create(spec);
+		}
 
-			RenderPassSpecification shadowRenderPassSpec;
-			shadowRenderPassSpec.TargetFramebuffer = Framebuffer::Create(shadowFramebufferSpec);
-			s_Data->ShadowPass = RenderPass::Create(shadowRenderPassSpec);
+		//TODO: Make layout dynamic	
+		// Geometry Pipeline
+		{
+			PipelineSpecification spec;
+			VertexBufferLayout layout = {
+			   { ShaderDataType::Float3, "a_Position" },
+			   { ShaderDataType::Float3, "a_Normal" },
+			   { ShaderDataType::Float3, "a_Tangent" },
+			   { ShaderDataType::Float3, "a_Bitangent" },
+			   { ShaderDataType::Float2, "a_TexCoord" },
+			};
+
+			spec.Layout = layout;
+			spec.Shader = Renderer::GetDefaultShader();
+			spec.TargetFramebuffer = geoFramebuffer;
+			spec.BackfaceCulling = true;
+			spec.DepthTest = true;
+			spec.Topology = PrimitiveTopology::Triangles;
+			spec.DepthOperator = DepthCompareOperator::Less;
+			s_Data->GeoPipeline = Pipeline::Create(spec);
+		}
+
+		// Skybox Pipeline
+		{
+			PipelineSpecification spec;
+			VertexBufferLayout layout = {
+			   { ShaderDataType::Float3, "a_Position" },
+			};
+			spec.Layout = layout;
+			spec.Shader = Renderer::GetShader("Skybox");
+			spec.TargetFramebuffer = geoFramebuffer;
+			spec.BackfaceCulling = false;
+			spec.DepthTest = true;
+			spec.Topology = PrimitiveTopology::Triangles;
+			spec.DepthOperator = DepthCompareOperator::LessEqual;
+			s_Data->SkyboxPipeline = Pipeline::Create(spec);
+		}
+
+		// Dont change the order of these, specially the model data buffer
+		s_Data->GeoPipeline->SetConstantBuffer(s_Data->ModelDataBuffer);
+		s_Data->GeoPipeline->SetConstantBuffer(s_Data->CameraDataBuffer);
+		s_Data->GeoPipeline->SetConstantBuffer(s_Data->SceneDataBuffer);
+		s_Data->GeoPipeline->SetConstantBuffer(s_Data->PointLightDataBuffer);
+		s_Data->GeoPipeline->SetConstantBuffer(s_Data->SpotLightDataBuffer);
+
+		s_Data->SkyboxPipeline->SetConstantBuffer(s_Data->CameraDataBuffer);
+
+		// Skybox Pass
+		{
+			RenderPassSpecification spec;
+			spec.Pipeline = s_Data->SkyboxPipeline;
+			s_Data->SkyboxPass = RenderPass::Create(spec);
+		}
+
+		// Geometry Pass
+		{
+			RenderPassSpecification spec;
+			spec.Pipeline = s_Data->GeoPipeline;
+			s_Data->GeoPass = RenderPass::Create(spec);
+		}
+
+		// Shadow Pass
+		{
+			RenderPassSpecification spec;
+			spec.Pipeline = s_Data->ShadowPipeline;
+			s_Data->ShadowPass = RenderPass::Create(spec);
 		}
 
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
-		s_Data->m_DefaultMaterial = defaultMaterialAsset->GetMaterial();
-
-		//TODO: Make layout dynamic
-		VertexBufferLayout layout = {
-		  { ShaderDataType::Float3, "a_Position" },
-		  { ShaderDataType::Float3, "a_Normal" },
-		  { ShaderDataType::Float3, "a_Tangent" },
-		  { ShaderDataType::Float3, "a_Bitangent" },
-		  { ShaderDataType::Float2, "a_TexCoord" },
-		};
-		PipelineSpecification spec;
-		spec.Layout = layout;
-		spec.Shader = Renderer::GetShader("PhongLighting");
-		spec.Topology = PrimitiveTopology::Triangles;
-		s_Data->m_DefaultPipeline = Pipeline::Create(spec);
-
-		// Dont change the order of the constant buffers, this order is mathcing the binding order in the shader
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->ModelDataBuffer);
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->CameraDataBuffer);
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->SceneDataBuffer);
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->PointLightDataBuffer);
-		s_Data->m_DefaultPipeline->SetConstantBuffer(s_Data->SpotLightDataBuffer);
+		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
+		s_Data->SkyboxMaterial = CreateRef<Material>(Renderer::GetShader("Skybox"));
 	}
 
 	void SceneRenderer::Shutdown()
@@ -150,10 +198,10 @@ namespace Hanabi
 
 	void SceneRenderer::SetViewportSize(uint32_t width, uint32_t height)
 	{
-		const FramebufferSpecification& fbsc = s_Data->GeoPass->GetSpecification().TargetFramebuffer->GetSpecification();
+		const FramebufferSpecification& fbsc = s_Data->GeoPass->GetTargetFramebuffer()->GetSpecification();
 		if (fbsc.Width != width || fbsc.Height != height)
 		{
-			s_Data->GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
+			s_Data->GeoPass->GetTargetFramebuffer()->Resize(width, height);
 		}
 	}
 
@@ -181,13 +229,30 @@ namespace Hanabi
 		s_Data->SpotLightDataBuffer->SetData(&s_Data->SpotLightData);
 		s_Data->DrawCommands.clear();
 
-		if (environment.ClearType == CameraComponent::ClearMethod::Soild_Color)
+		switch (environment.ClearType)
+		{
+		case CameraComponent::ClearMethod::Soild_Color:
 		{
 			Renderer::SetClearColor(environment.ClearColor);
+
+			s_Data->SkyboxDrawRequested = false;
+			break;
 		}
-		else if (environment.ClearType == CameraComponent::ClearMethod::Skybox)
+		case CameraComponent::ClearMethod::Skybox:
 		{
-			//TODO: Implement skybox
+			s_Data->SkyboxDrawRequested = true;
+			if (environment.SkyboxAssetHandle)
+			{
+				Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment.SkyboxAssetHandle);
+				Ref<TextureCube> textureCube = asset->GetEnvMap();
+				s_Data->SkyboxMaterial->SetTexture<TextureCube>(textureCube);
+			}
+			else
+			{
+				s_Data->SkyboxMaterial->SetTexture<TextureCube>(Renderer::GetTexture<TextureCube>("BlackCube"));
+			}
+			break;
+		}
 		}
 	}
 
@@ -207,12 +272,21 @@ namespace Hanabi
 			modelData->Transform = command.ModelData.Transform;
 			modelData->UseNormalMap = command.ModelData.UseNormalMap;
 
-			Ref<ConstantBuffer> transformBuffer = s_Data->m_DefaultPipeline->GetConstantBuffer(CBBingSlot::MODEL);
+			Ref<ConstantBuffer> transformBuffer = s_Data->GeoPipeline->GetConstantBuffer(CBBingSlot::MODEL);
 			transformBuffer->SetData(modelData.get());
 
-			Renderer::SubmitStaticMesh(command.Mesh, command.Material, s_Data->m_DefaultPipeline);
+			Renderer::SubmitStaticMesh(command.Mesh, command.Material, s_Data->GeoPipeline);
 		}
 		Renderer::EndRenderPass(s_Data->GeoPass);
+		if (s_Data->SkyboxDrawRequested)
+		{
+			Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
+
+			Ref<Mesh> mesh = Renderer::GetMesh("Box");
+			Renderer::SubmitStaticMesh(mesh, s_Data->SkyboxMaterial, s_Data->SkyboxPipeline);
+
+			Renderer::EndRenderPass(s_Data->SkyboxPass);
+		}
 	}
 
 	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
@@ -227,7 +301,7 @@ namespace Hanabi
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
-		s_Data->DrawCommands.push_back({ mesh ,s_Data->m_DefaultMaterial ,{ transform,false } });
+		s_Data->DrawCommands.push_back({ mesh ,s_Data->DefaultMaterial ,{ transform,false } });
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle)

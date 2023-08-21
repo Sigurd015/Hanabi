@@ -13,7 +13,7 @@ namespace Hanabi
 	{
 		Ref<ShaderLibrary> ShaderLibrary;
 
-		std::unordered_map<std::string, Ref<Texture2D>> Textures;
+		std::unordered_map<std::string, Ref<Texture>> Textures;
 		std::unordered_map<std::string, Ref<Mesh>> Meshes;
 	};
 
@@ -32,12 +32,23 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Line");
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
 		s_Data->ShaderLibrary->Load("PhongLighting");
+		s_Data->ShaderLibrary->Load("Skybox");
 
 		//Setup textures
-		Ref<Texture2D> whiteTexture = Texture2D::Create(TextureSpecification());
-		uint32_t whiteTextureData = 0xffffffff;
-		whiteTexture->SetData(Buffer(&whiteTextureData, sizeof(uint32_t)));
-		s_Data->Textures["White"] = whiteTexture;
+		TextureSpecification spec;
+		spec.Format = ImageFormat::RGBA8;
+		spec.Width = 1;
+		spec.Height = 1;
+		spec.SamplerWrap = TextureWrap::Repeat;
+		spec.SamplerFilter = TextureFilter::Linear;
+
+		constexpr uint32_t whiteTextureData = 0xffffffff;
+		s_Data->Textures["White"] = Texture2D::Create(spec, Buffer(&whiteTextureData, sizeof(uint32_t)));
+		constexpr uint32_t blackTextureData = 0xff000000;
+		s_Data->Textures["Black"] = Texture2D::Create(spec, Buffer(&blackTextureData, sizeof(uint32_t)));
+
+		constexpr uint32_t blackCubeTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
+		s_Data->Textures["BlackCube"] = TextureCube::Create(spec, Buffer(blackCubeTextureData, sizeof(blackCubeTextureData)));
 
 		//Load default meshes
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });
@@ -103,16 +114,16 @@ namespace Hanabi
 		return s_Data->Meshes[name];
 	}
 
-	Ref<Texture2D> Renderer::GetTexture(const std::string& name)
+	Ref<Shader> Renderer::GetDefaultShader()
+	{
+		return s_Data->ShaderLibrary->Get("PhongLighting");
+	}
+
+	Ref<Texture> Renderer::GetTextureInternal(const std::string& name)
 	{
 		if (s_Data->Textures.find(name) == s_Data->Textures.end())
 			return nullptr;
 
 		return s_Data->Textures[name];
-	}
-
-	Ref<Shader> Renderer::GetDefaultShader()
-	{
-		return s_Data->ShaderLibrary->Get("PhongLighting");
 	}
 }

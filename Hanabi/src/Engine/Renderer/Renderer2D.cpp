@@ -235,7 +235,7 @@ namespace Hanabi
 		}
 
 		// Set WhiteTexture slots to 0
-		s_Data->WhiteTexture = Renderer::GetTexture("White");
+		s_Data->WhiteTexture = Renderer::GetTexture<Texture2D>("White");
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
 		s_Data->CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);

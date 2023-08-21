@@ -1,6 +1,6 @@
 #pragma once
-#include "Engine/Renderer/Pipeline.h"
 #include "Mesh.h"
+#include "Engine/Renderer/RenderPass.h"
 
 #include <glm/glm.hpp>
 

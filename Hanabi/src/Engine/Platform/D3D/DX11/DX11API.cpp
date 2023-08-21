@@ -5,6 +5,7 @@
 #include "Engine/Platform/D3D/DXCommon.h"
 #include "DX11Context.h"
 #include "Engine/Core/Application.h"
+#include "DX11RenderStates.h"
 
 namespace Hanabi
 {
@@ -88,13 +89,38 @@ namespace Hanabi
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
 		if (clear)
-			renderPass->GetSpecification().TargetFramebuffer->ClearAttachment(m_ClearColor);
-		renderPass->GetSpecification().TargetFramebuffer->Bind();
+			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
+		renderPass->GetTargetFramebuffer()->Bind();
+
+		Ref<Pipeline> pipeline = renderPass->GetPipeline();
+
+		PipelineSpecification& spec = pipeline->GetSpecification();
+		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(spec.Topology));
+
+		if (!spec.DepthTest)
+			m_DeviceContext->OMSetDepthStencilState(DX11RenderStates::DSSNoDepthTest.Get(), 0);
+		else
+		{
+			switch (spec.DepthOperator)
+			{
+			case DepthCompareOperator::Less:
+				m_DeviceContext->OMSetDepthStencilState(DX11RenderStates::DSSLess.Get(), 0);
+				break;
+			case DepthCompareOperator::LessEqual:
+				m_DeviceContext->OMSetDepthStencilState(DX11RenderStates::DSSLessEqual.Get(), 0);
+				break;
+			}
+		}
+
+		if (spec.BackfaceCulling)
+			m_DeviceContext->RSSetState(DX11RenderStates::RSCullBack.Get());
+		else
+			m_DeviceContext->RSSetState(DX11RenderStates::RSNoCull.Get());
 	}
 
 	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		renderPass->GetSpecification().TargetFramebuffer->Unbind();
+		renderPass->GetTargetFramebuffer()->Unbind();
 		Clear();
 	}
 
@@ -105,7 +131,6 @@ namespace Hanabi
 		pipeline->Bind();
 		material->Bind();
 
-		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
@@ -117,7 +142,6 @@ namespace Hanabi
 		pipeline->Bind();
 		material->Bind();
 
-		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
@@ -127,7 +151,6 @@ namespace Hanabi
 		pipeline->Bind();
 		material->Bind();
 
-		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(pipeline->GetSpecification().Topology));
 		m_DeviceContext->Draw(vertexCount, 0);
 	}
 }

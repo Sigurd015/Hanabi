@@ -15,7 +15,7 @@ namespace Hanabi
 {
 	static std::unordered_map<MonoType*, std::function<bool(Entity)>> s_EntityHasComponentFuncs;
 
-#define HNB_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Hanabi.InternalCalls::" #Name, Name)
+	#define HNB_ADD_INTERNAL_CALL(Name) mono_add_internal_call("Hanabi.InternalCalls::" #Name, Name)
 
 	namespace Utils
 	{
@@ -81,6 +81,20 @@ namespace Hanabi
 		Entity entity = GetEntity(entityID);
 
 		entity.GetComponent<TransformComponent>().Translation = *translation;
+	}
+
+	static void TransformComponent_GetRotation(UUID entityID, glm::vec3* outRotation)
+	{
+		Entity entity = GetEntity(entityID);
+
+		*outRotation = entity.GetComponent<TransformComponent>().Rotation;
+	}
+
+	static void TransformComponent_SetRotation(UUID entityID, glm::vec3* rotation)
+	{
+		Entity entity = GetEntity(entityID);
+
+		entity.GetComponent<TransformComponent>().Rotation = *rotation;
 	}
 
 	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
@@ -233,6 +247,8 @@ namespace Hanabi
 
 		HNB_ADD_INTERNAL_CALL(TransformComponent_GetTranslation);
 		HNB_ADD_INTERNAL_CALL(TransformComponent_SetTranslation);
+		HNB_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
+		HNB_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
 
 		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
 		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);

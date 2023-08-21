@@ -12,7 +12,7 @@ namespace Hanabi
 		Material,
 		Mesh,
 		MeshSource,
-		EnvMap
+		EnvMap,
 	};
 
 	namespace Utils
@@ -27,6 +27,7 @@ namespace Hanabi
 			case AssetType::Material: return "AssetType::Material";
 			case AssetType::Mesh: return "AssetType::Mesh";
 			case AssetType::MeshSource: return "AssetType::MeshSource";
+			case AssetType::EnvMap: return "AssetType::EnvMap";
 			}
 
 			return "AssetType::<Invalid>";
@@ -40,6 +41,7 @@ namespace Hanabi
 			if (assetType == "AssetType::Material") return AssetType::Material;
 			if (assetType == "AssetType::Mesh") return AssetType::Mesh;
 			if (assetType == "AssetType::MeshSource") return AssetType::MeshSource;
+			if (assetType == "AssetType::EnvMap") return AssetType::EnvMap;
 
 			return AssetType::None;
 		}

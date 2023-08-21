@@ -23,10 +23,6 @@ namespace Hanabi
 		Ref<Texture2D> GetSpecular();
 		Ref<Texture2D> GetNormal();
 
-		void ClearDiffuse();
-		void ClearSpecular();
-		void ClearNormal();
-
 		void SetDiffuse(AssetHandle handle);
 		void SetSpecular(AssetHandle handle);
 		void SetNormal(AssetHandle handle);
@@ -44,7 +40,6 @@ namespace Hanabi
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
 		void SetTexture(Ref<Texture2D> texture, uint32_t index);
-		void ClearTexture(uint32_t index);
 
 		Ref<Material> m_Material;
 

@@ -191,6 +191,25 @@ namespace Hanabi
 		return nullptr;
 	}
 
+	Ref<TextureCube> TextureCube::Create(const TextureSpecification& specification, Buffer data)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPIType::OpenGL:
+			return CreateRef<OpenGLTextureCube>(specification, data);
+
+			#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPIType::DX11:
+			return CreateRef<DX11TextureCube>(specification, data);
+			#endif
+		}
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
 	Ref<Framebuffer> Framebuffer::Create(const FramebufferSpecification& spec)
 	{
 		switch (RendererAPI::GetAPI())

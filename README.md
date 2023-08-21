@@ -72,7 +72,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
     - [ ] Point light shadows
     - [ ] Cascaded Shadow Maps
     - [ ] Omnidirectional Shadow Maps
-  - [ ] Skyboxes
+  - [x] Skyboxes
   - [ ] Physically based rendering (PBR)
   - [ ] Screen space ambient occulsion
   - [ ] Screen space reflection

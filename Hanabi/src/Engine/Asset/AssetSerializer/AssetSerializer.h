@@ -4,6 +4,7 @@
 #include "Engine/Renderer/MaterialAsset.h"
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Scene/Scene.h"
+#include "Engine/Renderer/EnvMapAsset.h"
 
 namespace Hanabi
 {
@@ -34,6 +35,19 @@ namespace Hanabi
 		static Ref<MeshSource> LoadMeshSource(const std::filesystem::path& path);
 	};
 
+	class EnvMapAssetSerializer : public AssetSerializer
+	{
+	public:
+		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override;
+		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
+
+		// Use for creating new env map assets
+		static void SerializeToYAML(const std::filesystem::path& path);
+	private:
+		static std::string SerializeToYAML(Ref<EnvMapAsset> envMapAsset);
+		static bool DeserializeFromYAML(const std::string& yamlString, Ref<EnvMapAsset>& targetEnvMapAsset);
+	};
+
 	class MaterialAssetSerializer : public AssetSerializer
 	{
 	public:
@@ -55,6 +69,7 @@ namespace Hanabi
 
 		// Reads file directly from filesystem
 		// (i.e. path has to be relative / absolute to working directory)
+		static Buffer LoadTextureData(const std::filesystem::path& path, ImageFormat& outFormat, uint32_t& outWidth, uint32_t& outHeight);
 		static Ref<Texture2D> LoadTexture2D(const std::filesystem::path& path);
 	};
 }

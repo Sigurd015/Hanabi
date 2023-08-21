@@ -14,10 +14,17 @@
                 InternalCalls.TransformComponent_GetTranslation(Entity.ID, out Vector3 translation);
                 return translation;
             }
-            set
+            set => InternalCalls.TransformComponent_SetTranslation(Entity.ID, ref value);
+        }
+
+        public Vector3 Rotation
+        {
+            get
             {
-                InternalCalls.TransformComponent_SetTranslation(Entity.ID, ref value);
+                InternalCalls.TransformComponent_GetRotation(Entity.ID, out Vector3 rotation);
+                return rotation;
             }
+            set => InternalCalls.TransformComponent_SetRotation(Entity.ID, ref value);
         }
     }
 
@@ -74,11 +81,7 @@
                 InternalCalls.TextComponent_GetColor(Entity.ID, out Vector4 color);
                 return color;
             }
-
-            set
-            {
-                InternalCalls.TextComponent_SetColor(Entity.ID, ref value);
-            }
+            set => InternalCalls.TextComponent_SetColor(Entity.ID, ref value);
         }
 
         public float Kerning

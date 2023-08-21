@@ -1,7 +1,7 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/RendererAPI.h"
-#include "Engine/Renderer/PipeLine.h"
+#include "Engine/Renderer/RenderPass.h"
 #include "Engine/Renderer/Shader.h"
 
 #include <d3d11.h>

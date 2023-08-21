@@ -58,6 +58,8 @@ namespace Hanabi
 
 	void OpenGLTexture2D::SetData(Buffer data)
 	{
+		m_Data = Buffer::Copy(data);
+
 		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
 		HNB_CORE_ASSERT(data.Size == m_Width * m_Height * bpp, "Data must be entire texture!");
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data.Data);
@@ -71,5 +73,19 @@ namespace Hanabi
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
 		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& specification, Buffer data) :m_Specification(specification),
+		m_Width(specification.Width), m_Height(specification.Height)
+	{}
+	OpenGLTextureCube::~OpenGLTextureCube()
+	{}
+	void OpenGLTextureCube::Bind(uint32_t slot) const
+	{}
+	void OpenGLTextureCube::SetData(Buffer data)
+	{}
+	bool OpenGLTextureCube::operator==(const Texture& other) const
+	{
+		return false;
 	}
 }

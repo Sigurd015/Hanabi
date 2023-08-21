@@ -13,7 +13,7 @@ namespace Hanabi
 
 	void EditorLayer::OnAttach()
 	{
-		m_ViewportFramebuffer = SceneRenderer::GetFinalRenderPass()->GetSpecification().TargetFramebuffer;
+		m_ViewportFramebuffer = SceneRenderer::GetFinalRenderPass()->GetTargetFramebuffer();
 
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;

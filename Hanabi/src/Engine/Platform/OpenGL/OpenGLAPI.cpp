@@ -74,17 +74,17 @@ namespace Hanabi
 
 	void OpenGLRendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
-		renderPass->GetSpecification().TargetFramebuffer->Bind();
+		renderPass->GetTargetFramebuffer()->Bind();
 		if (clear)
 		{
 			Clear();
-			renderPass->GetSpecification().TargetFramebuffer->ClearAttachment(m_ClearColor);
+			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
 		}
 	}
 
 	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
 	{
-		renderPass->GetSpecification().TargetFramebuffer->Unbind();
+		renderPass->GetTargetFramebuffer()->Unbind();
 	}
 
 	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)

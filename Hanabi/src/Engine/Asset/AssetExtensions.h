@@ -14,6 +14,7 @@ namespace Hanabi
 
 		// Materials
 		{ ".hmat", AssetType::Material },
+		{ ".henv", AssetType::EnvMap },
 
 		// MeshSource
 		{ ".fbx", AssetType::MeshSource },

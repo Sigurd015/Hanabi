@@ -16,6 +16,7 @@ namespace Hanabi
 		s_Serializers[AssetType::Material] = CreateScope<MaterialAssetSerializer>();
 		s_Serializers[AssetType::MeshSource] = CreateScope<MeshSourceSerializer>();
 		s_Serializers[AssetType::Scene] = CreateScope<SceneSerializer>();
+		s_Serializers[AssetType::EnvMap] = CreateScope<EnvMapAssetSerializer>();
 	}
 
 	void AssetImporter::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset)

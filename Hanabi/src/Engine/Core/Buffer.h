@@ -21,6 +21,25 @@ namespace Hanabi
 			: Data((uint8_t*)data), Size(size)
 		{}
 
+		Buffer(const std::vector<Buffer>& buffers)
+		{
+			uint64_t totalSize = 0;
+			for (const Buffer& buffer : buffers)
+			{
+				totalSize += buffer.Size;
+			}
+
+			Allocate(totalSize);
+
+			uint8_t* destination = Data;
+
+			for (const Buffer& buffer : buffers)
+			{
+				memcpy(destination, buffer.Data, buffer.Size);
+				destination += buffer.Size;
+			}
+		}
+
 		Buffer(const Buffer&) = default;
 
 		static Buffer Copy(Buffer other)

@@ -62,6 +62,15 @@ namespace Hanabi
 								MaterialAssetSerializer::SerializeToYAML(filepath);
 							}
 						}
+						if (ImGui::MenuItem("Create EnvMap"))
+						{
+							std::string filepath = FileDialogs::SaveFile("EnvMap (*.henv)\0*.henv\0");
+							if (!filepath.empty())
+							{
+								ImportAsset(filepath);
+								EnvMapAssetSerializer::SerializeToYAML(filepath);
+							}
+						}
 						ImGui::EndPopup();
 					}
 

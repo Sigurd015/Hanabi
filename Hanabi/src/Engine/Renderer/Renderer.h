@@ -30,7 +30,18 @@ namespace Hanabi
 
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);
-		static Ref<Texture2D> GetTexture(const std::string& name);
+
+		template<typename T>
+		static Ref<T> GetTexture(const std::string& name)
+		{
+			static_assert(std::is_base_of<Texture, T>::value, "Renderer::GetTexture only works for types derived from Texture");
+
+			Ref<Texture> texture = GetTextureInternal(name);
+			return std::static_pointer_cast<T>(texture);
+		}
+
 		static Ref<Shader> GetDefaultShader();
+	private:
+		static Ref<Texture> GetTextureInternal(const std::string& name);
 	};
 }

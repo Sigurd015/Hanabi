@@ -5,24 +5,15 @@
 
 namespace Hanabi
 {
-	MaterialAsset::MaterialAsset()
-	{
-		m_Material = CreateRef<Material>(Renderer::GetDefaultShader());
-		ClearDiffuse();
-		ClearSpecular();
-		ClearNormal();
-	}
+	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetDefaultShader()))
+	{}
 
 	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))
-	{
-		ClearDiffuse();
-		ClearSpecular();
-		ClearNormal();
-	}
+	{}
 
 	Ref<Texture2D> MaterialAsset::GetDiffuse()
 	{
-		return m_Material->GetTexture(static_cast<uint32_t>(TextureType::Diffuse));
+		return m_Material->GetTexture<Texture2D>(static_cast<uint32_t>(TextureType::Diffuse));
 	}
 
 	void MaterialAsset::SetDiffuse(AssetHandle handle)
@@ -32,15 +23,9 @@ namespace Hanabi
 		SetTexture(texture, static_cast<uint32_t>(TextureType::Diffuse));
 	}
 
-	void MaterialAsset::ClearDiffuse()
-	{
-		m_DiffuseTexture = 0;
-		ClearTexture(static_cast<uint32_t>(TextureType::Diffuse));
-	}
-
 	Ref<Texture2D> MaterialAsset::GetSpecular()
 	{
-		return m_Material->GetTexture(static_cast<uint32_t>(TextureType::Specular));
+		return m_Material->GetTexture<Texture2D>(static_cast<uint32_t>(TextureType::Specular));
 	}
 
 	void MaterialAsset::SetSpecular(AssetHandle handle)
@@ -50,15 +35,9 @@ namespace Hanabi
 		SetTexture(texture, static_cast<uint32_t>(TextureType::Specular));
 	}
 
-	void MaterialAsset::ClearSpecular()
-	{
-		m_SpecularTexture = 0;
-		ClearTexture(static_cast<uint32_t>(TextureType::Specular));
-	}
-
 	Ref<Texture2D> MaterialAsset::GetNormal()
 	{
-		return m_Material->GetTexture(static_cast<uint32_t>(TextureType::Normal));
+		return m_Material->GetTexture<Texture2D>(static_cast<uint32_t>(TextureType::Normal));
 	}
 
 	void MaterialAsset::SetNormal(AssetHandle handle)
@@ -68,19 +47,8 @@ namespace Hanabi
 		SetTexture(texture, static_cast<uint32_t>(TextureType::Normal));
 	}
 
-	void MaterialAsset::ClearNormal()
-	{
-		m_NormalTexture = 0;
-		ClearTexture(static_cast<uint32_t>(TextureType::Normal));
-	}
-
 	void MaterialAsset::SetTexture(Ref<Texture2D> texture, uint32_t index)
 	{
-		m_Material->SetTexture(texture, index);
-	}
-
-	void MaterialAsset::ClearTexture(uint32_t index)
-	{
-		m_Material->SetTexture(Renderer::GetTexture("White"), index);
+		m_Material->SetTexture<Texture2D>(texture, index);
 	}
 }

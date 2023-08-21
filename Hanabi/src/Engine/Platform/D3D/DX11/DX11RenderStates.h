@@ -14,6 +14,7 @@ namespace Hanabi
 	public:
 		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSNoDepthTest = nullptr;
 		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSLess = nullptr;
+		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSLessEqual = nullptr;
 
 		inline static Microsoft::WRL::ComPtr <ID3D11RasterizerState> RSNoCull = nullptr;
 		inline static Microsoft::WRL::ComPtr <ID3D11RasterizerState> RSCullBack = nullptr;
@@ -39,9 +40,17 @@ namespace Hanabi
 			{
 				D3D11_DEPTH_STENCIL_DESC depthTestingDesc = {};
 				depthTestingDesc.DepthEnable = true;
-				depthTestingDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+				depthTestingDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 				depthTestingDesc.DepthFunc = D3D11_COMPARISON_LESS;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateDepthStencilState(&depthTestingDesc, DSSLess.GetAddressOf()));
+			}
+			{
+				D3D11_DEPTH_STENCIL_DESC depthTestingDesc = {};
+				depthTestingDesc.DepthEnable = true;
+				depthTestingDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+				depthTestingDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+				depthTestingDesc.StencilEnable = false;
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateDepthStencilState(&depthTestingDesc, DSSLessEqual.GetAddressOf()));
 			}
 
 			// Rasterizer States

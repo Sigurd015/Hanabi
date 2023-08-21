@@ -19,7 +19,7 @@ namespace Hanabi
 		return false;
 	}
 
-	Ref<Texture2D> TextureSerializer::LoadTexture2D(const std::filesystem::path& path)
+	Buffer TextureSerializer::LoadTextureData(const std::filesystem::path& path, ImageFormat& outFormat, uint32_t& outWidth, uint32_t& outHeight)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
@@ -30,26 +30,38 @@ namespace Hanabi
 		if (data.Data == nullptr)
 		{
 			HNB_CORE_ERROR("TextureSerializer::LoadTexture2D - Could not load texture from filepath: {}", path.string());
-			return nullptr;
+			return 0;
 		}
 
 		data.Size = width * height * channels;
 
-		TextureSpecification spec;
-		spec.Width = width;
-		spec.Height = height;
+		outWidth = width;
+		outHeight = height;
 		switch (channels)
 		{
 		case 3:
-			spec.Format = ImageFormat::RGB8;
+			outFormat = ImageFormat::RGB8;
 			break;
 		case 4:
-			spec.Format = ImageFormat::RGBA8;
+			outFormat = ImageFormat::RGBA8;
 			break;
 		}
 
-		Ref<Texture2D> texture = Texture2D::Create(spec, data);
-		data.Release();
-		return texture;
+		return data;
+	}
+
+	Ref<Texture2D> TextureSerializer::LoadTexture2D(const std::filesystem::path& path)
+	{
+		TextureSpecification spec;
+		Buffer data = LoadTextureData(path, spec.Format, spec.Width, spec.Height);
+
+		if (data)
+		{
+			Ref<Texture2D> texture = Texture2D::Create(spec, data);
+			data.Release();
+			return texture;
+		}
+
+		return nullptr;
 	}
 }

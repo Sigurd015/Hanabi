@@ -2,9 +2,15 @@ AssetRegistry:
   - Handle: 1312796883771253977
     FilePath: Textures/wall-10-brick/wall-10-brick-DIFFUSE.jpg
     Type: AssetType::Texture2D
+  - Handle: 1632207768508466527
+    FilePath: Textures/universe-skybox/bottom.png
+    Type: AssetType::Texture2D
   - Handle: 1661060954224083329
     FilePath: Materials/mat1.hmat
     Type: AssetType::Material
+  - Handle: 2135390756550958898
+    FilePath: Textures/universe-skybox/front.png
+    Type: AssetType::Texture2D
   - Handle: 3301359757521532587
     FilePath: Textures/wall-10-brick/wall-10-brick-NORM.jpg
     Type: AssetType::Texture2D
@@ -23,6 +29,9 @@ AssetRegistry:
   - Handle: 5775838104344894305
     FilePath: Scenes/3DLightingExample.hscene
     Type: AssetType::Scene
+  - Handle: 7061154424694109801
+    FilePath: Textures/universe-skybox/left.png
+    Type: AssetType::Texture2D
   - Handle: 8012010214947151524
     FilePath: Scenes/2DExample.hscene
     Type: AssetType::Scene
@@ -32,9 +41,15 @@ AssetRegistry:
   - Handle: 9328707022816709312
     FilePath: Textures/wall-10-brick/wall-10-brick-DISP.jpg
     Type: AssetType::Texture2D
+  - Handle: 9644760195236910386
+    FilePath: Textures/universe-skybox/top.png
+    Type: AssetType::Texture2D
   - Handle: 12104991068264146629
     FilePath: Models/Sphere.fbx
     Type: AssetType::MeshSource
+  - Handle: 13655973308143711059
+    FilePath: Textures/universe-skybox/back.png
+    Type: AssetType::Texture2D
   - Handle: 14535960835168578140
     FilePath: Models/Box.fbx
     Type: AssetType::MeshSource
@@ -47,3 +62,9 @@ AssetRegistry:
   - Handle: 17058150480603569601
     FilePath: Models/Cylinder.fbx
     Type: AssetType::MeshSource
+  - Handle: 17746566452886661726
+    FilePath: Materials/universeSkybox.henv
+    Type: AssetType::EnvMap
+  - Handle: 18104625788437832565
+    FilePath: Textures/universe-skybox/right.png
+    Type: AssetType::Texture2D

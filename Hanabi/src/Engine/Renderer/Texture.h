@@ -38,7 +38,9 @@ namespace Hanabi
 	public:
 		static Ref<Texture2D> Create(const TextureSpecification& specification, Buffer data = Buffer());
 
-		virtual TextureType GetType() const override { return TextureType::TextureCube; }
+		virtual Buffer GetWriteableBuffer() = 0;
+
+		virtual TextureType GetType() const override { return TextureType::Texture2D; }
 
 		static AssetType GetStaticType() { return AssetType::Texture2D; }
 		virtual AssetType GetAssetType() const { return GetStaticType(); }

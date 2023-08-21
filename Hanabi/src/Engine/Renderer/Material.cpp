@@ -13,9 +13,9 @@ namespace Hanabi
 	{
 		Ref<Material> material = CreateRef<Material>(other->GetShader());
 
-		for (auto& texture : other->m_Textures)
+		for (size_t i = 0; i < MAX_TEXTURES; i++)
 		{
-			material->m_Textures[texture.first] = texture.second;
+			material->m_Textures[i] = other->m_Textures[i];
 		}
 		return material;
 	}
@@ -25,12 +25,15 @@ namespace Hanabi
 		m_Shader = shader;
 	}
 
-	Material::~Material()
-	{}
-
-	void Material::SetTexture(const Ref<Texture2D>& texture, uint32_t index)
+	void Material::SetTextureInternal(const Ref<Texture>& texture, uint32_t index)
 	{
 		m_Textures[index] = texture;
+	}
+
+	Ref<Texture> Material::GetTextureInternal(uint32_t index)
+	{
+		HNB_CORE_ASSERT(index < MAX_TEXTURES, "Material::GetTextureInternal: index out of range!");
+		return m_Textures[index];
 	}
 
 	void Material::Bind() const
@@ -42,18 +45,12 @@ namespace Hanabi
 
 	void Material::BindTextures() const
 	{
-		for (auto& texture : m_Textures)
+		for (size_t i = 0; i < MAX_TEXTURES; i++)
 		{
-			if (texture.second)
-				texture.second->Bind(texture.first);
+			if (m_Textures[i])
+				m_Textures[i]->Bind(i);
+			else
+				Renderer::GetTexture<Texture2D>("White")->Bind(i);
 		}
-	}
-
-	Ref<Texture2D> Material::GetTexture(uint32_t index)
-	{
-		if (m_Textures.find(index) != m_Textures.end())
-			return m_Textures[index];
-
-		return nullptr;
 	}
 }
