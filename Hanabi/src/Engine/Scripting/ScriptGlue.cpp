@@ -7,7 +7,7 @@
 #include "Engine/Scene/Scene.h"
 #include "Engine/Scene/Entity.h"
 
-#include <box2d/b2_body.h>
+#include <Physix2D.h>
 #include <mono/metadata/reflection.h>
 #include <mono/metadata/object.h>
 
@@ -97,22 +97,13 @@ namespace Hanabi
 		entity.GetComponent<TransformComponent>().Rotation = *rotation;
 	}
 
-	static void Rigidbody2DComponent_ApplyLinearImpulse(UUID entityID, glm::vec2* impulse, glm::vec2* point, bool wake)
+	static void Rigidbody2DComponent_Move(UUID entityID, glm::vec2* amount)
 	{
 		Entity entity = GetEntity(entityID);
 
 		auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		body->ApplyLinearImpulse(b2Vec2(impulse->x, impulse->y), b2Vec2(point->x, point->y), wake);
-	}
-
-	static void Rigidbody2DComponent_ApplyLinearImpulseToCenter(UUID entityID, glm::vec2* impulse, bool wake)
-	{
-		Entity entity = GetEntity(entityID);
-
-		auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
-		b2Body* body = (b2Body*)rb2d.RuntimeBody;
-		body->ApplyLinearImpulseToCenter(b2Vec2(impulse->x, impulse->y), wake);
+		Physix2D::Rigidbody2D* body = (Physix2D::Rigidbody2D*)rb2d.RuntimeBody;
+		body->Move({ amount->x,amount->y });
 	}
 
 	static void SpriteRendererComponent_SetTextureCoords(UUID entityID, glm::vec2* start, glm::vec2* end)
@@ -250,8 +241,7 @@ namespace Hanabi
 		HNB_ADD_INTERNAL_CALL(TransformComponent_GetRotation);
 		HNB_ADD_INTERNAL_CALL(TransformComponent_SetRotation);
 
-		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulse);
-		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_ApplyLinearImpulseToCenter);
+		HNB_ADD_INTERNAL_CALL(Rigidbody2DComponent_Move);
 
 		HNB_ADD_INTERNAL_CALL(SpriteRendererComponent_SetTextureCoords);
 

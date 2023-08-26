@@ -7,7 +7,11 @@
 
 #include <entt.hpp>
 
-class b2World;
+namespace Physix2D
+{
+	class PhysicsWorld2D;
+}
+
 namespace Hanabi
 {
 	class Entity;
@@ -57,7 +61,7 @@ namespace Hanabi
 
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
-		b2World* m_PhysicsWorld = nullptr;
+		Physix2D::PhysicsWorld2D* m_PhysicsWorld = nullptr;
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;

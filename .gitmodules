@@ -26,3 +26,7 @@
 	path = Hanabi/vendor/msdf_atlas_gen
 	url = https://github.com/Sigurd015/msdf-atlas-gen
 	branch = stable
+[submodule "Hanabi/vendor/Physix2D"]
+	path = Hanabi/vendor/Physix2D
+	url = https://github.com/Sigurd015/Physix2D
+	branch = main

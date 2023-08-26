@@ -26,6 +26,7 @@ group "Dependencies"
 	include "Hanabi/vendor/Box2D"
 	include "Hanabi/vendor/yaml_cpp"
 	include "Hanabi/vendor/msdf_atlas_gen"
+	include "Hanabi/vendor/Physix2D/Physix2D"
 group ""
 
 group "Core"

@@ -45,7 +45,7 @@ namespace Sandbox
 
             velocity *= Speed * ts;
 
-            m_Rigidbody.ApplyLinearImpulse(velocity.XY, true);
+            m_Rigidbody.Move(velocity.XY);
         }
     }
 }

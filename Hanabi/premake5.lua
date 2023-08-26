@@ -46,7 +46,8 @@ project "Hanabi"
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.msdf_atlas_gen}",
-		"%{IncludeDir.assimp}"
+		"%{IncludeDir.assimp}",
+		"%{IncludeDir.Physix2D}"
 	}
 
 	links 
@@ -57,7 +58,8 @@ project "Hanabi"
 		"yaml_cpp",
 		"Box2D",
 		"opengl32.lib",
-		"msdf_atlas_gen"
+		"msdf_atlas_gen",
+		"Physix2D"
 	}
 
 	defines

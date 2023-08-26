@@ -6,13 +6,6 @@
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Physics/Physics2D.h"
 
-// Box2D
-#include <box2d/b2_world.h>
-#include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_polygon_shape.h>
-#include <box2d/b2_circle_shape.h>
-
 namespace Hanabi
 {
 	static glm::vec4 s_EditorClearColor = { 0.3f, 0.3f, 0.3f, 1.0f };
@@ -190,9 +183,8 @@ namespace Hanabi
 
 			// Update Physics
 			{
-				const int32_t velocityIterations = 6;
-				const int32_t positionIterations = 2;
-				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+				const int32_t iterations = 10;
+				m_PhysicsWorld->Step(ts, iterations);
 
 				// Retrieve transform from Box2D
 				auto view = m_Registry.view<Rigidbody2DComponent>();
@@ -202,7 +194,7 @@ namespace Hanabi
 					auto& transform = entity.GetComponent<TransformComponent>();
 					auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
-					b2Body* body = (b2Body*)rb2d.RuntimeBody;
+					Physix2D::Rigidbody2D* body = (Physix2D::Rigidbody2D*)rb2d.RuntimeBody;
 					const auto& position = body->GetPosition();
 					transform.Translation.x = position.x;
 					transform.Translation.y = position.y;
@@ -413,7 +405,9 @@ namespace Hanabi
 
 	void Scene::OnPhysics2DStart()
 	{
-		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+		Physix2D::PhysicsWorld2DSpecification spec;
+		spec.Gravity = { 0.0f, -9.8f };
+		m_PhysicsWorld = new Physix2D::PhysicsWorld2D(spec);
 
 		auto view = m_Registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
@@ -422,47 +416,48 @@ namespace Hanabi
 			auto& transform = entity.GetComponent<TransformComponent>();
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
-			b2BodyDef bodyDef;
-			bodyDef.type = bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
-			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
-			bodyDef.angle = transform.Rotation.z;
+			Physix2D::Rigidbody2DSpecification rb2dSpec;
+			rb2dSpec.Type = Utils::Rigidbody2DTypeToPhysix2DBody(rb2d.Type);
+			rb2dSpec.Position = { transform.Translation.x, transform.Translation.y };
+			rb2dSpec.Angle = transform.Rotation.z;
+			rb2dSpec.FixedRotation = rb2d.FixedRotation;
+			rb2dSpec.GravityScale = rb2d.GravityScale;
 
-			b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-			body->SetFixedRotation(rb2d.FixedRotation);
-			body->SetGravityScale(rb2d.GravityScale);
+			Physix2D::Rigidbody2D* body = m_PhysicsWorld->CreateBody(rb2dSpec);
 			rb2d.RuntimeBody = body;
 
 			if (entity.HasComponent<BoxCollider2DComponent>())
 			{
 				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
 
-				b2PolygonShape boxShape;
-				boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y, b2Vec2(bc2d.Offset.x, bc2d.Offset.y), 0.0f);
+				Physix2D::BoxCollider boxCollider;
+				boxCollider.Size = { bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y };
+				boxCollider.Offset = { bc2d.Offset.x, bc2d.Offset.y };
 
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &boxShape;
-				fixtureDef.density = bc2d.Density;
-				fixtureDef.friction = bc2d.Friction;
-				fixtureDef.restitution = bc2d.Restitution;
-				fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-				body->CreateFixture(&fixtureDef);
+				Physix2D::ShapeSpecification shapeSpec;
+				shapeSpec.Collider = &boxCollider;
+				shapeSpec.Density = bc2d.Density;
+				shapeSpec.Friction = bc2d.Friction;
+				shapeSpec.Restitution = bc2d.Restitution;
+				shapeSpec.RestitutionThreshold = bc2d.RestitutionThreshold;
+				body->CreateShape(shapeSpec);
 			}
 
 			if (entity.HasComponent<CircleCollider2DComponent>())
 			{
 				auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
 
-				b2CircleShape circleShape;
-				circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
-				circleShape.m_radius = transform.Scale.x * cc2d.Radius;
+				Physix2D::CircleCollider circleCollider;
+				circleCollider.Radius = cc2d.Radius * transform.Scale.x;
+				circleCollider.Offset = { cc2d.Offset.x, cc2d.Offset.y };
 
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &circleShape;
-				fixtureDef.density = cc2d.Density;
-				fixtureDef.friction = cc2d.Friction;
-				fixtureDef.restitution = cc2d.Restitution;
-				fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-				body->CreateFixture(&fixtureDef);
+				Physix2D::ShapeSpecification shapeSpec;
+				shapeSpec.Collider = &circleCollider;
+				shapeSpec.Density = cc2d.Density;
+				shapeSpec.Friction = cc2d.Friction;
+				shapeSpec.Restitution = cc2d.Restitution;
+				shapeSpec.RestitutionThreshold = cc2d.RestitutionThreshold;
+				body->CreateShape(shapeSpec);
 			}
 		}
 	}
