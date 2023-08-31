@@ -47,23 +47,5 @@ namespace Hanabi
 	void DX11Pipeline::Bind()
 	{
 		DX11Context::GetDeviceContext()->IASetInputLayout(m_InputLayout.Get());
-		if (m_ConstantBuffers.size())
-		{
-			for (auto& constantBuffer : m_ConstantBuffers)
-			{
-				constantBuffer->Bind();
-			}
-		}
-	}
-
-	void DX11Pipeline::SetConstantBuffer(const Ref<ConstantBuffer>& constantBuffer)
-	{
-		m_ConstantBuffers.push_back(constantBuffer);
-	}
-
-	Ref<ConstantBuffer> DX11Pipeline::GetConstantBuffer(uint32_t bindingID)
-	{
-		HNB_CORE_ASSERT(bindingID < m_ConstantBuffers.size(), "Binding ID is out of range!");
-		return m_ConstantBuffers[bindingID];
 	}
 }

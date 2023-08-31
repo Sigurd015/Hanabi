@@ -19,6 +19,9 @@ namespace Hanabi
 		void ClearAttachment(const glm::vec4& color) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
+		virtual uint32_t GetWidth() const override { return m_Specification.Width; }
+		virtual uint32_t GetHeight() const override { return m_Specification.Height; }
+
 		void* GetColorAttachment(uint32_t attachmentIndex = 0) const override;
 		void* GetDepthAttachment() const override;
 

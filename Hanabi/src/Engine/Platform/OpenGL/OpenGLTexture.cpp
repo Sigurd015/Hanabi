@@ -75,8 +75,10 @@ namespace Hanabi
 		glBindTextureUnit(slot, m_RendererID);
 	}
 
-	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& specification, Buffer data) :m_Specification(specification),
+	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers) :m_Specification(specification),
 		m_Width(specification.Width), m_Height(specification.Height)
+	{}
+	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification & specification, Buffer data)
 	{}
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{}

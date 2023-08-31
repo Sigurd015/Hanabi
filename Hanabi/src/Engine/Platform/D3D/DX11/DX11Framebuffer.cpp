@@ -258,20 +258,8 @@ namespace Hanabi
 			return;
 		}
 
-		if (width == m_Specification.Width && height == m_Specification.Height)
-			return;
-
 		m_Specification.Width = width;
 		m_Specification.Height = height;
-
-		D3D11_VIEWPORT viewPort{};
-		viewPort.Width = width;
-		viewPort.Height = height;
-		viewPort.MinDepth = 0;
-		viewPort.MaxDepth = 1.0f;
-		viewPort.TopLeftX = 0;
-		viewPort.TopLeftY = 0;
-		DX11Context::GetDeviceContext()->RSSetViewports(1, &viewPort);
 
 		Invalidate();
 	}

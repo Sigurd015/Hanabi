@@ -28,6 +28,8 @@ namespace Hanabi
 		void SetBuffer(uint32_t width, uint32_t height, uint32_t x = 0, uint32_t y = 0);
 		void Clear();
 
+		uint32_t m_Width = 0, m_Height = 0;
+
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
 		Microsoft::WRL::ComPtr<ID3D11Device> m_Device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DeviceContext;

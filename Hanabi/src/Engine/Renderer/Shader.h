@@ -6,6 +6,8 @@
 
 namespace Hanabi
 {
+	using ShaderReflectionData = std::unordered_map<std::string, uint32_t>;
+
 	class Shader
 	{
 	public:
@@ -13,7 +15,14 @@ namespace Hanabi
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 		virtual const std::string& GetName() const = 0;
+		virtual const ShaderReflectionData& GetReflectionData() const = 0;
+
 		static Ref<Shader> Create(const std::string& fileName);
+
+		static constexpr const char* GetShaderDirectoryPath()
+		{
+			return "resources/shaders/";
+		}
 	};
 
 	//TODO:This should be handled by the Asset Manager

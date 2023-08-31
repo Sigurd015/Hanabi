@@ -70,12 +70,6 @@ namespace Hanabi
 		else
 			return;
 
-		std::vector<Buffer> vectorData(m_TextureData.begin(), m_TextureData.end());
-
-		Buffer buffer = Buffer(vectorData);
-
-		m_EnvMap = TextureCube::Create(spec, buffer);
-
-		buffer.Release();
+		m_EnvMap = TextureCube::Create(spec, m_TextureData);
 	}
 }

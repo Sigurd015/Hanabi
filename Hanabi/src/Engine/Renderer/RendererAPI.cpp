@@ -31,6 +31,7 @@
 #include "Engine/Platform/D3D/DX11/DX11Pipeline.h"
 #include "Engine/Platform/D3D/DX11/DX11Framebuffer.h"
 #include "Engine/Platform/D3D/DX11/DX11ConstantBuffer.h"
+#include "Engine/Platform/D3D/DX11/DX11RenderPass.h"
 #endif
 
 namespace Hanabi
@@ -39,7 +40,23 @@ namespace Hanabi
 
 	Ref<RenderPass> RenderPass::Create(const RenderPassSpecification& spec)
 	{
-		return CreateRef<RenderPass>(spec);
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPIType::OpenGL:
+			HNB_CORE_ASSERT(false, "OpenGL RenderPass is currently not implemented!");
+			return nullptr;
+
+			#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPIType::DX11:
+			return CreateScope<DX11RenderPass>(spec);
+			#endif
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
 	}
 
 	Scope<RendererAPI> RendererAPI::Create()
@@ -191,6 +208,25 @@ namespace Hanabi
 		return nullptr;
 	}
 
+	Ref<TextureCube> TextureCube::Create(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPIType::OpenGL:
+			return CreateRef<OpenGLTextureCube>(specification, buffers);
+
+			#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPIType::DX11:
+			return CreateRef<DX11TextureCube>(specification, buffers);
+			#endif
+		}
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
 	Ref<TextureCube> TextureCube::Create(const TextureSpecification& specification, Buffer data)
 	{
 		switch (RendererAPI::GetAPI())
@@ -230,7 +266,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<ConstantBuffer> ConstantBuffer::Create(uint32_t size, uint32_t binding)
+	Ref<ConstantBuffer> ConstantBuffer::Create(uint32_t size)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -238,11 +274,11 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLUniformBuffer>(size, binding);
+			return CreateRef<OpenGLUniformBuffer>(size);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateRef<DX11ConstantBuffer>(size, binding);
+			return CreateRef<DX11ConstantBuffer>(size);
 			#endif
 		}
 

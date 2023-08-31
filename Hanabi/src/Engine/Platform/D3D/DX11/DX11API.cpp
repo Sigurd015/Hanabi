@@ -73,6 +73,9 @@ namespace Hanabi
 		viewPort.TopLeftX = x;
 		viewPort.TopLeftY = y;
 		m_DeviceContext->RSSetViewports(1, &viewPort);
+
+		m_Width = width;
+		m_Height = height;
 	}
 
 	void DX11RendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -116,6 +119,27 @@ namespace Hanabi
 			m_DeviceContext->RSSetState(DX11RenderStates::RSCullBack.Get());
 		else
 			m_DeviceContext->RSSetState(DX11RenderStates::RSNoCull.Get());
+
+		D3D11_VIEWPORT viewPort{};
+		viewPort.MinDepth = 0;
+		viewPort.MaxDepth = 1.0f;
+		viewPort.TopLeftX = 0;
+		viewPort.TopLeftY = 0;
+
+		if (spec.TargetFramebuffer->GetSpecification().SwapChainTarget)
+		{
+			viewPort.Width = m_Width;
+			viewPort.Height = m_Height;
+		}
+		else
+		{
+			viewPort.Width = spec.TargetFramebuffer->GetWidth();
+			viewPort.Height = spec.TargetFramebuffer->GetHeight();
+		}
+
+		m_DeviceContext->RSSetViewports(1, &viewPort);
+
+		renderPass->BindInputs();
 	}
 
 	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)

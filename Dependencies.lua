@@ -29,7 +29,8 @@ Library["assimp_Release"] = "%{LibraryDir.assimp_Release}/assimp-vc143-mt.lib"
 
 -- Windows
 Library["DX11"] = "d3d11.lib"
-Library["DXC"] = "D3DCompiler.lib"
+Library["DXC"] = "d3dCompiler.lib"
+Library["DXGuid"] = "dxguid.lib"
 Library["WinSock"] = "Ws2_32.lib"
 Library["WinMM"] = "Winmm.lib"
 Library["WinVersion"] = "Version.lib"

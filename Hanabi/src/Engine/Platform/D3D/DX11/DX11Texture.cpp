@@ -159,10 +159,29 @@ namespace Hanabi
 		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureSRV.GetAddressOf());
 	}
 
+	DX11TextureCube::DX11TextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers) :m_Specification(specification),
+		m_Width(specification.Width), m_Height(specification.Height)
+	{
+		m_DataFormat = Utils::ImageFormatToDXDataFormat(specification.Format);
+
+		D3D11_SUBRESOURCE_DATA subresourceData[6] = {};
+		for (size_t i = 0; i < 6; i++)
+		{
+			subresourceData[i].pSysMem = buffers[i].Data;
+			subresourceData[i].SysMemPitch = m_Width * 4;  // size of one row in bytes
+		}
+
+		Utils::CreateTexture(D3D11_USAGE_DEFAULT, 0, D3D11_RESOURCE_MISC_TEXTURECUBE, m_Width, m_Height, m_DataFormat, subresourceData, m_Texture.GetAddressOf());
+		Utils::CreateSRV(m_DataFormat, D3D11_SRV_DIMENSION_TEXTURECUBE, m_Texture.Get(), m_TextureSRV.GetAddressOf());
+
+		m_SamplerState = Utils::GetSamplerState(specification.SamplerFilter, specification.SamplerWrap);
+	}
+
 	DX11TextureCube::DX11TextureCube(const TextureSpecification& specification, Buffer data) :m_Specification(specification),
 		m_Width(specification.Width), m_Height(specification.Height)
 	{
 		m_DataFormat = Utils::ImageFormatToDXDataFormat(specification.Format);
+		//TODO: Create TextureCube with null data, and set data later
 		if (!data.Size)
 		{
 			Utils::CreateTexture(D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE, D3D11_RESOURCE_MISC_TEXTURECUBE, m_Width, m_Height, m_DataFormat, nullptr, m_Texture.GetAddressOf());

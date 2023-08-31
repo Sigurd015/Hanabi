@@ -29,6 +29,7 @@ namespace Hanabi
 	class OpenGLTextureCube : public TextureCube
 	{
 	public:
+		OpenGLTextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers);
 		OpenGLTextureCube(const TextureSpecification& specification, Buffer data = Buffer());
 		~OpenGLTextureCube();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
