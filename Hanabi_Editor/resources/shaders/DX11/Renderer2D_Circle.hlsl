@@ -23,7 +23,7 @@ struct VertexOutput
     int EntityID : EID;
 };
 
-cbuffer Camera : register(b0)
+cbuffer CBCamera : register(b0)
 {
     float4x4 u_ViewProjection;
 };

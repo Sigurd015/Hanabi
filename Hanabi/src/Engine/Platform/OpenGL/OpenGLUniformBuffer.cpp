@@ -5,7 +5,7 @@
 
 namespace Hanabi
 {
-	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size, uint32_t binding) :m_BindingID(binding), m_DataSize(size)
+	OpenGLUniformBuffer::OpenGLUniformBuffer(uint32_t size) :m_DataSize(size)
 	{
 		glCreateBuffers(1, &m_RendererID);
 		glNamedBufferData(m_RendererID, m_DataSize, nullptr, GL_DYNAMIC_DRAW); // TODO: investigate usage hint
@@ -16,9 +16,9 @@ namespace Hanabi
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
-	void OpenGLUniformBuffer::Bind() const
+	void OpenGLUniformBuffer::Bind(uint32_t binding) const
 	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, m_BindingID, m_RendererID);
+		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
 	}
 
 	void OpenGLUniformBuffer::SetData(const void* data, uint32_t offset)

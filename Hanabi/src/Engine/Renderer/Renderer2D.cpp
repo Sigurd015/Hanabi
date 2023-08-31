@@ -7,6 +7,7 @@
 #include "ConstantBuffer.h"
 #include "UI/MSDFData.h"
 #include "Engine/Asset/AssetManager/AssetManager.h"
+#include "RenderPass.h"
 
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -65,7 +66,7 @@ namespace Hanabi
 		static const uint32_t MaxIndices = MaxQuads * 6;
 		static const uint32_t MaxTextureSlots = 32;
 
-		Ref<Pipeline> QuadPipeline;
+		Ref<RenderPass> QuadRenderPass;
 		Ref<VertexBuffer> QuadVertexBuffer;
 		Ref<IndexBuffer> QuadIndexBuffer;
 		Ref<Material> QuadMaterial;
@@ -73,14 +74,14 @@ namespace Hanabi
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
-		Ref<Pipeline> CirclePipeline;
+		Ref<RenderPass> CircleRenderPass;
 		Ref<VertexBuffer> CircleVertexBuffer;
 		Ref<Material> CircleMaterial;
 		uint32_t CircleIndexCount = 0;
 		CircleVertex* CircleVertexBufferBase = nullptr;
 		CircleVertex* CircleVertexBufferPtr = nullptr;
 
-		Ref<Pipeline> LinePipeline;
+		Ref<RenderPass> LineRenderPass;
 		Ref<VertexBuffer> LineVertexBuffer;
 		Ref<Material> LineMaterial;
 		uint32_t LineVertexCount = 0;
@@ -88,7 +89,7 @@ namespace Hanabi
 		LineVertex* LineVertexBufferPtr = nullptr;
 		float LineWidth = 2.0f;
 
-		Ref<Pipeline> TextPipeline;
+		Ref<RenderPass> TextRenderPass;
 		Ref<VertexBuffer> TextVertexBuffer;
 		Ref<Material> TextMaterial;
 		uint32_t TextIndexCount = 0;
@@ -118,8 +119,6 @@ namespace Hanabi
 		CameraData SceneBuffer;
 		Ref<ConstantBuffer> CameraConstantBuffer;
 		Renderer2D::Statistics RendererStats;
-
-		Ref<RenderPass> TatgetRenderPass;
 	};
 	static Renderer2DData* s_Data;
 
@@ -159,9 +158,15 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Quad");
+			pipelineSpec.DepthTest = true;
+			pipelineSpec.BackfaceCulling = true;
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
+			pipelineSpec.DepthOperator = DepthCompareOperator::Less;
 
-			s_Data->QuadPipeline = Pipeline::Create(pipelineSpec);
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+
+			s_Data->QuadRenderPass = RenderPass::Create(renderPassSpec);
 			s_Data->QuadMaterial = Material::Create(pipelineSpec.Shader);
 
 			s_Data->QuadVertexBufferBase = new QuadVertex[s_Data->MaxVertices];
@@ -183,9 +188,15 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Circle");
+			pipelineSpec.DepthTest = true;
+			pipelineSpec.BackfaceCulling = true;
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
+			pipelineSpec.DepthOperator = DepthCompareOperator::Less;
 
-			s_Data->CirclePipeline = Pipeline::Create(pipelineSpec);
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+
+			s_Data->CircleRenderPass = RenderPass::Create(renderPassSpec);
 			s_Data->CircleMaterial = Material::Create(pipelineSpec.Shader);
 
 			s_Data->CircleVertexBufferBase = new CircleVertex[s_Data->MaxVertices];
@@ -204,9 +215,15 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Line");
+			pipelineSpec.DepthTest = true;
+			pipelineSpec.BackfaceCulling = true;
 			pipelineSpec.Topology = PrimitiveTopology::Lines;
+			pipelineSpec.DepthOperator = DepthCompareOperator::Less;
 
-			s_Data->LinePipeline = Pipeline::Create(pipelineSpec);
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+
+			s_Data->LineRenderPass = RenderPass::Create(renderPassSpec);
 			s_Data->LineMaterial = Material::Create(pipelineSpec.Shader);
 
 			s_Data->LineVertexBufferBase = new LineVertex[s_Data->MaxVertices];
@@ -226,9 +243,15 @@ namespace Hanabi
 			PipelineSpecification pipelineSpec;
 			pipelineSpec.Layout = layout;
 			pipelineSpec.Shader = Renderer::GetShader("Renderer2D_Text");
+			pipelineSpec.DepthTest = true;
+			pipelineSpec.BackfaceCulling = true;
 			pipelineSpec.Topology = PrimitiveTopology::Triangles;
+			pipelineSpec.DepthOperator = DepthCompareOperator::Less;
 
-			s_Data->TextPipeline = Pipeline::Create(pipelineSpec);
+			RenderPassSpecification renderPassSpec;
+			renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+
+			s_Data->TextRenderPass = RenderPass::Create(renderPassSpec);
 			s_Data->TextMaterial = Material::Create(pipelineSpec.Shader);
 
 			s_Data->TextVertexBufferBase = new TextVertex[s_Data->MaxVertices];
@@ -238,12 +261,12 @@ namespace Hanabi
 		s_Data->WhiteTexture = Renderer::GetTexture<Texture2D>("White");
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
-		s_Data->CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData), 0);
+		s_Data->CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData));
 
-		s_Data->QuadPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-		s_Data->CirclePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-		s_Data->LinePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-		s_Data->TextPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
+		s_Data->QuadRenderPass->SetInput("CBCamera", s_Data->CameraConstantBuffer);
+		s_Data->CircleRenderPass->SetInput("CBCamera", s_Data->CameraConstantBuffer);
+		s_Data->LineRenderPass->SetInput("CBCamera", s_Data->CameraConstantBuffer);
+		s_Data->TextRenderPass->SetInput("CBCamera", s_Data->CameraConstantBuffer);
 	}
 
 	void Renderer2D::Shutdown()
@@ -262,11 +285,6 @@ namespace Hanabi
 
 		s_Data->CameraConstantBuffer->SetData(&s_Data->SceneBuffer, sizeof(Renderer2DData::CameraData));
 
-		s_Data->QuadPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-		s_Data->CirclePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-		s_Data->LinePipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-		s_Data->TextPipeline->SetConstantBuffer(s_Data->CameraConstantBuffer);
-
 		StartBatch();
 	}
 
@@ -275,17 +293,12 @@ namespace Hanabi
 		Flush();
 	}
 
-	Ref<RenderPass> Renderer2D::GetTargetRenderPass()
+	void Renderer2D::SetTargetFramebuffer(const Ref<Framebuffer>& framebuffer)
 	{
-		return s_Data->TatgetRenderPass;
-	}
-
-	void Renderer2D::SetTargetRenderPass(const Ref<RenderPass>& renderPass)
-	{
-		if (renderPass != s_Data->TatgetRenderPass)
-		{
-			s_Data->TatgetRenderPass = renderPass;
-		}
+		s_Data->QuadRenderPass->GetPipeline()->GetSpecification().TargetFramebuffer = framebuffer;
+		s_Data->CircleRenderPass->GetPipeline()->GetSpecification().TargetFramebuffer = framebuffer;
+		s_Data->LineRenderPass->GetPipeline()->GetSpecification().TargetFramebuffer = framebuffer;
+		s_Data->TextRenderPass->GetPipeline()->GetSpecification().TargetFramebuffer = framebuffer;
 	}
 
 	void Renderer2D::StartBatch()
@@ -309,8 +322,7 @@ namespace Hanabi
 
 	void Renderer2D::Flush()
 	{
-		Renderer::BeginRenderPass(s_Data->TatgetRenderPass, false);
-
+		Renderer::BeginRenderPass(s_Data->QuadRenderPass, false);
 		if (s_Data->QuadIndexCount)
 		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->QuadVertexBufferPtr - (uint8_t*)s_Data->QuadVertexBufferBase);
@@ -320,29 +332,35 @@ namespace Hanabi
 			for (uint32_t i = 0; i < s_Data->TextureSlotIndex; i++)
 				s_Data->QuadMaterial->SetTexture(s_Data->TextureSlots[i], i);
 
-			Renderer::DrawIndexed(s_Data->QuadVertexBuffer, s_Data->QuadIndexBuffer, s_Data->QuadMaterial, s_Data->QuadPipeline, s_Data->QuadIndexCount);
+			Renderer::DrawIndexed(s_Data->QuadVertexBuffer, s_Data->QuadIndexBuffer, s_Data->QuadMaterial, s_Data->QuadRenderPass->GetPipeline(), s_Data->QuadIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
+		Renderer::EndRenderPass(s_Data->QuadRenderPass);
 
+		Renderer::BeginRenderPass(s_Data->CircleRenderPass, false);
 		if (s_Data->CircleIndexCount)
 		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->CircleVertexBufferPtr - (uint8_t*)s_Data->CircleVertexBufferBase);
 			s_Data->CircleVertexBuffer->SetData(s_Data->CircleVertexBufferBase, dataSize);
 
 			// Use quad QuadIndexBuffer
-			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->QuadIndexBuffer, s_Data->CircleMaterial, s_Data->CirclePipeline, s_Data->CircleIndexCount);
+			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->QuadIndexBuffer, s_Data->CircleMaterial, s_Data->CircleRenderPass->GetPipeline(), s_Data->CircleIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
+		Renderer::EndRenderPass(s_Data->CircleRenderPass);
 
+		Renderer::BeginRenderPass(s_Data->LineRenderPass, false);
 		if (s_Data->LineVertexCount)
 		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->LineVertexBufferPtr - (uint8_t*)s_Data->LineVertexBufferBase);
 			s_Data->LineVertexBuffer->SetData(s_Data->LineVertexBufferBase, dataSize);
 
-			Renderer::DrawLines(s_Data->LineVertexBuffer, s_Data->LineMaterial, s_Data->LinePipeline, s_Data->LineVertexCount);
+			Renderer::DrawLines(s_Data->LineVertexBuffer, s_Data->LineMaterial, s_Data->LineRenderPass->GetPipeline(), s_Data->LineVertexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
+		Renderer::EndRenderPass(s_Data->LineRenderPass);
 
+		Renderer::BeginRenderPass(s_Data->TextRenderPass, false);
 		if (s_Data->TextIndexCount)
 		{
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->TextVertexBufferPtr - (uint8_t*)s_Data->TextVertexBufferBase);
@@ -352,11 +370,10 @@ namespace Hanabi
 			// TODO: Bind multiple font atlas texture
 			s_Data->TextMaterial->SetTexture(s_Data->FontAtlasTexture, 0);
 
-			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->QuadIndexBuffer, s_Data->TextMaterial, s_Data->TextPipeline, s_Data->TextIndexCount);
+			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->QuadIndexBuffer, s_Data->TextMaterial, s_Data->TextRenderPass->GetPipeline(), s_Data->TextIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
-
-		Renderer::EndRenderPass(s_Data->TatgetRenderPass);
+		Renderer::EndRenderPass(s_Data->TextRenderPass);
 	}
 
 	void Renderer2D::NextBatch()

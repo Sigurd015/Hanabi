@@ -128,6 +128,9 @@ namespace Hanabi
 		float Range;
 		float Angle;
 
+		enum class ShadowType { None = 0, Hard, Soft };
+		ShadowType Shadow = ShadowType::None;
+
 		LightComponent() = default;
 		LightComponent(const LightComponent&) = default;
 	};

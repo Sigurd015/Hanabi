@@ -33,6 +33,7 @@ namespace Hanabi
 	class DX11TextureCube : public TextureCube
 	{
 	public:
+		DX11TextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers);
 		DX11TextureCube(const TextureSpecification& specification, Buffer data = Buffer());
 		~DX11TextureCube();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }

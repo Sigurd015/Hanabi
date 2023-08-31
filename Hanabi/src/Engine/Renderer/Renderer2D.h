@@ -16,8 +16,7 @@ namespace Hanabi
 		static void BeginScene(const glm::mat4& viewProjection);
 		static void EndScene();
 
-		static Ref<RenderPass> GetTargetRenderPass();
-		static void SetTargetRenderPass(const Ref<RenderPass>& renderPass);
+		static void SetTargetFramebuffer(const Ref<Framebuffer>& framebuffer);
 		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID = -1);
 		static void DrawCircle(const glm::mat4& transform, CircleRendererComponent& crc, int entityID = -1);
 		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);

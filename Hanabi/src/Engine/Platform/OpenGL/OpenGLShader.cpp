@@ -20,7 +20,8 @@ namespace Hanabi
 
 	OpenGLShader::OpenGLShader(const std::string& fileName) :m_Name(fileName)
 	{
-		std::string source = ReadFile("resources/shaders/OpenGL/" + fileName + ".glsl");
+		std::string filePath = std::string(GetShaderDirectoryPath()) + "DX11/" + fileName + ".hlsl";
+		std::string source = ReadFile(filePath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
 	}

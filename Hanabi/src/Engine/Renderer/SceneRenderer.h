@@ -3,73 +3,10 @@
 #include "ConstantBuffer.h"
 #include "Camera.h"
 #include "EditorCamera.h"
-
-#define MAX_POINT_LIGHT 32
-#define MAX_SPOT_LIGHT 32
+#include "Engine/Scene/Scene.h"
 
 namespace Hanabi
 {
-	struct DirectionalLight
-	{
-		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
-		float Intensity = 0.0f;
-		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-
-		// Padding
-		float padding;
-	};
-
-	struct PointLight
-	{
-		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-		float Intensity = 0.0f;
-		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
-		float Radius;
-		float Falloff;
-
-		// Padding
-		float padding[3];
-	};
-
-	struct SpotLight
-	{
-		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
-		float Intensity = 0.0f;
-		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
-		float AngleAttenuation;
-		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-		float Range;
-		float Angle;
-		float Falloff;
-
-		// Padding
-		float padding[2];
-	};
-
-	struct Environment
-	{
-		glm::vec3 CameraPosition;
-		glm::mat4 ViewProjection;
-
-		CameraComponent::ClearMethod ClearType = CameraComponent::ClearMethod::None;
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		AssetHandle SkyboxAssetHandle = 0;
-
-		DirectionalLight DirLight;
-
-		std::vector<PointLight> PointLights;
-		std::vector<SpotLight> SpotLights;
-	};
-
-	struct CBModel
-	{
-		glm::mat4 Transform;
-		bool UseNormalMap = false;
-
-		// Padding
-		float padding[3];
-	};
-
 	class SceneRenderer
 	{
 	public:
@@ -77,7 +14,7 @@ namespace Hanabi
 		static void Shutdown();
 		static void SetViewportSize(uint32_t width, uint32_t height);
 
-		static void BeginScene(const Environment& environment);
+		static void BeginScene(const Ref<Environment> environment);
 		static void EndScene();
 
 		static Ref<RenderPass> GetFinalRenderPass();
@@ -85,5 +22,12 @@ namespace Hanabi
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material);
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh);
 		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle = 0);
+
+	private:
+		static void ExecuteDrawCommands();
+		static void ShadowPass();
+		static void GeometryPass();
+		static void SkyboxPass();
+		static void CompositePass();
 	};
 }

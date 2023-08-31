@@ -64,12 +64,10 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [ ] UI Renderer
 - [X] Asset Manager
 - [ ] 3D Renderer
-  - [X] Mesh System (WIP)
-  - [X] Material System (WIP)
-  - [X] Lighting (WIP - Phong lighting)
+  - [X] Mesh System
+  - [X] Material System
+  - [X] Lighting
   - [ ] Shadow mapping
-    - [ ] Directional light shadows
-    - [ ] Point light shadows
     - [ ] Cascaded Shadow Maps
     - [ ] Omnidirectional Shadow Maps
   - [x] Skyboxes
