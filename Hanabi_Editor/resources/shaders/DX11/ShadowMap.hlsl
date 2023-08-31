@@ -1,5 +1,5 @@
 // --------------------------
-// SpotLight Shadow Map Shader
+// Shadow Map Shader
 // --------------------------
 
 #type:vertex
@@ -16,13 +16,14 @@ struct VertexInput
 
 struct VertexOutput
 {
-
+    float4 Position : SV_Position;
 };
 
 VertexOutput main(VertexInput Input)
 {
     VertexOutput Output;
-
+	float3 worldPos = mul(u_Transform, float4(Input.a_Position, 1.0f));
+    Output.Position = mul(u_ViewProjection, float4(worldPos, 1.0));
     return Output;
 }
 

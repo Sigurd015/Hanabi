@@ -78,6 +78,7 @@ project "Hanabi"
 		{
 			"%{Library.DX11}",
 			"%{Library.DXC}",
+			"%{Library.DXGuid}",
 			"%{Library.WinSock}",
 			"%{Library.WinMM}",
 			"%{Library.WinVersion}",

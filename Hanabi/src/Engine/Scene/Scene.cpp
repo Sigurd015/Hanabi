@@ -5,6 +5,7 @@
 #include "Engine/Scene/Entity.h"
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Physics/Physics2D.h"
+#include "Engine/Renderer/SceneRenderer.h"
 
 namespace Hanabi
 {
@@ -49,7 +50,7 @@ namespace Hanabi
 		CopyComponentIfExists<Component...>(dst, src);
 	}
 
-	Scene::Scene()
+	Scene::Scene() :m_Environment(CreateRef<Environment>())
 	{}
 
 	Scene::~Scene()
@@ -205,7 +206,8 @@ namespace Hanabi
 
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
-		Environment sceneEnvironment;
+		m_Environment->PointLights.clear();
+		m_Environment->SpotLights.clear();
 		auto view = m_Registry.view<TransformComponent, CameraComponent>();
 		for (auto entity : view)
 		{
@@ -215,10 +217,10 @@ namespace Hanabi
 			{
 				mainCamera = &camera.Camera;
 				cameraTransform = transform.GetTransform();
-				sceneEnvironment.CameraPosition = transform.Translation;
-				sceneEnvironment.ClearType = camera.ClearType;
-				sceneEnvironment.ClearColor = camera.ClearColor;
-				sceneEnvironment.SkyboxAssetHandle = camera.SkyboxHandle;
+				m_Environment->CameraPosition = transform.Translation;
+				m_Environment->ClearType = camera.ClearType;
+				m_Environment->ClearColor = camera.ClearColor;
+				m_Environment->SkyboxAssetHandle = camera.SkyboxHandle;
 				break;
 			}
 		}
@@ -226,20 +228,23 @@ namespace Hanabi
 		if (mainCamera)
 		{
 			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
-			sceneEnvironment.ViewProjection = viewProjection;
-			RenderScene(sceneEnvironment, selectedEntity, enableOverlayRender);
+			m_Environment->ViewProjection = viewProjection;
+			RenderScene(selectedEntity, enableOverlayRender);
 		}
 	}
 
 	void Scene::OnUpdateEditor(Timestep ts, EditorCamera& camera, Entity selectedEntity, bool enableOverlayRender)
 	{
-		Environment sceneEnvironment = { camera.GetPosition() , camera.GetViewProjection() };
-		sceneEnvironment.ClearType = CameraComponent::ClearMethod::Soild_Color;
-		sceneEnvironment.ClearColor = s_EditorClearColor;
-		RenderScene(sceneEnvironment, selectedEntity, enableOverlayRender);
+		m_Environment->PointLights.clear();
+		m_Environment->SpotLights.clear();
+		m_Environment->CameraPosition = camera.GetPosition();
+		m_Environment->ViewProjection = camera.GetViewProjection();
+		m_Environment->ClearType = CameraComponent::ClearMethod::Soild_Color;
+		m_Environment->ClearColor = s_EditorClearColor;
+		RenderScene(selectedEntity, enableOverlayRender);
 	}
 
-	void Scene::RenderScene(Environment& sceneEnvironment, Entity selectedEntity, bool enableOverlayRender)
+	void Scene::RenderScene(Entity selectedEntity, bool enableOverlayRender)
 	{
 		//----------------- 3D Scene Rendering -----------------//				
 		// Lights
@@ -252,27 +257,29 @@ namespace Hanabi
 				{
 				case LightComponent::LightType::Directional:
 				{
-					sceneEnvironment.DirLight = {
+					m_Environment->DirLight = {
 						light.Radiance,
 						light.Intensity,
 						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+						light.Shadow,
 					};
 					break;
 				}
 				case LightComponent::LightType::Point:
 				{
-					sceneEnvironment.PointLights.push_back({
+					m_Environment->PointLights.push_back({
 						transform.Translation,
 						light.Intensity,
 						light.Radiance,
 						light.Radius,
 						light.Falloff,
+						light.Shadow,
 						});
 					break;
 				}
 				case LightComponent::LightType::Spot:
 				{
-					sceneEnvironment.SpotLights.push_back({
+					m_Environment->SpotLights.push_back({
 						transform.Translation,
 						light.Intensity,
 						light.Radiance,
@@ -281,6 +288,7 @@ namespace Hanabi
 						light.Range,
 						light.Angle,
 						light.Falloff,
+						light.Shadow,
 						});
 					break;
 				}
@@ -288,7 +296,7 @@ namespace Hanabi
 			}
 		}
 
-		SceneRenderer::BeginScene(sceneEnvironment);
+		SceneRenderer::BeginScene(m_Environment);
 
 		// Draw objects with materials
 		{
@@ -313,8 +321,8 @@ namespace Hanabi
 		SceneRenderer::EndScene();
 
 		//----------------- 2D Scene Rendering -----------------//
-		Renderer2D::BeginScene(sceneEnvironment.ViewProjection);
-		Renderer2D::SetTargetRenderPass(SceneRenderer::GetFinalRenderPass());
+		Renderer2D::BeginScene(m_Environment->ViewProjection);
+		Renderer2D::SetTargetFramebuffer(SceneRenderer::GetFinalRenderPass()->GetTargetFramebuffer());
 		// Draw sprites
 		{
 			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();

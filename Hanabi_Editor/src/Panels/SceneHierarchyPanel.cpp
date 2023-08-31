@@ -683,29 +683,15 @@ namespace Hanabi
 					ImGui::DragFloat("Spot Light Falloff", &component.Falloff, 0.005f, 0.0f, 1.0f);
 					break;
 				}
+
+				const char* shadowTypeStrings[] = { "None", "Hard Shadow", "Soft Shadow" };
+				Utils::DrawComboControl("Shadow Type", shadowTypeStrings, 3, component.Shadow);
 			});
 
 		Utils::DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
 			{
 				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
-				const char* currentBodyTypeString = bodyTypeStrings[(int)component.Type];
-				if (ImGui::BeginCombo("Body Type", currentBodyTypeString))
-				{
-					for (int i = 0; i < 3; i++)
-					{
-						bool isSelected = currentBodyTypeString == bodyTypeStrings[i];
-						if (ImGui::Selectable(bodyTypeStrings[i], isSelected))
-						{
-							currentBodyTypeString = bodyTypeStrings[i];
-							component.Type = (Rigidbody2DComponent::BodyType)i;
-						}
-
-						if (isSelected)
-							ImGui::SetItemDefaultFocus();
-					}
-
-					ImGui::EndCombo();
-				}
+				Utils::DrawComboControl("Body Type", bodyTypeStrings, 3, component.Type);
 
 				ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
 				ImGui::DragFloat("Gravity Scale", &component.GravityScale, 0.01f, -1.0f, 1.0f);

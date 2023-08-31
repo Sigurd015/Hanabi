@@ -7,7 +7,7 @@
 
 namespace Hanabi
 {
-	DX11ConstantBuffer::DX11ConstantBuffer(uint32_t size, uint32_t binding) :m_BindingID(binding), m_DataSize(size)
+	DX11ConstantBuffer::DX11ConstantBuffer(uint32_t size) :m_DataSize(size)
 	{
 		D3D11_BUFFER_DESC buffer = {};
 		buffer.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -24,10 +24,10 @@ namespace Hanabi
 		m_ConstantBuffer.Reset();
 	}
 
-	void DX11ConstantBuffer::Bind() const
+	void DX11ConstantBuffer::Bind(uint32_t binding) const
 	{
-		DX11Context::GetDeviceContext()->VSSetConstantBuffers(m_BindingID, 1, m_ConstantBuffer.GetAddressOf());
-		DX11Context::GetDeviceContext()->PSSetConstantBuffers(m_BindingID, 1, m_ConstantBuffer.GetAddressOf());
+		DX11Context::GetDeviceContext()->VSSetConstantBuffers(binding, 1, m_ConstantBuffer.GetAddressOf());
+		DX11Context::GetDeviceContext()->PSSetConstantBuffers(binding, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 	void DX11ConstantBuffer::SetData(const void* data, uint32_t offset)

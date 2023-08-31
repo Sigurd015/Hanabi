@@ -1,4 +1,4 @@
-#include "hnbpch.h"
+﻿#include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11Shader.h"
@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <d3dcompiler.h>
+#include <D3D11Shader.h>
 #pragma pack_matrix(row_major)
 
 namespace Hanabi
@@ -24,9 +25,35 @@ namespace Hanabi
 
 	DX11Shader::DX11Shader(const std::string& fileName) :m_Name(fileName)
 	{
-		std::string source = ReadFile("resources/shaders/DX11/" + fileName + ".hlsl");
+		std::string filePath = std::string(GetShaderDirectoryPath()) + "DX11/" + fileName + ".hlsl";
+		std::string source = ReadFile(filePath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
+	}
+
+	void DX11Shader::CreateReflectionData(const Microsoft::WRL::ComPtr<ID3DBlob>& shaderBlob)
+	{
+		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> shaderReflection;
+		DX_CHECK_RESULT(D3DReflect(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&shaderReflection));
+
+		D3D11_SHADER_DESC shaderDesc;
+		shaderReflection->GetDesc(&shaderDesc);
+
+		for (UINT i = 0; i < shaderDesc.BoundResources; ++i)
+		{
+			D3D11_SHADER_INPUT_BIND_DESC bindDesc;
+			shaderReflection->GetResourceBindingDesc(i, &bindDesc);
+
+			if (bindDesc.Type == D3D_SIT_CBUFFER)
+			{
+				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
+			}
+
+			if (bindDesc.Type == D3D_SIT_TEXTURE)
+			{
+				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
+			}
+		}
 	}
 
 	std::string DX11Shader::ReadFile(const std::string& filepath)
@@ -117,6 +144,8 @@ namespace Hanabi
 					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateVertexShader(m_VertexShaderBlob->GetBufferPointer(),
 					m_VertexShaderBlob->GetBufferSize(), nullptr, m_VertexShader.GetAddressOf()));
+
+				CreateReflectionData(m_VertexShaderBlob);
 				break;
 			}
 			case Hanabi::PIXEL_SHADER:
@@ -126,6 +155,8 @@ namespace Hanabi
 					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, blob.ReleaseAndGetAddressOf(), nullptr));
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
 					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf()));
+
+				CreateReflectionData(blob);
 				break;
 			}
 			}

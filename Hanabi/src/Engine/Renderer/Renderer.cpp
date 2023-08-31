@@ -32,6 +32,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Line");
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
 		s_Data->ShaderLibrary->Load("PhongLighting");
+		s_Data->ShaderLibrary->Load("ShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
 
 		//Setup textures

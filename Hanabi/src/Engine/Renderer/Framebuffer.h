@@ -50,6 +50,9 @@ namespace Hanabi
 		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
+		virtual uint32_t GetWidth() const = 0;
+		virtual uint32_t GetHeight() const = 0;
+
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
 	};

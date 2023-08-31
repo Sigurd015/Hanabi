@@ -3,7 +3,7 @@
 #include "Engine/Core/Timestep.h"
 #include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Core/UUID.h"
-#include "Engine/Renderer/SceneRenderer.h"
+#include "Components.h"
 
 #include <entt.hpp>
 
@@ -14,6 +14,56 @@ namespace Physix2D
 
 namespace Hanabi
 {
+	struct DirectionalLight
+	{
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float Intensity = 0.0f;
+		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
+
+		LightComponent::ShadowType ShadowType = LightComponent::ShadowType::None;
+	};
+
+	struct PointLight
+	{
+		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+		float Intensity = 0.0f;
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float Radius;
+		float Falloff;
+
+		LightComponent::ShadowType ShadowType = LightComponent::ShadowType::None;
+	};
+
+	struct SpotLight
+	{
+		glm::vec3 Position = { 0.0f, 0.0f, 0.0f };
+		float Intensity = 0.0f;
+		glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
+		float AngleAttenuation;
+		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
+		float Range;
+		float Angle;
+		float Falloff;
+
+		LightComponent::ShadowType ShadowType = LightComponent::ShadowType::None;
+	};
+
+	struct Environment
+	{
+		glm::vec3 CameraPosition;
+		glm::mat4 ViewProjection;
+
+		CameraComponent::ClearMethod ClearType = CameraComponent::ClearMethod::None;
+		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		AssetHandle SkyboxAssetHandle = 0;
+
+		DirectionalLight DirLight;
+
+		std::vector<PointLight> PointLights;
+		std::vector<SpotLight> SpotLights;
+	};
+
+	// Forward declaration
 	class Entity;
 	class Scene : public Asset
 	{
@@ -54,7 +104,7 @@ namespace Hanabi
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
 
-		void RenderScene(Environment& sceneEnvironment, Entity selectedEntity, bool enableOverlayRender);
+		void RenderScene(Entity selectedEntity, bool enableOverlayRender);
 		void OnOverlayRender(bool enable, Entity selectedEntity);
 		void OnPhysics2DStart();
 		void OnPhysics2DStop();
@@ -66,6 +116,8 @@ namespace Hanabi
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;
 		int m_StepFrames = 0;
+
+		Ref<Environment> m_Environment;
 
 		friend class Entity;
 		friend class SceneHierarchyPanel;
