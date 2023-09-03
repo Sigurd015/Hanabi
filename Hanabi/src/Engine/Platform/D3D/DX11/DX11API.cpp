@@ -40,6 +40,15 @@ namespace Hanabi
 
 	void DX11RendererAPI::Clear()
 	{
+		D3D11_VIEWPORT viewPort{};
+		viewPort.Width = m_Width;
+		viewPort.Height = m_Height;
+		viewPort.MinDepth = 0;
+		viewPort.MaxDepth = 1.0f;
+		viewPort.TopLeftX = 0;
+		viewPort.TopLeftY = 0;
+		m_DeviceContext->RSSetViewports(1, &viewPort);
+
 		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
@@ -64,15 +73,6 @@ namespace Hanabi
 		DX_CHECK_RESULT(m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilBuffer.GetAddressOf()));
 		DX_CHECK_RESULT(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-
-		D3D11_VIEWPORT viewPort{};
-		viewPort.Width = width;
-		viewPort.Height = height;
-		viewPort.MinDepth = 0;
-		viewPort.MaxDepth = 1.0f;
-		viewPort.TopLeftX = x;
-		viewPort.TopLeftY = y;
-		m_DeviceContext->RSSetViewports(1, &viewPort);
 
 		m_Width = width;
 		m_Height = height;

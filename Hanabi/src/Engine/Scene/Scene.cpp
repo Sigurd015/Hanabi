@@ -268,7 +268,9 @@ namespace Hanabi
 					m_Environment->DirLight = {
 						light.Radiance,
 						light.Intensity,
-						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+						//TODO: Maybe (0,0,-1) is correct, why cherno set it to (1,1,1)?
+						//-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(0,0,-1.0f)),
 						light.Shadow,
 					};
 					break;

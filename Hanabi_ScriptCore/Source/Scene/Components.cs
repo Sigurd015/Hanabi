@@ -65,9 +65,17 @@
     public class CircleCollider2DComponent : Component
     { }
 
+    public class MeshComponent : Component
+    { }
+
+    public class MaterialComponent : Component
+    { }
+
+    public class LightComponent : Component
+    { }
+
     public class TextComponent : Component
     {
-
         public string Text
         {
             get => InternalCalls.TextComponent_GetText(Entity.ID);

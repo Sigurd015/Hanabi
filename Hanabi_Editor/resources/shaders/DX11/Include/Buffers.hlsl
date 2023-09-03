@@ -59,4 +59,9 @@ cbuffer CBSpotLight : register(b4)
     uint u_SpotLightsCount;
     SpotLight u_SpotLights[MAX_SPOT_LIGHT];
 };
+
+cbuffer CBLightVP : register(b5)
+{
+    float4x4 u_LightViewProjection;
+};
 #endif

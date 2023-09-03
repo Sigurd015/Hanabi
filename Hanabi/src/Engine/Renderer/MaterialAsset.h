@@ -6,19 +6,10 @@ namespace Hanabi
 	class MaterialAsset : public Asset
 	{
 	public:
-		// Phong Lighting Model for now
-		enum class TextureType
-		{
-			Diffuse = 0,
-			Specular = 1,
-			Normal = 2,
-		};
-
 		MaterialAsset();
 		MaterialAsset(Ref<Material> material);
 		~MaterialAsset() = default;
 
-		//TODO : For now(Phong lighting model) we only need diffuse and specular textures
 		Ref<Texture2D> GetDiffuse();
 		Ref<Texture2D> GetSpecular();
 		Ref<Texture2D> GetNormal();
@@ -39,7 +30,7 @@ namespace Hanabi
 		static AssetType GetStaticType() { return AssetType::Material; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
-		void SetTexture(Ref<Texture2D> texture, uint32_t index);
+		void SetTexture(const std::string& name, AssetHandle handle);
 
 		Ref<Material> m_Material;
 

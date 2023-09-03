@@ -18,14 +18,13 @@ namespace Hanabi
 		void ClearAttachment(const glm::vec4& color) override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
-		void* GetColorAttachment(uint32_t index = 0) const override
+		//TODO: Implement
+		virtual Ref<Image2D> GetImage(uint32_t attachmentIndex = 0) const override
 		{
-			HNB_CORE_ASSERT(index < m_ColorAttachments.size()); return (void*)m_ColorAttachments[index];
+			HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size()); return nullptr;
 		}
-		void* GetDepthAttachment() const override
-		{
-			return (void*)m_DepthAttachment;
-		}
+
+		virtual Ref<Image2D> GetDepthImage() const override { return nullptr; }
 
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:

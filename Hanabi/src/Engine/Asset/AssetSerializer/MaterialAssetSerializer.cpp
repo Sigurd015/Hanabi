@@ -73,14 +73,11 @@ namespace Hanabi
 		YAML::Node materialNode = root["Material"];
 
 		AssetHandle diffuseHandle = materialNode["DiffuseTextureHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(diffuseHandle))
-			targetMaterialAsset->SetDiffuse(diffuseHandle);
+		targetMaterialAsset->SetDiffuse(diffuseHandle);
 		AssetHandle specularHandle = materialNode["SpecularTextureHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(specularHandle))
-			targetMaterialAsset->SetSpecular(specularHandle);
+		targetMaterialAsset->SetSpecular(specularHandle);
 		AssetHandle normalHandle = materialNode["NormalTextureHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(normalHandle))
-			targetMaterialAsset->SetNormal(normalHandle);
+		targetMaterialAsset->SetNormal(normalHandle);
 
 		targetMaterialAsset->SetUseNormalMap(materialNode["UseNormalMap"].as<bool>());
 

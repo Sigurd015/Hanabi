@@ -293,11 +293,11 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPIType::OpenGL:
-			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+			ImGui::Image(m_ViewportFramebuffer->GetImage()->GetRendererID(), ImVec2{m_ViewportSize.x, m_ViewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});
 			break;
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+			ImGui::Image(m_ViewportFramebuffer->GetImage()->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 			break;
 			#endif
 		}

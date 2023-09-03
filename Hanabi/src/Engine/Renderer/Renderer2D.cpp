@@ -96,6 +96,7 @@ namespace Hanabi
 		TextVertex* TextVertexBufferBase = nullptr;
 		TextVertex* TextVertexBufferPtr = nullptr;
 
+		std::array<std::string, MaxTextureSlots> TextureSlotNames;
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;// 0 is white texture
 		uint32_t TextureSlotIndex = 1;
 		Ref<Texture2D> FontAtlasTexture;
@@ -261,6 +262,11 @@ namespace Hanabi
 		s_Data->WhiteTexture = Renderer::GetTexture<Texture2D>("White");
 		s_Data->TextureSlots[0] = s_Data->WhiteTexture;
 
+		for (uint32_t i = 0; i < s_Data->MaxTextureSlots; i++)
+		{
+			s_Data->TextureSlotNames[i] = "u_Textures[" + std::to_string(i) + "]";
+		}
+
 		s_Data->CameraConstantBuffer = ConstantBuffer::Create(sizeof(Renderer2DData::CameraData));
 
 		s_Data->QuadRenderPass->SetInput("CBCamera", s_Data->CameraConstantBuffer);
@@ -330,7 +336,9 @@ namespace Hanabi
 
 			// Bind textures
 			for (uint32_t i = 0; i < s_Data->TextureSlotIndex; i++)
-				s_Data->QuadMaterial->SetTexture(s_Data->TextureSlots[i], i);
+			{
+				s_Data->QuadMaterial->SetTexture(s_Data->TextureSlotNames[i], s_Data->TextureSlots[i]);
+			}
 
 			Renderer::DrawIndexed(s_Data->QuadVertexBuffer, s_Data->QuadIndexBuffer, s_Data->QuadMaterial, s_Data->QuadRenderPass->GetPipeline(), s_Data->QuadIndexCount);
 			s_Data->RendererStats.DrawCalls++;
@@ -343,7 +351,6 @@ namespace Hanabi
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->CircleVertexBufferPtr - (uint8_t*)s_Data->CircleVertexBufferBase);
 			s_Data->CircleVertexBuffer->SetData(s_Data->CircleVertexBufferBase, dataSize);
 
-			// Use quad QuadIndexBuffer
 			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->QuadIndexBuffer, s_Data->CircleMaterial, s_Data->CircleRenderPass->GetPipeline(), s_Data->CircleIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
@@ -366,9 +373,8 @@ namespace Hanabi
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->TextVertexBufferPtr - (uint8_t*)s_Data->TextVertexBufferBase);
 			s_Data->TextVertexBuffer->SetData(s_Data->TextVertexBufferBase, dataSize);
 
-			// Bind textures
-			// TODO: Bind multiple font atlas texture
-			s_Data->TextMaterial->SetTexture(s_Data->FontAtlasTexture, 0);
+			// TODO: Only have one font atlas texture for now
+			s_Data->TextMaterial->SetTexture("u_FontAtlas", s_Data->FontAtlasTexture);
 
 			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->QuadIndexBuffer, s_Data->TextMaterial, s_Data->TextRenderPass->GetPipeline(), s_Data->TextIndexCount);
 			s_Data->RendererStats.DrawCalls++;

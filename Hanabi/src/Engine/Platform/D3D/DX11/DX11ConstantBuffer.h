@@ -13,7 +13,7 @@ namespace Hanabi
 	public:
 		DX11ConstantBuffer(uint32_t size);
 		~DX11ConstantBuffer();
-		void Bind(uint32_t binding) const override;
+		void Bind(uint32_t slot) const override;
 		void SetData(const void* data, uint32_t offset = 0) override;
 	private:
 		uint32_t m_DataSize;

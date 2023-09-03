@@ -16,9 +16,9 @@ namespace Hanabi
 		glDeleteBuffers(1, &m_RendererID);
 	}
 
-	void OpenGLUniformBuffer::Bind(uint32_t binding) const
+	void OpenGLUniformBuffer::Bind(uint32_t slot) const
 	{
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_RendererID);
+		glBindBufferBase(GL_UNIFORM_BUFFER, slot, m_RendererID);
 	}
 
 	void OpenGLUniformBuffer::SetData(const void* data, uint32_t offset)

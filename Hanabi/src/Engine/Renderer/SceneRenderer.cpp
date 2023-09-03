@@ -310,8 +310,7 @@ namespace Hanabi
 		{
 			constexpr glm::vec4 clearColor = { 0.0f,0.0f,0.0f,1.0f };
 			Renderer::SetClearColor(clearColor);
-			s_Data->SkyboxMaterial->SetTexture<TextureCube>(Renderer::GetTexture<TextureCube>("BlackCube"));
-
+			s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
 			s_Data->SkyboxDrawRequested = false;
 			break;
 		}
@@ -329,11 +328,11 @@ namespace Hanabi
 			{
 				Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->SkyboxAssetHandle);
 				Ref<TextureCube> textureCube = asset->GetEnvMap();
-				s_Data->SkyboxMaterial->SetTexture<TextureCube>(textureCube);
+				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", textureCube);
 			}
 			else
 			{
-				s_Data->SkyboxMaterial->SetTexture<TextureCube>(Renderer::GetTexture<TextureCube>("BlackCube"));
+				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
 			}
 			break;
 		}
@@ -410,6 +409,8 @@ namespace Hanabi
 			Renderer::BeginRenderPass(s_Data->ShadowPass);
 			ExecuteDrawCommands();
 			Renderer::EndRenderPass(s_Data->ShadowPass);
+
+			s_Data->GeoPass->SetInput("u_ShadowDepth", s_Data->ShadowPass->GetDepthOutput());
 
 			switch (s_Data->SceneEnvironment->DirLight.ShadowType)
 			{

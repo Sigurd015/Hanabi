@@ -70,6 +70,8 @@ namespace Hanabi
 		else
 			return;
 
-		m_EnvMap = TextureCube::Create(spec, m_TextureData);
+		Buffer buffer = Buffer(m_TextureData.data(), 6);
+		m_EnvMap = TextureCube::Create(spec, buffer);
+		buffer.Release();
 	}
 }

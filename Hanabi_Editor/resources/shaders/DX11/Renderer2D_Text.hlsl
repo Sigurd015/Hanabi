@@ -50,7 +50,7 @@ struct PixelOutput
 };
 
 Texture2D u_FontAtlas : register(t0);
-SamplerState u_FontAtlasSamplerState : register(s0);
+SamplerState u_SSLinearWrap : register(s0);
 
 float screenPxRange(PixelInput Input)
 {
@@ -70,7 +70,7 @@ float median(float r, float g, float b)
 PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
-    float4 temp = u_FontAtlas.Sample(u_FontAtlasSamplerState, Input.TexCoord);
+    float4 temp = u_FontAtlas.Sample(u_SSLinearWrap, Input.TexCoord);
     float4 texColor = temp * Input.Color;
     float3 msd = temp.rgb;
     float sd = median(msd.r, msd.g, msd.b);

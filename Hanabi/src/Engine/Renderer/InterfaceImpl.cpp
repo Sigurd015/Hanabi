@@ -1,14 +1,5 @@
 #include "hnbpch.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "RendererAPI.h"
-#include "RenderPass.h"
-#include "RendererContext.h"
-#include "Shader.h"
-#include "Texture.h"
-#include "Pipeline.h"
-#include "Framebuffer.h"
-#include "ConstantBuffer.h"
+
 //----------OpenGL----------------------------------------
 #include "Engine/Platform/OpenGL/OpenGLVertexBuffer.h"
 #include "Engine/Platform/OpenGL/OpenGLIndexBuffer.h"
@@ -32,32 +23,12 @@
 #include "Engine/Platform/D3D/DX11/DX11Framebuffer.h"
 #include "Engine/Platform/D3D/DX11/DX11ConstantBuffer.h"
 #include "Engine/Platform/D3D/DX11/DX11RenderPass.h"
+#include "Engine/Platform/D3D/DX11/DX11Image.h"
 #endif
 
 namespace Hanabi
 {
 	RendererAPIType RendererAPI::s_API = RendererAPIType::None;
-
-	Ref<RenderPass> RenderPass::Create(const RenderPassSpecification& spec)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::None:
-			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPIType::OpenGL:
-			HNB_CORE_ASSERT(false, "OpenGL RenderPass is currently not implemented!");
-			return nullptr;
-
-			#if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPIType::DX11:
-			return CreateScope<DX11RenderPass>(spec);
-			#endif
-		}
-
-		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
 
 	Scope<RendererAPI> RendererAPI::Create()
 	{
@@ -79,17 +50,24 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Ref<Pipeline> Pipeline::Create(const PipelineSpecification& spec)
+	Ref<RenderPass> RenderPass::Create(const RenderPassSpecification& spec)
 	{
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLPipeline>(spec);
+			HNB_CORE_ASSERT(false, "OpenGL RenderPass is currently not implemented!");
+			return nullptr;
+
+			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return CreateRef<DX11Pipeline>(spec);
+			return CreateRef<DX11RenderPass>(spec);
+			#endif
 		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -109,6 +87,25 @@ namespace Hanabi
 			#endif
 		}
 
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<Pipeline> Pipeline::Create(const PipelineSpecification& spec)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPIType::OpenGL:
+			return CreateRef<OpenGLPipeline>(spec);
+
+			#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPIType::DX11:
+			return CreateRef<DX11Pipeline>(spec);
+			#endif
+		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
 	}
@@ -189,6 +186,27 @@ namespace Hanabi
 		return nullptr;
 	}
 
+	Ref<Image2D> Image2D::Create(const ImageSpecification& specification, Buffer buffer)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPIType::OpenGL:
+			HNB_CORE_ASSERT(false, "OpenGL Image2D is currently not implemented!");
+			return nullptr;
+
+			#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPIType::DX11:
+			return CreateRef<DX11Image2D>(specification, buffer);
+			#endif
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
 	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification, Buffer data)
 	{
 		switch (RendererAPI::GetAPI())
@@ -202,25 +220,6 @@ namespace Hanabi
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Texture2D>(specification, data);
-			#endif
-		}
-		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
-	Ref<TextureCube> TextureCube::Create(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::None:
-			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLTextureCube>(specification, buffers);
-
-			#if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPIType::DX11:
-			return CreateRef<DX11TextureCube>(specification, buffers);
 			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

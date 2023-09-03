@@ -44,12 +44,7 @@ namespace Hanabi
 			D3D11_SHADER_INPUT_BIND_DESC bindDesc;
 			shaderReflection->GetResourceBindingDesc(i, &bindDesc);
 
-			if (bindDesc.Type == D3D_SIT_CBUFFER)
-			{
-				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
-			}
-
-			if (bindDesc.Type == D3D_SIT_TEXTURE)
+			if (bindDesc.Type == D3D_SIT_CBUFFER || bindDesc.Type == D3D_SIT_TEXTURE)
 			{
 				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
 			}

@@ -13,10 +13,11 @@ namespace Hanabi
 	{
 		Ref<Material> material = CreateRef<Material>(other->GetShader());
 
-		for (size_t i = 0; i < MAX_TEXTURES; i++)
+		for (auto& texture : other->m_Textures)
 		{
-			material->m_Textures[i] = other->m_Textures[i];
+			material->m_Textures[texture.first] = texture.second;
 		}
+
 		return material;
 	}
 
@@ -25,15 +26,15 @@ namespace Hanabi
 		m_Shader = shader;
 	}
 
-	void Material::SetTextureInternal(const Ref<Texture>& texture, uint32_t index)
+	void Material::SetTextureInternal(const std::string& name, const Ref<Texture>& texture)
 	{
-		m_Textures[index] = texture;
+		m_Textures[name] = texture;
 	}
 
-	Ref<Texture> Material::GetTextureInternal(uint32_t index)
+	Ref<Texture> Material::GetTextureInternal(const std::string& name)
 	{
-		HNB_CORE_ASSERT(index < MAX_TEXTURES, "Material::GetTextureInternal: index out of range!");
-		return m_Textures[index];
+		HNB_CORE_ASSERT(m_Textures.find(name) != m_Textures.end(), "Material::GetTextureInternal: Texture not found");
+		return m_Textures[name];
 	}
 
 	void Material::Bind() const
@@ -45,12 +46,23 @@ namespace Hanabi
 
 	void Material::BindTextures() const
 	{
-		for (size_t i = 0; i < MAX_TEXTURES; i++)
+		const ShaderReflectionData& reflectionData = m_Shader->GetReflectionData();
+
+		for (auto& texture : m_Textures)
 		{
-			if (m_Textures[i])
-				m_Textures[i]->Bind(i);
+			auto it = reflectionData.find(texture.first);
+			if (it != reflectionData.end())
+			{
+				uint32_t slot = it->second;
+				if (texture.second)
+					texture.second->Bind(slot);
+				else
+					Renderer::GetTexture<Texture2D>("White")->Bind(slot);
+			}
 			else
-				Renderer::GetTexture<Texture2D>("White")->Bind(i);
+			{
+				HNB_CORE_WARN("Constant buffer '{}' not found in shader!", texture.first);
+			}
 		}
 	}
 }

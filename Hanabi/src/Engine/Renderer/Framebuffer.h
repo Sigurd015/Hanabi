@@ -44,8 +44,9 @@ namespace Hanabi
 		virtual void Unbind() = 0;
 
 		virtual void ClearAttachment(const glm::vec4& color) = 0;
-		virtual void* GetColorAttachment(uint32_t attachmentIndex = 0) const = 0;
-		virtual void* GetDepthAttachment() const = 0;
+		
+		virtual Ref<Image2D> GetImage(uint32_t attachmentIndex = 0) const = 0;
+		virtual Ref<Image2D> GetDepthImage() const = 0;
 
 		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) = 0;
 		virtual void Resize(uint32_t width, uint32_t height) = 0;

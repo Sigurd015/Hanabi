@@ -1,3 +1,4 @@
+#if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/RenderPass.h"
 
@@ -9,14 +10,12 @@ namespace Hanabi
 		DX11RenderPass(const RenderPassSpecification& spec);
 		virtual ~DX11RenderPass() = default;
 
-		virtual void SetInput(std::string_view name, Ref<ConstantBuffer> constantBuffer) override;
-		virtual void SetInput(std::string_view name, Ref<TextureCube> textureCube) override;
-		virtual void SetInput(std::string_view name, Ref<Texture2D> texture) override;
+		virtual void SetInput(std::string_view name, Ref<RendererResource> resource) override;
 
 		virtual void BindInputs() override;
 
-		virtual Ref<Texture2D> GetOutput(uint32_t index) override;
-		virtual Ref<Texture2D> GetDepthOutput() override;
+		virtual Ref<Image2D> GetOutput(uint32_t index) override;
+		virtual Ref<Image2D> GetDepthOutput() override;
 
 		virtual RenderPassSpecification& GetSpecification() override { return m_Specification; }
 		virtual const RenderPassSpecification& GetSpecification() const override { return m_Specification; }
@@ -29,3 +28,4 @@ namespace Hanabi
 		std::unordered_map<std::string, Ref<RendererResource>> m_Inputs;
 	};
 }
+#endif

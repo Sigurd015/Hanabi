@@ -41,6 +41,7 @@ VertexOutput main(VertexInput Input)
 #include "Buffers.hlsl"
 #include "Lighting.hlsl"
 #include "Textures.hlsl"
+#include "Shadow.hlsl"
 
 struct PixelInput
 {
@@ -61,8 +62,8 @@ PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
     Material material;
-    material.DiffuseColor = u_Diffuse.Sample(u_DiffuseSamplerState, Input.TexCoord).xyz;
-    material.SpecularColor = u_Specular.Sample(u_SpecularSamplerState, Input.TexCoord).xyz;
+    material.DiffuseColor = u_Diffuse.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
+    material.SpecularColor = u_Specular.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
       
     Input.Normal = normalize(mul((float3x3) (u_Transform), Input.Normal));
     
@@ -73,7 +74,7 @@ PixelOutput main(PixelInput Input)
         Input.Bitangent = normalize(mul((float3x3) (u_Transform), Input.Bitangent));
         float3x3 mat = float3x3(Input.Tangent, Input.Bitangent, Input.Normal);
 
-        float3 normalSample = u_Normal.Sample(u_NormalSamplerState, Input.TexCoord).xyz;
+        float3 normalSample = u_Normal.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
         normal = normalSample * 2.0f - 1.0f; // from RGB[0, 1] to [-1, 1]
         normal = normalize(mul(mat, normal));
     }

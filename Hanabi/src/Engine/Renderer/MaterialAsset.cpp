@@ -13,42 +13,40 @@ namespace Hanabi
 
 	Ref<Texture2D> MaterialAsset::GetDiffuse()
 	{
-		return m_Material->GetTexture<Texture2D>(static_cast<uint32_t>(TextureType::Diffuse));
+		return m_Material->GetTexture<Texture2D>("u_Diffuse");
 	}
 
 	void MaterialAsset::SetDiffuse(AssetHandle handle)
 	{
 		m_DiffuseTexture = handle;
-		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
-		SetTexture(texture, static_cast<uint32_t>(TextureType::Diffuse));
+		SetTexture("u_Diffuse", m_DiffuseTexture);
 	}
 
 	Ref<Texture2D> MaterialAsset::GetSpecular()
 	{
-		return m_Material->GetTexture<Texture2D>(static_cast<uint32_t>(TextureType::Specular));
+		return m_Material->GetTexture<Texture2D>("u_Specular");
 	}
 
 	void MaterialAsset::SetSpecular(AssetHandle handle)
 	{
 		m_SpecularTexture = handle;
-		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
-		SetTexture(texture, static_cast<uint32_t>(TextureType::Specular));
+		SetTexture("u_Specular", m_SpecularTexture);
 	}
 
 	Ref<Texture2D> MaterialAsset::GetNormal()
 	{
-		return m_Material->GetTexture<Texture2D>(static_cast<uint32_t>(TextureType::Normal));
+		return m_Material->GetTexture<Texture2D>("u_Normal");
 	}
 
 	void MaterialAsset::SetNormal(AssetHandle handle)
 	{
 		m_NormalTexture = handle;
-		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
-		SetTexture(texture, static_cast<uint32_t>(TextureType::Normal));
+		SetTexture("u_Normal", m_NormalTexture);
 	}
 
-	void MaterialAsset::SetTexture(Ref<Texture2D> texture, uint32_t index)
+	void MaterialAsset::SetTexture(const std::string& name, AssetHandle handle)
 	{
-		m_Material->SetTexture<Texture2D>(texture, index);
+		Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
+		m_Material->SetTexture<Texture2D>(name, texture);
 	}
 }

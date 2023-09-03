@@ -1,6 +1,7 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/Framebuffer.h"
+#include "DX11Image.h"
 
 #include <d3d11.h>
 #include <Windows.h>
@@ -22,8 +23,17 @@ namespace Hanabi
 		virtual uint32_t GetWidth() const override { return m_Specification.Width; }
 		virtual uint32_t GetHeight() const override { return m_Specification.Height; }
 
-		void* GetColorAttachment(uint32_t attachmentIndex = 0) const override;
-		void* GetDepthAttachment() const override;
+		virtual Ref<Image2D> GetImage(uint32_t attachmentIndex = 0) const override
+		{
+			HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
+			return m_ColorAttachments[attachmentIndex];
+		}
+
+		virtual Ref<Image2D> GetDepthImage() const override
+		{
+			HNB_CORE_ASSERT(m_DSAttachment != nullptr);
+			return m_DSAttachment;
+		}
 
 		void Resize(uint32_t width, uint32_t height) override;
 
@@ -32,14 +42,15 @@ namespace Hanabi
 		void Invalidate();
 
 		FramebufferSpecification m_Specification;
+
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
 		FramebufferTextureSpecification m_DepthAttachmentSpecification = ImageFormat::None;
+
+		std::vector<Ref<DX11Image2D>> m_ColorAttachments;
 		std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> m_ColorAttachmentRTV;
-		std::vector<Microsoft::WRL::ComPtr<ID3D11Texture2D>> m_ColorAttachmentTextures;
-		std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> m_ColorAttachmentSRV;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthStencilAttachment;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_DepthStencilAttachmentsTexture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_DepthStencilSRV;
+
+		Ref<DX11Image2D> m_DSAttachment = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSAttachmentDSV;
 	};
 }
 #endif

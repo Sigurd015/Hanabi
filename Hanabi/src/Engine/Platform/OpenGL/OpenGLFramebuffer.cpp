@@ -67,16 +67,6 @@ namespace Hanabi
 			glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, TextureTarget(multisampled), id, 0);
 		}
 
-		static bool IsDepthFormat(ImageFormat format)
-		{
-			switch (format)
-			{
-			case ImageFormat::DEPTH24STENCIL8:  return true;
-			}
-
-			return false;
-		}
-
 		static GLenum FBTextureFormatToGL(ImageFormat format)
 		{
 			switch (format)

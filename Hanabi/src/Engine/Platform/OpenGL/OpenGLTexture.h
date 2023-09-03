@@ -16,6 +16,7 @@ namespace Hanabi
 		void* GetRendererID() const override { return (void*)m_RendererID; }
 		void Bind(uint32_t slot = 0) const override;
 		void SetData(Buffer data) override;
+		virtual Ref<Image2D> GetImage() const override;
 		virtual Buffer GetWriteableBuffer() override { return m_Data; }
 		bool operator==(const Texture& other) const override;
 	private:
