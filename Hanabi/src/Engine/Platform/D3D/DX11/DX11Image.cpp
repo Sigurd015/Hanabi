@@ -24,7 +24,7 @@ namespace Hanabi
 			return DXGI_FORMAT_UNKNOWN;
 		}
 
-		static DXGI_FORMAT ImageFormatToDXSRVFormat(ImageFormat format)
+		static DXGI_FORMAT ImageFormatToDXDepthSRVFormat(ImageFormat format)
 		{
 			switch (format)
 			{
@@ -172,7 +172,7 @@ namespace Hanabi
 			D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceDesc = {};
 			if (isdepth)
 			{
-				shaderResourceDesc.Format = Utils::ImageFormatToDXSRVFormat(m_Specification.Format);
+				shaderResourceDesc.Format = Utils::ImageFormatToDXDepthSRVFormat(m_Specification.Format);
 			}
 			else
 			{

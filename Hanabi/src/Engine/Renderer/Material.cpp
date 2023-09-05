@@ -61,7 +61,7 @@ namespace Hanabi
 			}
 			else
 			{
-				HNB_CORE_WARN("Constant buffer '{}' not found in shader!", texture.first);
+				HNB_CORE_WARN("Texture '{}' not found in shader!", texture.first);
 			}
 		}
 	}

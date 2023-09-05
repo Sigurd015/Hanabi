@@ -22,6 +22,7 @@ struct VertexOutput
     float2 TexCoord : Tex;
     float3 Tangent : Tangent;
     float3 Bitangent : Bitangent;
+    float4 LightTransformedPosition : LightTransformedPosition;
 };
 
 VertexOutput main(VertexInput Input)
@@ -29,6 +30,7 @@ VertexOutput main(VertexInput Input)
     VertexOutput Output;
     Output.WorldPosition = mul(u_Transform, float4(Input.a_Position, 1.0f));
     Output.Position = mul(u_ViewProjection, float4(Output.WorldPosition, 1.0));
+    Output.LightTransformedPosition = mul(u_LightViewProjection, float4(Output.WorldPosition, 1.0));
     Output.TexCoord = Input.a_TexCoord;
     Output.Tangent = Input.a_Tangent;
     Output.Bitangent = Input.a_Bitangent;
@@ -40,8 +42,8 @@ VertexOutput main(VertexInput Input)
 #type:pixel
 #include "Buffers.hlsl"
 #include "Lighting.hlsl"
-#include "Textures.hlsl"
-#include "Shadow.hlsl"
+#include "Material.hlsl"
+#include "ShadowMapping.hlsl"
 
 struct PixelInput
 {
@@ -51,6 +53,7 @@ struct PixelInput
     float2 TexCoord : Tex;
     float3 Tangent : Tangent;
     float3 Bitangent : Bitangent;
+    float4 LightTransformedPosition : LightTransformedPosition;
 };
 
 struct PixelOutput
@@ -80,11 +83,18 @@ PixelOutput main(PixelInput Input)
     }
     else
         normal = Input.Normal;
+
+    float shadowResult = CalculateShadow(Input.LightTransformedPosition);
     
+    float3 ambient = u_SkyLightIntensity * float3(1.0f,1.0f,1.0f) * material.DiffuseColor;
+
     float3 PixelToCamera = normalize(u_CameraPosition - Input.WorldPosition);
     float3 dirLightResult = CalcDirectionalLight(material, normal, PixelToCamera);
     float3 pointLightResult = CalcPointLight(material, normal, PixelToCamera, Input.WorldPosition);
     float3 spotLightResult = CalcSpotLight(material, normal, PixelToCamera, Input.WorldPosition);
-    Output.Color = float4(saturate(dirLightResult + pointLightResult + spotLightResult), 1.0f);
+    //Output.Color = float4(saturate(dirLightResult + pointLightResult + spotLightResult), 1.0f);
+    //float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult) * shadowResult;
+    float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult);
+    Output.Color = float4(saturate(ambient + lightResult), 1.0f);
     return Output;
 }

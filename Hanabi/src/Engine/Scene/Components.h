@@ -116,6 +116,12 @@ namespace Hanabi
 		MaterialComponent(const MaterialComponent&) = default;
 	};
 
+	struct SkyLightComponent
+	{
+		AssetHandle SceneEnvironment;
+		float Intensity = 1.0f;
+	};
+
 	struct LightComponent
 	{
 		enum class LightType { None = 0, Directional, Point, Spot };
@@ -214,7 +220,7 @@ namespace Hanabi
 		ComponentGroup<
 		TransformComponent, SpriteRendererComponent, CircleRendererComponent,
 		MeshComponent, MaterialComponent,
-		LightComponent,
+		LightComponent, SkyLightComponent,
 		CameraComponent,
 		ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent,

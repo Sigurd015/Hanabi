@@ -257,51 +257,69 @@ namespace Hanabi
 		//----------------- 3D Scene Rendering -----------------//				
 		// Lights
 		{
-			auto view = m_Registry.view<TransformComponent, LightComponent>();
-			for (auto entity : view)
 			{
-				auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
-				switch (light.Type)
+				auto view = m_Registry.view<SkyLightComponent>();
+				if (view.empty())
 				{
-				case LightComponent::LightType::Directional:
-				{
-					m_Environment->DirLight = {
-						light.Radiance,
-						light.Intensity,
-						//TODO: Maybe (0,0,-1) is correct, why cherno set it to (1,1,1)?
-						//-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
-						-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(0,0,-1.0f)),
-						light.Shadow,
-					};
-					break;
+					m_Environment->SceneEnvironmentAssetHandle = 0;
+					m_Environment->SkyLightIntensity = 0.0f;
 				}
-				case LightComponent::LightType::Point:
+				else
 				{
-					m_Environment->PointLights.push_back({
-						transform.Translation,
-						light.Intensity,
-						light.Radiance,
-						light.Radius,
-						light.Falloff,
-						light.Shadow,
-						});
-					break;
+					// Only one skylight is allowed
+					auto& skylight = view.get<SkyLightComponent>(view.front());
+					m_Environment->SceneEnvironmentAssetHandle = skylight.SceneEnvironment;
+					m_Environment->SkyLightIntensity = skylight.Intensity;
 				}
-				case LightComponent::LightType::Spot:
+			}
+
+			{
+				auto view = m_Registry.view<TransformComponent, LightComponent>();
+				for (auto entity : view)
 				{
-					m_Environment->SpotLights.push_back({
-						transform.Translation,
-						light.Intensity,
-						light.Radiance,
-						light.AngleAttenuation,
-						glm::normalize(glm::rotate(transform.GetRotation(), glm::vec3(1.0f, 0.0f, 0.0f))),
-						light.Range,
-						light.Angle,
-						light.Falloff,
-						light.Shadow,
-						});
-					break;
-				}
+					auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
+					switch (light.Type)
+					{
+					case LightComponent::LightType::Directional:
+					{
+						m_Environment->DirLight = {
+							light.Radiance,
+							light.Intensity,
+							//TODO: Maybe (0,0,-1) is correct, why cherno set it to (1,1,1)?
+							//-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+							-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(0,0,-1.0f)),
+							light.Shadow,
+						};
+						break;
+					}
+					case LightComponent::LightType::Point:
+					{
+						m_Environment->PointLights.push_back({
+							transform.Translation,
+							light.Intensity,
+							light.Radiance,
+							light.Radius,
+							light.Falloff,
+							light.Shadow,
+							});
+						break;
+					}
+					case LightComponent::LightType::Spot:
+					{
+						m_Environment->SpotLights.push_back({
+							transform.Translation,
+							light.Intensity,
+							light.Radiance,
+							light.AngleAttenuation,
+							glm::normalize(glm::rotate(transform.GetRotation(), glm::vec3(1.0f, 0.0f, 0.0f))),
+							light.Range,
+							light.Angle,
+							light.Falloff,
+							light.Shadow,
+							});
+						break;
+					}
+					}
 				}
 			}
 		}

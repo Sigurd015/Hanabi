@@ -38,11 +38,11 @@ struct PixelOutput
 };
 
 TextureCube u_SkyboxTexture : register(t0);
-SamplerState u_SkyboxSampler : register(s0);
+SamplerState u_SSLinearWrap : register(s0);
 
 PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
-    Output.Color = u_SkyboxTexture.Sample(u_SkyboxSampler, Input.WorldPos);
+    Output.Color = u_SkyboxTexture.Sample(u_SSLinearWrap, Input.WorldPos);
     return Output;
 }

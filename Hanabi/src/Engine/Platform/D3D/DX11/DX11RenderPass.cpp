@@ -45,11 +45,19 @@ namespace Hanabi
 			}
 		}
 		{
-			auto it = reflectionData.find("SSLinearClamp");
+			auto it = reflectionData.find("u_SSLinearClamp");
 			if (it != reflectionData.end())
 			{
 				uint32_t slot = it->second;
 				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
+			}
+		}
+		{
+			auto it = reflectionData.find("u_SSShadowPCF");
+			if (it != reflectionData.end())
+			{
+				uint32_t slot = it->second;
+				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSShadowPCF.GetAddressOf());
 			}
 		}
 	}

@@ -317,6 +317,7 @@ namespace Hanabi
 			DisplayAddComponentEntry<MeshComponent>("Mesh Component");
 			DisplayAddComponentEntry<MaterialComponent>("Material Component");
 			DisplayAddComponentEntry<LightComponent>("Light Component");
+			DisplayAddComponentEntry<SkyLightComponent>("SkyLight Component");
 			ImGui::EndPopup();
 		}
 
@@ -468,7 +469,7 @@ namespace Hanabi
 						{
 							AssetImporter::Serialize(envMapAsset);
 							envMapAsset->Invalidate();
-						}			
+						}
 					}
 				}
 			});
@@ -653,6 +654,27 @@ namespace Hanabi
 					if (diffuseChanged || specularChanged || normalChanged || useNormalMapChanged)
 						AssetImporter::Serialize(materialAsset);
 				}
+			});
+
+		Utils::DrawComponent<SkyLightComponent>("SkyLight", entity, [](auto& component)
+			{
+				std::string label = "None";
+				if (AssetManager::IsAssetHandleValid(component.SceneEnvironment)
+					&& AssetManager::GetAssetType(component.SceneEnvironment) == AssetType::EnvMap)
+				{
+					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.SceneEnvironment);
+					label = metadata.FilePath.filename().string();
+				}
+
+				Utils::DrawDragDropContent(component.SceneEnvironment, AssetType::EnvMap, [&]()
+					{
+						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
+						{
+							component.SceneEnvironment = 0;
+						}
+					});
+
+				ImGui::DragFloat("Intensity", &component.Intensity, 0.1f, 0.0f, 5.0f);
 			});
 
 		Utils::DrawComponent<LightComponent>("Light", entity, [](auto& component)

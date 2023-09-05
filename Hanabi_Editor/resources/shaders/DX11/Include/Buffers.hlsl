@@ -45,6 +45,7 @@ cbuffer CBCamera : register(b1)
 
 cbuffer CBScene : register(b2)
 {
+    float u_SkyLightIntensity;
     DirectionalLight u_DirLight;
 };
 
@@ -60,7 +61,7 @@ cbuffer CBSpotLight : register(b4)
     SpotLight u_SpotLights[MAX_SPOT_LIGHT];
 };
 
-cbuffer CBLightVP : register(b5)
+cbuffer CBLightShadow : register(b5)
 {
     float4x4 u_LightViewProjection;
 };

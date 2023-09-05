@@ -195,6 +195,13 @@ namespace Hanabi
 				out << YAML::Key << "Falloff" << YAML::Value << lightComponent.Falloff;
 			});
 
+		SerializeComponent<SkyLightComponent>("SkyLightComponent", entity, out, [&]()
+			{
+				auto& skyLightComponent = entity.GetComponent<SkyLightComponent>();
+				out << YAML::Key << "SceneEnvironmentAssetHandle" << YAML::Value << skyLightComponent.SceneEnvironment;
+				out << YAML::Key << "Intensity" << YAML::Value << skyLightComponent.Intensity;
+			});
+
 		SerializeComponent<ScriptComponent>("ScriptComponent", entity, out, [&]()
 			{
 				auto& scriptComponent = entity.GetComponent<ScriptComponent>();
@@ -422,6 +429,14 @@ namespace Hanabi
 					lc.Angle = lightComponent["Angle"].as<float>();
 					lc.AngleAttenuation = lightComponent["AngleAttenuation"].as<float>();
 					lc.Falloff = lightComponent["Falloff"].as<float>();
+				}
+
+				auto skyLightComponent = entity["SkyLightComponent"];
+				if (skyLightComponent)
+				{
+					auto& slc = deserializedEntity.AddComponent<SkyLightComponent>();
+					slc.SceneEnvironment = skyLightComponent["SceneEnvironmentAssetHandle"].as<AssetHandle>();
+					slc.Intensity = skyLightComponent["Intensity"].as<float>();
 				}
 
 				auto scriptComponent = entity["ScriptComponent"];

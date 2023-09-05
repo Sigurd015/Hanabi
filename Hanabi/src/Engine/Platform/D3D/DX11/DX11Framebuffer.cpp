@@ -14,7 +14,7 @@ namespace Hanabi
 	static const uint32_t s_MaxFramebufferSize = 8192;
 	namespace Utils
 	{
-		static DXGI_FORMAT ImageFormatToDXDSVFormat(ImageFormat format)
+		static DXGI_FORMAT ImageFormatToDXDepthDSVFormat(ImageFormat format)
 		{
 			switch (format)
 			{
@@ -115,7 +115,7 @@ namespace Hanabi
 			m_DSAttachment->Invalidate();
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
-			depthStencilViewDesc.Format = Utils::ImageFormatToDXDSVFormat(m_DepthAttachmentSpecification.TextureFormat);
+			depthStencilViewDesc.Format = Utils::ImageFormatToDXDepthDSVFormat(m_DepthAttachmentSpecification.TextureFormat);
 			depthStencilViewDesc.Flags = 0;
 			depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			depthStencilViewDesc.Texture2D.MipSlice = 0;

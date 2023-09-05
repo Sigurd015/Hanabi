@@ -161,3 +161,13 @@ Entities:
         - Name: Speed
           Type: Float
           Data: 10
+  - Entity: 10126013087257898834
+    TagComponent:
+      Tag: Skylight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SkyLightComponent:
+      SceneEnvironmentAssetHandle: 17714572538490360680
+      Intensity: 0.200000003

@@ -70,6 +70,11 @@ namespace Hanabi
 
 		struct CBScene
 		{
+			float SkyLightIntensity = 0.0f;
+
+			// Padding
+			float padding[3];
+
 			DirectionalLight Light;
 		};
 
@@ -93,21 +98,26 @@ namespace Hanabi
 			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
 		};
 
+		struct CBLightShadow
+		{
+			glm::mat4 LightViewProj;
+		};
+
 		Ref<Environment> SceneEnvironment;
 
 		CBModel ModelData;
 		CBCamera CameraData;
-		CBCamera LightViewProjData;
 		CBScene SceneData;
 		CBPointLight PointLightData;
 		CBSpotLight SpotLightData;
+		CBLightShadow LightShadowData;
 
 		Ref<ConstantBuffer> ModelDataBuffer;
 		Ref<ConstantBuffer> CameraDataBuffer;
-		Ref<ConstantBuffer> LightViewProjDataBuffer;
 		Ref<ConstantBuffer> SceneDataBuffer;
 		Ref<ConstantBuffer> PointLightDataBuffer;
 		Ref<ConstantBuffer> SpotLightDataBuffer;
+		Ref<ConstantBuffer> LightShadowDataBuffer;
 
 		Ref<RenderPass> SkyboxPass;
 		Ref<RenderPass> ShadowPass;
@@ -135,10 +145,10 @@ namespace Hanabi
 
 		s_Data->ModelDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBModel));
 		s_Data->CameraDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBCamera));
-		s_Data->LightViewProjDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBCamera));
 		s_Data->SceneDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBScene));
 		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight));
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
+		s_Data->LightShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBLightShadow));
 
 		VertexBufferLayout vertexLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
@@ -227,9 +237,10 @@ namespace Hanabi
 		s_Data->GeoPass->SetInput("CBScene", s_Data->SceneDataBuffer);
 		s_Data->GeoPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->GeoPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
+		s_Data->GeoPass->SetInput("CBLightShadow", s_Data->LightShadowDataBuffer);
 
 		s_Data->ShadowPass->SetInput("CBModel", s_Data->ModelDataBuffer);
-		s_Data->ShadowPass->SetInput("CBCamera", s_Data->LightViewProjDataBuffer);
+		s_Data->ShadowPass->SetInput("CBLightShadow", s_Data->LightShadowDataBuffer);
 
 		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
@@ -258,6 +269,12 @@ namespace Hanabi
 		s_Data->CameraDataBuffer->SetData(&s_Data->CameraData);
 
 		s_Data->SceneEnvironment = environment;
+
+		// Sky Light
+		{
+			// TODO: Handle SceneEnvironment Map
+			s_Data->SceneData.SkyLightIntensity = environment->SkyLightIntensity;
+		}
 
 		// Directional Light
 		{
@@ -402,9 +419,18 @@ namespace Hanabi
 	{
 		// Directional Light
 		{
-			s_Data->LightViewProjData.ViewProj = glm::lookAt(s_Data->SceneEnvironment->DirLight.Direction,
-				glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)) * glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -100.0f, 100.0f);
-			s_Data->LightViewProjDataBuffer->SetData(&s_Data->LightViewProjData);
+			// PCF for soft shadow
+			static glm::mat4 temp = {
+				0.5f, 0.0f, 0.0f, 0.0f,
+				0.0f, -0.5f, 0.0f, 0.0f,
+				0.0f, 0.0f, 1.0f, 0.0f,
+				0.5f, 0.5f, 0.0f, 1.0f
+			};
+
+			glm::vec3 lightPosition = glm::vec3(0.0f) - s_Data->SceneEnvironment->DirLight.Direction * 200.0f;
+			s_Data->LightShadowData.LightViewProj = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, -1000.0f, 1000.0f)
+				* glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			s_Data->LightShadowDataBuffer->SetData(&s_Data->LightShadowData);
 
 			Renderer::BeginRenderPass(s_Data->ShadowPass);
 			ExecuteDrawCommands();

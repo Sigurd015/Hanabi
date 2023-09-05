@@ -53,6 +53,9 @@ namespace Hanabi
 		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		AssetHandle SkyboxAssetHandle = 0;
 
+		AssetHandle SceneEnvironmentAssetHandle = 0;
+		float SkyLightIntensity = 0.0f;
+
 		DirectionalLight DirLight;
 
 		std::vector<PointLight> PointLights;

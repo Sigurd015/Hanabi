@@ -2,7 +2,10 @@
 #define SHADOW_HEADER
 
 #include "Buffers.hlsl"
-#include "Textures.hlsl"
+
+Texture2D u_ShadowDepth : register(t3);
+
+SamplerState u_SSShadowPCF : register(s1);
 
 float CalculateShadow(float4 position)
 {
@@ -29,7 +32,7 @@ float CalculateShadow(float4 position)
     {
         for (int j = -KERNEL_WIDTH; j <= KERNEL_WIDTH; j++)
         {
-            float pcfDepth = u_ShadowDepth.Sample(u_SSLinearWrap, shadowPosition.xy + float2(i, j) * texelSize).r;
+            float pcfDepth = u_ShadowDepth.Sample(u_SSShadowPCF, shadowPosition.xy + float2(i, j) * texelSize).r;
             shadow += currentDepthValue - bias > pcfDepth ? 0.0f : 1.0f;
         }
     }

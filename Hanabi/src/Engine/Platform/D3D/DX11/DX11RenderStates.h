@@ -26,6 +26,7 @@ namespace Hanabi
 
 		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSLinearWrap = nullptr;
 		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSLinearClamp = nullptr;
+		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSShadowPCF = nullptr;
 
 		static void Init()
 		{
@@ -146,6 +147,22 @@ namespace Hanabi
 				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSLinearClamp.GetAddressOf()));
 			}
+			{
+				D3D11_SAMPLER_DESC samplerDesc = {};
+				samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+				samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+				samplerDesc.MaxAnisotropy = 1;
+				samplerDesc.MinLOD = 0.0f;
+				samplerDesc.MaxLOD = 0.0f;
+				samplerDesc.BorderColor[0] = 0.0f;
+				samplerDesc.BorderColor[1] = 0.0f;
+				samplerDesc.BorderColor[2] = 0.0f;
+				samplerDesc.BorderColor[3] = 1.0f;
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSShadowPCF.GetAddressOf()));
+			}		
 		}
 	};
 }
