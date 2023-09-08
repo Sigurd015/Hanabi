@@ -61,7 +61,7 @@ cbuffer CBSpotLight : register(b4)
     SpotLight u_SpotLights[MAX_SPOT_LIGHT];
 };
 
-cbuffer CBLightShadow : register(b5)
+cbuffer CBShadow : register(b5)
 {
     float4x4 u_LightViewProjection;
 };

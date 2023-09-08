@@ -4,29 +4,26 @@
 #include "DX11Context.h"
 
 #include <d3d11.h>
-#include <Windows.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
 	class DX11RenderStates
 	{
 	public:
-		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSNoDepthTest = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSLess = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSLessEqual = nullptr;
+		inline static ComPtr <ID3D11DepthStencilState> DSSNoDepthTest = nullptr;
+		inline static ComPtr <ID3D11DepthStencilState> DSSLess = nullptr;
+		inline static ComPtr <ID3D11DepthStencilState> DSSLessEqual = nullptr;
 
-		inline static Microsoft::WRL::ComPtr <ID3D11RasterizerState> RSNoCull = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11RasterizerState> RSCullBack = nullptr;
+		inline static ComPtr <ID3D11RasterizerState> RSNoCull = nullptr;
+		inline static ComPtr <ID3D11RasterizerState> RSCullBack = nullptr;
 
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSNoBlend = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSAlpha = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSAdditive = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSSubtractive = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSNoBlend = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSAlpha = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSAdditive = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSSubtractive = nullptr;
 
-		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSLinearWrap = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSLinearClamp = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSShadowPCF = nullptr;
+		inline static ComPtr <ID3D11SamplerState> SSLinearWrap = nullptr;
+		inline static ComPtr <ID3D11SamplerState> SSLinearClamp = nullptr;
 
 		static void Init()
 		{
@@ -146,22 +143,6 @@ namespace Hanabi
 				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSLinearClamp.GetAddressOf()));
-			}
-			{
-				D3D11_SAMPLER_DESC samplerDesc = {};
-				samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-				samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
-				samplerDesc.MaxAnisotropy = 1;
-				samplerDesc.MinLOD = 0.0f;
-				samplerDesc.MaxLOD = 0.0f;
-				samplerDesc.BorderColor[0] = 0.0f;
-				samplerDesc.BorderColor[1] = 0.0f;
-				samplerDesc.BorderColor[2] = 0.0f;
-				samplerDesc.BorderColor[3] = 1.0f;
-				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSShadowPCF.GetAddressOf()));
 			}		
 		}
 	};

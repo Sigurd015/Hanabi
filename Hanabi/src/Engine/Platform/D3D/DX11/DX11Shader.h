@@ -1,10 +1,10 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <string>
 #include <d3d11.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -25,14 +25,14 @@ namespace Hanabi
 		LPVOID GetVertextBufferPointer() { return m_VertexShaderBlob->GetBufferPointer(); }
 		SIZE_T GetVertextBufferSize() { return m_VertexShaderBlob->GetBufferSize(); }
 	private:
-		void CreateReflectionData(const Microsoft::WRL::ComPtr<ID3DBlob>& shaderBlob);
+		void CreateReflectionData(const ComPtr<ID3DBlob>& shaderBlob);
 		std::string ReadFile(const std::string& filepath);
 		std::unordered_map<ShaderType, std::string> PreProcess(const std::string& source);
 		void Compile(const std::unordered_map<ShaderType, std::string>& shaderSources);
 		std::string m_Name;
-		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_VertexShader;
-		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader;
-		Microsoft::WRL::ComPtr<ID3DBlob> m_VertexShaderBlob;
+		ComPtr<ID3D11VertexShader> m_VertexShader;
+		ComPtr<ID3D11PixelShader> m_PixelShader;
+		ComPtr<ID3DBlob> m_VertexShaderBlob;
 		ShaderReflectionData m_ReflectionData;
 	};
 }

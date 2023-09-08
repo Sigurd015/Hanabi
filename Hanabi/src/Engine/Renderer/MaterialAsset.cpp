@@ -6,7 +6,11 @@
 namespace Hanabi
 {
 	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetDefaultShader()))
-	{}
+	{
+		m_Material->SetTexture<Texture2D>("u_Diffuse", nullptr);
+		m_Material->SetTexture<Texture2D>("u_Specular", nullptr);
+		m_Material->SetTexture<Texture2D>("u_Normal", nullptr);
+	}
 
 	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))
 	{}

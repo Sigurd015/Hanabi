@@ -21,7 +21,7 @@ float3 CalcDirectionalLight(Material material, float3 worldNormal, float3 pixelT
     float3 diffuseColor = diffuseFactor * u_DirLight.Intensity * u_DirLight.Radiance * material.DiffuseColor;
 
     float3 lightReflect = normalize(reflect(lightDir, worldNormal));
-    float specularFactor = max(dot(pixelToCamera, lightReflect), 0);
+    float specularFactor = pow(max(dot(pixelToCamera, lightReflect), 0),32);
     float3 specularColor = specularFactor * u_DirLight.Intensity * material.SpecularColor;
     
     result = (diffuseColor + specularColor);
@@ -42,11 +42,11 @@ float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamer
         float distance = length(lightDirection);
         lightDirection = normalize(lightDirection);
       
-        float diffuseFactor = max(dot(worldNormal, -lightDirection), 0);
+        float diffuseFactor = max(dot(worldNormal, lightDirection), 0);
         float3 diffuseColor = diffuseFactor * pointLight.Intensity * pointLight.Radiance * material.DiffuseColor;
 
-        float3 lightReflect = normalize(reflect(lightDirection, worldNormal));
-        float specularFactor = max(dot(pixelToCamera, lightReflect), 0);
+        float3 lightReflect = normalize(reflect(-lightDirection, worldNormal));
+        float specularFactor = pow(max(dot(pixelToCamera, lightReflect), 0),32);
         float3 specularColor = specularFactor * pointLight.Intensity * material.SpecularColor;
 
         float3 color = (diffuseColor + specularColor);
@@ -84,7 +84,7 @@ float3 CalcSpotLight(Material material, float3 worldNormal, float3 pixelToCamera
         float3 diffuseColor = diffuseFactor * spotLight.Intensity * spotLight.Radiance * material.DiffuseColor;
 
         float3 lightReflect = normalize(reflect(lightDirection, worldNormal));
-        float specularFactor = max(dot(pixelToCamera, lightReflect), 0);
+        float specularFactor = pow(max(dot(pixelToCamera, lightReflect), 0),32);
         float3 specularColor = specularFactor * spotLight.Intensity * material.SpecularColor;
 
         float3 color = (diffuseColor + specularColor);

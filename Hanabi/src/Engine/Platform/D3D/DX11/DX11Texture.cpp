@@ -15,8 +15,8 @@ namespace Hanabi
 	{
 		bool CompareTexture(const Texture& tex1, const Texture& tex2)
 		{
-			Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv1 = static_cast<ID3D11ShaderResourceView*>(tex1.GetRendererID());
-			Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv2 = static_cast<ID3D11ShaderResourceView*>(tex2.GetRendererID());
+			ComPtr<ID3D11ShaderResourceView> srv1 = static_cast<ID3D11ShaderResourceView*>(tex1.GetRendererID());
+			ComPtr<ID3D11ShaderResourceView> srv2 = static_cast<ID3D11ShaderResourceView*>(tex2.GetRendererID());
 			ID3D11Resource* resource1;
 			ID3D11Resource* resource2;
 			srv1->GetResource(&resource1);

@@ -3,12 +3,10 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11Shader.h"
 #include "DX11Context.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <fstream>
 #include <d3dcompiler.h>
 #include <D3D11Shader.h>
-#pragma pack_matrix(row_major)
 
 namespace Hanabi
 {
@@ -31,9 +29,9 @@ namespace Hanabi
 		Compile(shaderSources);
 	}
 
-	void DX11Shader::CreateReflectionData(const Microsoft::WRL::ComPtr<ID3DBlob>& shaderBlob)
+	void DX11Shader::CreateReflectionData(const ComPtr<ID3DBlob>& shaderBlob)
 	{
-		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> shaderReflection;
+		ComPtr<ID3D11ShaderReflection> shaderReflection;
 		DX_CHECK_RESULT(D3DReflect(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&shaderReflection));
 
 		D3D11_SHADER_DESC shaderDesc;
@@ -146,7 +144,7 @@ namespace Hanabi
 			}
 			case Hanabi::PIXEL_SHADER:
 			{
-				Microsoft::WRL::ComPtr<ID3DBlob> blob;
+				ComPtr<ID3DBlob> blob;
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
 					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, blob.ReleaseAndGetAddressOf(), nullptr));
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),

@@ -2,7 +2,6 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11Image.h"
 #include "DX11Context.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 
 namespace Hanabi
 {

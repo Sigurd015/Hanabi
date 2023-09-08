@@ -5,7 +5,6 @@
 #include "DX11Framebuffer.h"
 #include "DX11Context.h"
 #include "DX11Framebuffer.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -93,7 +92,7 @@ namespace Hanabi
 				Ref<DX11Image2D> image = CreateRef<DX11Image2D>(spec);
 				image->Invalidate();
 
-				Microsoft::WRL::ComPtr<ID3D11RenderTargetView> targetView;
+				ComPtr<ID3D11RenderTargetView> targetView;
 				D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
 				targetViewDesc.Format = image->GetFormat();
 				targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
@@ -170,9 +169,9 @@ namespace Hanabi
 		HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
 
 		D3D11_TEXTURE2D_DESC textureDesc = {};
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> temp = m_ColorAttachments[attachmentIndex]->GetTexture();
+		ComPtr<ID3D11Texture2D> temp = m_ColorAttachments[attachmentIndex]->GetTexture();
 		temp->GetDesc(&textureDesc);
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> textureCopy;
+		ComPtr<ID3D11Texture2D> textureCopy;
 		D3D11_TEXTURE2D_DESC textureCopyDesc = textureDesc;
 		textureCopyDesc.Usage = D3D11_USAGE_STAGING;
 		textureCopyDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;

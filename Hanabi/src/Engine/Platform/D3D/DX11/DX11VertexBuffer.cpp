@@ -2,7 +2,6 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11VertexBuffer.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 #include "DX11Context.h"
 
 namespace Hanabi

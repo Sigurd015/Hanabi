@@ -98,7 +98,7 @@ namespace Hanabi
 			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
 		};
 
-		struct CBLightShadow
+		struct CBShadow
 		{
 			glm::mat4 LightViewProj;
 		};
@@ -110,14 +110,14 @@ namespace Hanabi
 		CBScene SceneData;
 		CBPointLight PointLightData;
 		CBSpotLight SpotLightData;
-		CBLightShadow LightShadowData;
+		CBShadow ShadowData;
 
 		Ref<ConstantBuffer> ModelDataBuffer;
 		Ref<ConstantBuffer> CameraDataBuffer;
 		Ref<ConstantBuffer> SceneDataBuffer;
 		Ref<ConstantBuffer> PointLightDataBuffer;
 		Ref<ConstantBuffer> SpotLightDataBuffer;
-		Ref<ConstantBuffer> LightShadowDataBuffer;
+		Ref<ConstantBuffer> ShadowDataBuffer;
 
 		Ref<RenderPass> SkyboxPass;
 		Ref<RenderPass> ShadowPass;
@@ -148,7 +148,7 @@ namespace Hanabi
 		s_Data->SceneDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBScene));
 		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight));
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
-		s_Data->LightShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBLightShadow));
+		s_Data->ShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBShadow));
 
 		VertexBufferLayout vertexLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
@@ -211,8 +211,8 @@ namespace Hanabi
 			{
 				FramebufferSpecification spec;
 				spec.Attachments = { ImageFormat::ShadowMap };
-				spec.Width = 1024;
-				spec.Height = 1024;
+				spec.Width = 2048;
+				spec.Height = 2048;
 				spec.SwapChainTarget = false;
 				shadowFramebuffer = Framebuffer::Create(spec);
 			}
@@ -237,14 +237,17 @@ namespace Hanabi
 		s_Data->GeoPass->SetInput("CBScene", s_Data->SceneDataBuffer);
 		s_Data->GeoPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->GeoPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
-		s_Data->GeoPass->SetInput("CBLightShadow", s_Data->LightShadowDataBuffer);
+		s_Data->GeoPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
+		s_Data->GeoPass->SetInput("u_ShadowDepth", s_Data->ShadowPass->GetDepthOutput());
 
 		s_Data->ShadowPass->SetInput("CBModel", s_Data->ModelDataBuffer);
-		s_Data->ShadowPass->SetInput("CBLightShadow", s_Data->LightShadowDataBuffer);
+		s_Data->ShadowPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
 
 		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
-		s_Data->DefaultMaterial = CreateRef<Material>(Renderer::GetDefaultShader());
+		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
+		//s_Data->DefaultMaterial = CreateRef<Material>(Renderer::GetDefaultShader());
+		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
 		s_Data->SkyboxMaterial = CreateRef<Material>(Renderer::GetShader("Skybox"));
 	}
 
@@ -420,23 +423,16 @@ namespace Hanabi
 		// Directional Light
 		{
 			// PCF for soft shadow
-			static glm::mat4 temp = {
-				0.5f, 0.0f, 0.0f, 0.0f,
-				0.0f, -0.5f, 0.0f, 0.0f,
-				0.0f, 0.0f, 1.0f, 0.0f,
-				0.5f, 0.5f, 0.0f, 1.0f
-			};
-
-			glm::vec3 lightPosition = glm::vec3(0.0f) - s_Data->SceneEnvironment->DirLight.Direction * 200.0f;
-			s_Data->LightShadowData.LightViewProj = glm::ortho(-100.0f, 100.0f, -100.0f, 100.0f, -1000.0f, 1000.0f)
-				* glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			s_Data->LightShadowDataBuffer->SetData(&s_Data->LightShadowData);
+			glm::vec3 lightDir = -s_Data->SceneEnvironment->DirLight.Direction;
+			glm::vec3 lightPosition = glm::vec3(0.0f) - lightDir * 5.0f;
+			glm::mat4 lightViewMatrix = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			glm::mat4 lightOrthoMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 100.0f);
+			s_Data->ShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
+			s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 
 			Renderer::BeginRenderPass(s_Data->ShadowPass);
 			ExecuteDrawCommands();
 			Renderer::EndRenderPass(s_Data->ShadowPass);
-
-			s_Data->GeoPass->SetInput("u_ShadowDepth", s_Data->ShadowPass->GetDepthOutput());
 
 			switch (s_Data->SceneEnvironment->DirLight.ShadowType)
 			{

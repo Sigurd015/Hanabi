@@ -1,10 +1,9 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/ConstantBuffer.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <d3d11.h>
-#include <Windows.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -17,7 +16,7 @@ namespace Hanabi
 		void SetData(const void* data, uint32_t offset = 0) override;
 	private:
 		uint32_t m_DataSize;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_ConstantBuffer;
+		ComPtr<ID3D11Buffer> m_ConstantBuffer;
 	};
 }
 #endif

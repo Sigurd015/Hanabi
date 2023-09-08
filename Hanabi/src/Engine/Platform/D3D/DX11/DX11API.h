@@ -3,10 +3,9 @@
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/RenderPass.h"
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <d3d11.h>
-#include <Windows.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -30,12 +29,12 @@ namespace Hanabi
 
 		uint32_t m_Width = 0, m_Height = 0;
 
-		Microsoft::WRL::ComPtr<IDXGISwapChain> m_SwapChain;
-		Microsoft::WRL::ComPtr<ID3D11Device> m_Device;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_DeviceContext;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
+		ComPtr<IDXGISwapChain> m_SwapChain;
+		ComPtr<ID3D11Device> m_Device;
+		ComPtr<ID3D11DeviceContext> m_DeviceContext;
+		ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
+		ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
+		ComPtr<ID3D11Texture2D> m_DepthStencilBuffer;
 		glm::vec4 m_ClearColor = { 0.0f,0.0f,0.0f,1.0f };
 	};
 }

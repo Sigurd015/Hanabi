@@ -1,10 +1,10 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/IndexBuffer.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <cstdint>
 #include <d3d11.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -17,7 +17,7 @@ namespace Hanabi
 		uint32_t GetCount() const { return m_Count; }
 	private:
 		uint32_t m_Count;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_IndexBuffer;
+		ComPtr<ID3D11Buffer> m_IndexBuffer;
 	};
 }
 #endif

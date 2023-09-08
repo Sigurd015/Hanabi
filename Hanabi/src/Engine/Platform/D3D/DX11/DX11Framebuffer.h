@@ -2,10 +2,9 @@
 #pragma once
 #include "Engine/Renderer/Framebuffer.h"
 #include "DX11Image.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <d3d11.h>
-#include <Windows.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -47,10 +46,10 @@ namespace Hanabi
 		FramebufferTextureSpecification m_DepthAttachmentSpecification = ImageFormat::None;
 
 		std::vector<Ref<DX11Image2D>> m_ColorAttachments;
-		std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> m_ColorAttachmentRTV;
+		std::vector<ComPtr<ID3D11RenderTargetView>> m_ColorAttachmentRTV;
 
 		Ref<DX11Image2D> m_DSAttachment = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSAttachmentDSV;
+		ComPtr<ID3D11DepthStencilView> m_DSAttachmentDSV;
 	};
 }
 #endif

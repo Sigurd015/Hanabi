@@ -52,14 +52,6 @@ namespace Hanabi
 				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
 			}
 		}
-		{
-			auto it = reflectionData.find("u_SSShadowPCF");
-			if (it != reflectionData.end())
-			{
-				uint32_t slot = it->second;
-				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSShadowPCF.GetAddressOf());
-			}
-		}
 	}
 
 	Ref<Image2D> DX11RenderPass::GetOutput(uint32_t index)

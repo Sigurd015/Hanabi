@@ -1,9 +1,9 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/Image.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <d3d11.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -35,13 +35,13 @@ namespace Hanabi
 		void SetData(Buffer data);
 
 		DXGI_FORMAT GetFormat() const { return m_DataFormat; }
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> GetTexture() const { return m_Texture; }
+		ComPtr<ID3D11Texture2D> GetTexture() const { return m_Texture; }
 	private:
 		ImageSpecification m_Specification;
 		Buffer m_ImageData;
 		DXGI_FORMAT m_DataFormat;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
+		ComPtr<ID3D11Texture2D> m_Texture;
+		ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
 	};
 }
 #endif
