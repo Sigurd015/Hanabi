@@ -8,10 +8,6 @@
 struct VertexInput
 {
     float3 a_Position : a_Position;
-    float3 a_Normal : a_Normal;
-    float3 a_Tangent : a_Tangent;
-    float3 a_Bitangent : a_Bitangent;
-    float2 a_TexCoord : a_TexCoord;
 };
 
 struct VertexOutput
@@ -29,5 +25,10 @@ VertexOutput main(VertexInput Input)
 
 #type:pixel
 
-void main()
+struct PSInput
+{
+    float4 Position : SV_Position;
+};
+
+void main(PSInput Input)
 {}

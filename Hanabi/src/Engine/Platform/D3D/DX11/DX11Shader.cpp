@@ -114,7 +114,8 @@ namespace Hanabi
 					size_t begin = pos + includeTokenLength;
 					std::string fileName = code.second.substr(begin, eol - begin - fileTypeLength);
 					size_t nextLinePos = code.second.find_first_not_of("\r\n", eol);
-					std::string includeSource = ReadFile("resources/shaders/DX11/include/" + fileName + ".hlsl");
+					std::string filePath = std::string(GetShaderDirectoryPath()) + "DX11/include/" + fileName + ".hlsl";
+					std::string includeSource = ReadFile(filePath);
 					code.second.replace(pos, eol - pos, includeSource);
 					pos = code.second.find(includeToken, nextLinePos);
 				}

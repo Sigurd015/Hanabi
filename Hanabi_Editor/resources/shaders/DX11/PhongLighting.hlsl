@@ -84,16 +84,16 @@ PixelOutput main(PixelInput Input)
     else
         normal = Input.Normal;
 
-    float dirLifhtShadowResult = CalculateHardShadow(Input.LightTransformedPosition);
+    float shadowResult = CalculateSoftShadow(Input.LightTransformedPosition);
     
     float3 ambient = u_SkyLightIntensity * float3(1.0f,1.0f,1.0f) * material.DiffuseColor;
 
     float3 PixelToCamera = normalize(u_CameraPosition - Input.WorldPosition);
-    float3 dirLightResult = CalcDirectionalLight(material, normal, PixelToCamera) * dirLifhtShadowResult;
+    float3 dirLightResult = CalcDirectionalLight(material, normal, PixelToCamera);
     float3 pointLightResult = CalcPointLight(material, normal, PixelToCamera, Input.WorldPosition);
     float3 spotLightResult = CalcSpotLight(material, normal, PixelToCamera, Input.WorldPosition);
     //Output.Color = float4(saturate(dirLightResult + pointLightResult + spotLightResult), 1.0f);
-    float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult);
+    float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult) * shadowResult;
     //float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult);
     Output.Color = float4(saturate(ambient + lightResult), 1.0f);
     //Output.Color = float4(shadowResult,shadowResult,shadowResult, 1.0f);

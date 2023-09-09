@@ -125,6 +125,7 @@ namespace Hanabi
 
 		Ref<Material> DefaultMaterial;
 		Ref<Material> SkyboxMaterial;
+		Ref<Material> ShadowMaterial;
 
 		struct GeoDrawCommand
 		{
@@ -133,7 +134,7 @@ namespace Hanabi
 
 			CBModel ModelData;
 		};
-		std::vector<GeoDrawCommand> GeoDrawCommands;
+		std::vector<GeoDrawCommand> DrawCommands;
 
 		bool SkyboxDrawRequested = false;
 	};
@@ -150,14 +151,6 @@ namespace Hanabi
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
 		s_Data->ShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBShadow));
 
-		VertexBufferLayout vertexLayout = {
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float3, "a_Normal" },
-			{ ShaderDataType::Float3, "a_Tangent" },
-			{ ShaderDataType::Float3, "a_Bitangent" },
-			{ ShaderDataType::Float2, "a_TexCoord" },
-		};
-
 		// Geometry Pass
 		Ref<Framebuffer> geoFramebuffer;
 		{
@@ -172,6 +165,14 @@ namespace Hanabi
 				geoFramebuffer = Framebuffer::Create(spec);
 			}
 			{
+				VertexBufferLayout vertexLayout = {
+					{ ShaderDataType::Float3, "a_Position" },
+					{ ShaderDataType::Float3, "a_Normal" },
+					{ ShaderDataType::Float3, "a_Tangent" },
+					{ ShaderDataType::Float3, "a_Bitangent" },
+					{ ShaderDataType::Float2, "a_TexCoord" },
+				};
+
 				PipelineSpecification pipelineSpec;
 				pipelineSpec.Layout = vertexLayout;
 				pipelineSpec.Shader = Renderer::GetDefaultShader();
@@ -217,6 +218,10 @@ namespace Hanabi
 				shadowFramebuffer = Framebuffer::Create(spec);
 			}
 			{
+				VertexBufferLayout vertexLayout = {
+					{ ShaderDataType::Float3, "a_Position" },
+				};
+
 				PipelineSpecification pipelineSpec;
 				pipelineSpec.Layout = vertexLayout;
 				pipelineSpec.Shader = Renderer::GetShader("ShadowMap");
@@ -248,6 +253,7 @@ namespace Hanabi
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
 		//s_Data->DefaultMaterial = CreateRef<Material>(Renderer::GetDefaultShader());
 		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
+		s_Data->ShadowMaterial = CreateRef<Material>(Renderer::GetShader("ShadowMap"));
 		s_Data->SkyboxMaterial = CreateRef<Material>(Renderer::GetShader("Skybox"));
 	}
 
@@ -322,7 +328,7 @@ namespace Hanabi
 			s_Data->SpotLightDataBuffer->SetData(&s_Data->SpotLightData);
 		}
 
-		s_Data->GeoDrawCommands.clear();
+		s_Data->DrawCommands.clear();
 
 		switch (environment->ClearType)
 		{
@@ -373,12 +379,12 @@ namespace Hanabi
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material)
 	{
-		s_Data->GeoDrawCommands.push_back({ mesh ,material->GetMaterial() ,{ transform,material->IsUsingNormalMap() } });
+		s_Data->DrawCommands.push_back({ mesh ,material->GetMaterial() ,{ transform,material->IsUsingNormalMap() } });
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
-		s_Data->GeoDrawCommands.push_back({ mesh ,s_Data->DefaultMaterial ,{ transform,false } });
+		s_Data->DrawCommands.push_back({ mesh ,s_Data->DefaultMaterial ,{ transform,false } });
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle)
@@ -405,16 +411,19 @@ namespace Hanabi
 		}
 	}
 
-	void SceneRenderer::ExecuteDrawCommands()
+	void SceneRenderer::ExecuteDrawCommands(const Ref<Pipeline>& pipeline, const Ref<Material>& material)
 	{
-		for (auto& command : s_Data->GeoDrawCommands)
+		for (auto& command : s_Data->DrawCommands)
 		{
 			s_Data->ModelData.Transform = command.ModelData.Transform;
 			s_Data->ModelData.UseNormalMap = command.ModelData.UseNormalMap;
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 
-			Renderer::SubmitStaticMesh(command.Mesh, command.Material, s_Data->GeoPass->GetPipeline());
+			if (material)
+				Renderer::SubmitStaticMesh(command.Mesh, material, pipeline);
+			else
+				Renderer::SubmitStaticMesh(command.Mesh, command.Material, pipeline);
 		}
 	}
 
@@ -422,16 +431,14 @@ namespace Hanabi
 	{
 		// Directional Light
 		{
-			// PCF for soft shadow
-			glm::vec3 lightDir = -s_Data->SceneEnvironment->DirLight.Direction;
-			glm::vec3 lightPosition = glm::vec3(0.0f) - lightDir * 5.0f;
+			glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 20.0f);
 			glm::mat4 lightViewMatrix = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 lightOrthoMatrix = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 100.0f);
+			glm::mat4 lightOrthoMatrix = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
 			s_Data->ShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
 			s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 
 			Renderer::BeginRenderPass(s_Data->ShadowPass);
-			ExecuteDrawCommands();
+			ExecuteDrawCommands(s_Data->ShadowPass->GetPipeline(), s_Data->ShadowMaterial);
 			Renderer::EndRenderPass(s_Data->ShadowPass);
 
 			switch (s_Data->SceneEnvironment->DirLight.ShadowType)
@@ -508,7 +515,7 @@ namespace Hanabi
 	void SceneRenderer::GeometryPass()
 	{
 		Renderer::BeginRenderPass(s_Data->GeoPass);
-		ExecuteDrawCommands();
+		ExecuteDrawCommands(s_Data->GeoPass->GetPipeline());
 		Renderer::EndRenderPass(s_Data->GeoPass);
 	}
 

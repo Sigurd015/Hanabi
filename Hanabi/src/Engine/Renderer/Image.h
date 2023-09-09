@@ -106,13 +106,5 @@ namespace Hanabi
 
 			return false;
 		}
-
-		inline static bool IsShadowMap(ImageFormat format)
-		{
-			if (format == ImageFormat::DEPTH32F)
-				return true;
-
-			return false;
-		}
 	}
 }
