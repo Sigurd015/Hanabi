@@ -84,8 +84,17 @@ PixelOutput main(PixelInput Input)
     else
         normal = Input.Normal;
 
-    float shadowResult = CalculateSoftShadow(Input.LightTransformedPosition);
-    
+    float shadowResult = 1.0f;
+    switch(u_DirLight.ShadowType)
+    {
+        case 1:
+            shadowResult = CalculateHardShadow(Input.LightTransformedPosition, normal);
+            break;
+        case 2:
+            shadowResult = CalculateSoftShadow(Input.LightTransformedPosition, normal);
+            break;
+    }
+
     float3 ambient = u_SkyLightIntensity * float3(1.0f,1.0f,1.0f) * material.DiffuseColor;
 
     float3 PixelToCamera = normalize(u_CameraPosition - Input.WorldPosition);

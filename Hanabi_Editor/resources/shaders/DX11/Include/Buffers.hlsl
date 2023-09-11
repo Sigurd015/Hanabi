@@ -8,6 +8,7 @@ struct DirectionalLight
     float3 Radiance;
     float Intensity;
     float3 Direction;
+    uint ShadowType;
 };
 
 struct PointLight

@@ -7,8 +7,15 @@ Texture2D u_ShadowDepth : register(t3);
 
 SamplerState u_SSLinearClamp : register(s1);
 
+float GetDirShadowBias(float3 worldNormal)
+{
+	const float MINIMUM_SHADOW_BIAS = 0.002f;
+	float bias = max(MINIMUM_SHADOW_BIAS * (1.0 - dot(worldNormal, u_DirLight.Direction)), MINIMUM_SHADOW_BIAS);
+	return bias;
+}
+
 // PCF Soft Shadows
-float CalculateSoftShadow(float4 position)
+float CalculateSoftShadow(float4 position, float3 worldNormal)
 {
     float4 shadowPosition = position;
     shadowPosition.xyz /= shadowPosition.w;
@@ -26,7 +33,7 @@ float CalculateSoftShadow(float4 position)
     float currentDepth = shadowPosition.z;
 
     float shadow = 0.0f;
-    float bias = 0.005f; // max(0.05f * (1.0f -  dot(input.normal, lightDirection.xyz)), 0.005f);
+    float bias = GetDirShadowBias(worldNormal);
     float texelSize =0.00008f;
 
     // PCF Sample with 6x6 kernel
@@ -46,7 +53,7 @@ float CalculateSoftShadow(float4 position)
 }
 
 // Hard Shadows
-float CalculateHardShadow(float4 position)
+float CalculateHardShadow(float4 position, float3 worldNormal)
 {
     float4 shadowPosition = position;
     shadowPosition.xyz /= shadowPosition.w;
@@ -62,13 +69,13 @@ float CalculateHardShadow(float4 position)
 
     float currentDepth = shadowPosition.z;
 
-    float shadow = 0.0f;
-    float bias = 0.005f; 
+    float shadow = 1.0f;
+    float bias = GetDirShadowBias(worldNormal);
     float depthFromLight = u_ShadowDepth.Sample(u_SSLinearClamp, shadowPosition.xy).r;
     if(currentDepth > depthFromLight + bias)
     {
-        shadow = 1.0f;
+        shadow = 0.0f;
     }
-    return 1.0f - shadow;
+    return shadow;
 }
 #endif

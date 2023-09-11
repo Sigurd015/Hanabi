@@ -74,6 +74,9 @@
     public class LightComponent : Component
     { }
 
+    public class SkyLightComponent : Component
+    { }
+
     public class TextComponent : Component
     {
         public string Text

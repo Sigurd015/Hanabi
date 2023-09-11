@@ -20,7 +20,7 @@ Entities:
     TagComponent:
       Tag: Box
     TransformComponent:
-      Translation: [-4.87281179, 0, 6.71382523]
+      Translation: [-4.87281179, 0.350687027, 6.7973156]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
@@ -48,7 +48,7 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 5025462131848195016
     MaterialComponent:
-      MaterialAssetHandle: 15452597858793361030
+      MaterialAssetHandle: 4137013318427118749
   - Entity: 1514165854352143360
     TagComponent:
       Tag: Wall
@@ -59,7 +59,7 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 5025462131848195016
     MaterialComponent:
-      MaterialAssetHandle: 15452597858793361030
+      MaterialAssetHandle: 4137013318427118749
   - Entity: 18258964263546460165
     TagComponent:
       Tag: Wall
@@ -70,17 +70,17 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 5025462131848195016
     MaterialComponent:
-      MaterialAssetHandle: 15452597858793361030
+      MaterialAssetHandle: 4137013318427118749
   - Entity: 1195692201421875731
     TagComponent:
       Tag: DirectionalLight
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Rotation: [0.155334294, -1.5254178, -0.33859387]
       Scale: [1, 1, 1]
     LightComponent:
       LightType: Directional
-      Intensity: 0.300000012
+      Intensity: 0.400000006
       Radiance: [1, 1, 1]
       Radius: 0
       Range: 0
@@ -102,14 +102,14 @@ Entities:
     TagComponent:
       Tag: PointLight
     TransformComponent:
-      Translation: [-12.4543171, 0.690446496, -2.18538117]
+      Translation: [-6.13191414, 0.690446496, 3.15182066]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 0.100000001, 1]
     LightComponent:
       LightType: Point
       Intensity: 0
       Radiance: [1, 1, 1]
-      Radius: 5
+      Radius: 15
       Range: 0
       Angle: 0
       AngleAttenuation: 0
@@ -118,14 +118,14 @@ Entities:
     TagComponent:
       Tag: PointLight
     TransformComponent:
-      Translation: [-0.179519653, -3.05634832, 10.5375605]
+      Translation: [-0.676193953, -0.0656661987, 0.416122556]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 0.100000001, 1]
     LightComponent:
       LightType: Point
       Intensity: 0
       Radiance: [1, 1, 1]
-      Radius: 5
+      Radius: 15
       Range: 0
       Angle: 0
       AngleAttenuation: 0

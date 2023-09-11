@@ -29,6 +29,8 @@ namespace Hanabi
 		m_Device = DX11Context::GetDevice();
 		m_SwapChain = DX11Context::GetSwapChain();
 
+		DX11RenderStates::Init();
+
 		SetBuffer(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
 	}
 
@@ -147,7 +149,7 @@ namespace Hanabi
 		Clear();
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();

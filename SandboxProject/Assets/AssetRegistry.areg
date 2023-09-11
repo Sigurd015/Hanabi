@@ -44,6 +44,9 @@ AssetRegistry:
   - Handle: 9644760195236910386
     FilePath: Textures/universe-skybox/top.png
     Type: AssetType::Texture2D
+  - Handle: 11971813417510223497
+    FilePath: Textures/brickwall/brickwall_normal.jpg
+    Type: AssetType::Texture2D
   - Handle: 12104991068264146629
     FilePath: Models/Sphere.fbx
     Type: AssetType::MeshSource
@@ -59,12 +62,18 @@ AssetRegistry:
   - Handle: 15452597858793361030
     FilePath: Materials/mat3.hmat
     Type: AssetType::Material
+  - Handle: 16012621993207567016
+    FilePath: Textures/brickwall/brickwall_normal_obj.png
+    Type: AssetType::Texture2D
   - Handle: 17058150480603569601
     FilePath: Models/Cylinder.fbx
     Type: AssetType::MeshSource
   - Handle: 17746566452886661726
     FilePath: Materials/universeSkybox.henv
     Type: AssetType::EnvMap
+  - Handle: 17815512371411204623
+    FilePath: Textures/brickwall/brickwall.jpg
+    Type: AssetType::Texture2D
   - Handle: 18104625788437832565
     FilePath: Textures/universe-skybox/right.png
     Type: AssetType::Texture2D

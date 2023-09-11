@@ -19,7 +19,7 @@ namespace Hanabi
 		return false;
 	}
 
-	Buffer TextureSerializer::LoadTextureData(const std::filesystem::path& path, ImageFormat& outFormat, uint32_t& outWidth, uint32_t& outHeight)
+	Buffer TextureSerializer::LoadTextureData(const std::filesystem::path& path, TextureSpecification& spec)
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
@@ -35,15 +35,15 @@ namespace Hanabi
 
 		data.Size = width * height * channels;
 
-		outWidth = width;
-		outHeight = height;
+		spec.Width = width;
+		spec.Height = height;
 		switch (channels)
 		{
 		case 3:
-			outFormat = ImageFormat::RGB8;
+			spec.Format = ImageFormat::RGB8;
 			break;
 		case 4:
-			outFormat = ImageFormat::RGBA8;
+			spec.Format = ImageFormat::RGBA8;
 			break;
 		}
 
@@ -53,7 +53,7 @@ namespace Hanabi
 	Ref<Texture2D> TextureSerializer::LoadTexture2D(const std::filesystem::path& path)
 	{
 		TextureSpecification spec;
-		Buffer data = LoadTextureData(path, spec.Format, spec.Width, spec.Height);
+		Buffer data = LoadTextureData(path, spec);
 
 		if (data)
 		{

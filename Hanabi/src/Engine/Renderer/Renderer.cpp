@@ -32,7 +32,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Line");
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
 		s_Data->ShaderLibrary->Load("PhongLighting");
-		s_Data->ShaderLibrary->Load("ShadowMap");
+		s_Data->ShaderLibrary->Load("DirShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
 
 		//Setup textures
@@ -86,9 +86,9 @@ namespace Hanabi
 		s_RendererAPI->EndRenderPass(renderPass);
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
-		s_RendererAPI->SubmitStaticMesh(mesh, material, pipeline);
+		s_RendererAPI->DrawMesh(mesh, material, pipeline);
 	}
 
 	void Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,

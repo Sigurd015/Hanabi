@@ -85,9 +85,7 @@ namespace Hanabi
 		if (buffer.Size)
 			m_ImageData = Buffer::Copy(buffer);
 
-		HNB_CORE_INFO("Creating Image2D: Source buffer size {} ", buffer.Size);
-		HNB_CORE_INFO("Creating Image2D: m_ImageData buffer size {} ", m_ImageData.Size);
-
+		//TODO: Fix
 		switch (m_Specification.Usage)
 		{
 		case ImageUsage::Texture2D:
@@ -101,17 +99,16 @@ namespace Hanabi
 			textureDesc.SampleDesc.Count = 1;
 			textureDesc.SampleDesc.Quality = 0;
 			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.MiscFlags = 0;
 
-			if (!buffer.Size)
+			if (!buffer)
 			{
 				textureDesc.Usage = D3D11_USAGE_DYNAMIC;
 				textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-				textureDesc.MiscFlags = 0;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, m_Texture.GetAddressOf()));
 			}
 			else
 			{
-
 				textureDesc.Usage = D3D11_USAGE_DEFAULT;
 				textureDesc.CPUAccessFlags = 0;
 				D3D11_SUBRESOURCE_DATA subresourceData = {};
@@ -138,7 +135,10 @@ namespace Hanabi
 	}
 
 	void DX11Image2D::Resize(const uint32_t width, const uint32_t height)
-	{}
+	{
+		m_Specification.Width = width;
+		m_Specification.Height = height;
+	}
 
 	void DX11Image2D::Invalidate()
 	{
@@ -157,6 +157,7 @@ namespace Hanabi
 			textureDesc.SampleDesc.Count = 1;
 			textureDesc.SampleDesc.Quality = 0;
 			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.CPUAccessFlags = 0;
 			if (isdepth)
 			{
 				textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
@@ -165,10 +166,11 @@ namespace Hanabi
 			{
 				textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 			}
-			textureDesc.CPUAccessFlags = 0;
 			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, m_Texture.GetAddressOf()));
 
 			D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceDesc = {};
+			shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			shaderResourceDesc.Texture2D.MipLevels = 1;
 			if (isdepth)
 			{
 				shaderResourceDesc.Format = Utils::ImageFormatToDXDepthSRVFormat(m_Specification.Format);
@@ -177,8 +179,6 @@ namespace Hanabi
 			{
 				shaderResourceDesc.Format = textureDesc.Format;
 			}
-			shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			shaderResourceDesc.Texture2D.MipLevels = 1;
 			DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &shaderResourceDesc, m_TextureSRV.GetAddressOf());
 			break;
 		}
@@ -193,17 +193,16 @@ namespace Hanabi
 		//	textureDesc.SampleDesc.Count = 1;
 		//	textureDesc.SampleDesc.Quality = 0;
 		//	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		//	textureDesc.MiscFlags = 0;
 
-		//	if (!m_ImageData.Size)
+		//	if (!m_ImageData)
 		//	{
 		//		textureDesc.Usage = D3D11_USAGE_DYNAMIC;
 		//		textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		//		textureDesc.MiscFlags = 0;
 		//		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, m_Texture.GetAddressOf()));
 		//	}
 		//	else
 		//	{
-
 		//		textureDesc.Usage = D3D11_USAGE_DEFAULT;
 		//		textureDesc.CPUAccessFlags = 0;
 		//		D3D11_SUBRESOURCE_DATA subresourceData = {};
@@ -233,7 +232,7 @@ namespace Hanabi
 			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 			textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
 
-			if (!m_ImageData.Size)
+			if (!m_ImageData)
 			{
 				textureDesc.Usage = D3D11_USAGE_DYNAMIC;
 				textureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -241,6 +240,8 @@ namespace Hanabi
 			}
 			else
 			{
+				textureDesc.Usage = D3D11_USAGE_DEFAULT;
+				textureDesc.CPUAccessFlags = 0;
 				uint32_t faceSize = m_ImageData.Size / 6;
 				D3D11_SUBRESOURCE_DATA subresourceData[6] = {};
 				for (size_t i = 0; i < 6; i++)
@@ -248,8 +249,6 @@ namespace Hanabi
 					subresourceData[i].pSysMem = m_ImageData.Data + i * faceSize;
 					subresourceData[i].SysMemPitch = m_Specification.Width * 4;  // size of one row in bytes
 				}
-				textureDesc.Usage = D3D11_USAGE_DEFAULT;
-				textureDesc.CPUAccessFlags = 0;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, subresourceData, m_Texture.GetAddressOf()));
 			}
 

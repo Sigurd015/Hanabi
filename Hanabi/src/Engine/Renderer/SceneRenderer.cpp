@@ -18,9 +18,7 @@ namespace Hanabi
 			glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
 			float Intensity = 0.0f;
 			glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-
-			// Padding
-			float padding;
+			uint32_t ShadowType = 0;
 		};
 
 		struct PointLight
@@ -206,9 +204,9 @@ namespace Hanabi
 			s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
 		}
 
-		// Shadow Pass
-		Ref<Framebuffer> shadowFramebuffer;
+		// Shadow Pass	
 		{
+			Ref<Framebuffer> shadowFramebuffer;
 			{
 				FramebufferSpecification spec;
 				spec.Attachments = { ImageFormat::ShadowMap };
@@ -224,7 +222,7 @@ namespace Hanabi
 
 				PipelineSpecification pipelineSpec;
 				pipelineSpec.Layout = vertexLayout;
-				pipelineSpec.Shader = Renderer::GetShader("ShadowMap");
+				pipelineSpec.Shader = Renderer::GetShader("DirShadowMap");
 				pipelineSpec.TargetFramebuffer = shadowFramebuffer;
 				pipelineSpec.BackfaceCulling = true;
 				pipelineSpec.DepthTest = true;
@@ -253,7 +251,7 @@ namespace Hanabi
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
 		//s_Data->DefaultMaterial = CreateRef<Material>(Renderer::GetDefaultShader());
 		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
-		s_Data->ShadowMaterial = CreateRef<Material>(Renderer::GetShader("ShadowMap"));
+		s_Data->ShadowMaterial = CreateRef<Material>(Renderer::GetShader("DirShadowMap"));
 		s_Data->SkyboxMaterial = CreateRef<Material>(Renderer::GetShader("Skybox"));
 	}
 
@@ -290,6 +288,7 @@ namespace Hanabi
 			s_Data->SceneData.Light.Direction = environment->DirLight.Direction;
 			s_Data->SceneData.Light.Intensity = environment->DirLight.Intensity;
 			s_Data->SceneData.Light.Radiance = environment->DirLight.Radiance;
+			s_Data->SceneData.Light.ShadowType = static_cast<uint32_t>(environment->DirLight.ShadowType);
 			s_Data->SceneDataBuffer->SetData(&s_Data->SceneData);
 		}
 
@@ -399,7 +398,7 @@ namespace Hanabi
 
 			Ref<Mesh> mesh = AssetManager::GetAsset<Mesh>(meshComponent.MeshHandle);
 
-			if (materialAssetHandle)
+			if (AssetManager::IsAssetHandleValid(materialAssetHandle))
 			{
 				Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(materialAssetHandle);
 				SubmitStaticMesh(transform, mesh, materialAsset);
@@ -421,9 +420,9 @@ namespace Hanabi
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 
 			if (material)
-				Renderer::SubmitStaticMesh(command.Mesh, material, pipeline);
+				Renderer::DrawMesh(command.Mesh, material, pipeline);
 			else
-				Renderer::SubmitStaticMesh(command.Mesh, command.Material, pipeline);
+				Renderer::DrawMesh(command.Mesh, command.Material, pipeline);
 		}
 	}
 
@@ -431,31 +430,22 @@ namespace Hanabi
 	{
 		// Directional Light
 		{
-			glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 20.0f);
-			glm::mat4 lightViewMatrix = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 lightOrthoMatrix = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
-			s_Data->ShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
-			s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
-
-			Renderer::BeginRenderPass(s_Data->ShadowPass);
-			ExecuteDrawCommands(s_Data->ShadowPass->GetPipeline(), s_Data->ShadowMaterial);
-			Renderer::EndRenderPass(s_Data->ShadowPass);
-
 			switch (s_Data->SceneEnvironment->DirLight.ShadowType)
 			{
 			case LightComponent::ShadowType::None:
-			{
-
 				break;
-			}
 			case LightComponent::ShadowType::Hard:
-			{
-
-				break;
-			}
 			case LightComponent::ShadowType::Soft:
 			{
+				glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 20.0f);
+				glm::mat4 lightViewMatrix = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+				glm::mat4 lightOrthoMatrix = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
+				s_Data->ShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
+				s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 
+				Renderer::BeginRenderPass(s_Data->ShadowPass);
+				ExecuteDrawCommands(s_Data->ShadowPass->GetPipeline(), s_Data->ShadowMaterial);
+				Renderer::EndRenderPass(s_Data->ShadowPass);
 				break;
 			}
 			}
@@ -526,7 +516,7 @@ namespace Hanabi
 			Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
 
 			Ref<Mesh> mesh = Renderer::GetMesh("Box");
-			Renderer::SubmitStaticMesh(mesh, s_Data->SkyboxMaterial, s_Data->SkyboxPass->GetPipeline());
+			Renderer::DrawMesh(mesh, s_Data->SkyboxMaterial, s_Data->SkyboxPass->GetPipeline());
 
 			Renderer::EndRenderPass(s_Data->SkyboxPass);
 		}

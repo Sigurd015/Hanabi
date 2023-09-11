@@ -87,7 +87,7 @@ namespace Hanabi
 		renderPass->GetTargetFramebuffer()->Unbind();
 	}
 
-	void OpenGLRendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void OpenGLRendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
