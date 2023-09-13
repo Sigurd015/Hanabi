@@ -32,9 +32,9 @@ VertexOutput main(VertexInput Input)
     Output.Position = mul(u_ViewProjection, float4(Output.WorldPosition, 1.0));
     Output.LightTransformedPosition = mul(u_LightViewProjection, float4(Output.WorldPosition, 1.0));
     Output.TexCoord = Input.a_TexCoord;
-    Output.Tangent = Input.a_Tangent;
-    Output.Bitangent = Input.a_Bitangent;
-    Output.Normal = Input.a_Normal;
+    Output.Tangent = mul((float3x3) (u_Transform), Input.a_Tangent);
+    Output.Bitangent = mul((float3x3) (u_Transform), Input.a_Bitangent);
+    Output.Normal = mul((float3x3) (u_Transform), Input.a_Normal);
 
     return Output;
 }
@@ -67,44 +67,35 @@ PixelOutput main(PixelInput Input)
     Material material;
     material.DiffuseColor = u_Diffuse.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
     material.SpecularColor = u_Specular.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
-      
-    Input.Normal = normalize(mul((float3x3) (u_Transform), Input.Normal));
-    
-    float3 normal = float3(0, 0, 0);
+
+    material.WorldNormal = normalize(Input.Normal);
     if (u_UseNormalMap)
     {
-        Input.Tangent = normalize(mul((float3x3) (u_Transform), Input.Tangent));
-        Input.Bitangent = normalize(mul((float3x3) (u_Transform), Input.Bitangent));
-        float3x3 mat = float3x3(Input.Tangent, Input.Bitangent, Input.Normal);
+        float3x3 mat = float3x3(normalize(Input.Tangent), normalize(Input.Bitangent), material.WorldNormal);
 
         float3 normalSample = u_Normal.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
-        normal = normalSample * 2.0f - 1.0f; // from RGB[0, 1] to [-1, 1]
-        normal = normalize(mul(mat, normal));
+        material.WorldNormal = normalSample * 2.0f - 1.0f; // from RGB[0, 1] to [-1, 1]
+        material.WorldNormal = normalize(mul(mat, material.WorldNormal));
     }
-    else
-        normal = Input.Normal;
 
     float shadowResult = 1.0f;
-    switch(u_DirLight.ShadowType)
+    switch (u_ShadowType)
     {
         case 1:
-            shadowResult = CalculateHardShadow(Input.LightTransformedPosition, normal);
+            shadowResult = CalculateHardShadow(Input.LightTransformedPosition, material.WorldNormal);
             break;
         case 2:
-            shadowResult = CalculateSoftShadow(Input.LightTransformedPosition, normal);
+            shadowResult = CalculateSoftShadow(Input.LightTransformedPosition, material.WorldNormal);
             break;
     }
 
-    float3 ambient = u_SkyLightIntensity * float3(1.0f,1.0f,1.0f) * material.DiffuseColor;
+    float3 ambient = u_SkyLightIntensity * float3(1.0f, 1.0f, 1.0f) * material.DiffuseColor;
 
     float3 PixelToCamera = normalize(u_CameraPosition - Input.WorldPosition);
-    float3 dirLightResult = CalcDirectionalLight(material, normal, PixelToCamera);
-    float3 pointLightResult = CalcPointLight(material, normal, PixelToCamera, Input.WorldPosition);
-    float3 spotLightResult = CalcSpotLight(material, normal, PixelToCamera, Input.WorldPosition);
-    //Output.Color = float4(saturate(dirLightResult + pointLightResult + spotLightResult), 1.0f);
+    float3 dirLightResult = CalcDirectionalLight(material, PixelToCamera);
+    float3 pointLightResult = CalcPointLight(material, PixelToCamera, Input.WorldPosition);
+    float3 spotLightResult = CalcSpotLight(material, PixelToCamera, Input.WorldPosition);
     float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult) * shadowResult;
-    //float3 lightResult = saturate(dirLightResult + pointLightResult + spotLightResult);
     Output.Color = float4(saturate(ambient + lightResult), 1.0f);
-    //Output.Color = float4(shadowResult,shadowResult,shadowResult, 1.0f);
     return Output;
 }

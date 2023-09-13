@@ -16,6 +16,7 @@ namespace Hanabi
 		virtual uint32_t GetHeight() const override { return m_Specification.Height; }
 
 		void ClearAttachment(const glm::vec4& color) override;
+		virtual void ClearAttachment() override;
 		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
 		//TODO: Implement

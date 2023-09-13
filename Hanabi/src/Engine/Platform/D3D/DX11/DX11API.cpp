@@ -93,12 +93,20 @@ namespace Hanabi
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
 		if (clear)
-			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
+		{
+			if (!renderPass->GetTargetFramebuffer()->GetSpecification().UseUniqueClearColor)
+				renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
+			else
+				renderPass->GetTargetFramebuffer()->ClearAttachment();
+		}
+
 		renderPass->GetTargetFramebuffer()->Bind();
 
 		Ref<Pipeline> pipeline = renderPass->GetPipeline();
+		pipeline->Bind();
 
 		PipelineSpecification& spec = pipeline->GetSpecification();
+		spec.Shader->Bind();
 		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(spec.Topology));
 
 		if (!spec.DepthTest)
@@ -149,34 +157,36 @@ namespace Hanabi
 		Clear();
 	}
 
-	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
-		pipeline->Bind();
 		material->Bind();
 
 		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
 	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
-		const Ref<Pipeline>& pipeline, uint32_t indexCount)
+		uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		pipeline->Bind();
 		material->Bind();
 
 		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
-		pipeline->Bind();
 		material->Bind();
 
 		m_DeviceContext->Draw(vertexCount, 0);
+	}
+
+	void DX11RendererAPI::DrawFullscreenQuad()
+	{
+		m_DeviceContext->Draw(0, 0);
 	}
 }
 #endif

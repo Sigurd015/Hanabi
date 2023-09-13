@@ -27,6 +27,8 @@ namespace Hanabi
 	{
 		uint32_t Width = 0, Height = 0;
 		float DepthClearValue = 1.0f;
+		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		bool UseUniqueClearColor = false;
 
 		// TODO: Make a better way to do mouse picking
 		int MousePickClearValue = -1;
@@ -44,7 +46,8 @@ namespace Hanabi
 		virtual void Unbind() = 0;
 
 		virtual void ClearAttachment(const glm::vec4& color) = 0;
-		
+		virtual void ClearAttachment() = 0;
+
 		virtual Ref<Image2D> GetImage(uint32_t attachmentIndex = 0) const = 0;
 		virtual Ref<Image2D> GetDepthImage() const = 0;
 

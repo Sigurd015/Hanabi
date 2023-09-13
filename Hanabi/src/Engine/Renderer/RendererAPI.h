@@ -26,11 +26,12 @@ namespace Hanabi
 		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear) = 0;
 		virtual void EndRenderPass(const Ref<RenderPass>& renderPass) = 0;
 
-		virtual void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline) = 0;
+		virtual void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material) = 0;
 
 		virtual void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
-			const Ref<Pipeline>& pipeline, uint32_t indexCount) = 0;
-		virtual void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount) = 0;
+			uint32_t indexCount) = 0;
+		virtual void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, uint32_t vertexCount) = 0;
+		virtual void DrawFullscreenQuad() = 0;
 
 		static RendererAPIType GetAPI() { return s_API; }
 		static void SetAPI(RendererAPIType api) { s_API = api; };

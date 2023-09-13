@@ -1,14 +1,9 @@
 #ifndef LIGHTING_HEADER
 #define LIGHTING_HEADER
 #include "Buffers.hlsl"
+#include "Material.hlsl"
 
-struct Material
-{
-    float3 DiffuseColor;
-    float3 SpecularColor;
-};
-
-float3 CalcDirectionalLight(Material material, float3 worldNormal, float3 pixelToCamera)
+float3 CalcDirectionalLight(Material material, float3 pixelToCamera)
 {
     float3 result = float3(0, 0, 0);
     
@@ -17,10 +12,10 @@ float3 CalcDirectionalLight(Material material, float3 worldNormal, float3 pixelT
     
     float3 lightDir = normalize(u_DirLight.Direction);
     
-    float diffuseFactor = max(dot(worldNormal, -lightDir), 0);
+    float diffuseFactor = max(dot(material.WorldNormal, -lightDir), 0);
     float3 diffuseColor = diffuseFactor * u_DirLight.Intensity * u_DirLight.Radiance * material.DiffuseColor;
 
-    float3 lightReflect = normalize(reflect(lightDir, worldNormal));
+    float3 lightReflect = normalize(reflect(lightDir, material.WorldNormal));
     float specularFactor = pow(max(dot(pixelToCamera, lightReflect), 0),32);
     float3 specularColor = specularFactor * u_DirLight.Intensity * material.SpecularColor;
     
@@ -28,7 +23,7 @@ float3 CalcDirectionalLight(Material material, float3 worldNormal, float3 pixelT
     return result;
 }
 
-float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamera, float3 worldPos)
+float3 CalcPointLight(Material material, float3 pixelToCamera, float3 worldPos)
 {
     float3 result = float3(0, 0, 0);
     for (int i = 0; i < u_PointLightsCount; i++)
@@ -42,10 +37,10 @@ float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamer
         float distance = length(lightDirection);
         lightDirection = normalize(lightDirection);
       
-        float diffuseFactor = max(dot(worldNormal, lightDirection), 0);
+        float diffuseFactor = max(dot(material.WorldNormal, lightDirection), 0);
         float3 diffuseColor = diffuseFactor * pointLight.Intensity * pointLight.Radiance * material.DiffuseColor;
 
-        float3 lightReflect = normalize(reflect(-lightDirection, worldNormal));
+        float3 lightReflect = normalize(reflect(-lightDirection, material.WorldNormal));
         float specularFactor = pow(max(dot(pixelToCamera, lightReflect), 0),32);
         float3 specularColor = specularFactor * pointLight.Intensity * material.SpecularColor;
 
@@ -59,7 +54,7 @@ float3 CalcPointLight(Material material, float3 worldNormal, float3 pixelToCamer
     return result;
 }
 
-float3 CalcSpotLight(Material material, float3 worldNormal, float3 pixelToCamera, float3 worldPos)
+float3 CalcSpotLight(Material material, float3 pixelToCamera, float3 worldPos)
 {
     float3 result = float3(0, 0, 0);
     for (int i = 0; i < u_SpotLightsCount; i++)
@@ -80,10 +75,10 @@ float3 CalcSpotLight(Material material, float3 worldNormal, float3 pixelToCamera
         
         float3 lightDirection = normalize(spotLight.Direction);
             
-        float diffuseFactor = max(dot(worldNormal, -lightDirection), 0);
+        float diffuseFactor = max(dot(material.WorldNormal, -lightDirection), 0);
         float3 diffuseColor = diffuseFactor * spotLight.Intensity * spotLight.Radiance * material.DiffuseColor;
 
-        float3 lightReflect = normalize(reflect(lightDirection, worldNormal));
+        float3 lightReflect = normalize(reflect(lightDirection, material.WorldNormal));
         float specularFactor = pow(max(dot(pixelToCamera, lightReflect), 0),32);
         float3 specularColor = specularFactor * spotLight.Intensity * material.SpecularColor;
 

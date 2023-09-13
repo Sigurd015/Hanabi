@@ -219,6 +219,9 @@ namespace Hanabi
 		}
 	}
 
+	void OpenGLFramebuffer::ClearAttachment()
+	{}
+
 	int OpenGLFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
 	{
 		HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());

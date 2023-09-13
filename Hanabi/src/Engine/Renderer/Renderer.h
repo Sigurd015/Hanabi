@@ -21,12 +21,13 @@ namespace Hanabi
 		static void EndRenderPass(const Ref<RenderPass>& renderPass);
 
 		//3D Objects
-		static void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline);
+		static void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material);
 
 		//2D Objects
 		static void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
-			const Ref<Pipeline>& pipeline, uint32_t indexCount);
-		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount);
+			uint32_t indexCount);
+		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, uint32_t vertexCount);
+		static void DrawFullscreenQuad();
 
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);

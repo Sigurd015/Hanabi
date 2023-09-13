@@ -2,4 +2,4 @@ Material:
   DiffuseTextureHandle: 17815512371411204623
   SpecularTextureHandle: 0
   NormalTextureHandle: 11971813417510223497
-  UseNormalMap: true
+  UseNormalMap: false

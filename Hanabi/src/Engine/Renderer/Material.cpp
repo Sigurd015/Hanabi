@@ -39,8 +39,6 @@ namespace Hanabi
 
 	void Material::Bind() const
 	{
-		m_Shader->Bind();
-
 		BindTextures();
 	}
 

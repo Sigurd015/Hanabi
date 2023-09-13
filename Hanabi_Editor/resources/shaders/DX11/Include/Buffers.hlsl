@@ -8,7 +8,6 @@ struct DirectionalLight
     float3 Radiance;
     float Intensity;
     float3 Direction;
-    uint ShadowType;
 };
 
 struct PointLight
@@ -65,5 +64,7 @@ cbuffer CBSpotLight : register(b4)
 cbuffer CBShadow : register(b5)
 {
     float4x4 u_LightViewProjection;
+    uint u_ShadowType;
+    uint u_LightType;
 };
 #endif

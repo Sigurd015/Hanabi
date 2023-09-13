@@ -32,6 +32,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Line");
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
 		s_Data->ShaderLibrary->Load("PhongLighting");
+		s_Data->ShaderLibrary->Load("DeferredGeometry");
 		s_Data->ShaderLibrary->Load("DirShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
 
@@ -86,20 +87,25 @@ namespace Hanabi
 		s_RendererAPI->EndRenderPass(renderPass);
 	}
 
-	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
-		s_RendererAPI->DrawMesh(mesh, material, pipeline);
+		s_RendererAPI->DrawMesh(mesh, material);
 	}
 
 	void Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
-		const Ref<Pipeline>& pipeline, uint32_t indexCount)
+		uint32_t indexCount)
 	{
-		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, pipeline, indexCount);
+		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, indexCount);
 	}
 
-	void Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, uint32_t vertexCount)
 	{
-		s_RendererAPI->DrawLines(vertexBuffer, material, pipeline, vertexCount);
+		s_RendererAPI->DrawLines(vertexBuffer, material, vertexCount);
+	}
+
+	void Renderer::DrawFullscreenQuad()
+	{
+		s_RendererAPI->DrawFullscreenQuad();
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)

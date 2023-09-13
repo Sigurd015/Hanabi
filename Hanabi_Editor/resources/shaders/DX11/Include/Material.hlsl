@@ -7,4 +7,12 @@ Texture2D u_Normal : register(t2);
 
 SamplerState u_SSLinearWrap : register(s0);
 
+struct Material
+{
+    float3 DiffuseColor;
+    float3 SpecularColor;
+
+    float3 WorldNormal;
+};
+
 #endif

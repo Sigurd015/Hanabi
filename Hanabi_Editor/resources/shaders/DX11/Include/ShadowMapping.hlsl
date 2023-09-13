@@ -3,7 +3,7 @@
 
 #include "Buffers.hlsl"
 
-Texture2D u_ShadowDepth : register(t3);
+Texture2D u_ShadowDepth : register(t5);
 
 SamplerState u_SSLinearClamp : register(s1);
 
@@ -36,15 +36,15 @@ float CalculateSoftShadow(float4 position, float3 worldNormal)
     float bias = GetDirShadowBias(worldNormal);
     float texelSize =0.00008f;
 
-    // PCF Sample with 6x6 kernel
-    static const int SampleSize = 3;
+    // PCF Sample with 8x8 kernel
+    static const int SampleSize = 4;
 
     for (int i = -SampleSize; i <= SampleSize; i++)
     {
         for (int j = -SampleSize; j <= SampleSize; j++)
         {
             float pcfDepth = u_ShadowDepth.Sample(u_SSLinearClamp, shadowPosition.xy + float2(i, j) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 0.0f : 1.0f;
+            shadow += step(currentDepth - bias , pcfDepth);
         }
     }
 

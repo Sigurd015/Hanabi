@@ -18,7 +18,9 @@ namespace Hanabi
 			glm::vec3 Radiance = { 1.0f,1.0f,1.0f };
 			float Intensity = 0.0f;
 			glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-			uint32_t ShadowType = 0;
+
+			// Padding
+			float padding;
 		};
 
 		struct PointLight
@@ -99,6 +101,10 @@ namespace Hanabi
 		struct CBShadow
 		{
 			glm::mat4 LightViewProj;
+			uint32_t ShadowType = 0;
+
+			// Padding
+			float padding[3];
 		};
 
 		Ref<Environment> SceneEnvironment;
@@ -120,10 +126,9 @@ namespace Hanabi
 		Ref<RenderPass> SkyboxPass;
 		Ref<RenderPass> ShadowPass;
 		Ref<RenderPass> GeoPass;
+		Ref<RenderPass> DeferredGeoPass;
 
 		Ref<Material> DefaultMaterial;
-		Ref<Material> SkyboxMaterial;
-		Ref<Material> ShadowMaterial;
 
 		struct GeoDrawCommand
 		{
@@ -185,7 +190,43 @@ namespace Hanabi
 				s_Data->GeoPass = RenderPass::Create(renderPassSpec);
 			}
 		}
+		{
+			Ref<Framebuffer> geoFramebuffer;
+			{
+				{
+					FramebufferSpecification spec;
+					spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::RGBA8F,
+						ImageFormat::RGBA8F,ImageFormat::RGBA8F,ImageFormat::Depth };
+					spec.Width = 1920;
+					spec.Height = 1080;
+					spec.SwapChainTarget = false;
+					geoFramebuffer = Framebuffer::Create(spec);
+				}
+				{
+					VertexBufferLayout vertexLayout = {
+						{ ShaderDataType::Float3, "a_Position" },
+						{ ShaderDataType::Float3, "a_Normal" },
+						{ ShaderDataType::Float3, "a_Tangent" },
+						{ ShaderDataType::Float3, "a_Bitangent" },
+						{ ShaderDataType::Float2, "a_TexCoord" },
+					};
 
+					PipelineSpecification pipelineSpec;
+					pipelineSpec.Layout = vertexLayout;
+					pipelineSpec.Shader = Renderer::GetShader("DeferredGeometry");
+					pipelineSpec.TargetFramebuffer = geoFramebuffer;
+					pipelineSpec.BackfaceCulling = true;
+					pipelineSpec.DepthTest = true;
+					pipelineSpec.Topology = PrimitiveTopology::Triangles;
+					pipelineSpec.DepthOperator = DepthCompareOperator::Less;
+
+					RenderPassSpecification renderPassSpec;
+					renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+					s_Data->DeferredGeoPass = RenderPass::Create(renderPassSpec);
+				}
+			}
+		}
+	
 		// Skybox Pass
 		{
 			PipelineSpecification pipelineSpec;
@@ -213,6 +254,7 @@ namespace Hanabi
 				spec.Width = 2048;
 				spec.Height = 2048;
 				spec.SwapChainTarget = false;
+				spec.DepthClearValue = 1.0f;
 				shadowFramebuffer = Framebuffer::Create(spec);
 			}
 			{
@@ -240,8 +282,8 @@ namespace Hanabi
 		s_Data->GeoPass->SetInput("CBScene", s_Data->SceneDataBuffer);
 		s_Data->GeoPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->GeoPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
-		s_Data->GeoPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
 		s_Data->GeoPass->SetInput("u_ShadowDepth", s_Data->ShadowPass->GetDepthOutput());
+		s_Data->GeoPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
 
 		s_Data->ShadowPass->SetInput("CBModel", s_Data->ModelDataBuffer);
 		s_Data->ShadowPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
@@ -249,10 +291,7 @@ namespace Hanabi
 		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
-		//s_Data->DefaultMaterial = CreateRef<Material>(Renderer::GetDefaultShader());
 		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
-		s_Data->ShadowMaterial = CreateRef<Material>(Renderer::GetShader("DirShadowMap"));
-		s_Data->SkyboxMaterial = CreateRef<Material>(Renderer::GetShader("Skybox"));
 	}
 
 	void SceneRenderer::Shutdown()
@@ -288,7 +327,6 @@ namespace Hanabi
 			s_Data->SceneData.Light.Direction = environment->DirLight.Direction;
 			s_Data->SceneData.Light.Intensity = environment->DirLight.Intensity;
 			s_Data->SceneData.Light.Radiance = environment->DirLight.Radiance;
-			s_Data->SceneData.Light.ShadowType = static_cast<uint32_t>(environment->DirLight.ShadowType);
 			s_Data->SceneDataBuffer->SetData(&s_Data->SceneData);
 		}
 
@@ -366,6 +404,13 @@ namespace Hanabi
 
 	void SceneRenderer::EndScene()
 	{
+		// Temp deferred rendering
+		{
+			Renderer::BeginRenderPass(s_Data->DeferredGeoPass);
+			ExecuteDrawCommands();
+			Renderer::EndRenderPass(s_Data->DeferredGeoPass);
+		}
+
 		ShadowPass();
 		GeometryPass();
 		SkyboxPass();
@@ -410,7 +455,7 @@ namespace Hanabi
 		}
 	}
 
-	void SceneRenderer::ExecuteDrawCommands(const Ref<Pipeline>& pipeline, const Ref<Material>& material)
+	void SceneRenderer::ExecuteDrawCommands()
 	{
 		for (auto& command : s_Data->DrawCommands)
 		{
@@ -419,10 +464,7 @@ namespace Hanabi
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 
-			if (material)
-				Renderer::DrawMesh(command.Mesh, material, pipeline);
-			else
-				Renderer::DrawMesh(command.Mesh, command.Material, pipeline);
+			Renderer::DrawMesh(command.Mesh, command.Material);
 		}
 	}
 
@@ -430,82 +472,33 @@ namespace Hanabi
 	{
 		// Directional Light
 		{
-			switch (s_Data->SceneEnvironment->DirLight.ShadowType)
-			{
-			case LightComponent::ShadowType::None:
-				break;
-			case LightComponent::ShadowType::Hard:
-			case LightComponent::ShadowType::Soft:
+			Renderer::BeginRenderPass(s_Data->ShadowPass);
+			s_Data->ShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->DirLight.ShadowType);
+			if (s_Data->SceneEnvironment->DirLight.ShadowType != LightComponent::ShadowType::None)
 			{
 				glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 20.0f);
 				glm::mat4 lightViewMatrix = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 				glm::mat4 lightOrthoMatrix = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
 				s_Data->ShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
+
 				s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 
-				Renderer::BeginRenderPass(s_Data->ShadowPass);
-				ExecuteDrawCommands(s_Data->ShadowPass->GetPipeline(), s_Data->ShadowMaterial);
-				Renderer::EndRenderPass(s_Data->ShadowPass);
-				break;
+				ExecuteDrawCommands();
 			}
-			}
-		}
-
-		// Point Lights
-		{
-			for (uint32_t i = 0; i < s_Data->SceneEnvironment->PointLights.size(); i++)
+			else
 			{
-				switch (s_Data->SceneEnvironment->PointLights[i].ShadowType)
-				{
-				case LightComponent::ShadowType::None:
-				{
-
-					break;
-				}
-				case LightComponent::ShadowType::Hard:
-				{
-
-					break;
-				}
-				case LightComponent::ShadowType::Soft:
-				{
-
-					break;
-				}
-				}
+				s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 			}
+			Renderer::EndRenderPass(s_Data->ShadowPass);
 		}
 
-		// Spot Lights
-		{
-			for (uint32_t i = 0; i < s_Data->SceneEnvironment->SpotLights.size(); i++)
-			{
-				switch (s_Data->SceneEnvironment->SpotLights[i].ShadowType)
-				{
-				case LightComponent::ShadowType::None:
-				{
-
-					break;
-				}
-				case LightComponent::ShadowType::Hard:
-				{
-
-					break;
-				}
-				case LightComponent::ShadowType::Soft:
-				{
-
-					break;
-				}
-				}
-			}
-		}
+		// TODO: Implement Point Light Shadow and Spot Light Shadow
 	}
 
 	void SceneRenderer::GeometryPass()
 	{
 		Renderer::BeginRenderPass(s_Data->GeoPass);
-		ExecuteDrawCommands(s_Data->GeoPass->GetPipeline());
+		ExecuteDrawCommands();
 		Renderer::EndRenderPass(s_Data->GeoPass);
 	}
 
@@ -516,7 +509,7 @@ namespace Hanabi
 			Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
 
 			Ref<Mesh> mesh = Renderer::GetMesh("Box");
-			Renderer::DrawMesh(mesh, s_Data->SkyboxMaterial, s_Data->SkyboxPass->GetPipeline());
+			Renderer::DrawMesh(mesh, s_Data->DefaultMaterial);
 
 			Renderer::EndRenderPass(s_Data->SkyboxPass);
 		}

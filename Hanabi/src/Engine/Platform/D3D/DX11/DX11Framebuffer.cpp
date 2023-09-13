@@ -134,7 +134,7 @@ namespace Hanabi
 		DX11Context::GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
 	}
 
-	void DX11Framebuffer::ClearAttachment(const glm::vec4& color)
+	void DX11Framebuffer::Clear(const glm::vec4& color)
 	{
 		for (size_t i = 0; i < m_ColorAttachmentRTV.size(); i++)
 		{
@@ -148,6 +148,16 @@ namespace Hanabi
 		}
 		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DSAttachmentDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 			m_Specification.DepthClearValue, 0);
+	}
+
+	void DX11Framebuffer::ClearAttachment(const glm::vec4& color)
+	{
+		Clear(color);
+	}
+
+	void DX11Framebuffer::ClearAttachment()
+	{
+		Clear(m_Specification.ClearColor);
 	}
 
 	void DX11Framebuffer::Resize(uint32_t width, uint32_t height)

@@ -37,7 +37,7 @@ struct PixelOutput
     float4 Color : SV_Target0;
 };
 
-TextureCube u_SkyboxTexture : register(t0);
+TextureCube u_SkyboxTexture : register(t5);
 SamplerState u_SSLinearWrap : register(s0);
 
 PixelOutput main(PixelInput Input)

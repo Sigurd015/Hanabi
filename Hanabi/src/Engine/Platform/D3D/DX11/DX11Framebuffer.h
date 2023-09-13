@@ -14,10 +14,12 @@ namespace Hanabi
 		DX11Framebuffer(const FramebufferSpecification& spec);
 		~DX11Framebuffer();
 
-		void Bind() override;
-		void Unbind() override;
-		void ClearAttachment(const glm::vec4& color) override;
-		int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
+		virtual void Bind() override;
+		virtual void Unbind() override;
+		virtual void ClearAttachment(const glm::vec4& color) override;
+		virtual void ClearAttachment() override;
+
+		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
 		virtual uint32_t GetWidth() const override { return m_Specification.Width; }
 		virtual uint32_t GetHeight() const override { return m_Specification.Height; }
@@ -38,6 +40,7 @@ namespace Hanabi
 
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:
+		void Clear(const glm::vec4& color);
 		void Invalidate();
 
 		FramebufferSpecification m_Specification;

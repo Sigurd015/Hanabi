@@ -340,7 +340,7 @@ namespace Hanabi
 				s_Data->QuadMaterial->SetTexture(s_Data->TextureSlotNames[i], s_Data->TextureSlots[i]);
 			}
 
-			Renderer::DrawIndexed(s_Data->QuadVertexBuffer, s_Data->QuadIndexBuffer, s_Data->QuadMaterial, s_Data->QuadRenderPass->GetPipeline(), s_Data->QuadIndexCount);
+			Renderer::DrawIndexed(s_Data->QuadVertexBuffer, s_Data->QuadIndexBuffer, s_Data->QuadMaterial, s_Data->QuadIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
 		Renderer::EndRenderPass(s_Data->QuadRenderPass);
@@ -351,7 +351,7 @@ namespace Hanabi
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->CircleVertexBufferPtr - (uint8_t*)s_Data->CircleVertexBufferBase);
 			s_Data->CircleVertexBuffer->SetData(s_Data->CircleVertexBufferBase, dataSize);
 
-			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->QuadIndexBuffer, s_Data->CircleMaterial, s_Data->CircleRenderPass->GetPipeline(), s_Data->CircleIndexCount);
+			Renderer::DrawIndexed(s_Data->CircleVertexBuffer, s_Data->QuadIndexBuffer, s_Data->CircleMaterial, s_Data->CircleIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
 		Renderer::EndRenderPass(s_Data->CircleRenderPass);
@@ -362,7 +362,7 @@ namespace Hanabi
 			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data->LineVertexBufferPtr - (uint8_t*)s_Data->LineVertexBufferBase);
 			s_Data->LineVertexBuffer->SetData(s_Data->LineVertexBufferBase, dataSize);
 
-			Renderer::DrawLines(s_Data->LineVertexBuffer, s_Data->LineMaterial, s_Data->LineRenderPass->GetPipeline(), s_Data->LineVertexCount);
+			Renderer::DrawLines(s_Data->LineVertexBuffer, s_Data->LineMaterial, s_Data->LineVertexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
 		Renderer::EndRenderPass(s_Data->LineRenderPass);
@@ -376,7 +376,7 @@ namespace Hanabi
 			// TODO: Only have one font atlas texture for now
 			s_Data->TextMaterial->SetTexture("u_FontAtlas", s_Data->FontAtlasTexture);
 
-			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->QuadIndexBuffer, s_Data->TextMaterial, s_Data->TextRenderPass->GetPipeline(), s_Data->TextIndexCount);
+			Renderer::DrawIndexed(s_Data->TextVertexBuffer, s_Data->QuadIndexBuffer, s_Data->TextMaterial, s_Data->TextIndexCount);
 			s_Data->RendererStats.DrawCalls++;
 		}
 		Renderer::EndRenderPass(s_Data->TextRenderPass);

@@ -80,6 +80,7 @@ namespace Hanabi
 			Clear();
 			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
 		}
+
 	}
 
 	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
@@ -87,33 +88,33 @@ namespace Hanabi
 		renderPass->GetTargetFramebuffer()->Unbind();
 	}
 
-	void OpenGLRendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void OpenGLRendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
-		pipeline->Bind();
 		material->Bind();
 
-		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		//glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t indexCount)
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		pipeline->Bind();
 		material->Bind();
 
-		glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), indexCount, GL_UNSIGNED_INT, nullptr);
+		//glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material,uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
-		pipeline->Bind();
 		material->Bind();
 
-		glLineWidth(pipeline->GetSpecification().LineWidth);
-		glDrawArrays(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), 0, vertexCount);
+		//glLineWidth(pipeline->GetSpecification().LineWidth);
+		//glDrawArrays(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), 0, vertexCount);
 	}
+
+	void OpenGLRendererAPI::DrawFullscreenQuad()
+	{}
 }
