@@ -15,11 +15,7 @@ namespace Hanabi
 		~DX11Framebuffer();
 
 		virtual void Bind() override;
-		virtual void Unbind() override;
 		virtual void ClearAttachment(const glm::vec4& color) override;
-		virtual void ClearAttachment() override;
-
-		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
 		virtual uint32_t GetWidth() const override { return m_Specification.Width; }
 		virtual uint32_t GetHeight() const override { return m_Specification.Height; }
@@ -40,13 +36,11 @@ namespace Hanabi
 
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:
-		void Clear(const glm::vec4& color);
 		void Invalidate();
 
 		FramebufferSpecification m_Specification;
 
-		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
-		FramebufferTextureSpecification m_DepthAttachmentSpecification = ImageFormat::None;
+		std::vector<FramebufferTextureSpecification> m_AttachmentSpecifications;
 
 		std::vector<Ref<DX11Image2D>> m_ColorAttachments;
 		std::vector<ComPtr<ID3D11RenderTargetView>> m_ColorAttachmentRTV;

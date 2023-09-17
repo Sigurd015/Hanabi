@@ -12,15 +12,12 @@ namespace Hanabi
 		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), m_Indices.size() * sizeof(Index));
 		m_VertexBuffer->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex));
 
-		//TODO: Make layout dynamic
-		VertexBufferLayout layout = {
+		m_VertexBuffer->SetLayout({
 		  { ShaderDataType::Float3, "a_Position" },
 		  { ShaderDataType::Float3, "a_Normal" },
 		  { ShaderDataType::Float3, "a_Tangent" },
 		  { ShaderDataType::Float3, "a_Bitangent" },
 		  { ShaderDataType::Float2, "a_TexCoord" },
-		};
-
-		m_VertexBuffer->SetLayout(layout);
+			});
 	}
 }

@@ -20,7 +20,7 @@ namespace Hanabi
 
 		virtual void BindInputs() = 0;
 
-		virtual Ref<Image2D> GetOutput(uint32_t index) = 0;
+		virtual Ref<Image2D> GetOutput(uint32_t index = 0) = 0;
 		virtual Ref<Image2D> GetDepthOutput() = 0;
 
 		virtual RenderPassSpecification& GetSpecification() = 0;

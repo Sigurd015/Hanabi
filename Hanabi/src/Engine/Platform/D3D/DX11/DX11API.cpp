@@ -8,21 +8,6 @@
 
 namespace Hanabi
 {
-	static D3D11_PRIMITIVE_TOPOLOGY PrimitiveTopologyTypeToD3D(PrimitiveTopology type)
-	{
-		switch (type)
-		{
-		case PrimitiveTopology::Points:
-			return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-		case PrimitiveTopology::Lines:
-			return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-		case PrimitiveTopology::Triangles:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		}
-
-		HNB_CORE_ASSERT(false, "Unknown Primitive Topology!");
-	}
-
 	void DX11RendererAPI::Init()
 	{
 		m_DeviceContext = DX11Context::GetDeviceContext();
@@ -94,20 +79,15 @@ namespace Hanabi
 	{
 		if (clear)
 		{
-			if (!renderPass->GetTargetFramebuffer()->GetSpecification().UseUniqueClearColor)
-				renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
-			else
-				renderPass->GetTargetFramebuffer()->ClearAttachment();
+			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
 		}
 
 		renderPass->GetTargetFramebuffer()->Bind();
 
-		Ref<Pipeline> pipeline = renderPass->GetPipeline();
+		Ref<Pipeline>& pipeline = renderPass->GetPipeline();
 		pipeline->Bind();
 
 		PipelineSpecification& spec = pipeline->GetSpecification();
-		spec.Shader->Bind();
-		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(spec.Topology));
 
 		if (!spec.DepthTest)
 			m_DeviceContext->OMSetDepthStencilState(DX11RenderStates::DSSNoDepthTest.Get(), 0);
@@ -151,17 +131,22 @@ namespace Hanabi
 		renderPass->BindInputs();
 	}
 
-	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
+	void DX11RendererAPI::EndRenderPass()
 	{
-		renderPass->GetTargetFramebuffer()->Unbind();
+		DX11Context::GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
 		Clear();
 	}
 
 	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
+		material->Bind();
+		DrawMesh(mesh);
+	}
+
+	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh)
+	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
-		material->Bind();
 
 		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);
 	}
@@ -169,24 +154,27 @@ namespace Hanabi
 	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 		uint32_t indexCount)
 	{
+		material->Bind();
+
+		DrawIndexed(vertexBuffer, indexBuffer, indexCount);
+	}
+
+	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount)
+	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		material->Bind();
 
-		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+		if (indexCount == 0)
+			m_DeviceContext->DrawIndexed(indexBuffer->GetCount(), 0, 0);
+		else
+			m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, uint32_t vertexCount)
+	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
-		material->Bind();
 
 		m_DeviceContext->Draw(vertexCount, 0);
-	}
-
-	void DX11RendererAPI::DrawFullscreenQuad()
-	{
-		m_DeviceContext->Draw(0, 0);
 	}
 }
 #endif

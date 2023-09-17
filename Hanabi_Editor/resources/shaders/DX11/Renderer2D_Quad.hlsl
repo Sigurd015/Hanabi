@@ -10,7 +10,6 @@ struct VertexInput
     float2 a_TexCoord : a_TexCoord;
     int a_TexIndex : a_TexIndex;
     float a_TilingFactor : a_TilingFactor;
-    int a_EntityID : a_EntityID;
 };
 
 struct VertexOutput
@@ -20,7 +19,6 @@ struct VertexOutput
     float2 TexCoord : Ted;
     int TexIndex : Tei;
     float TilingFactor : Tlf;
-    int EntityID : EID;
 };
 
 cbuffer CBCamera : register(b0)
@@ -35,7 +33,6 @@ VertexOutput main(VertexInput Input)
     Output.TexCoord = Input.a_TexCoord;
     Output.TexIndex = Input.a_TexIndex;
     Output.TilingFactor = Input.a_TilingFactor;
-    Output.EntityID = Input.a_EntityID;
     Output.Pos = mul(u_ViewProjection, float4(Input.a_Position, 1.0f));
     return Output;
 }
@@ -50,13 +47,11 @@ struct PixelInput
     float2 TexCoord : Ted;
     int TexIndex : Tei;
     float TilingFactor : Tlf;
-    int EntityID : EID;
 };
 
 struct PixelOutput
 {
     float4 Color : SV_Target0;
-    int EntityID : SV_Target1;
 };
 
 Texture2D u_Textures[MAX_TEXTURE] : register(t0);
@@ -122,6 +117,5 @@ PixelOutput main(PixelInput Input)
         discard;
 	
     Output.Color = texColor;
-    Output.EntityID = Input.EntityID;
     return Output;
 }

@@ -348,14 +348,14 @@ namespace Hanabi
 
 		//----------------- 2D Scene Rendering -----------------//
 		Renderer2D::BeginScene(m_Environment->ViewProjection);
-		Renderer2D::SetTargetFramebuffer(SceneRenderer::GetFinalRenderPass()->GetTargetFramebuffer());
+		Renderer2D::SetTargetFramebuffer(SceneRenderer::GetDeferredGeoPass()->GetTargetFramebuffer());
 		// Draw sprites
 		{
 			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
 			for (auto entity : view)
 			{
 				auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite);
 			}
 		}
 
@@ -366,7 +366,7 @@ namespace Hanabi
 			{
 				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
 
-				Renderer2D::DrawCircle(transform.GetTransform(), circle, (int)entity);
+				Renderer2D::DrawCircle(transform.GetTransform(), circle);
 			}
 		}
 
@@ -377,7 +377,7 @@ namespace Hanabi
 			{
 				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
 
-				Renderer2D::DrawString(transform.GetTransform(), text, (int)entity);
+				Renderer2D::DrawString(transform.GetTransform(), text);
 			}
 		}
 

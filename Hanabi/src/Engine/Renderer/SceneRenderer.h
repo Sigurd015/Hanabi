@@ -5,6 +5,11 @@
 #include "EditorCamera.h"
 #include "Engine/Scene/Scene.h"
 
+#define DEFERRED_OUTPUT_DIFFUSE 0
+#define DEFERRED_OUTPUT_SPECULAR 1
+#define DEFERRED_OUTPUT_NORMAL 2
+#define DEFERRED_OUTPUT_POSITION 3
+
 namespace Hanabi
 {
 	class SceneRenderer
@@ -17,17 +22,24 @@ namespace Hanabi
 		static void BeginScene(const Ref<Environment> environment);
 		static void EndScene();
 
-		static Ref<RenderPass> GetFinalRenderPass();
+		static Ref<RenderPass> GetDeferredGeoPass();
+		static Ref<RenderPass> GetDeferredLightPass();
+		static Ref<RenderPass> GetShadowMappingPass();
+		static Ref<RenderPass> GetCompositePass();
 
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material);
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh);
 		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle = 0);
 
 	private:
-		static void ExecuteDrawCommands();
-		static void ShadowPass();
-		static void GeometryPass();
-		static void SkyboxPass();
+		static void ExecuteDrawCommands(bool useMaterial = true);
+
+		static void DeferredGeoPass();
+		static void DeferredLightPass();
+
+		static void ShadowMapPass();
+		static void ShadowMappingPass();
+
 		static void CompositePass();
 	};
 }

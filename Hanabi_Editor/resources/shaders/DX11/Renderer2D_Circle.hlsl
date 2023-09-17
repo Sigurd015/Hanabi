@@ -10,7 +10,6 @@ struct VertexInput
     float4 a_Color : a_Color;
     float a_Thickness : a_Thickness;
     float a_Fade : a_Fade;
-    int a_EntityID : a_EntityID;
 };
 
 struct VertexOutput
@@ -20,7 +19,6 @@ struct VertexOutput
     float4 Color : Cor;
     float Thickness : Ths;
     float Fade : Fde;
-    int EntityID : EID;
 };
 
 cbuffer CBCamera : register(b0)
@@ -35,7 +33,6 @@ VertexOutput main(VertexInput Input)
     Output.Color = Input.a_Color;
     Output.Thickness = Input.a_Thickness;
     Output.Fade = Input.a_Fade;
-    Output.EntityID = Input.a_EntityID;
     Output.Pos = mul(u_ViewProjection,float4(Input.a_WorldPosition, 1.0f));
     return Output;
 }
@@ -48,13 +45,11 @@ struct PixelInput
     float4 Color : Cor;
     float Thickness : Ths;
     float Fade : Fde;
-    int EntityID : EID;
 };
 
 struct PixelOutput
 {
     float4 Color : SV_Target0;
-    int EntityID : SV_Target1;
 };
 
 PixelOutput main(PixelInput Input)
@@ -71,6 +66,5 @@ PixelOutput main(PixelInput Input)
 		
     Output.Color = Input.Color;
     Output.Color.a *= circle;
-    Output.EntityID = Input.EntityID;
     return Output;
 }

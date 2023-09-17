@@ -17,16 +17,16 @@ namespace Hanabi
 		static void EndScene();
 
 		static void SetTargetFramebuffer(const Ref<Framebuffer>& framebuffer);
-		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src, int entityID = -1);
-		static void DrawCircle(const glm::mat4& transform, CircleRendererComponent& crc, int entityID = -1);
-		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+		static void DrawSprite(const glm::mat4& transform, SpriteRendererComponent& src);
+		static void DrawCircle(const glm::mat4& transform, CircleRendererComponent& crc);
+		static void DrawQuad(const glm::mat4& transform, const glm::vec4& color);
 		static void DrawQuad(const glm::mat4& transform, const Ref<Texture2D>& texture, glm::vec2 uv0, glm::vec2 uv1,
-			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f, int entityID = -1);
+			const glm::vec4& tintColor = glm::vec4(1.0f), float tilingFactor = 1.0f);
 		static void DrawCircle(const glm::mat4& transform, const glm::vec4& color,
-			float thickness = 1.0f, float fade = 0.005f, int entityID = -1);
-		static void DrawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color, int entityID = -1);
-		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID = -1);
-		static void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
+			float thickness = 1.0f, float fade = 0.005f);
+		static void DrawLine(const glm::vec3& p0, glm::vec3& p1, const glm::vec4& color);
+		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color);
+		static void DrawRect(const glm::mat4& transform, const glm::vec4& color);
 		static float GetLineWidth();
 		static void SetLineWidth(float width);
 
@@ -36,8 +36,8 @@ namespace Hanabi
 			float Kerning = 0.0f;
 			float LineSpacing = 0.0f;
 		};
-		static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams, int entityID = -1);
-		static void DrawString(const glm::mat4& transform, const TextComponent& tc, int entityID = -1);
+		static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams);
+		static void DrawString(const glm::mat4& transform, const TextComponent& tc);
 
 		struct Statistics
 		{
@@ -54,7 +54,7 @@ namespace Hanabi
 	private:
 		static float GetTextureID(const Ref<Texture2D>& texture);
 		static void SetQuadVertex(const glm::mat4& transform, const glm::vec4& color,
-			int entityID, const glm::vec2* texCoord, float texIndex, float tilingFactor);
+			const glm::vec2* texCoord, float texIndex, float tilingFactor);
 		static void StartBatch();
 		static void Flush();
 		static void NextBatch();

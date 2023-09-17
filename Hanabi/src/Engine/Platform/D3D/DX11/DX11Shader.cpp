@@ -133,7 +133,7 @@ namespace Hanabi
 			const std::string& source = kv.second;
 			switch (type)
 			{
-			case Hanabi::VERTEX_SHADER:
+			case VERTEX_SHADER:
 			{
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
 					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
@@ -143,7 +143,7 @@ namespace Hanabi
 				CreateReflectionData(m_VertexShaderBlob);
 				break;
 			}
-			case Hanabi::PIXEL_SHADER:
+			case PIXEL_SHADER:
 			{
 				ComPtr<ID3DBlob> blob;
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,

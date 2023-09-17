@@ -78,16 +78,6 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false);
 			return 0;
 		}
-
-		static bool IsMousePickFormat(ImageFormat format)
-		{
-			switch (format)
-			{
-			case ImageFormat::RED8UI:  return true;
-			}
-
-			return false;
-		}
 	}
 
 	OpenGLFramebuffer::OpenGLFramebuffer(const FramebufferSpecification& spec) : m_Specification(spec)
@@ -187,11 +177,6 @@ namespace Hanabi
 		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 	}
 
-	void OpenGLFramebuffer::Unbind()
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
 	void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height)
 	{
 		if (width == 0 || height == 0 || width > s_MaxFramebufferSize || height > s_MaxFramebufferSize)
@@ -207,28 +192,5 @@ namespace Hanabi
 	}
 
 	void OpenGLFramebuffer::ClearAttachment(const glm::vec4& color)
-	{
-		for (size_t i = 0; i < m_ColorAttachments.size(); i++)
-		{
-			if (Utils::IsMousePickFormat(m_ColorAttachmentSpecifications[i].TextureFormat))
-			{
-				int value = m_Specification.MousePickClearValue;
-				glClearTexImage(m_ColorAttachments[i], 0,
-					Utils::FBTextureFormatToGL(m_ColorAttachmentSpecifications[i].TextureFormat), GL_INT, &value);
-			}
-		}
-	}
-
-	void OpenGLFramebuffer::ClearAttachment()
 	{}
-
-	int OpenGLFramebuffer::ReadPixel(uint32_t attachmentIndex, int x, int y)
-	{
-		HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
-
-		glReadBuffer(GL_COLOR_ATTACHMENT0 + attachmentIndex);
-		int pixelData = -1;
-		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
-		return pixelData;
-	}
 }

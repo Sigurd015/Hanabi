@@ -14,7 +14,7 @@ namespace Hanabi
 
 		virtual void BindInputs() override;
 
-		virtual Ref<Image2D> GetOutput(uint32_t index) override;
+		virtual Ref<Image2D> GetOutput(uint32_t index = 0) override;
 		virtual Ref<Image2D> GetDepthOutput() override;
 
 		virtual RenderPassSpecification& GetSpecification() override { return m_Specification; }

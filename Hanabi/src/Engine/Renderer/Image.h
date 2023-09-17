@@ -10,6 +10,7 @@ namespace Hanabi
 		RGB8,
 		RGBA8,
 		RGBA32F,
+		RED8UI,
 
 		// Color
 		RGBA8F,
@@ -17,10 +18,6 @@ namespace Hanabi
 		// Depth/stencil
 		DEPTH24STENCIL8,
 		DEPTH32F,
-
-		// TODO: Make a better way to do mouse picking
-		RED8UI,
-		MousePick = RED8UI,
 
 		// Defaults
 		Depth = DEPTH24STENCIL8,

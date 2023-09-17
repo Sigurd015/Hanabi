@@ -3,10 +3,6 @@
 
 #include "Buffers.hlsl"
 
-Texture2D u_ShadowDepth : register(t5);
-
-SamplerState u_SSLinearClamp : register(s1);
-
 float GetDirShadowBias(float3 worldNormal)
 {
 	const float MINIMUM_SHADOW_BIAS = 0.002f;

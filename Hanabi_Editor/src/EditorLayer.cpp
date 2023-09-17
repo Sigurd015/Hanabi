@@ -13,7 +13,14 @@ namespace Hanabi
 
 	void EditorLayer::OnAttach()
 	{
-		m_ViewportFramebuffer = SceneRenderer::GetFinalRenderPass()->GetTargetFramebuffer();
+		m_FinalResultImage = SceneRenderer::GetShadowMappingPass()->GetOutput();
+		m_ViewportImage = m_FinalResultImage;
+		m_GBufferDiffuseImage = SceneRenderer::GetDeferredGeoPass()->GetOutput(DEFERRED_OUTPUT_DIFFUSE);
+		m_GBufferSpecularImage = SceneRenderer::GetDeferredGeoPass()->GetOutput(DEFERRED_OUTPUT_SPECULAR);
+		m_GBufferNormalImage = SceneRenderer::GetDeferredGeoPass()->GetOutput(DEFERRED_OUTPUT_NORMAL);
+		m_GBufferPositionImage = SceneRenderer::GetDeferredGeoPass()->GetOutput(DEFERRED_OUTPUT_POSITION);
+		m_LightingResultImage = SceneRenderer::GetDeferredLightPass()->GetOutput();
+		m_ShadowMappingResultImage = SceneRenderer::GetShadowMappingPass()->GetOutput();
 
 		m_EditorScene = CreateRef<Scene>();
 		m_ActiveScene = m_EditorScene;
@@ -78,8 +85,7 @@ namespace Hanabi
 
 		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
 		{
-			int pixelData = m_ViewportFramebuffer->ReadPixel(1, mouseX, mouseY);
-			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
+			// Mouse Picking
 		}
 		#pragma endregion	
 	}
@@ -210,12 +216,48 @@ namespace Hanabi
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
+
 		ImGui::Separator();
 		ImGui::Text("Render Settings:");
 		ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
 		if (ImGui::Checkbox("Enable Vsyn", &m_EnableVsyn))
 		{
 			Application::Get().GetWindow().SetVSync(m_EnableVsyn);
+		}
+
+		ImGui::Separator();
+		ImGui::Text("Deferred Rendering Debug:");
+
+		const char* debugModeTypeStrings[] = { "None","GBufferDiffuse", "GBufferSpecular","GBufferNormal",
+		"GBufferPosition","LightingResult","ShadowMappingResult" };
+		const char* currentTypeString = debugModeTypeStrings[(int)m_ViewportDebugMode];
+		if (ImGui::BeginCombo("Rendering Debug", currentTypeString))
+		{
+			for (int i = 0; i < ViewportDebugMode::Count; i++)
+			{
+				bool isSelected = currentTypeString == debugModeTypeStrings[i];
+				if (ImGui::Selectable(debugModeTypeStrings[i], isSelected))
+				{
+					currentTypeString = debugModeTypeStrings[i];
+					m_ViewportDebugMode = (ViewportDebugMode)i;
+				}
+
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+
+			ImGui::EndCombo();
+		}
+
+		switch (m_ViewportDebugMode)
+		{
+		case None: m_ViewportImage = m_FinalResultImage; break;
+		case GBufferDiffuse: m_ViewportImage = m_GBufferDiffuseImage; break;
+		case GBufferSpecular: m_ViewportImage = m_GBufferSpecularImage; break;
+		case GBufferNormal: m_ViewportImage = m_GBufferNormalImage; break;
+		case GBufferPosition: m_ViewportImage = m_GBufferPositionImage; break;
+		case LightingResult: m_ViewportImage = m_LightingResultImage; break;
+		case ShadowMappingResult: m_ViewportImage = m_ShadowMappingResultImage; break;
 		}
 
 		ImGui::End();
@@ -293,11 +335,11 @@ namespace Hanabi
 		switch (RendererAPI::GetAPI())
 		{
 		case RendererAPIType::OpenGL:
-			ImGui::Image(m_ViewportFramebuffer->GetImage()->GetRendererID(), ImVec2{m_ViewportSize.x, m_ViewportSize.y}, ImVec2{0, 1}, ImVec2{1, 0});
+			ImGui::Image(m_ViewportImage->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 			break;
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			ImGui::Image(m_ViewportFramebuffer->GetImage()->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+			ImGui::Image(m_ViewportImage->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 			break;
 			#endif
 		}

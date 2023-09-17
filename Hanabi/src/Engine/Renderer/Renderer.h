@@ -18,16 +18,20 @@ namespace Hanabi
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
 		static void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear = true);
-		static void EndRenderPass(const Ref<RenderPass>& renderPass);
+		static void EndRenderPass();
 
 		//3D Objects
 		static void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material);
+		static void DrawMesh(const Ref<Mesh>& mesh);
 
 		//2D Objects
 		static void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
 			uint32_t indexCount);
-		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, uint32_t vertexCount);
-		static void DrawFullscreenQuad();
+		static void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount = 0);
+		static void DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount);
+
+		static void DrawFullScreenQuad();
+
 
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);

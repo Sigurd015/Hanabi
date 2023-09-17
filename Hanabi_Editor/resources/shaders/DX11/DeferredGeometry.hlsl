@@ -30,16 +30,15 @@ VertexOutput main(VertexInput Input)
     Output.WorldPosition = mul(u_Transform, float4(Input.a_Position, 1.0f));
     Output.Position = mul(u_ViewProjection, float4(Output.WorldPosition, 1.0));
     Output.TexCoord = Input.a_TexCoord;
-    Output.Tangent = mul((float3x3) (u_Transform), Input.a_Tangent);
-    Output.Bitangent = mul((float3x3) (u_Transform), Input.a_Bitangent);
-    Output.Normal = mul((float3x3) (u_Transform), Input.a_Normal);
+    Output.Tangent = normalize(mul((float3x3) (u_Transform), Input.a_Tangent));
+    Output.Bitangent = normalize(mul((float3x3) (u_Transform), Input.a_Bitangent));
+    Output.Normal = normalize(mul((float3x3) (u_Transform), Input.a_Normal));
 
     return Output;
 }
 
 #type:pixel
 #include "Buffers.hlsl"
-#include "Material.hlsl"
 
 struct PixelInput
 {
@@ -59,19 +58,25 @@ struct PixelOutput
     float4 Position : SV_Target3;
 };
 
+Texture2D u_Diffuse : register(t0);
+Texture2D u_Specular : register(t1);
+Texture2D u_Normal : register(t2);
+
+SamplerState u_SSLinearWrap : register(s0);
+
 PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
     float4 diffuseColor = u_Diffuse.Sample(u_SSLinearWrap, Input.TexCoord);
     float4 specularColor = u_Specular.Sample(u_SSLinearWrap, Input.TexCoord);
     
-    float3 normal = normalize(Input.Normal);
+    float3 normal = Input.Normal;
     if (u_UseNormalMap)
     {
-        float3x3 mat = float3x3(normalize(Input.Tangent), normalize(Input.Bitangent), normal);
+        float3x3 mat = float3x3(Input.Tangent, Input.Bitangent, normal);
 
         float3 normalSample = u_Normal.Sample(u_SSLinearWrap, Input.TexCoord).xyz;
-        normal = normalSample * 2.0f - 1.0f; // from RGB[0, 1] to [-1, 1]
+        normal = normalSample * 2.0f - float3(1.0f, 1.0f, 1.0f);; // from RGB[0, 1] to [-1, 1]
         normal = normalize(mul(mat, normal));
     }
 

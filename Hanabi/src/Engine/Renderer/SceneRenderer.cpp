@@ -102,9 +102,10 @@ namespace Hanabi
 		{
 			glm::mat4 LightViewProj;
 			uint32_t ShadowType = 0;
+			uint32_t LightType = 0;
 
 			// Padding
-			float padding[3];
+			float padding[2];
 		};
 
 		Ref<Environment> SceneEnvironment;
@@ -123,10 +124,12 @@ namespace Hanabi
 		Ref<ConstantBuffer> SpotLightDataBuffer;
 		Ref<ConstantBuffer> ShadowDataBuffer;
 
-		Ref<RenderPass> SkyboxPass;
-		Ref<RenderPass> ShadowPass;
-		Ref<RenderPass> GeoPass;
+		Ref<RenderPass> ShadowMapPass;
+		Ref<RenderPass> ShadowMappingPass;
 		Ref<RenderPass> DeferredGeoPass;
+		Ref<RenderPass> DeferredLightingPass;
+		Ref<RenderPass> SkyboxPass;
+		Ref<RenderPass> CompositePass;
 
 		Ref<Material> DefaultMaterial;
 
@@ -154,18 +157,45 @@ namespace Hanabi
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
 		s_Data->ShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBShadow));
 
-		// Geometry Pass
-		Ref<Framebuffer> geoFramebuffer;
+		// Skybox Pass
 		{
+			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::MousePick,ImageFormat::Depth };
+				spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
-				// TODO: Make a better way to do mouse picking
-				spec.MousePickClearValue = -1;
-				geoFramebuffer = Framebuffer::Create(spec);
+				framebuffer = Framebuffer::Create(spec);
+			}
+			{
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.Layout = {
+				   { ShaderDataType::Float3, "a_Position" },
+				};
+				pipelineSpec.Shader = Renderer::GetShader("Skybox");
+				pipelineSpec.TargetFramebuffer = framebuffer;
+				pipelineSpec.BackfaceCulling = false;
+				pipelineSpec.DepthTest = true;
+				pipelineSpec.Topology = PrimitiveTopology::Triangles;
+				pipelineSpec.DepthOperator = DepthCompareOperator::LessEqual;
+
+				RenderPassSpecification renderPassSpec;
+				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+				s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
+			}
+		}
+		// Deferred Geometry Pass
+		{
+			Ref<Framebuffer> framebuffer;
+			{
+				FramebufferSpecification spec;
+				spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::RGBA8F,
+					ImageFormat::RGBA8F,ImageFormat::RGBA8F,ImageFormat::Depth };
+				spec.Width = 1920;
+				spec.Height = 1080;
+				spec.SwapChainTarget = false;
+				framebuffer = Framebuffer::Create(spec);
 			}
 			{
 				VertexBufferLayout vertexLayout = {
@@ -178,8 +208,8 @@ namespace Hanabi
 
 				PipelineSpecification pipelineSpec;
 				pipelineSpec.Layout = vertexLayout;
-				pipelineSpec.Shader = Renderer::GetDefaultShader();
-				pipelineSpec.TargetFramebuffer = geoFramebuffer;
+				pipelineSpec.Shader = Renderer::GetShader("DeferredGeometry");
+				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = true;
 				pipelineSpec.DepthTest = true;
 				pipelineSpec.Topology = PrimitiveTopology::Triangles;
@@ -187,67 +217,40 @@ namespace Hanabi
 
 				RenderPassSpecification renderPassSpec;
 				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->GeoPass = RenderPass::Create(renderPassSpec);
+				s_Data->DeferredGeoPass = RenderPass::Create(renderPassSpec);
 			}
 		}
+		// Deferred Lighting Pass
 		{
-			Ref<Framebuffer> geoFramebuffer;
+			Ref<Framebuffer> framebuffer;
 			{
-				{
-					FramebufferSpecification spec;
-					spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::RGBA8F,
-						ImageFormat::RGBA8F,ImageFormat::RGBA8F,ImageFormat::Depth };
-					spec.Width = 1920;
-					spec.Height = 1080;
-					spec.SwapChainTarget = false;
-					geoFramebuffer = Framebuffer::Create(spec);
-				}
-				{
-					VertexBufferLayout vertexLayout = {
-						{ ShaderDataType::Float3, "a_Position" },
-						{ ShaderDataType::Float3, "a_Normal" },
-						{ ShaderDataType::Float3, "a_Tangent" },
-						{ ShaderDataType::Float3, "a_Bitangent" },
-						{ ShaderDataType::Float2, "a_TexCoord" },
-					};
+				FramebufferSpecification spec;
+				spec.Attachments = { ImageFormat::RGBA8F };
+				spec.Width = 1920;
+				spec.Height = 1080;
+				spec.SwapChainTarget = false;
+				framebuffer = Framebuffer::Create(spec);
+			}
+			{
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.Layout = {
+				   { ShaderDataType::Float3, "a_Position" },
+				   { ShaderDataType::Float2, "a_TexCoord" },
+				};
+				pipelineSpec.Shader = Renderer::GetShader("DeferredLighting");
+				pipelineSpec.TargetFramebuffer = framebuffer;
+				pipelineSpec.BackfaceCulling = false;
+				pipelineSpec.DepthTest = false;
+				pipelineSpec.Topology = PrimitiveTopology::Triangles;
 
-					PipelineSpecification pipelineSpec;
-					pipelineSpec.Layout = vertexLayout;
-					pipelineSpec.Shader = Renderer::GetShader("DeferredGeometry");
-					pipelineSpec.TargetFramebuffer = geoFramebuffer;
-					pipelineSpec.BackfaceCulling = true;
-					pipelineSpec.DepthTest = true;
-					pipelineSpec.Topology = PrimitiveTopology::Triangles;
-					pipelineSpec.DepthOperator = DepthCompareOperator::Less;
-
-					RenderPassSpecification renderPassSpec;
-					renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-					s_Data->DeferredGeoPass = RenderPass::Create(renderPassSpec);
-				}
+				RenderPassSpecification renderPassSpec;
+				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+				s_Data->DeferredLightingPass = RenderPass::Create(renderPassSpec);
 			}
 		}
-	
-		// Skybox Pass
+		// Shadow Map Pass
 		{
-			PipelineSpecification pipelineSpec;
-			pipelineSpec.Layout = {
-			   { ShaderDataType::Float3, "a_Position" },
-			};
-			pipelineSpec.Shader = Renderer::GetShader("Skybox");
-			pipelineSpec.TargetFramebuffer = geoFramebuffer;
-			pipelineSpec.BackfaceCulling = false;
-			pipelineSpec.DepthTest = true;
-			pipelineSpec.Topology = PrimitiveTopology::Triangles;
-			pipelineSpec.DepthOperator = DepthCompareOperator::LessEqual;
-
-			RenderPassSpecification renderPassSpec;
-			renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-			s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
-		}
-
-		// Shadow Pass	
-		{
-			Ref<Framebuffer> shadowFramebuffer;
+			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
 				spec.Attachments = { ImageFormat::ShadowMap };
@@ -255,7 +258,7 @@ namespace Hanabi
 				spec.Height = 2048;
 				spec.SwapChainTarget = false;
 				spec.DepthClearValue = 1.0f;
-				shadowFramebuffer = Framebuffer::Create(spec);
+				framebuffer = Framebuffer::Create(spec);
 			}
 			{
 				VertexBufferLayout vertexLayout = {
@@ -264,8 +267,8 @@ namespace Hanabi
 
 				PipelineSpecification pipelineSpec;
 				pipelineSpec.Layout = vertexLayout;
-				pipelineSpec.Shader = Renderer::GetShader("DirShadowMap");
-				pipelineSpec.TargetFramebuffer = shadowFramebuffer;
+				pipelineSpec.Shader = Renderer::GetShader("ShadowMap");
+				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = true;
 				pipelineSpec.DepthTest = true;
 				pipelineSpec.Topology = PrimitiveTopology::Triangles;
@@ -273,22 +276,94 @@ namespace Hanabi
 
 				RenderPassSpecification renderPassSpec;
 				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->ShadowPass = RenderPass::Create(renderPassSpec);
+				s_Data->ShadowMapPass = RenderPass::Create(renderPassSpec);
+			}
+		}
+		// Shadow Mapping Pass
+		{
+			Ref<Framebuffer> framebuffer;
+			{
+				FramebufferSpecification spec;
+				spec.Attachments = { ImageFormat::RGBA8F };
+				spec.Width = 1920;
+				spec.Height = 1080;
+				spec.SwapChainTarget = false;
+				framebuffer = Framebuffer::Create(spec);
+			}
+			{
+				VertexBufferLayout vertexLayout = {
+					{ ShaderDataType::Float3, "a_Position" },
+					{ ShaderDataType::Float2, "a_TexCoord" },
+				};
+
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.Layout = vertexLayout;
+				pipelineSpec.Shader = Renderer::GetShader("ShadowMapping");
+				pipelineSpec.TargetFramebuffer = framebuffer;
+				pipelineSpec.BackfaceCulling = false;
+				pipelineSpec.DepthTest = false;
+				pipelineSpec.Topology = PrimitiveTopology::Triangles;
+
+				RenderPassSpecification renderPassSpec;
+				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+				s_Data->ShadowMappingPass = RenderPass::Create(renderPassSpec);
+			}
+		}
+		// Composite Pass
+		{
+			Ref<Framebuffer> framebuffer;
+			{
+				{
+					FramebufferSpecification spec;
+					spec.Attachments = { ImageFormat::RGBA8F };
+					spec.Width = 1920;
+					spec.Height = 1080;
+					spec.SwapChainTarget = false;
+					framebuffer = Framebuffer::Create(spec);
+				}
+				{
+					PipelineSpecification pipelineSpec;
+					pipelineSpec.Layout = {
+					   { ShaderDataType::Float3, "a_Position" },
+					   { ShaderDataType::Float2, "a_TexCoord" },
+					};
+					pipelineSpec.Shader = Renderer::GetShader("Composite");
+					pipelineSpec.TargetFramebuffer = framebuffer;
+					pipelineSpec.BackfaceCulling = false;
+					pipelineSpec.DepthTest = false;
+					pipelineSpec.Topology = PrimitiveTopology::Triangles;
+
+					RenderPassSpecification renderPassSpec;
+					renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+					s_Data->CompositePass = RenderPass::Create(renderPassSpec);
+				}
 			}
 		}
 
-		s_Data->GeoPass->SetInput("CBModel", s_Data->ModelDataBuffer);
-		s_Data->GeoPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
-		s_Data->GeoPass->SetInput("CBScene", s_Data->SceneDataBuffer);
-		s_Data->GeoPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
-		s_Data->GeoPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
-		s_Data->GeoPass->SetInput("u_ShadowDepth", s_Data->ShadowPass->GetDepthOutput());
-		s_Data->GeoPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
+		s_Data->DeferredGeoPass->SetInput("CBModel", s_Data->ModelDataBuffer);
+		s_Data->DeferredGeoPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
-		s_Data->ShadowPass->SetInput("CBModel", s_Data->ModelDataBuffer);
-		s_Data->ShadowPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("CBScene", s_Data->SceneDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("u_DiffuseBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_DIFFUSE));
+		s_Data->DeferredLightingPass->SetInput("u_SpecularBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_SPECULAR));
+		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_NORMAL));
+		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_POSITION));
+
+		s_Data->ShadowMapPass->SetInput("CBModel", s_Data->ModelDataBuffer);
+		s_Data->ShadowMapPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
+
+		s_Data->ShadowMappingPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
+		s_Data->ShadowMappingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_NORMAL));
+		s_Data->ShadowMappingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_POSITION));
+		s_Data->ShadowMappingPass->SetInput("u_ShadowDepth", s_Data->ShadowMapPass->GetDepthOutput());
+		s_Data->ShadowMappingPass->SetInput("u_LightResult", s_Data->DeferredLightingPass->GetOutput());
 
 		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
+
+		s_Data->CompositePass->SetInput("u_Color", s_Data->ShadowMappingPass->GetOutput());
 
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
 		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
@@ -301,10 +376,10 @@ namespace Hanabi
 
 	void SceneRenderer::SetViewportSize(uint32_t width, uint32_t height)
 	{
-		const FramebufferSpecification& fbsc = s_Data->GeoPass->GetTargetFramebuffer()->GetSpecification();
+		const FramebufferSpecification& fbsc = s_Data->CompositePass->GetTargetFramebuffer()->GetSpecification();
 		if (fbsc.Width != width || fbsc.Height != height)
 		{
-			s_Data->GeoPass->GetTargetFramebuffer()->Resize(width, height);
+			s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
 		}
 	}
 
@@ -373,20 +448,17 @@ namespace Hanabi
 		{
 			constexpr glm::vec4 clearColor = { 0.0f,0.0f,0.0f,1.0f };
 			Renderer::SetClearColor(clearColor);
-			s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
-			s_Data->SkyboxDrawRequested = false;
+			Renderer::BeginRenderPass(s_Data->SkyboxPass);
+			Renderer::EndRenderPass();
 			break;
 		}
 		case CameraComponent::ClearMethod::Soild_Color:
 		{
 			Renderer::SetClearColor(environment->ClearColor);
-
-			s_Data->SkyboxDrawRequested = false;
 			break;
 		}
 		case CameraComponent::ClearMethod::Skybox:
 		{
-			s_Data->SkyboxDrawRequested = true;
 			if (environment->SkyboxAssetHandle)
 			{
 				Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->SkyboxAssetHandle);
@@ -397,6 +469,10 @@ namespace Hanabi
 			{
 				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
 			}
+			Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
+			Ref<Mesh> mesh = Renderer::GetMesh("Box");
+			Renderer::DrawMesh(mesh);
+			Renderer::EndRenderPass();
 			break;
 		}
 		}
@@ -404,21 +480,33 @@ namespace Hanabi
 
 	void SceneRenderer::EndScene()
 	{
-		// Temp deferred rendering
-		{
-			Renderer::BeginRenderPass(s_Data->DeferredGeoPass);
-			ExecuteDrawCommands();
-			Renderer::EndRenderPass(s_Data->DeferredGeoPass);
-		}
+		DeferredGeoPass();
+		DeferredLightPass();
 
-		ShadowPass();
-		GeometryPass();
-		SkyboxPass();
+		ShadowMapPass();
+		ShadowMappingPass();
+
+		CompositePass();
 	}
 
-	Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
+	Ref<RenderPass> SceneRenderer::GetDeferredGeoPass()
 	{
-		return s_Data->GeoPass;
+		return s_Data->DeferredGeoPass;
+	}
+
+	Ref<RenderPass> SceneRenderer::GetDeferredLightPass()
+	{
+		return s_Data->DeferredLightingPass;
+	}
+
+	Ref<RenderPass> SceneRenderer::GetShadowMappingPass()
+	{
+		return s_Data->ShadowMappingPass;
+	}
+
+	Ref<RenderPass> SceneRenderer::GetCompositePass()
+	{
+		return s_Data->CompositePass;
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material)
@@ -455,7 +543,7 @@ namespace Hanabi
 		}
 	}
 
-	void SceneRenderer::ExecuteDrawCommands()
+	void SceneRenderer::ExecuteDrawCommands(bool useMaterial)
 	{
 		for (auto& command : s_Data->DrawCommands)
 		{
@@ -464,15 +552,33 @@ namespace Hanabi
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 
-			Renderer::DrawMesh(command.Mesh, command.Material);
+			if (useMaterial)
+				Renderer::DrawMesh(command.Mesh, command.Material);
+			else
+				Renderer::DrawMesh(command.Mesh);
 		}
 	}
 
-	void SceneRenderer::ShadowPass()
+	void SceneRenderer::DeferredGeoPass()
+	{
+		Renderer::BeginRenderPass(s_Data->DeferredGeoPass);
+		ExecuteDrawCommands();
+		Renderer::EndRenderPass();
+	}
+
+	void SceneRenderer::DeferredLightPass()
+	{
+		Renderer::BeginRenderPass(s_Data->DeferredLightingPass);
+		Renderer::DrawFullScreenQuad();
+		Renderer::EndRenderPass();
+	}
+
+	void SceneRenderer::ShadowMapPass()
 	{
 		// Directional Light
 		{
-			Renderer::BeginRenderPass(s_Data->ShadowPass);
+			Renderer::BeginRenderPass(s_Data->ShadowMapPass);
+			s_Data->ShadowData.LightType = static_cast<uint32_t>(LightComponent::LightType::Directional);
 			s_Data->ShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->DirLight.ShadowType);
 			if (s_Data->SceneEnvironment->DirLight.ShadowType != LightComponent::ShadowType::None)
 			{
@@ -483,38 +589,29 @@ namespace Hanabi
 
 				s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 
-				ExecuteDrawCommands();
+				ExecuteDrawCommands(false);
 			}
 			else
 			{
 				s_Data->ShadowDataBuffer->SetData(&s_Data->ShadowData);
 			}
-			Renderer::EndRenderPass(s_Data->ShadowPass);
+			Renderer::EndRenderPass();
 		}
 
 		// TODO: Implement Point Light Shadow and Spot Light Shadow
 	}
 
-	void SceneRenderer::GeometryPass()
+	void SceneRenderer::ShadowMappingPass()
 	{
-		Renderer::BeginRenderPass(s_Data->GeoPass);
-		ExecuteDrawCommands();
-		Renderer::EndRenderPass(s_Data->GeoPass);
-	}
-
-	void SceneRenderer::SkyboxPass()
-	{
-		if (s_Data->SkyboxDrawRequested)
-		{
-			Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
-
-			Ref<Mesh> mesh = Renderer::GetMesh("Box");
-			Renderer::DrawMesh(mesh, s_Data->DefaultMaterial);
-
-			Renderer::EndRenderPass(s_Data->SkyboxPass);
-		}
+		Renderer::BeginRenderPass(s_Data->ShadowMappingPass);
+		Renderer::DrawFullScreenQuad();
+		Renderer::EndRenderPass();
 	}
 
 	void SceneRenderer::CompositePass()
-	{}
+	{
+		Renderer::BeginRenderPass(s_Data->CompositePass);
+		Renderer::DrawFullScreenQuad();
+		Renderer::EndRenderPass();
+	}
 }

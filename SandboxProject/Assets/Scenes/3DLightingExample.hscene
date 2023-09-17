@@ -1,15 +1,135 @@
 Scene: Untitled
 Entities:
-  - Entity: 10126013087257898834
+  - Entity: 4561722243831121537
     TagComponent:
-      Tag: Skylight
+      Tag: SpotLight
     TransformComponent:
-      Translation: [0, 0, 0]
+      Translation: [-11.0619669, -5.68647099, 8.43979263]
+      Rotation: [-1.56103912e-08, 0.67164886, -2.49791636e-08]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Spot
+      Intensity: 0
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 50
+      Angle: 100
+      AngleAttenuation: 1
+      Falloff: 1
+  - Entity: 10984799672297330328
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [-4.87281179, 0.350687027, 6.7973156]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    SkyLightComponent:
-      SceneEnvironmentAssetHandle: 17714572538490360680
-      Intensity: 0.100000001
+    MeshComponent:
+      MeshSourceHandle: 14535960835168578140
+    MaterialComponent:
+      MaterialAssetHandle: 1661060954224083329
+  - Entity: 14705402661947822433
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [2.09046817, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 14535960835168578140
+    MaterialComponent:
+      MaterialAssetHandle: 1661060954224083329
+  - Entity: 10459819922746361433
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      Translation: [-8.21379185, -8.99667168, 4.30451298]
+      Rotation: [1.57079637, 0, 0]
+      Scale: [9.99881268, 9.99934769, 0.999885023]
+    MeshComponent:
+      MeshSourceHandle: 5025462131848195016
+    MaterialComponent:
+      MaterialAssetHandle: 4137013318427118749
+  - Entity: 1514165854352143360
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      Translation: [-15.6619968, 0, 3.16022372]
+      Rotation: [0, -1.57079637, 0]
+      Scale: [9.99974728, 10, 0.999984205]
+    MeshComponent:
+      MeshSourceHandle: 5025462131848195016
+    MaterialComponent:
+      MaterialAssetHandle: 4137013318427118749
+  - Entity: 18258964263546460165
+    TagComponent:
+      Tag: Wall
+    TransformComponent:
+      Translation: [-6.37311268, 0, 12.776907]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 1]
+    MeshComponent:
+      MeshSourceHandle: 5025462131848195016
+    MaterialComponent:
+      MaterialAssetHandle: 4137013318427118749
+  - Entity: 1195692201421875731
+    TagComponent:
+      Tag: DirectionalLight
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [1.31423295, -1.76278257, -0.33859387]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Directional
+      Intensity: 1
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 0
+  - Entity: 2520661167971211209
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Translation: [-7.66967821, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 14535960835168578140
+    MaterialComponent:
+      MaterialAssetHandle: 1661060954224083329
+  - Entity: 7885237720320880870
+    TagComponent:
+      Tag: PointLight
+    TransformComponent:
+      Translation: [-6.13191414, 0.690446496, 3.15182066]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 0.100000001, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 0
+      Radiance: [1, 1, 1]
+      Radius: 15
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 1
+  - Entity: 15379224362395118360
+    TagComponent:
+      Tag: PointLight
+    TransformComponent:
+      Translation: [-0.676193953, -0.0656661987, 0.416122556]
+      Rotation: [0, 0, 0]
+      Scale: [0.100000001, 0.100000001, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 0
+      Radiance: [1, 1, 1]
+      Radius: 15
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 1
   - Entity: 3265185506109202002
     TagComponent:
       Tag: Camera
@@ -41,133 +161,13 @@ Entities:
         - Name: Speed
           Type: Float
           Data: 10
-  - Entity: 15379224362395118360
+  - Entity: 10126013087257898834
     TagComponent:
-      Tag: PointLight
-    TransformComponent:
-      Translation: [-0.676193953, -0.0656661987, 0.416122556]
-      Rotation: [0, 0, 0]
-      Scale: [0.100000001, 0.100000001, 1]
-    LightComponent:
-      LightType: Point
-      Intensity: 0
-      Radiance: [1, 1, 1]
-      Radius: 15
-      Range: 0
-      Angle: 0
-      AngleAttenuation: 0
-      Falloff: 1
-  - Entity: 7885237720320880870
-    TagComponent:
-      Tag: PointLight
-    TransformComponent:
-      Translation: [-6.13191414, 0.690446496, 3.15182066]
-      Rotation: [0, 0, 0]
-      Scale: [0.100000001, 0.100000001, 1]
-    LightComponent:
-      LightType: Point
-      Intensity: 0
-      Radiance: [1, 1, 1]
-      Radius: 15
-      Range: 0
-      Angle: 0
-      AngleAttenuation: 0
-      Falloff: 1
-  - Entity: 2520661167971211209
-    TagComponent:
-      Tag: Box
-    TransformComponent:
-      Translation: [-7.66967821, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 14535960835168578140
-    MaterialComponent:
-      MaterialAssetHandle: 1661060954224083329
-  - Entity: 1195692201421875731
-    TagComponent:
-      Tag: DirectionalLight
+      Tag: Skylight
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [1.31423295, -1.76278257, -0.33859387]
-      Scale: [1, 1, 1]
-    LightComponent:
-      LightType: Directional
-      Intensity: 0.400000006
-      Radiance: [1, 1, 1]
-      Radius: 0
-      Range: 0
-      Angle: 0
-      AngleAttenuation: 0
-      Falloff: 0
-  - Entity: 18258964263546460165
-    TagComponent:
-      Tag: Wall
-    TransformComponent:
-      Translation: [-6.37311268, 0, 12.776907]
-      Rotation: [0, 0, 0]
-      Scale: [10, 10, 1]
-    MeshComponent:
-      MeshSourceHandle: 5025462131848195016
-    MaterialComponent:
-      MaterialAssetHandle: 4137013318427118749
-  - Entity: 1514165854352143360
-    TagComponent:
-      Tag: Wall
-    TransformComponent:
-      Translation: [-15.6619968, 0, 3.16022372]
-      Rotation: [0, -1.57079637, 0]
-      Scale: [9.99974728, 10, 0.999984205]
-    MeshComponent:
-      MeshSourceHandle: 5025462131848195016
-    MaterialComponent:
-      MaterialAssetHandle: 4137013318427118749
-  - Entity: 10459819922746361433
-    TagComponent:
-      Tag: Wall
-    TransformComponent:
-      Translation: [-8.21379185, -8.99667168, 4.30451298]
-      Rotation: [1.57079637, 0, 0]
-      Scale: [9.99881268, 9.99934769, 0.999885023]
-    MeshComponent:
-      MeshSourceHandle: 5025462131848195016
-    MaterialComponent:
-      MaterialAssetHandle: 4137013318427118749
-  - Entity: 14705402661947822433
-    TagComponent:
-      Tag: Box
-    TransformComponent:
-      Translation: [2.09046817, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 14535960835168578140
-    MaterialComponent:
-      MaterialAssetHandle: 1661060954224083329
-  - Entity: 10984799672297330328
-    TagComponent:
-      Tag: Box
-    TransformComponent:
-      Translation: [-4.87281179, 0.350687027, 6.7973156]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 14535960835168578140
-    MaterialComponent:
-      MaterialAssetHandle: 1661060954224083329
-  - Entity: 4561722243831121537
-    TagComponent:
-      Tag: SpotLight
-    TransformComponent:
-      Translation: [-11.0619669, -5.68647099, 8.43979263]
-      Rotation: [-1.56103912e-08, 0.67164886, -2.49791636e-08]
-      Scale: [1, 1, 1]
-    LightComponent:
-      LightType: Spot
-      Intensity: 0
-      Radiance: [1, 1, 1]
-      Radius: 0
-      Range: 50
-      Angle: 100
-      AngleAttenuation: 1
-      Falloff: 1
+    SkyLightComponent:
+      SceneEnvironmentAssetHandle: 17714572538490360680
+      Intensity: 0.100000001

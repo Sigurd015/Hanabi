@@ -11,10 +11,10 @@ namespace Hanabi
 		{
 			switch (format)
 			{
-			case ImageFormat::RGB8:            return DXGI_FORMAT_R8G8B8A8_UNORM;
-			case ImageFormat::RGBA8:           return DXGI_FORMAT_R8G8B8A8_UNORM;
-			case ImageFormat::RGBA8F:          return DXGI_FORMAT_R32G32B32A32_FLOAT;
-			case ImageFormat::RED8UI:          return DXGI_FORMAT_R32_SINT;
+			case ImageFormat::RGB8:            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			case ImageFormat::RGBA8:           return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			case ImageFormat::RGBA8F:          return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			case ImageFormat::RED8UI:          return DXGI_FORMAT_R8_SINT;
 			case ImageFormat::DEPTH24STENCIL8: return DXGI_FORMAT_R24G8_TYPELESS;
 			case ImageFormat::DEPTH32F:        return DXGI_FORMAT_R32_TYPELESS;
 			}
@@ -82,7 +82,7 @@ namespace Hanabi
 	DX11Image2D::DX11Image2D(const ImageSpecification& specification, Buffer buffer) :m_Specification(specification)
 	{
 		m_DataFormat = Utils::ImageFormatToDXTextureFormat(m_Specification.Format);
-		if (buffer.Size)
+		if (buffer)
 			m_ImageData = Buffer::Copy(buffer);
 
 		//TODO: Fix
@@ -130,8 +130,7 @@ namespace Hanabi
 
 	DX11Image2D::~DX11Image2D()
 	{
-		m_Texture.Reset();
-		m_TextureSRV.Reset();
+		Release();
 	}
 
 	void DX11Image2D::Resize(const uint32_t width, const uint32_t height)

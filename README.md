@@ -34,6 +34,8 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] Renderer 
     - [x] 2D Batch Renderer
     - [ ] 3D Renderer
+      - [x] Deferred Rendering 
+      - [ ] .....
 
 - [ ] Editor  
   - [x] Play in editor

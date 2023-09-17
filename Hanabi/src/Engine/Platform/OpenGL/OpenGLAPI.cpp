@@ -80,41 +80,47 @@ namespace Hanabi
 			Clear();
 			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
 		}
-
+		//glLineWidth(pipeline->GetSpecification().LineWidth);
 	}
 
-	void OpenGLRendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
+	void OpenGLRendererAPI::EndRenderPass()
 	{
-		renderPass->GetTargetFramebuffer()->Unbind();
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void OpenGLRendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
+		material->Bind();
+
+		DrawMesh(mesh);
+	}
+
+	void OpenGLRendererAPI::DrawMesh(const Ref<Mesh>& mesh)
+	{
 		mesh->GetVertexBuffer()->Bind();
 		mesh->GetIndexBuffer()->Bind();
-		material->Bind();
 
 		//glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, uint32_t indexCount)
 	{
+		material->Bind();
+		DrawIndexed(vertexBuffer, indexBuffer, indexCount);
+	}
+
+	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount)
+	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		material->Bind();
 
 		//glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), indexCount, GL_UNSIGNED_INT, nullptr);
 	}
 
-	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material,uint32_t vertexCount)
+	void OpenGLRendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
-		material->Bind();
 
-		//glLineWidth(pipeline->GetSpecification().LineWidth);
 		//glDrawArrays(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), 0, vertexCount);
 	}
-
-	void OpenGLRendererAPI::DrawFullscreenQuad()
-	{}
 }
