@@ -26,10 +26,6 @@ namespace Hanabi
 			FileIcon = LoadTexture("resources/icons/ContentBrowser/FileIcon.png");
 			ImportedFileIcon = LoadTexture("resources/icons/ContentBrowser/ImportedFileIcon.png");
 		}
-
-		static void Shutdown()
-		{}
-
 	private:
 		static Ref<Texture2D> LoadTexture(const std::filesystem::path& relativePath)
 		{

@@ -30,7 +30,7 @@ namespace Hanabi
 		static AssetType GetStaticType() { return AssetType::Material; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
-		void SetTexture(const std::string& name, AssetHandle handle);
+		void SetTexture(const std::string& name, const Ref<Texture2D>& texture);
 
 		Ref<Material> m_Material;
 

@@ -5,11 +5,6 @@
 #include "EditorCamera.h"
 #include "Engine/Scene/Scene.h"
 
-#define DEFERRED_OUTPUT_DIFFUSE 0
-#define DEFERRED_OUTPUT_SPECULAR 1
-#define DEFERRED_OUTPUT_NORMAL 2
-#define DEFERRED_OUTPUT_POSITION 3
-
 namespace Hanabi
 {
 	class SceneRenderer
@@ -22,10 +17,12 @@ namespace Hanabi
 		static void BeginScene(const Ref<Environment> environment);
 		static void EndScene();
 
-		static Ref<RenderPass> GetDeferredGeoPass();
-		static Ref<RenderPass> GetDeferredLightPass();
-		static Ref<RenderPass> GetShadowMappingPass();
-		static Ref<RenderPass> GetCompositePass();
+		static Ref<RenderPass> GetFinalPass();
+		//----- GBuffer Debugging -----
+		static Ref<Image2D> GetGBufferDiffuse();
+		static Ref<Image2D> GetGBufferSpecular();
+		static Ref<Image2D> GetGBufferNormal();
+		static Ref<Image2D> GetGBufferPosition();
 
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material);
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh);

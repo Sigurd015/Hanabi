@@ -18,7 +18,6 @@ namespace Hanabi
 		void* GetRendererID() const override { return m_Image->GetRendererID(); }
 		void Bind(uint32_t slot = 0) const override;
 		virtual Ref<Image2D> GetImage() const override { return m_Image; }
-		void SetData(Buffer data) override { m_Image->SetData(data); }
 		virtual Buffer GetWriteableBuffer() override { return m_Image->GetBuffer(); }
 		bool operator==(const Texture& other) const override;
 	private:
@@ -36,7 +35,6 @@ namespace Hanabi
 		uint32_t GetHeight() const override { return m_Specification.Height; }
 		void* GetRendererID() const override { return m_Image->GetRendererID(); }
 		void Bind(uint32_t slot = 0) const override;
-		void SetData(Buffer data) override { m_Image->SetData(data); }
 		bool operator==(const Texture& other) const override;
 	private:
 		Ref<DX11Image2D> m_Image;

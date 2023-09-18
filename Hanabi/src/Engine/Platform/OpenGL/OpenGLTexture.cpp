@@ -47,22 +47,18 @@ namespace Hanabi
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		if (!data.Size)
-			SetData(data);
-	}
+		HNB_CORE_ASSERT(data, "OpenGLTexture2D: Data is null!");
 
-	OpenGLTexture2D::~OpenGLTexture2D()
-	{
-		glDeleteTextures(1, &m_RendererID);
-	}
-
-	void OpenGLTexture2D::SetData(Buffer data)
-	{
 		m_Data = Buffer::Copy(data);
 
 		uint32_t bpp = m_DataFormat == GL_RGBA ? 4 : 3;
 		HNB_CORE_ASSERT(data.Size == m_Width * m_Height * bpp, "Data must be entire texture!");
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data.Data);
+	}
+
+	OpenGLTexture2D::~OpenGLTexture2D()
+	{
+		glDeleteTextures(1, &m_RendererID);
 	}
 
 	Ref<Image2D> OpenGLTexture2D::GetImage() const
@@ -83,13 +79,11 @@ namespace Hanabi
 	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers) :m_Specification(specification),
 		m_Width(specification.Width), m_Height(specification.Height)
 	{}
-	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification & specification, Buffer data)
+	OpenGLTextureCube::OpenGLTextureCube(const TextureSpecification& specification, Buffer data)
 	{}
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{}
 	void OpenGLTextureCube::Bind(uint32_t slot) const
-	{}
-	void OpenGLTextureCube::SetData(Buffer data)
 	{}
 	bool OpenGLTextureCube::operator==(const Texture& other) const
 	{

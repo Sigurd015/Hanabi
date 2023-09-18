@@ -348,7 +348,7 @@ namespace Hanabi
 
 		//----------------- 2D Scene Rendering -----------------//
 		Renderer2D::BeginScene(m_Environment->ViewProjection);
-		Renderer2D::SetTargetFramebuffer(SceneRenderer::GetDeferredGeoPass()->GetTargetFramebuffer());
+		Renderer2D::SetTargetFramebuffer(SceneRenderer::GetFinalPass()->GetTargetFramebuffer());
 		// Draw sprites
 		{
 			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();

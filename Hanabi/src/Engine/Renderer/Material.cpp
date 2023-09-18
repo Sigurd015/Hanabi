@@ -54,8 +54,6 @@ namespace Hanabi
 				uint32_t slot = it->second;
 				if (texture.second)
 					texture.second->Bind(slot);
-				else
-					Renderer::GetTexture<Texture2D>("White")->Bind(slot);
 			}
 			else
 			{

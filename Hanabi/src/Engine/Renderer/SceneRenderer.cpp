@@ -9,6 +9,11 @@
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
+#define DEFERRED_OUTPUT_DIFFUSE 0
+#define DEFERRED_OUTPUT_SPECULAR 1
+#define DEFERRED_OUTPUT_NORMAL 2
+#define DEFERRED_OUTPUT_POSITION 3
+
 namespace Hanabi
 {
 	struct SceneRendererData
@@ -489,24 +494,29 @@ namespace Hanabi
 		CompositePass();
 	}
 
-	Ref<RenderPass> SceneRenderer::GetDeferredGeoPass()
-	{
-		return s_Data->DeferredGeoPass;
-	}
-
-	Ref<RenderPass> SceneRenderer::GetDeferredLightPass()
-	{
-		return s_Data->DeferredLightingPass;
-	}
-
-	Ref<RenderPass> SceneRenderer::GetShadowMappingPass()
+	Ref<RenderPass> SceneRenderer::GetFinalPass()
 	{
 		return s_Data->ShadowMappingPass;
 	}
 
-	Ref<RenderPass> SceneRenderer::GetCompositePass()
+	Ref<Image2D> SceneRenderer::GetGBufferDiffuse()
 	{
-		return s_Data->CompositePass;
+		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_DIFFUSE);
+	}
+
+	Ref<Image2D> SceneRenderer::GetGBufferSpecular()
+	{
+		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_SPECULAR);
+	}
+
+	Ref<Image2D> SceneRenderer::GetGBufferNormal()
+	{
+		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_NORMAL);
+	}
+
+	Ref<Image2D> SceneRenderer::GetGBufferPosition()
+	{
+		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_POSITION);
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material)

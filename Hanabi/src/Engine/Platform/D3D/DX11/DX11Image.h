@@ -32,8 +32,6 @@ namespace Hanabi
 		virtual Buffer GetBuffer() const override { return m_ImageData; }
 		virtual Buffer& GetBuffer() override { return m_ImageData; }
 
-		void SetData(Buffer data);
-
 		DXGI_FORMAT GetFormat() const { return m_DataFormat; }
 		ComPtr<ID3D11Texture2D> GetTexture() const { return m_Texture; }
 	private:

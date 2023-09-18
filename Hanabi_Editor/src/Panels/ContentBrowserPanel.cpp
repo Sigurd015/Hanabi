@@ -19,10 +19,22 @@ namespace Hanabi
 		}
 	}
 
-	ContentBrowserPanel::ContentBrowserPanel() :m_ProjectDirectory(Project::GetProjectDirectory())
+	ContentBrowserPanel::ContentBrowserPanel(const std::filesystem::path& projectDirectory)
 	{
+		SetContext(projectDirectory);
+	}
+
+	void ContentBrowserPanel::SetContext(const std::filesystem::path& projectDirectory)
+	{
+		m_ProjectDirectory = projectDirectory;
 		RefreshAssetsMap();
 	}
+
+	void ContentBrowserPanel::OnEvent(Event& e)
+	{}
+
+	void ContentBrowserPanel::OnUpdate(Timestep ts)
+	{}
 
 	void ContentBrowserPanel::OnImGuiRender()
 	{

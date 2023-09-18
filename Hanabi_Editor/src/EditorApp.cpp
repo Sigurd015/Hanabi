@@ -17,7 +17,7 @@ namespace Hanabi
 
 		~HanabiEditor()
 		{
-			EditorResources::Shutdown();
+			
 		}
 	};
 }

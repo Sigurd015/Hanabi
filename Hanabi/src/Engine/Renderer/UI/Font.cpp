@@ -29,8 +29,7 @@ namespace Hanabi
 		spec.Format = ImageFormat::RGB8;
 		spec.GenerateMips = false;
 
-		Ref<Texture2D> texture = Texture2D::Create(spec);
-		texture->SetData(Buffer((void*)bitmap.pixels, bitmap.width * bitmap.height * 3));
+		Ref<Texture2D> texture = Texture2D::Create(spec, Buffer((void*)bitmap.pixels, bitmap.width * bitmap.height * 3));
 		return texture;
 	}
 

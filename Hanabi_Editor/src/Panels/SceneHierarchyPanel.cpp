@@ -1,4 +1,5 @@
 ﻿#include "SceneHierarchyPanel.h"
+#include "CommonStates/SelectionManager.h"
 
 #include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -166,10 +167,10 @@ namespace Hanabi
 		template<typename T>
 		static void DrawComboControl(const std::string& name, const char** typeStrings, uint32_t typeCount, T& type)
 		{
-			const char* currentTypeString = typeStrings[(int)type];
+			const char* currentTypeString = typeStrings[(uint32_t)type];
 			if (ImGui::BeginCombo(name.c_str(), currentTypeString))
 			{
-				for (int i = 0; i < typeCount; i++)
+				for (uint32_t i = 0; i < typeCount; i++)
 				{
 					bool isSelected = currentTypeString == typeStrings[i];
 					if (ImGui::Selectable(typeStrings[i], isSelected))
@@ -190,11 +191,12 @@ namespace Hanabi
 	template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 	{
-		if (!m_SelectionContext.HasComponent<T>())
+		Entity selectedEntity = SelectionManager::GetSelectedEntity();
+		if (!selectedEntity.HasComponent<T>())
 		{
 			if (ImGui::MenuItem(entryName.c_str()))
 			{
-				m_SelectionContext.AddComponent<T>();
+				selectedEntity.AddComponent<T>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
@@ -208,13 +210,13 @@ namespace Hanabi
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
 	{
 		m_Context = context;
-		m_SelectionContext = {};
 	}
 
-	void SceneHierarchyPanel::SetSelectedEntity(Entity entity)
-	{
-		m_SelectionContext = entity;
-	}
+	void SceneHierarchyPanel::OnEvent(Event& e)
+	{}
+
+	void SceneHierarchyPanel::OnUpdate(Timestep ts)
+	{}
 
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
@@ -228,7 +230,7 @@ namespace Hanabi
 					DrawEntityNode(entity);
 				});
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-				m_SelectionContext = {};
+				SelectionManager::SetSelectedEntity({});
 
 			// Right-click on blank space
 			if (ImGui::BeginPopupContextWindow(0, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
@@ -242,9 +244,10 @@ namespace Hanabi
 		ImGui::End();
 
 		ImGui::Begin("Properties");
-		if (m_SelectionContext)
+		Entity selectedEntity = SelectionManager::GetSelectedEntity();
+		if (selectedEntity)
 		{
-			DrawComponents(m_SelectionContext);
+			DrawComponents(selectedEntity);
 		}
 		ImGui::End();
 	}
@@ -253,11 +256,12 @@ namespace Hanabi
 	{
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-		ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		Entity selectedEntity = SelectionManager::GetSelectedEntity();
+		ImGuiTreeNodeFlags flags = ((selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
-			m_SelectionContext = entity;
+			SelectionManager::SetSelectedEntity(entity);
 		}
 
 		if (ImGui::BeginPopupContextItem())
@@ -265,8 +269,8 @@ namespace Hanabi
 			if (ImGui::MenuItem("Delete Entity"))
 			{
 				m_Context->DestroyEntity(entity);
-				if (m_SelectionContext == entity)
-					m_SelectionContext = {};
+				if (selectedEntity == entity)
+					SelectionManager::SetSelectedEntity({});
 			}
 
 			ImGui::EndPopup();

@@ -33,6 +33,8 @@ namespace Hanabi
 		imageSpec.Format = specification.Format;
 		imageSpec.Usage = ImageUsage::Texture2D;
 
+		HNB_CORE_ASSERT(data, "DX11Texture2D: Data is null!");
+
 		m_Image = CreateRef<DX11Image2D>(imageSpec, data);
 		m_Image->Invalidate();
 	}
@@ -59,6 +61,8 @@ namespace Hanabi
 		imageSpec.Height = specification.Height;
 		imageSpec.Format = specification.Format;
 		imageSpec.Usage = ImageUsage::TextureCube;
+
+		HNB_CORE_ASSERT(data, "DX11TextureCube: Data is null!");
 
 		m_Image = CreateRef<DX11Image2D>(imageSpec, data);
 		m_Image->Invalidate();
