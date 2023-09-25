@@ -56,14 +56,10 @@ namespace Hanabi
 		glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE);
 	}
 
-	void OpenGLRendererAPI::SetClearColor(const glm::vec4& color)
-	{
-		m_ClearColor = color;
-	}
-
 	void OpenGLRendererAPI::Clear()
 	{
-		glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, m_ClearColor.a);
+		static const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
@@ -78,7 +74,7 @@ namespace Hanabi
 		if (clear)
 		{
 			Clear();
-			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
+			renderPass->GetTargetFramebuffer()->ClearAttachment();
 		}
 		//glLineWidth(pipeline->GetSpecification().LineWidth);
 	}

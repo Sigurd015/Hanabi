@@ -5,15 +5,18 @@ namespace Hanabi
 {
 	enum class ImageFormat
 	{
+		// Unsigned normalized
 		None = 0,
 		R8,
 		RGB8,
 		RGBA8,
-		RGBA32F,
+
 		RED8UI,
 
-		// Color
+		// Color - signed float
 		RGBA8F,
+		RGBA16F,
+		RGBA32F,
 
 		// Depth/stencil
 		DEPTH24STENCIL8,

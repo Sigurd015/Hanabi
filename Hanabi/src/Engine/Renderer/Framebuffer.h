@@ -29,6 +29,7 @@ namespace Hanabi
 	{
 		uint32_t Width = 0, Height = 0;
 		float DepthClearValue = 1.0f;
+		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 		bool SwapChainTarget = false;
 
@@ -43,7 +44,9 @@ namespace Hanabi
 	public:
 		virtual void Bind() = 0;
 
-		virtual void ClearAttachment(const glm::vec4& color) = 0;
+		virtual void ClearAttachment() = 0;
+		virtual void ClearAttachment(uint32_t attachmentIndex) = 0;
+		virtual void ClearDepthAttachment() = 0;
 
 		virtual Ref<Image2D> GetImage(uint32_t attachmentIndex = 0) const = 0;
 		virtual Ref<Image2D> GetDepthImage() const = 0;
@@ -52,6 +55,7 @@ namespace Hanabi
 
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
+		virtual void SetClearColor(const glm::vec4& color) = 0;
 
 		virtual const FramebufferSpecification& GetSpecification() const = 0;
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);

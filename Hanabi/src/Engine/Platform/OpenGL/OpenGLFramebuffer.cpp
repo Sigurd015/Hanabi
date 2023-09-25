@@ -191,6 +191,10 @@ namespace Hanabi
 		Invalidate();
 	}
 
-	void OpenGLFramebuffer::ClearAttachment(const glm::vec4& color)
+	void OpenGLFramebuffer::ClearAttachment()
+	{}
+	void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex)
+	{}
+	void OpenGLFramebuffer::ClearDepthAttachment()
 	{}
 }

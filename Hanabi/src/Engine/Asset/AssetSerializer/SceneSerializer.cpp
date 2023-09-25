@@ -52,7 +52,7 @@ namespace Hanabi
 		case LightComponent::LightType::Directional: return "Directional";
 		}
 
-		HNB_CORE_ASSERT(false, "Unknown light type");
+		HNB_CORE_ASSERT(false, "Unknown Light Type");
 		return {};
 	}
 
@@ -62,8 +62,31 @@ namespace Hanabi
 		if (lightTypeString == "Spot")   return LightComponent::LightType::Spot;
 		if (lightTypeString == "Directional") return LightComponent::LightType::Directional;
 
-		HNB_CORE_ASSERT(false, "Unknown light type");
+		HNB_CORE_ASSERT(false, "Unknown Light Type");
 		return LightComponent::LightType::None;
+	}
+
+	static std::string ShadowTypeToString(LightComponent::ShadowType lightType)
+	{
+		switch (lightType)
+		{
+		case LightComponent::ShadowType::None:  return "None";
+		case LightComponent::ShadowType::Hard:   return "Hard";
+		case LightComponent::ShadowType::Soft: return "Soft";
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown Shadow Type");
+		return {};
+	}
+
+	static LightComponent::ShadowType ShadowTypeFromString(const std::string& lightTypeString)
+	{
+		if (lightTypeString == "None")    return LightComponent::ShadowType::None;
+		if (lightTypeString == "Hard")   return LightComponent::ShadowType::Hard;
+		if (lightTypeString == "Soft") return LightComponent::ShadowType::Soft;
+
+		HNB_CORE_ASSERT(false, "Unknown Shadow Type");
+		return LightComponent::ShadowType::None;
 	}
 
 	static std::string ClearMethodTypeToString(CameraComponent::ClearMethod clearMethod)
@@ -193,6 +216,7 @@ namespace Hanabi
 				out << YAML::Key << "Angle" << YAML::Value << lightComponent.Angle;
 				out << YAML::Key << "AngleAttenuation" << YAML::Value << lightComponent.AngleAttenuation;
 				out << YAML::Key << "Falloff" << YAML::Value << lightComponent.Falloff;
+				out << YAML::Key << "ShadowType" << YAML::Value << ShadowTypeToString(lightComponent.Shadow);
 			});
 
 		SerializeComponent<SkyLightComponent>("SkyLightComponent", entity, out, [&]()
@@ -429,6 +453,7 @@ namespace Hanabi
 					lc.Angle = lightComponent["Angle"].as<float>();
 					lc.AngleAttenuation = lightComponent["AngleAttenuation"].as<float>();
 					lc.Falloff = lightComponent["Falloff"].as<float>();
+					lc.Shadow = ShadowTypeFromString(lightComponent["ShadowType"].as<std::string>());
 				}
 
 				auto skyLightComponent = entity["SkyLightComponent"];

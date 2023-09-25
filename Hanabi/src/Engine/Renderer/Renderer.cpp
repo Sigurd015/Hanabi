@@ -108,11 +108,6 @@ namespace Hanabi
 		SceneRenderer::Shutdown();
 	}
 
-	void Renderer::SetClearColor(const glm::vec4& color)
-	{
-		s_RendererAPI->SetClearColor(color);
-	}
-
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	{
 		s_RendererAPI->SetViewport(0, 0, width, height);

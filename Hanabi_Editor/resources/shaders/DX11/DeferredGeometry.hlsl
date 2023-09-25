@@ -30,9 +30,9 @@ VertexOutput main(VertexInput Input)
     Output.WorldPosition = mul(u_Transform, float4(Input.a_Position, 1.0f));
     Output.Position = mul(u_ViewProjection, float4(Output.WorldPosition, 1.0));
     Output.TexCoord = Input.a_TexCoord;
-    Output.Tangent = normalize(mul((float3x3) (u_Transform), Input.a_Tangent));
-    Output.Bitangent = normalize(mul((float3x3) (u_Transform), Input.a_Bitangent));
-    Output.Normal = normalize(mul((float3x3) (u_Transform), Input.a_Normal));
+    Output.Tangent = normalize(mul(u_Transform, float4(Input.a_Tangent, 0.0f)).xyz);
+    Output.Bitangent = normalize(mul(u_Transform, float4(Input.a_Bitangent, 0.0f)).xyz);
+    Output.Normal = normalize(mul(u_Transform, float4(Input.a_Normal, 0.0f)).xyz);
 
     return Output;
 }

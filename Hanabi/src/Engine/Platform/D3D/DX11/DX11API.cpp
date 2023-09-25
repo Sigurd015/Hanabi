@@ -6,6 +6,8 @@
 #include "Engine/Core/Application.h"
 #include "DX11RenderStates.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace Hanabi
 {
 	void DX11RendererAPI::Init()
@@ -19,11 +21,6 @@ namespace Hanabi
 		SetBuffer(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
 	}
 
-	void DX11RendererAPI::SetClearColor(const glm::vec4& color)
-	{
-		m_ClearColor = color;
-	}
-
 	void DX11RendererAPI::Clear()
 	{
 		D3D11_VIEWPORT viewPort{};
@@ -35,7 +32,8 @@ namespace Hanabi
 		viewPort.TopLeftY = 0;
 		m_DeviceContext->RSSetViewports(1, &viewPort);
 
-		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
+		static const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), glm::value_ptr(clearColor));
 		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
 	}
@@ -79,7 +77,7 @@ namespace Hanabi
 	{
 		if (clear)
 		{
-			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
+			renderPass->GetTargetFramebuffer()->ClearAttachment();
 		}
 
 		renderPass->GetTargetFramebuffer()->Bind();

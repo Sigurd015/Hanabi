@@ -57,6 +57,7 @@ Entities:
       Angle: 0
       AngleAttenuation: 0
       Falloff: 1
+      ShadowType: None
   - Entity: 7885237720320880870
     TagComponent:
       Tag: PointLight
@@ -73,6 +74,7 @@ Entities:
       Angle: 0
       AngleAttenuation: 0
       Falloff: 1
+      ShadowType: None
   - Entity: 2520661167971211209
     TagComponent:
       Tag: Box
@@ -89,17 +91,18 @@ Entities:
       Tag: DirectionalLight
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [1.31423295, -1.76278257, -0.33859387]
+      Rotation: [0.577703953, -1.46084046, 0]
       Scale: [1, 1, 1]
     LightComponent:
       LightType: Directional
-      Intensity: 0.5
+      Intensity: 2.0999999
       Radiance: [1, 1, 1]
       Radius: 0
       Range: 0
       Angle: 0
       AngleAttenuation: 0
       Falloff: 0
+      ShadowType: Hard
   - Entity: 18258964263546460165
     TagComponent:
       Tag: Wall
@@ -171,3 +174,4 @@ Entities:
       Angle: 100
       AngleAttenuation: 1
       Falloff: 1
+      ShadowType: None

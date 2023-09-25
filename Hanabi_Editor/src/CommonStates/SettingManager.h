@@ -64,7 +64,7 @@ namespace Hanabi
 			}
 			ImGui::End();
 
-			if (SettingManager::ImGuiDebugWndDraw)
+			if (ImGuiDebugWndDraw)
 				ImGui::ShowMetricsWindow();
 		}
 	};

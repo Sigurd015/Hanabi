@@ -17,7 +17,7 @@ struct PixelInput
 
 struct PixelOutput
 {
-    float4 LightResult : SV_Target0;
+    float4 Color : SV_Target0;
 };
 
 Texture2D u_DiffuseBuffer : register(t3);
@@ -43,6 +43,6 @@ PixelOutput main(PixelInput Input)
     float3 dirLightResult = CalcDirectionalLight(material);
     float3 pointLightResult = CalcPointLight(material);
     float3 spotLightResult = CalcSpotLight(material);
-    Output.LightResult = float4(saturate(ambient + saturate(dirLightResult + pointLightResult + spotLightResult)), 1.0f);
+    Output.Color = float4(saturate(ambient + dirLightResult + pointLightResult + spotLightResult), 1.0f);
     return Output;
 }

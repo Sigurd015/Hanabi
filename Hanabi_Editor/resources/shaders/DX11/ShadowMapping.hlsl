@@ -36,13 +36,14 @@ PixelOutput main(PixelInput Input)
     float2 texCoord = float2(Input.TexCoord.x, 1.0 - Input.TexCoord.y);
     float3 lightResult = u_LightResult.Sample(u_SSLinearWrap, texCoord).xyz;
     float3 normal = u_NormalBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
-    float4 position = u_PositionBuffer.Sample(u_SSLinearWrap, texCoord);
-    float4 lightTransformedPosition = mul(position, u_LightViewProjection);
+    float3 worldPosition = u_PositionBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
+    float4 lightTransformedPosition = mul(u_LightViewProjection, float4(worldPosition, 1.0));
 
     float shadowResult = 1.0f;
     switch (u_LightType)
     {
         case 1: // Directional
+        {
             switch (u_ShadowType)
             {
                 case 1:
@@ -53,6 +54,7 @@ PixelOutput main(PixelInput Input)
                     break;
             }
             break;
+        }         
     }
 
     output.Color = float4(lightResult * shadowResult, 1.0f);

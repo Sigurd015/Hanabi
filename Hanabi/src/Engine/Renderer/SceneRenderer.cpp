@@ -162,41 +162,13 @@ namespace Hanabi
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
 		s_Data->ShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBShadow));
 
-		// Skybox Pass
-		{
-			Ref<Framebuffer> framebuffer;
-			{
-				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::Depth };
-				spec.Width = 1920;
-				spec.Height = 1080;
-				spec.SwapChainTarget = false;
-				framebuffer = Framebuffer::Create(spec);
-			}
-			{
-				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = {
-				   { ShaderDataType::Float3, "a_Position" },
-				};
-				pipelineSpec.Shader = Renderer::GetShader("Skybox");
-				pipelineSpec.TargetFramebuffer = framebuffer;
-				pipelineSpec.BackfaceCulling = false;
-				pipelineSpec.DepthTest = true;
-				pipelineSpec.Topology = PrimitiveTopology::Triangles;
-				pipelineSpec.DepthOperator = DepthCompareOperator::LessEqual;
-
-				RenderPassSpecification renderPassSpec;
-				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
-			}
-		}
 		// Deferred Geometry Pass
 		{
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8F,ImageFormat::RGBA8F,
-					ImageFormat::RGBA8F,ImageFormat::RGBA8F,ImageFormat::Depth };
+				spec.Attachments = { ImageFormat::RGBA8,ImageFormat::RGBA8,
+					ImageFormat::RGBA8F,ImageFormat::RGBA16F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
@@ -230,7 +202,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8F };
+				spec.Attachments = { ImageFormat::RGBA8 };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
@@ -289,7 +261,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8F };
+				spec.Attachments = { ImageFormat::RGBA8 };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
@@ -320,10 +292,11 @@ namespace Hanabi
 			{
 				{
 					FramebufferSpecification spec;
-					spec.Attachments = { ImageFormat::RGBA8F };
+					spec.Attachments = { ImageFormat::RGBA8,ImageFormat::Depth };
 					spec.Width = 1920;
 					spec.Height = 1080;
 					spec.SwapChainTarget = false;
+					spec.ExistingImages[1] = s_Data->DeferredGeoPass->GetDepthOutput();
 					framebuffer = Framebuffer::Create(spec);
 				}
 				{
@@ -342,6 +315,36 @@ namespace Hanabi
 					renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
 					s_Data->CompositePass = RenderPass::Create(renderPassSpec);
 				}
+			}
+		}
+		// Skybox Pass
+		{
+			Ref<Framebuffer> framebuffer;
+			{
+				FramebufferSpecification spec;
+				spec.Attachments = { ImageFormat::RGBA8,ImageFormat::Depth };
+				spec.Width = 1920;
+				spec.Height = 1080;
+				spec.SwapChainTarget = false;
+				spec.ExistingImages[0] = s_Data->CompositePass->GetOutput(0);
+				spec.ExistingImages[1] = s_Data->CompositePass->GetDepthOutput();
+				framebuffer = Framebuffer::Create(spec);
+			}
+			{
+				PipelineSpecification pipelineSpec;
+				pipelineSpec.Layout = {
+				   { ShaderDataType::Float3, "a_Position" },
+				};
+				pipelineSpec.Shader = Renderer::GetShader("Skybox");
+				pipelineSpec.TargetFramebuffer = framebuffer;
+				pipelineSpec.BackfaceCulling = false;
+				pipelineSpec.DepthTest = true;
+				pipelineSpec.Topology = PrimitiveTopology::Triangles;
+				pipelineSpec.DepthOperator = DepthCompareOperator::Less;
+
+				RenderPassSpecification renderPassSpec;
+				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+				s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
 			}
 		}
 
@@ -384,7 +387,11 @@ namespace Hanabi
 		const FramebufferSpecification& fbsc = s_Data->CompositePass->GetTargetFramebuffer()->GetSpecification();
 		if (fbsc.Width != width || fbsc.Height != height)
 		{
-			s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
+			// TODO: Resize color attachment and depth attachment(Depth attachment is DeferedGeoPass's depth attachment)
+			//s_Data->DeferredGeoPass->GetTargetFramebuffer()->Resize(width, height);
+			//s_Data->DeferredLightingPass->GetTargetFramebuffer()->Resize(width, height);
+			//s_Data->ShadowMappingPass->GetTargetFramebuffer()->Resize(width, height);
+			//s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
 		}
 	}
 
@@ -451,15 +458,17 @@ namespace Hanabi
 		{
 		case CameraComponent::ClearMethod::None:
 		{
-			constexpr glm::vec4 clearColor = { 0.0f,0.0f,0.0f,1.0f };
-			Renderer::SetClearColor(clearColor);
+			const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+			s_Data->SkyboxPass->GetTargetFramebuffer()->SetClearColor(clearColor);
 			Renderer::BeginRenderPass(s_Data->SkyboxPass);
 			Renderer::EndRenderPass();
 			break;
 		}
 		case CameraComponent::ClearMethod::Soild_Color:
 		{
-			Renderer::SetClearColor(environment->ClearColor);
+			s_Data->SkyboxPass->GetTargetFramebuffer()->SetClearColor(environment->ClearColor);
+			Renderer::BeginRenderPass(s_Data->SkyboxPass);
+			Renderer::EndRenderPass();
 			break;
 		}
 		case CameraComponent::ClearMethod::Skybox:
@@ -474,7 +483,7 @@ namespace Hanabi
 			{
 				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
 			}
-			Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
+			Renderer::BeginRenderPass(s_Data->SkyboxPass);
 			Ref<Mesh> mesh = Renderer::GetMesh("Box");
 			Renderer::DrawMesh(mesh);
 			Renderer::EndRenderPass();
@@ -492,11 +501,12 @@ namespace Hanabi
 		ShadowMappingPass();
 
 		CompositePass();
+
 	}
 
 	Ref<RenderPass> SceneRenderer::GetFinalPass()
 	{
-		return s_Data->ShadowMappingPass;
+		return s_Data->CompositePass;
 	}
 
 	Ref<Image2D> SceneRenderer::GetGBufferDiffuse()
@@ -571,7 +581,13 @@ namespace Hanabi
 
 	void SceneRenderer::DeferredGeoPass()
 	{
-		Renderer::BeginRenderPass(s_Data->DeferredGeoPass);
+		// Notice: Depth attachment is cleared in SkyboxPass
+		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_DIFFUSE);
+		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_SPECULAR);
+		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_NORMAL);
+		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_POSITION);
+
+		Renderer::BeginRenderPass(s_Data->DeferredGeoPass, false);
 		ExecuteDrawCommands();
 		Renderer::EndRenderPass();
 	}
@@ -620,7 +636,8 @@ namespace Hanabi
 
 	void SceneRenderer::CompositePass()
 	{
-		Renderer::BeginRenderPass(s_Data->CompositePass);
+		// Notice: Already cleared in SkyboxPass
+		Renderer::BeginRenderPass(s_Data->CompositePass, false);
 		Renderer::DrawFullScreenQuad();
 		Renderer::EndRenderPass();
 	}

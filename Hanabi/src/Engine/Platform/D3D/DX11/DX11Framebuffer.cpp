@@ -106,7 +106,7 @@ namespace Hanabi
 					image = CreateRef<DX11Image2D>(depthImageSpec);
 					image->Invalidate();
 				}
-		
+
 				D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 				depthStencilViewDesc.Format = Utils::ImageFormatToDXDepthDSVFormat(spec.TextureFormat);
 				depthStencilViewDesc.Flags = 0;
@@ -127,12 +127,25 @@ namespace Hanabi
 			m_DSAttachmentDSV.Get());
 	}
 
-	void DX11Framebuffer::ClearAttachment(const glm::vec4& color)
+	void DX11Framebuffer::ClearAttachment()
 	{
 		for (size_t i = 0; i < m_ColorAttachmentRTV.size(); i++)
 		{
-			DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[i].Get(), glm::value_ptr(color));
+			DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[i].Get(), glm::value_ptr(m_Specification.ClearColor));
 		}
+		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DSAttachmentDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			m_Specification.DepthClearValue, 0);
+	}
+
+	void DX11Framebuffer::ClearAttachment(uint32_t attachmentIndex)
+	{
+		HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachmentRTV.size(), "DX11Framebuffer::ClearAttachment - Invalid attachment index!");
+
+		DX11Context::GetDeviceContext()->ClearRenderTargetView(m_ColorAttachmentRTV[attachmentIndex].Get(), glm::value_ptr(m_Specification.ClearColor));
+	}
+
+	void DX11Framebuffer::ClearDepthAttachment()
+	{
 		DX11Context::GetDeviceContext()->ClearDepthStencilView(m_DSAttachmentDSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 			m_Specification.DepthClearValue, 0);
 	}

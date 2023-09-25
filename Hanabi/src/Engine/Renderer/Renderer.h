@@ -14,7 +14,6 @@ namespace Hanabi
 		static void Init();
 		static void Shutdown();
 
-		static void SetClearColor(const glm::vec4& color);
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
 		static void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear = true);
