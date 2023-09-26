@@ -292,11 +292,10 @@ namespace Hanabi
 			{
 				{
 					FramebufferSpecification spec;
-					spec.Attachments = { ImageFormat::RGBA8,ImageFormat::Depth };
+					spec.Attachments = { ImageFormat::RGBA8 };
 					spec.Width = 1920;
 					spec.Height = 1080;
 					spec.SwapChainTarget = false;
-					spec.ExistingImages[1] = s_Data->DeferredGeoPass->GetDepthOutput();
 					framebuffer = Framebuffer::Create(spec);
 				}
 				{
@@ -327,7 +326,7 @@ namespace Hanabi
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
 				spec.ExistingImages[0] = s_Data->CompositePass->GetOutput(0);
-				spec.ExistingImages[1] = s_Data->CompositePass->GetDepthOutput();
+				spec.ExistingImages[1] = s_Data->DeferredGeoPass->GetDepthOutput();
 				framebuffer = Framebuffer::Create(spec);
 			}
 			{
@@ -387,7 +386,7 @@ namespace Hanabi
 		const FramebufferSpecification& fbsc = s_Data->CompositePass->GetTargetFramebuffer()->GetSpecification();
 		if (fbsc.Width != width || fbsc.Height != height)
 		{
-			// TODO: Resize color attachment and depth attachment(Depth attachment is DeferedGeoPass's depth attachment)
+			// TODO: Resize color attachment and depth attachment
 			//s_Data->DeferredGeoPass->GetTargetFramebuffer()->Resize(width, height);
 			//s_Data->DeferredLightingPass->GetTargetFramebuffer()->Resize(width, height);
 			//s_Data->ShadowMappingPass->GetTargetFramebuffer()->Resize(width, height);
@@ -454,21 +453,20 @@ namespace Hanabi
 
 		s_Data->DrawCommands.clear();
 
+		//TODO: Make clear color work
 		switch (environment->ClearType)
 		{
 		case CameraComponent::ClearMethod::None:
 		{
 			const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 			s_Data->SkyboxPass->GetTargetFramebuffer()->SetClearColor(clearColor);
-			Renderer::BeginRenderPass(s_Data->SkyboxPass);
-			Renderer::EndRenderPass();
+			s_Data->SkyboxDrawRequested = false;
 			break;
 		}
 		case CameraComponent::ClearMethod::Soild_Color:
 		{
 			s_Data->SkyboxPass->GetTargetFramebuffer()->SetClearColor(environment->ClearColor);
-			Renderer::BeginRenderPass(s_Data->SkyboxPass);
-			Renderer::EndRenderPass();
+			s_Data->SkyboxDrawRequested = false;
 			break;
 		}
 		case CameraComponent::ClearMethod::Skybox:
@@ -483,10 +481,7 @@ namespace Hanabi
 			{
 				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
 			}
-			Renderer::BeginRenderPass(s_Data->SkyboxPass);
-			Ref<Mesh> mesh = Renderer::GetMesh("Box");
-			Renderer::DrawMesh(mesh);
-			Renderer::EndRenderPass();
+			s_Data->SkyboxDrawRequested = true;
 			break;
 		}
 		}
@@ -501,12 +496,12 @@ namespace Hanabi
 		ShadowMappingPass();
 
 		CompositePass();
-
+		SkyboxPass();
 	}
 
 	Ref<RenderPass> SceneRenderer::GetFinalPass()
 	{
-		return s_Data->CompositePass;
+		return s_Data->SkyboxPass;
 	}
 
 	Ref<Image2D> SceneRenderer::GetGBufferDiffuse()
@@ -581,13 +576,7 @@ namespace Hanabi
 
 	void SceneRenderer::DeferredGeoPass()
 	{
-		// Notice: Depth attachment is cleared in SkyboxPass
-		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_DIFFUSE);
-		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_SPECULAR);
-		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_NORMAL);
-		s_Data->DeferredGeoPass->GetTargetFramebuffer()->ClearAttachment(DEFERRED_OUTPUT_POSITION);
-
-		Renderer::BeginRenderPass(s_Data->DeferredGeoPass, false);
+		Renderer::BeginRenderPass(s_Data->DeferredGeoPass);
 		ExecuteDrawCommands();
 		Renderer::EndRenderPass();
 	}
@@ -636,9 +625,19 @@ namespace Hanabi
 
 	void SceneRenderer::CompositePass()
 	{
-		// Notice: Already cleared in SkyboxPass
-		Renderer::BeginRenderPass(s_Data->CompositePass, false);
+		Renderer::BeginRenderPass(s_Data->CompositePass);
 		Renderer::DrawFullScreenQuad();
+		Renderer::EndRenderPass();
+	}
+
+	void SceneRenderer::SkyboxPass()
+	{
+		Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
+		if (s_Data->SkyboxDrawRequested)
+		{
+			Ref<Mesh> mesh = Renderer::GetMesh("Box");
+			Renderer::DrawMesh(mesh);
+		}
 		Renderer::EndRenderPass();
 	}
 }
