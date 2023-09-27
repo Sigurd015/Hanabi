@@ -8,8 +8,8 @@ Entities:
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     SkyLightComponent:
-      SceneEnvironmentAssetHandle: 17714572538490360680
       Intensity: 0
+      EnvMapHandle: 17746566452886661726
   - Entity: 3265185506109202002
     TagComponent:
       Tag: Camera
@@ -28,10 +28,6 @@ Entities:
         OrthographicFar: 100
       Primary: true
       FixedAspectRatio: false
-      ClearMethod:
-        Type: Skybox
-        ClearColor: [0, 0, 0, 1]
-        SkyboxHandle: 17746566452886661726
     ScriptComponent:
       ClassName: Sandbox.Camera
       ScriptFields:

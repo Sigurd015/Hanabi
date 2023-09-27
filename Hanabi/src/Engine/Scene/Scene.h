@@ -49,11 +49,7 @@ namespace Hanabi
 		glm::vec3 CameraPosition;
 		glm::mat4 ViewProjection;
 
-		CameraComponent::ClearMethod ClearType = CameraComponent::ClearMethod::None;
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		AssetHandle SkyboxAssetHandle = 0;
-
-		AssetHandle SceneEnvironmentAssetHandle = 0;
+		AssetHandle EnvMapHandle = 0;
 		float SkyLightIntensity = 0.0f;
 
 		DirectionalLight DirLight;

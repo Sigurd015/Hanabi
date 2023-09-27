@@ -38,7 +38,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("ShadowMapping");
 		s_Data->ShaderLibrary->Load("Composite");
 		s_Data->ShaderLibrary->Load("ShadowMap");
-		s_Data->ShaderLibrary->Load("Skybox");
+		s_Data->ShaderLibrary->Load("EnvMap");
 
 		//Setup textures
 		TextureSpecification spec;

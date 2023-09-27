@@ -379,103 +379,6 @@ namespace Hanabi
 						camera.SetOrthographicFarClip(orthoFar);
 					ImGui::Checkbox("Fixed Aspect Ratio", &component.FixedAspectRatio);
 				}
-
-				const char* clearMethodTypeStrings[] = { "None","Soild Color", "Skybox" };
-				Utils::DrawComboControl("Clear Method", clearMethodTypeStrings, 3, component.ClearType);
-
-				if (component.ClearType == CameraComponent::ClearMethod::Soild_Color)
-				{
-					ImGui::ColorEdit4("Clear Color", glm::value_ptr(component.ClearColor));
-				}
-
-				if (component.ClearType == CameraComponent::ClearMethod::Skybox)
-				{
-					Ref<EnvMapAsset> envMapAsset = nullptr;
-					std::string label = "None";
-					if (AssetManager::IsAssetHandleValid(component.SkyboxHandle)
-						&& AssetManager::GetAssetType(component.SkyboxHandle) == AssetType::EnvMap)
-					{
-						envMapAsset = AssetManager::GetAsset<EnvMapAsset>(component.SkyboxHandle);
-						const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.SkyboxHandle);
-						label = metadata.FilePath.filename().string();
-					}
-
-					Utils::DrawDragDropContent(component.SkyboxHandle, AssetType::EnvMap, [&]()
-						{
-							if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
-							{
-								component.SkyboxHandle = 0;
-								envMapAsset = nullptr;
-							}
-						});
-
-					if (envMapAsset != nullptr)
-					{
-						AssetHandle topHandle = envMapAsset->GetTopHandle();
-						AssetHandle bottomHandle = envMapAsset->GetBottomHandle();
-						AssetHandle leftHandle = envMapAsset->GetLeftHandle();
-						AssetHandle rightHandle = envMapAsset->GetRightHandle();
-						AssetHandle frontHandle = envMapAsset->GetFrontHandle();
-						AssetHandle backHandle = envMapAsset->GetBackHandle();
-
-						AssetHandle tempTopHandle = topHandle;
-						AssetHandle tempBottomHandle = bottomHandle;
-						AssetHandle tempLeftHandle = leftHandle;
-						AssetHandle tempRightHandle = rightHandle;
-						AssetHandle tempFrontHandle = frontHandle;
-						AssetHandle tempBackHandle = backHandle;
-
-						Utils::DrawTextureControl("Top Texture", tempTopHandle);
-						Utils::DrawTextureControl("Bottom Texture", tempBottomHandle);
-						Utils::DrawTextureControl("Left Texture", tempLeftHandle);
-						Utils::DrawTextureControl("Right Texture", tempRightHandle);
-						Utils::DrawTextureControl("Front Texture", tempFrontHandle);
-						Utils::DrawTextureControl("Back Texture", tempBackHandle);
-
-						bool topChanged = tempTopHandle != topHandle;
-						bool bottomChanged = tempBottomHandle != bottomHandle;
-						bool leftChanged = tempLeftHandle != leftHandle;
-						bool rightChanged = tempRightHandle != rightHandle;
-						bool frontChanged = tempFrontHandle != frontHandle;
-						bool backChanged = tempBackHandle != backHandle;
-
-						if (topChanged)
-						{
-							envMapAsset->SetTopHandle(tempTopHandle);
-						}
-
-						if (bottomChanged)
-						{
-							envMapAsset->SetBottomHandle(tempBottomHandle);
-						}
-
-						if (leftChanged)
-						{
-							envMapAsset->SetLeftHandle(tempLeftHandle);
-						}
-
-						if (rightChanged)
-						{
-							envMapAsset->SetRightHandle(tempRightHandle);
-						}
-
-						if (frontChanged)
-						{
-							envMapAsset->SetFrontHandle(tempFrontHandle);
-						}
-
-						if (backChanged)
-						{
-							envMapAsset->SetBackHandle(tempBackHandle);
-						}
-
-						if (topChanged || bottomChanged || leftChanged || rightChanged || frontChanged || backChanged)
-						{
-							AssetImporter::Serialize(envMapAsset);
-							envMapAsset->Invalidate();
-						}
-					}
-				}
 			});
 
 		Utils::DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
@@ -662,23 +565,93 @@ namespace Hanabi
 
 		Utils::DrawComponent<SkyLightComponent>("SkyLight", entity, [](auto& component)
 			{
+				ImGui::DragFloat("Intensity", &component.Intensity, 0.1f, 0.0f, 5.0f);
+
+				Ref<EnvMapAsset> envMapAsset = nullptr;
 				std::string label = "None";
-				if (AssetManager::IsAssetHandleValid(component.SceneEnvironment)
-					&& AssetManager::GetAssetType(component.SceneEnvironment) == AssetType::EnvMap)
+				if (AssetManager::IsAssetHandleValid(component.EnvMapHandle)
+					&& AssetManager::GetAssetType(component.EnvMapHandle) == AssetType::EnvMap)
 				{
-					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.SceneEnvironment);
+					envMapAsset = AssetManager::GetAsset<EnvMapAsset>(component.EnvMapHandle);
+					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.EnvMapHandle);
 					label = metadata.FilePath.filename().string();
 				}
 
-				Utils::DrawDragDropContent(component.SceneEnvironment, AssetType::EnvMap, [&]()
+				Utils::DrawDragDropContent(component.EnvMapHandle, AssetType::EnvMap, [&]()
 					{
 						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
 						{
-							component.SceneEnvironment = 0;
+							component.EnvMapHandle = 0;
+							envMapAsset = nullptr;
 						}
 					});
 
-				ImGui::DragFloat("Intensity", &component.Intensity, 0.1f, 0.0f, 5.0f);
+				if (envMapAsset != nullptr)
+				{
+					AssetHandle topHandle = envMapAsset->GetTopHandle();
+					AssetHandle bottomHandle = envMapAsset->GetBottomHandle();
+					AssetHandle leftHandle = envMapAsset->GetLeftHandle();
+					AssetHandle rightHandle = envMapAsset->GetRightHandle();
+					AssetHandle frontHandle = envMapAsset->GetFrontHandle();
+					AssetHandle backHandle = envMapAsset->GetBackHandle();
+
+					AssetHandle tempTopHandle = topHandle;
+					AssetHandle tempBottomHandle = bottomHandle;
+					AssetHandle tempLeftHandle = leftHandle;
+					AssetHandle tempRightHandle = rightHandle;
+					AssetHandle tempFrontHandle = frontHandle;
+					AssetHandle tempBackHandle = backHandle;
+
+					Utils::DrawTextureControl("Top Texture", tempTopHandle);
+					Utils::DrawTextureControl("Bottom Texture", tempBottomHandle);
+					Utils::DrawTextureControl("Left Texture", tempLeftHandle);
+					Utils::DrawTextureControl("Right Texture", tempRightHandle);
+					Utils::DrawTextureControl("Front Texture", tempFrontHandle);
+					Utils::DrawTextureControl("Back Texture", tempBackHandle);
+
+					bool topChanged = tempTopHandle != topHandle;
+					bool bottomChanged = tempBottomHandle != bottomHandle;
+					bool leftChanged = tempLeftHandle != leftHandle;
+					bool rightChanged = tempRightHandle != rightHandle;
+					bool frontChanged = tempFrontHandle != frontHandle;
+					bool backChanged = tempBackHandle != backHandle;
+
+					if (topChanged)
+					{
+						envMapAsset->SetTopHandle(tempTopHandle);
+					}
+
+					if (bottomChanged)
+					{
+						envMapAsset->SetBottomHandle(tempBottomHandle);
+					}
+
+					if (leftChanged)
+					{
+						envMapAsset->SetLeftHandle(tempLeftHandle);
+					}
+
+					if (rightChanged)
+					{
+						envMapAsset->SetRightHandle(tempRightHandle);
+					}
+
+					if (frontChanged)
+					{
+						envMapAsset->SetFrontHandle(tempFrontHandle);
+					}
+
+					if (backChanged)
+					{
+						envMapAsset->SetBackHandle(tempBackHandle);
+					}
+
+					if (topChanged || bottomChanged || leftChanged || rightChanged || frontChanged || backChanged)
+					{
+						AssetImporter::Serialize(envMapAsset);
+						envMapAsset->Invalidate();
+					}
+				}
 			});
 
 		Utils::DrawComponent<LightComponent>("Light", entity, [](auto& component)

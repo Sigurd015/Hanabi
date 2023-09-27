@@ -16,8 +16,6 @@
 
 namespace Hanabi
 {
-	static glm::vec4 s_EditorClearColor = { 0.3f, 0.3f, 0.3f, 1.0f };
-
 	template<typename... Component>
 	static void CopyComponent(entt::registry& dst, entt::registry& src,
 		const std::unordered_map<UUID, entt::entity>& enttMap)
@@ -226,9 +224,6 @@ namespace Hanabi
 				mainCamera = &camera.Camera;
 				cameraTransform = transform.GetTransform();
 				m_Environment->CameraPosition = transform.Translation;
-				m_Environment->ClearType = camera.ClearType;
-				m_Environment->ClearColor = camera.ClearColor;
-				m_Environment->SkyboxAssetHandle = camera.SkyboxHandle;
 				break;
 			}
 		}
@@ -247,8 +242,6 @@ namespace Hanabi
 		m_Environment->SpotLights.clear();
 		m_Environment->CameraPosition = camera.GetPosition();
 		m_Environment->ViewProjection = camera.GetViewProjection();
-		m_Environment->ClearType = CameraComponent::ClearMethod::Soild_Color;
-		m_Environment->ClearColor = s_EditorClearColor;
 		RenderScene(selectedEntity, enableOverlayRender);
 	}
 
@@ -261,14 +254,14 @@ namespace Hanabi
 				auto view = m_Registry.view<SkyLightComponent>();
 				if (view.empty())
 				{
-					m_Environment->SceneEnvironmentAssetHandle = 0;
+					m_Environment->EnvMapHandle = 0;
 					m_Environment->SkyLightIntensity = 0.0f;
 				}
 				else
 				{
 					// Only one skylight is allowed
 					auto& skylight = view.get<SkyLightComponent>(view.front());
-					m_Environment->SceneEnvironmentAssetHandle = skylight.SceneEnvironment;
+					m_Environment->EnvMapHandle = skylight.EnvMapHandle;
 					m_Environment->SkyLightIntensity = skylight.Intensity;
 				}
 			}

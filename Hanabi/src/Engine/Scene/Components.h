@@ -66,11 +66,6 @@ namespace Hanabi
 		bool Primary = true; // TODO: think about moving to Scene
 		bool FixedAspectRatio = false;
 
-		enum class ClearMethod { None = 0, Soild_Color, Skybox };
-		ClearMethod ClearType = ClearMethod::None;
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		AssetHandle SkyboxHandle = 0;
-
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
 	};
@@ -118,7 +113,7 @@ namespace Hanabi
 
 	struct SkyLightComponent
 	{
-		AssetHandle SceneEnvironment;
+		AssetHandle EnvMapHandle;
 		float Intensity = 1.0f;
 	};
 

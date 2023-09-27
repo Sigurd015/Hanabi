@@ -133,7 +133,7 @@ namespace Hanabi
 		Ref<RenderPass> ShadowMappingPass;
 		Ref<RenderPass> DeferredGeoPass;
 		Ref<RenderPass> DeferredLightingPass;
-		Ref<RenderPass> SkyboxPass;
+		Ref<RenderPass> EnvMapPass;
 		Ref<RenderPass> CompositePass;
 
 		Ref<Material> DefaultMaterial;
@@ -146,8 +146,6 @@ namespace Hanabi
 			CBModel ModelData;
 		};
 		std::vector<GeoDrawCommand> DrawCommands;
-
-		bool SkyboxDrawRequested = false;
 	};
 	static SceneRendererData* s_Data;
 
@@ -334,7 +332,7 @@ namespace Hanabi
 				pipelineSpec.Layout = {
 				   { ShaderDataType::Float3, "a_Position" },
 				};
-				pipelineSpec.Shader = Renderer::GetShader("Skybox");
+				pipelineSpec.Shader = Renderer::GetShader("EnvMap");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = false;
 				pipelineSpec.DepthTest = true;
@@ -343,7 +341,7 @@ namespace Hanabi
 
 				RenderPassSpecification renderPassSpec;
 				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
+				s_Data->EnvMapPass = RenderPass::Create(renderPassSpec);
 			}
 		}
 
@@ -368,9 +366,9 @@ namespace Hanabi
 		s_Data->ShadowMappingPass->SetInput("u_ShadowDepth", s_Data->ShadowMapPass->GetDepthOutput());
 		s_Data->ShadowMappingPass->SetInput("u_LightResult", s_Data->DeferredLightingPass->GetOutput());
 
-		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
-
 		s_Data->CompositePass->SetInput("u_Color", s_Data->ShadowMappingPass->GetOutput());
+
+		s_Data->EnvMapPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
 		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
@@ -453,37 +451,15 @@ namespace Hanabi
 
 		s_Data->DrawCommands.clear();
 
-		//TODO: Make clear color work
-		switch (environment->ClearType)
+		if (environment->EnvMapHandle)
 		{
-		case CameraComponent::ClearMethod::None:
-		{
-			const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-			s_Data->SkyboxPass->GetTargetFramebuffer()->SetClearColor(clearColor);
-			s_Data->SkyboxDrawRequested = false;
-			break;
+			Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
+			Ref<TextureCube> textureCube = asset->GetEnvMap();
+			s_Data->EnvMapPass->SetInput("u_EnvMap", textureCube);
 		}
-		case CameraComponent::ClearMethod::Soild_Color:
+		else
 		{
-			s_Data->SkyboxPass->GetTargetFramebuffer()->SetClearColor(environment->ClearColor);
-			s_Data->SkyboxDrawRequested = false;
-			break;
-		}
-		case CameraComponent::ClearMethod::Skybox:
-		{
-			if (environment->SkyboxAssetHandle)
-			{
-				Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->SkyboxAssetHandle);
-				Ref<TextureCube> textureCube = asset->GetEnvMap();
-				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", textureCube);
-			}
-			else
-			{
-				s_Data->SkyboxPass->SetInput("u_SkyboxTexture", Renderer::GetTexture<TextureCube>("BlackCube"));
-			}
-			s_Data->SkyboxDrawRequested = true;
-			break;
-		}
+			s_Data->EnvMapPass->SetInput("u_EnvMap", Renderer::GetTexture<TextureCube>("BlackCube"));
 		}
 	}
 
@@ -496,12 +472,12 @@ namespace Hanabi
 		ShadowMappingPass();
 
 		CompositePass();
-		SkyboxPass();
+		EnvMapPass();
 	}
 
 	Ref<RenderPass> SceneRenderer::GetFinalPass()
 	{
-		return s_Data->SkyboxPass;
+		return s_Data->EnvMapPass;
 	}
 
 	Ref<Image2D> SceneRenderer::GetGBufferDiffuse()
@@ -630,14 +606,11 @@ namespace Hanabi
 		Renderer::EndRenderPass();
 	}
 
-	void SceneRenderer::SkyboxPass()
+	void SceneRenderer::EnvMapPass()
 	{
-		Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
-		if (s_Data->SkyboxDrawRequested)
-		{
-			Ref<Mesh> mesh = Renderer::GetMesh("Box");
-			Renderer::DrawMesh(mesh);
-		}
+		Renderer::BeginRenderPass(s_Data->EnvMapPass, false);
+		Ref<Mesh> mesh = Renderer::GetMesh("Box");
+		Renderer::DrawMesh(mesh);
 		Renderer::EndRenderPass();
 	}
 }
