@@ -2,17 +2,18 @@
 #define LIGHTING_HEADER
 #include "Buffers.hlsl"
 
-struct Material
+struct PBRParameters
 {
-    float3 DiffuseColor;
-    float3 SpecularColor;
+	float3 Albedo;
+	float Roughness;
+	float Metalness;
 
     float3 WorldNormal;
     float3 WorldPosition;
     float3 PixelToCamera;
 };
 
-float3 CalcDirectionalLight(Material material)
+float3 CalcDirectionalLight(PBRParameters material)
 {
     float3 result = float3(0, 0, 0);
     
@@ -32,7 +33,7 @@ float3 CalcDirectionalLight(Material material)
     return result;
 }
 
-float3 CalcPointLight(Material material)
+float3 CalcPointLight(PBRParameters material)
 {
     float3 result = float3(0, 0, 0);
     for (int i = 0; i < u_PointLightsCount; i++)
@@ -63,7 +64,7 @@ float3 CalcPointLight(Material material)
     return result;
 }
 
-float3 CalcSpotLight(Material material)
+float3 CalcSpotLight(PBRParameters material)
 {
     float3 result = float3(0, 0, 0);
     for (int i = 0; i < u_SpotLightsCount; i++)

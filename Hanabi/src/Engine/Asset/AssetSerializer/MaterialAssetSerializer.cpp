@@ -2,6 +2,7 @@
 #include "AssetSerializer.h"
 #include "Engine/Project/Project.h"
 #include "Engine/Asset/AssetManager/AssetManager.h"
+#include "Engine/Utils/YAMLHelpers.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -9,9 +10,14 @@
 namespace Hanabi
 {
 	static std::string s_DefaultMaterialYAML = R"(Material:
-  DiffuseTextureHandle: 0
-  SpecularTextureHandle: 0
-  NormalTextureHandle: 0
+  AlbedoTexHandle: 0
+  MetalnessTexHandle: 0
+  RoughnessTexHandle: 0
+  NormalTexHandle: 0
+  AlbedoColor: [0, 0, 0]
+  Emission: 0.0
+  Metalness: 0.0
+  Roughness: 0.0
   UseNormalMap: false)";
 
 	void MaterialAssetSerializer::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const
@@ -55,9 +61,14 @@ namespace Hanabi
 			out << YAML::Key << "Material" << YAML::Value;
 			{
 				out << YAML::BeginMap;// Material
-				out << YAML::Key << "DiffuseTextureHandle" << YAML::Value << materialAsset->GetDiffuseHandle();
-				out << YAML::Key << "SpecularTextureHandle" << YAML::Value << materialAsset->GetSpecularHandle();
-				out << YAML::Key << "NormalTextureHandle" << YAML::Value << materialAsset->GetNormalHandle();
+				out << YAML::Key << "AlbedoTexHandle" << YAML::Value << materialAsset->GetAlbedoTexHandle();
+				out << YAML::Key << "MetalnessTexHandle" << YAML::Value << materialAsset->GetMetalnessTexHandle();
+				out << YAML::Key << "RoughnessTexHandle" << YAML::Value << materialAsset->GetRoughnessTexHandle();
+				out << YAML::Key << "NormalTexHandle" << YAML::Value << materialAsset->GetNormalTexHandle();
+				out << YAML::Key << "AlbedoColor" << YAML::Value << materialAsset->GetAlbedo();
+				out << YAML::Key << "Emission" << YAML::Value << materialAsset->GetEmission();
+				out << YAML::Key << "Metalness" << YAML::Value << materialAsset->GetMetalness();
+				out << YAML::Key << "Roughness" << YAML::Value << materialAsset->GetRoughness();
 				out << YAML::Key << "UseNormalMap" << YAML::Value << materialAsset->IsUsingNormalMap();
 				out << YAML::EndMap; // Material
 			}
@@ -72,13 +83,19 @@ namespace Hanabi
 		YAML::Node root = YAML::Load(yamlString);
 		YAML::Node materialNode = root["Material"];
 
-		AssetHandle diffuseHandle = materialNode["DiffuseTextureHandle"].as<uint64_t>();
-		targetMaterialAsset->SetDiffuse(diffuseHandle);
-		AssetHandle specularHandle = materialNode["SpecularTextureHandle"].as<uint64_t>();
-		targetMaterialAsset->SetSpecular(specularHandle);
-		AssetHandle normalHandle = materialNode["NormalTextureHandle"].as<uint64_t>();
-		targetMaterialAsset->SetNormal(normalHandle);
+		AssetHandle albedoTexHandle = materialNode["AlbedoTexHandle"].as<uint64_t>();
+		targetMaterialAsset->SetAlbedoTex(albedoTexHandle);
+		AssetHandle metalnessTexHandle = materialNode["MetalnessTexHandle"].as<uint64_t>();
+		targetMaterialAsset->SetMetalnessTex(metalnessTexHandle);
+		AssetHandle roughnessTexHandle = materialNode["RoughnessTexHandle"].as<uint64_t>();
+		targetMaterialAsset->SetRoughnessTex(roughnessTexHandle);
+		AssetHandle normalHandle = materialNode["NormalTexHandle"].as<uint64_t>();
+		targetMaterialAsset->SetNormalTex(normalHandle);
 
+		targetMaterialAsset->SetAlbedo(materialNode["AlbedoColor"].as<glm::vec3>());
+		targetMaterialAsset->SetEmission(materialNode["Emission"].as<float>());
+		targetMaterialAsset->SetMetalness(materialNode["Metalness"].as<float>());
+		targetMaterialAsset->SetRoughness(materialNode["Roughness"].as<float>());
 		targetMaterialAsset->SetUseNormalMap(materialNode["UseNormalMap"].as<bool>());
 
 		return true;

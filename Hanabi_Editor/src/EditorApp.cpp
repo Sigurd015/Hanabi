@@ -30,7 +30,7 @@ Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 	spec.CommandLineArgs = args;
 	spec.EnableImGui = true;
 	spec.EnableScripting = true;
-	spec.ScriptConfig.CoreAssemblyPath = "resources/scripts/Hanabi_ScriptCore.dll";
+	spec.ScriptConfig.CoreAssemblyPath = "Resources/Scripts/Hanabi_ScriptCore.dll";
 
 	if (spec.CommandLineArgs.Count > 2)
 	{

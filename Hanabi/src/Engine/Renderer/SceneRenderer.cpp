@@ -9,11 +9,6 @@
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
-#define DEFERRED_OUTPUT_DIFFUSE 0
-#define DEFERRED_OUTPUT_SPECULAR 1
-#define DEFERRED_OUTPUT_NORMAL 2
-#define DEFERRED_OUTPUT_POSITION 3
-
 namespace Hanabi
 {
 	struct SceneRendererData
@@ -55,13 +50,22 @@ namespace Hanabi
 			float padding[2];
 		};
 
+		struct MaterialData
+		{
+			glm::vec3 Albedo;
+			float Emission;
+			float Metalness;
+			float Roughness;
+			bool UseNormalMap;
+
+			// Padding
+			float padding;
+		};
+
 		struct CBModel
 		{
 			glm::mat4 Transform;
-			bool UseNormalMap = false;
-
-			// Padding
-			float padding[3];
+			MaterialData Material;
 		};
 
 		struct CBCamera
@@ -337,7 +341,7 @@ namespace Hanabi
 				pipelineSpec.BackfaceCulling = false;
 				pipelineSpec.DepthTest = true;
 				pipelineSpec.Topology = PrimitiveTopology::Triangles;
-				pipelineSpec.DepthOperator = DepthCompareOperator::Less;
+				pipelineSpec.DepthOperator = DepthCompareOperator::LessEqual;
 
 				RenderPassSpecification renderPassSpec;
 				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
@@ -352,17 +356,17 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("CBScene", s_Data->SceneDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
-		s_Data->DeferredLightingPass->SetInput("u_DiffuseBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_DIFFUSE));
-		s_Data->DeferredLightingPass->SetInput("u_SpecularBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_SPECULAR));
-		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_NORMAL));
-		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_POSITION));
+		s_Data->DeferredLightingPass->SetInput("u_AlbedoBuffer", s_Data->DeferredGeoPass->GetOutput(0));
+		s_Data->DeferredLightingPass->SetInput("u_MetalnessRoughnessBuffer", s_Data->DeferredGeoPass->GetOutput(1));
+		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
+		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
 
 		s_Data->ShadowMapPass->SetInput("CBModel", s_Data->ModelDataBuffer);
 		s_Data->ShadowMapPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
 
 		s_Data->ShadowMappingPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
-		s_Data->ShadowMappingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_NORMAL));
-		s_Data->ShadowMappingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_POSITION));
+		s_Data->ShadowMappingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
+		s_Data->ShadowMappingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
 		s_Data->ShadowMappingPass->SetInput("u_ShadowDepth", s_Data->ShadowMapPass->GetDepthOutput());
 		s_Data->ShadowMappingPass->SetInput("u_LightResult", s_Data->DeferredLightingPass->GetOutput());
 
@@ -480,34 +484,46 @@ namespace Hanabi
 		return s_Data->EnvMapPass;
 	}
 
-	Ref<Image2D> SceneRenderer::GetGBufferDiffuse()
+	Ref<Image2D> SceneRenderer::GetGBufferAlbedo()
 	{
-		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_DIFFUSE);
+		return s_Data->DeferredGeoPass->GetOutput(0);
 	}
 
-	Ref<Image2D> SceneRenderer::GetGBufferSpecular()
+	Ref<Image2D> SceneRenderer::GetGBufferMetalnessRoughness()
 	{
-		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_SPECULAR);
+		return s_Data->DeferredGeoPass->GetOutput(1);
 	}
 
 	Ref<Image2D> SceneRenderer::GetGBufferNormal()
 	{
-		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_NORMAL);
+		return s_Data->DeferredGeoPass->GetOutput(2);
 	}
 
 	Ref<Image2D> SceneRenderer::GetGBufferPosition()
 	{
-		return s_Data->DeferredGeoPass->GetOutput(DEFERRED_OUTPUT_POSITION);
+		return s_Data->DeferredGeoPass->GetOutput(3);
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material)
 	{
-		s_Data->DrawCommands.push_back({ mesh ,material->GetMaterial() ,{ transform,material->IsUsingNormalMap() } });
+		s_Data->DrawCommands.push_back({ mesh ,material->GetMaterial() ,{
+			transform,
+			material->GetAlbedo(),
+			material->GetEmission(),
+			material->GetMetalness(),
+			material->GetRoughness(),
+			material->IsUsingNormalMap() } });
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh)
 	{
-		s_Data->DrawCommands.push_back({ mesh ,s_Data->DefaultMaterial ,{ transform,false } });
+		s_Data->DrawCommands.push_back({ mesh ,s_Data->DefaultMaterial ,{
+			transform,
+			glm::vec3(1.0f),
+			0.0f,
+			0.0f,
+			0.0f,
+			false  } });
 	}
 
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle)
@@ -539,7 +555,7 @@ namespace Hanabi
 		for (auto& command : s_Data->DrawCommands)
 		{
 			s_Data->ModelData.Transform = command.ModelData.Transform;
-			s_Data->ModelData.UseNormalMap = command.ModelData.UseNormalMap;
+			s_Data->ModelData.Material = command.ModelData.Material;
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 

@@ -31,10 +31,19 @@ struct SpotLight
     float Falloff;
 };
 
+struct Material
+{
+    float3 Albedo;
+    float Emission;
+    float Metalness;
+	float Roughness;
+    bool UseNormalMap;
+};
+
 cbuffer CBModel : register(b0)
 {
     float4x4 u_Transform;
-    bool u_UseNormalMap;
+    Material u_Material;
 };
 
 cbuffer CBCamera : register(b1)

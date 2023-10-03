@@ -1,7 +1,6 @@
 #ifndef PBR_HEADER
 #define PBR_HEADER
-
-const float PI = 3.141592;
+#include "Common.hlsl"
 
 // GGX/Towbridge-Reitz normal distribution function.
 // Uses Disney's reparametrization of alpha = roughness^2

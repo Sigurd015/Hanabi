@@ -21,7 +21,7 @@ namespace Hanabi
 
 		static constexpr const char* GetShaderDirectoryPath()
 		{
-			return "resources/shaders/";
+			return "Resources/Shaders/";
 		}
 	};
 

@@ -517,20 +517,39 @@ namespace Hanabi
 
 				if (materialAsset != nullptr)
 				{
-					AssetHandle diffuseHandle = materialAsset->GetDiffuseHandle();
-					AssetHandle specularHandle = materialAsset->GetSpecularHandle();
-					AssetHandle normalHandle = materialAsset->GetNormalHandle();
+					AssetHandle albedoHandle = materialAsset->GetAlbedoTexHandle();
+					AssetHandle metalnessHandle = materialAsset->GetMetalnessTexHandle();
+					AssetHandle roughnessHandle = materialAsset->GetRoughnessTexHandle();
+					AssetHandle normalHandle = materialAsset->GetNormalTexHandle();
 
-					AssetHandle tempDiffuseHandle = diffuseHandle;
-					AssetHandle tempSpecularHandle = specularHandle;
+					AssetHandle tempAlbedoHandle = albedoHandle;
+					AssetHandle tempMetalnessHandle = metalnessHandle;
+					AssetHandle tempRoughnessHandle = roughnessHandle;
 					AssetHandle tempNormalHandle = normalHandle;
 					bool tempUseNormalMap = materialAsset->IsUsingNormalMap();
+					float tempMetalness = materialAsset->GetMetalness();
+					float tempRoughness = materialAsset->GetRoughness();
+					float tempEmission = materialAsset->GetEmission();
+					glm::vec3 tempAlbedo = materialAsset->GetAlbedo();
 
-					Utils::DrawTextureControl("Diffuse Texture", tempDiffuseHandle);
-					Utils::DrawTextureControl("Specular Texture", tempSpecularHandle);
+					Utils::DrawTextureControl("Albedo Texture", tempAlbedoHandle, [&]()
+						{
+							ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo));
+							ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f);
+						});
+
+					Utils::DrawTextureControl("Metalness Texture", tempMetalnessHandle, [&]()
+						{
+							ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f);
+						});
+
+					Utils::DrawTextureControl("Roughness Texture", tempRoughnessHandle, [&]()
+						{
+							ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f);
+						});
+
 					Utils::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
 						{
-							ImGui::SameLine();
 							bool useNormalMap = materialAsset->IsUsingNormalMap();
 							if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
 							{
@@ -538,27 +557,59 @@ namespace Hanabi
 							}
 						});
 
-					bool diffuseChanged = tempDiffuseHandle != diffuseHandle;
-					bool specularChanged = tempSpecularHandle != specularHandle;
+					bool albedoChanged = tempAlbedoHandle != albedoHandle;
+					bool metalnessChanged = tempMetalnessHandle != metalnessHandle;
+					bool roughnessChanged = tempRoughnessHandle != roughnessHandle;
 					bool normalChanged = tempNormalHandle != normalHandle;
 					bool useNormalMapChanged = tempUseNormalMap != materialAsset->IsUsingNormalMap();
+					bool metalnessValueChange = tempMetalness != materialAsset->GetMetalness();
+					bool roughnessValueChange = tempRoughness != materialAsset->GetRoughness();
+					bool albedoValueChange = tempAlbedo != materialAsset->GetAlbedo();
+					bool emissionValueChange = tempEmission != materialAsset->GetEmission();
 
-					if (diffuseChanged)
+					if (albedoChanged)
 					{
-						materialAsset->SetDiffuse(tempDiffuseHandle);
+						materialAsset->SetAlbedoTex(tempAlbedoHandle);
 					}
 
-					if (specularChanged)
+					if (metalnessChanged)
 					{
-						materialAsset->SetSpecular(tempSpecularHandle);
+						materialAsset->SetMetalnessTex(tempMetalnessHandle);
+					}
+
+					if (roughnessChanged)
+					{
+						materialAsset->SetRoughnessTex(tempRoughnessHandle);
 					}
 
 					if (normalChanged)
 					{
-						materialAsset->SetNormal(tempNormalHandle);
+						materialAsset->SetNormalTex(tempNormalHandle);
 					}
 
-					if (diffuseChanged || specularChanged || normalChanged || useNormalMapChanged)
+					if (albedoValueChange)
+					{
+						materialAsset->SetAlbedo(tempAlbedo);
+					}
+
+					if (emissionValueChange)
+					{
+						materialAsset->SetEmission(tempEmission);
+					}
+
+					if (metalnessValueChange)
+					{
+						materialAsset->SetMetalness(tempMetalness);
+					}
+
+					if (roughnessValueChange)
+					{
+						materialAsset->SetRoughness(tempRoughness);
+					}
+
+					if (albedoChanged || metalnessChanged || roughnessChanged || normalChanged
+						|| useNormalMapChanged || emissionValueChange || albedoValueChange
+						|| metalnessValueChange || roughnessValueChange)
 						AssetImporter::Serialize(materialAsset);
 				}
 			});

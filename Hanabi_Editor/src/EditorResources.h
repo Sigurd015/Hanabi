@@ -17,14 +17,14 @@ namespace Hanabi
 
 		static void Init()
 		{
-			PlayIcon = LoadTexture("resources/icons/PlayButton.png");
-			StopIcon = LoadTexture("resources/icons/StopButton.png");
-			PauseIcon = LoadTexture("resources/icons/PauseButton.png");
-			StepIcon = LoadTexture("resources/icons/StepButton.png");
+			PlayIcon = LoadTexture("Resources/Icons/PlayButton.png");
+			StopIcon = LoadTexture("Resources/Icons/StopButton.png");
+			PauseIcon = LoadTexture("Resources/Icons/PauseButton.png");
+			StepIcon = LoadTexture("Resources/Icons/StepButton.png");
 
-			DirectoryIcon = LoadTexture("resources/icons/ContentBrowser/DirectoryIcon.png");
-			FileIcon = LoadTexture("resources/icons/ContentBrowser/FileIcon.png");
-			ImportedFileIcon = LoadTexture("resources/icons/ContentBrowser/ImportedFileIcon.png");
+			DirectoryIcon = LoadTexture("Resources/Icons/ContentBrowser/DirectoryIcon.png");
+			FileIcon = LoadTexture("Resources/Icons/ContentBrowser/FileIcon.png");
+			ImportedFileIcon = LoadTexture("Resources/Icons/ContentBrowser/ImportedFileIcon.png");
 		}
 	private:
 		static Ref<Texture2D> LoadTexture(const std::filesystem::path& relativePath)

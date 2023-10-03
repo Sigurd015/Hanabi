@@ -4,6 +4,8 @@
 #include "ViewPortPanel.h"
 
 #include <unordered_map>
+#include "CommonStates/SelectionManager.h"
+
 #include <memory>
 
 namespace Hanabi
@@ -72,11 +74,13 @@ namespace Hanabi
 
 	void PanelManager::OnOpenProject()
 	{
+		SelectionManager::SetSelectedEntity({});
 		GetPanel<ContentBrowserPanel>("ContentBrowser")->SetContext(Project::GetProjectDirectory());
 	}
 
 	void PanelManager::OnSceneChange(const Ref<Scene>& scene)
 	{
+		SelectionManager::SetSelectedEntity({});
 		GetPanel<SceneHierarchyPanel>("SceneHierarchy")->SetContext(scene);
 		GetPanel<ViewPortPanel>("ViewPort")->SetContext(scene);
 	}

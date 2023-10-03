@@ -17,6 +17,7 @@ namespace Hanabi
 		void BlockEvents(bool block) { m_BlockEvents = block; }
 		static ImGuiLayer* Create();
 	protected:
+		void Init();
 		void SetDarkThemeColors();
 
 		bool m_BlockEvents = true;

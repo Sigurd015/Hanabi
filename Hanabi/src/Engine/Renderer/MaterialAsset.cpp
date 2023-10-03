@@ -7,64 +7,66 @@ namespace Hanabi
 {
 	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetDefaultShader()))
 	{
-		m_Material->SetTexture<Texture2D>("u_Diffuse", Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>("u_Specular", Renderer::GetTexture<Texture2D>("Black"));
-		m_Material->SetTexture<Texture2D>("u_Normal", Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>("u_AlbedoTex", Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>("u_MetalnessTex", Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>("u_RoughnessTex", Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>("u_NormalTex", Renderer::GetTexture<Texture2D>("Black"));
 	}
 
 	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))
 	{}
 
-	Ref<Texture2D> MaterialAsset::GetDiffuse()
+	Ref<Texture2D> MaterialAsset::GetAlbedoTex()
 	{
-		return m_Material->GetTexture<Texture2D>("u_Diffuse");
+		return m_Material->GetTexture<Texture2D>("u_AlbedoTex");
 	}
 
-	void MaterialAsset::SetDiffuse(AssetHandle handle)
+	Ref<Texture2D> MaterialAsset::GetNormalTex()
 	{
-		m_DiffuseTexture = handle;
-		Ref<Texture2D>& texture = Renderer::GetTexture<Texture2D>("White");
-		if (AssetManager::IsAssetHandleValid(m_DiffuseTexture))
-		{
-			texture = AssetManager::GetAsset<Texture2D>(m_DiffuseTexture);
-		}
-		SetTexture("u_Diffuse", texture);
+		return m_Material->GetTexture<Texture2D>("u_NormalTex");
 	}
 
-	Ref<Texture2D> MaterialAsset::GetSpecular()
+	Ref<Texture2D> MaterialAsset::GetMetalnessTex()
 	{
-		return m_Material->GetTexture<Texture2D>("u_Specular");
+		return m_Material->GetTexture<Texture2D>("u_MetalnessTex");
 	}
 
-	void MaterialAsset::SetSpecular(AssetHandle handle)
+	Ref<Texture2D> MaterialAsset::GetRoughnessTex()
 	{
-		m_SpecularTexture = handle;
-		Ref<Texture2D>& texture = Renderer::GetTexture<Texture2D>("Black");
-		if (AssetManager::IsAssetHandleValid(m_SpecularTexture))
-		{
-			texture = AssetManager::GetAsset<Texture2D>(m_SpecularTexture);
-		}
-		SetTexture("u_Specular", texture);
+		return m_Material->GetTexture<Texture2D>("u_RoughnessTex");
 	}
 
-	Ref<Texture2D> MaterialAsset::GetNormal()
+	void MaterialAsset::SetAlbedoTex(AssetHandle handle)
 	{
-		return m_Material->GetTexture<Texture2D>("u_Normal");
+		m_AlbedoTexture = handle;
+		SetTextureInternal("u_AlbedoTex", m_AlbedoTexture);
 	}
 
-	void MaterialAsset::SetNormal(AssetHandle handle)
+	void MaterialAsset::SetMetalnessTex(AssetHandle handle)
+	{
+		m_MetalnessTexture = handle;
+		SetTextureInternal("u_MetalnessTex", m_MetalnessTexture);
+	}
+
+	void MaterialAsset::SetRoughnessTex(AssetHandle handle)
+	{
+		m_RoughnessTexture = handle;
+		SetTextureInternal("u_RoughnessTex", m_RoughnessTexture);
+	}
+
+	void MaterialAsset::SetNormalTex(AssetHandle handle)
 	{
 		m_NormalTexture = handle;
-		Ref<Texture2D>& texture = Renderer::GetTexture<Texture2D>("White");
-		if (AssetManager::IsAssetHandleValid(m_NormalTexture))
-		{
-			texture = AssetManager::GetAsset<Texture2D>(m_NormalTexture);
-		}
-		SetTexture("u_Normal", texture);
+		SetTextureInternal("u_NormalTex", m_NormalTexture);
 	}
 
-	void MaterialAsset::SetTexture(const std::string& name, const Ref<Texture2D>& texture)
+	void MaterialAsset::SetTextureInternal(const std::string& name, AssetHandle handle, const std::string& defaultTexName)
 	{
+		Ref<Texture2D>& texture = Renderer::GetTexture<Texture2D>(defaultTexName);
+		if (AssetManager::IsAssetHandleValid(handle))
+		{
+			texture = AssetManager::GetAsset<Texture2D>(handle);
+		}
 		m_Material->SetTexture<Texture2D>(name, texture);
 	}
 }

@@ -6,6 +6,7 @@
 #include "FullScreenQuadVertex.hlsl"
 
 #type:pixel
+#include "Common.hlsl"
 
 struct PixelInput
 {
@@ -25,6 +26,7 @@ PixelOutput main(PixelInput Input)
 {
     PixelOutput output;
     float2 texCoord = float2(Input.TexCoord.x, 1.0 - Input.TexCoord.y);
-    output.Color = u_Color.Sample(u_SSLinearWrap, texCoord);
+    float4 color = u_Color.Sample(u_SSLinearWrap, texCoord);
+    output.Color = float4(LinearToSRGB(color.xyz).xyz, color.w);
     return output;
 }

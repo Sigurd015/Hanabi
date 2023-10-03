@@ -1,7 +1,4 @@
 AssetRegistry:
-  - Handle: 1312796883771253977
-    FilePath: Textures/wall-10-brick/wall-10-brick-DIFFUSE.jpg
-    Type: AssetType::Texture2D
   - Handle: 1632207768508466527
     FilePath: Textures/universe-skybox/bottom.png
     Type: AssetType::Texture2D
@@ -10,18 +7,6 @@ AssetRegistry:
     Type: AssetType::Material
   - Handle: 2135390756550958898
     FilePath: Textures/universe-skybox/front.png
-    Type: AssetType::Texture2D
-  - Handle: 3301359757521532587
-    FilePath: Textures/wall-10-brick/wall-10-brick-NORM.jpg
-    Type: AssetType::Texture2D
-  - Handle: 3830939339728664841
-    FilePath: Textures/Checkerboard.png
-    Type: AssetType::Texture2D
-  - Handle: 4137013318427118749
-    FilePath: Materials/mat2.hmat
-    Type: AssetType::Material
-  - Handle: 4559566493173355299
-    FilePath: Textures/Container_Diffuse.png
     Type: AssetType::Texture2D
   - Handle: 5025462131848195016
     FilePath: Models/Plane.fbx
@@ -35,17 +20,8 @@ AssetRegistry:
   - Handle: 8012010214947151524
     FilePath: Scenes/2DExample.hscene
     Type: AssetType::Scene
-  - Handle: 8249847587482819021
-    FilePath: Textures/Container_Specular.png
-    Type: AssetType::Texture2D
-  - Handle: 9328707022816709312
-    FilePath: Textures/wall-10-brick/wall-10-brick-DISP.jpg
-    Type: AssetType::Texture2D
   - Handle: 9644760195236910386
     FilePath: Textures/universe-skybox/top.png
-    Type: AssetType::Texture2D
-  - Handle: 11971813417510223497
-    FilePath: Textures/brickwall/brickwall_normal.jpg
     Type: AssetType::Texture2D
   - Handle: 12104991068264146629
     FilePath: Models/Sphere.fbx
@@ -59,21 +35,12 @@ AssetRegistry:
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
-  - Handle: 15452597858793361030
-    FilePath: Materials/mat3.hmat
-    Type: AssetType::Material
-  - Handle: 16012621993207567016
-    FilePath: Textures/brickwall/brickwall_normal_obj.png
-    Type: AssetType::Texture2D
   - Handle: 17058150480603569601
     FilePath: Models/Cylinder.fbx
     Type: AssetType::MeshSource
   - Handle: 17746566452886661726
     FilePath: Materials/universeSkybox.henv
     Type: AssetType::EnvMap
-  - Handle: 17815512371411204623
-    FilePath: Textures/brickwall/brickwall.jpg
-    Type: AssetType::Texture2D
   - Handle: 18104625788437832565
     FilePath: Textures/universe-skybox/right.png
     Type: AssetType::Texture2D

@@ -136,7 +136,7 @@ namespace Hanabi
 	{
 		static Ref<Font> DefaultFont;
 		if (!DefaultFont)
-			DefaultFont = CreateRef<Font>("resources/fonts/opensans/OpenSans-Regular.ttf");
+			DefaultFont = CreateRef<Font>("Resources/Fonts/Opensans/OpenSans-Regular.ttf");
 
 		return DefaultFont;
 	}

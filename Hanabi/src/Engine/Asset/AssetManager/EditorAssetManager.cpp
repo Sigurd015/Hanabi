@@ -99,6 +99,21 @@ namespace Hanabi
 		return metadata.Handle;
 	}
 
+	void EditorAssetManager::RemoveAsset(AssetHandle handle)
+	{
+		if (m_LoadedAssets.find(handle) != m_LoadedAssets.end())
+			m_LoadedAssets.erase(handle);
+
+		if (m_MemoryAssets.find(handle) != m_MemoryAssets.end())
+			m_MemoryAssets.erase(handle);
+
+		if (m_AssetRegistry.find(handle) != m_AssetRegistry.end())
+			m_AssetRegistry.erase(handle);
+
+		//TODO: Call this at ~EditorAssetManager is the best way, but it will cause crash when close the editor
+		SerializeAssetRegistry();
+	}
+
 	void EditorAssetManager::AddMemoryOnlyAsset(Ref<Asset> asset)
 	{
 		AssetMetadata metadata;

@@ -19,8 +19,8 @@ namespace Hanabi
 
 		static Ref<RenderPass> GetFinalPass();
 		//----- GBuffer Debugging -----
-		static Ref<Image2D> GetGBufferDiffuse();
-		static Ref<Image2D> GetGBufferSpecular();
+		static Ref<Image2D> GetGBufferAlbedo();
+		static Ref<Image2D> GetGBufferMetalnessRoughness();
 		static Ref<Image2D> GetGBufferNormal();
 		static Ref<Image2D> GetGBufferPosition();
 

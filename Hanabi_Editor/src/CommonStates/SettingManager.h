@@ -9,8 +9,8 @@ namespace Hanabi
 		enum class ViewportDebugMode
 		{
 			None = 0,
-			GBufferDiffuse,
-			GBufferSpecular,
+			GBufferAlbedo,
+			GBufferMetalnessRoughness,
 			GBufferNormal,
 			GBufferPosition,
 			Count
@@ -42,8 +42,8 @@ namespace Hanabi
 			ImGui::Separator();
 			ImGui::Text("GBuffer Debug:");
 
-			const char* debugModeTypeStrings[] = { "None","GBufferDiffuse",
-				"GBufferSpecular", "GBufferNormal", "GBufferPosition" };
+			const char* debugModeTypeStrings[] = { "None","Albedo",
+				"MetalnessRoughness", "Normal", "Position" };
 			const char* currentTypeString = debugModeTypeStrings[(uint32_t)DebugDrawMode];
 			if (ImGui::BeginCombo("Rendering Debug", currentTypeString))
 			{

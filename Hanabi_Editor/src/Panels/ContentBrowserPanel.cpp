@@ -200,6 +200,17 @@ namespace Hanabi
 
 			if (isAsset)
 			{
+				if (ImGui::BeginPopupContextItem())
+				{
+					if (ImGui::MenuItem("Remove"))
+					{
+						Project::GetEditorAssetManager()->RemoveAsset(m_ImportedFiles[relativePath]);
+						m_ImportedFiles.erase(relativePath);
+					}
+
+					ImGui::EndPopup();
+				}
+
 				if (ImGui::BeginDragDropSource())
 				{
 					AssetHandle temp = m_ImportedFiles[relativePath];
