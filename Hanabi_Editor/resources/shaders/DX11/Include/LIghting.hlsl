@@ -1,6 +1,7 @@
 #ifndef LIGHTING_HEADER
 #define LIGHTING_HEADER
 #include "Buffers.hlsl"
+#include "PBRUtils.hlsl"
 
 struct PBRParameters
 {
@@ -10,30 +11,42 @@ struct PBRParameters
 
     float3 WorldNormal;
     float3 WorldPosition;
-    float3 PixelToCamera;
+    float3 View;  // Pixel to camera
+    float NdotV;
 };
 
-float3 CalcDirectionalLight(PBRParameters material)
+float3 CalculateDirLights(PBRParameters params, float3 F0) 
 {
     float3 result = float3(0, 0, 0);
     
     if (u_DirLight.Intensity == 0)
         return result;
     
-    float3 lightDir = normalize(u_DirLight.Direction);
-    
-    float diffuseFactor = max(dot(material.WorldNormal, -lightDir), 0);
-    float3 diffuseColor = diffuseFactor * u_DirLight.Intensity * u_DirLight.Radiance * material.DiffuseColor;
+    float3 Li = normalize(u_DirLight.Direction);
+	float3 Lradiance = u_DirLight.Radiance * u_DirLight.Intensity;
+    // half-vector
+	float3 Lh = normalize(Li + params.View);
 
-    float3 lightReflect = normalize(reflect(lightDir, material.WorldNormal));
-    float specularFactor = pow(max(dot(material.PixelToCamera, lightReflect), 0),32);
-    float3 specularColor = specularFactor * u_DirLight.Intensity * material.SpecularColor;
+    // Calculate angles between surface normal and various light vectors.
+	float cosLi = max(0.0, dot(params.WorldNormal, Li));
+	float cosLh = max(0.0, dot(params.WorldNormal, Lh));
+
+	float3 F = FresnelSchlickRoughness(F0, max(0.0, dot(Lh, params.View)), params.Roughness);
+	float D = NdfGGX(cosLh, params.Roughness);
+	float G = GaSchlickGGX(cosLi, params.NdotV, params.Roughness);
+
+    float3 kd = (1.0 - F) * (1.0 - params.Metalness);
+	float3 diffuseBRDF = kd * params.Albedo;
     
-    result = (diffuseColor + specularColor);
+    // Cook-Torrance
+	float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * params.NdotV);
+	specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
+	result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+
     return result;
 }
 
-float3 CalcPointLight(PBRParameters material)
+float3 CalculatePointLights(PBRParameters params, float3 F0)
 {
     float3 result = float3(0, 0, 0);
     for (int i = 0; i < u_PointLightsCount; i++)
@@ -42,29 +55,37 @@ float3 CalcPointLight(PBRParameters material)
             continue;
         
         PointLight pointLight = u_PointLights[i];
-        
-        float3 lightDirection = pointLight.Position - material.WorldPosition;
-        float distance = length(lightDirection);
-        lightDirection = normalize(lightDirection);
-      
-        float diffuseFactor = max(dot(material.WorldNormal, lightDirection), 0);
-        float3 diffuseColor = diffuseFactor * pointLight.Intensity * pointLight.Radiance * material.DiffuseColor;
 
-        float3 lightReflect = normalize(reflect(-lightDirection, material.WorldNormal));
-        float specularFactor = pow(max(dot(material.PixelToCamera, lightReflect), 0),32);
-        float3 specularColor = specularFactor * pointLight.Intensity * material.SpecularColor;
+        float3 lightDirection = pointLight.Position - params.WorldPosition;
+        float3 Li = normalize(lightDirection);
+		float lightDistance = length(lightDirection);
+		float3 Lh = normalize(Li + params.View);
+        
+        float attenuation = clamp(1.0 - (lightDistance * lightDistance) / (pointLight.Radius * pointLight.Radius), 0.0, 1.0);
+		attenuation *= lerp(attenuation, 1.0, pointLight.Falloff);
+        
+        float3 Lradiance = pointLight.Radiance * pointLight.Intensity * attenuation;
 
-        float3 color = (diffuseColor + specularColor);
-        
-        float attenuation = clamp(1.0 - (distance * distance) / (pointLight.Radius * pointLight.Radius), 0.0, 1.0);
-        attenuation *= lerp(attenuation, 1.0, pointLight.Falloff);
-        
-        result += color * attenuation;
+        // Calculate angles between surface normal and various light vectors.
+		float cosLi = max(0.0, dot(params.WorldNormal, Li));
+		float cosLh = max(0.0, dot(params.WorldNormal, Lh));
+
+        float3 F = FresnelSchlickRoughness(F0, max(0.0, dot(Lh, params.View)), params.Roughness);
+		float D = NdfGGX(cosLh, params.Roughness);
+		float G = GaSchlickGGX(cosLi, params.NdotV, params.Roughness);
+
+        float3 kd = (1.0 - F) * (1.0 - params.Metalness);
+		float3 diffuseBRDF = kd * params.Albedo;
+
+        // Cook-Torrance
+		float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * params.NdotV);
+		specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
+		result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
     }
     return result;
 }
 
-float3 CalcSpotLight(PBRParameters material)
+float3 CalculateSpotLights(PBRParameters params, float3 F0)
 {
     float3 result = float3(0, 0, 0);
     for (int i = 0; i < u_SpotLightsCount; i++)
@@ -73,36 +94,37 @@ float3 CalcSpotLight(PBRParameters material)
             continue;
         
         SpotLight spotLight = u_SpotLights[i];
+
+        float3 lightToWorldPos = spotLight.Position - params.WorldPosition;
+        float3 Li = normalize(lightToWorldPos);
+		float lightDistance = length(lightToWorldPos);
         
-        float3 lightToWorldPos = spotLight.Position - material.WorldPosition;
-        float distance = length(lightToWorldPos);
-        lightToWorldPos = normalize(lightToWorldPos);
-       
-        float spotFactor = dot(lightToWorldPos, normalize(spotLight.Direction));
-
-        if (spotFactor < 0)
-            continue;
-        
-        float3 lightDirection = normalize(spotLight.Direction);
-            
-        float diffuseFactor = max(dot(material.WorldNormal, -lightDirection), 0);
-        float3 diffuseColor = diffuseFactor * spotLight.Intensity * spotLight.Radiance * material.DiffuseColor;
-
-        float3 lightReflect = normalize(reflect(lightDirection, material.WorldNormal));
-        float specularFactor = pow(max(dot(material.PixelToCamera, lightReflect), 0),32);
-        float3 specularColor = specularFactor * spotLight.Intensity * material.SpecularColor;
-
-        float3 color = (diffuseColor + specularColor);
-            
         float cutoff = cos(radians(spotLight.Angle * 0.5f));
-        float scos = max(dot(lightToWorldPos, lightDirection), cutoff);
-        float rim = (1.0 - scos) / (1.0 - cutoff);
-            
-        float attenuation = clamp(1.0 - (distance * distance) / (spotLight.Range * spotLight.Range), 0.0, 1.0);
-        attenuation *= lerp(attenuation, 1.0, spotLight.Falloff);
-        attenuation *= 1.0 - pow(max(rim, 0.001), spotLight.AngleAttenuation);
-           
-        result += color * attenuation;
+		float scos = max(dot(Li, spotLight.Direction), cutoff);
+		float rim = (1.0 - scos) / (1.0 - cutoff);
+ 
+        float attenuation = clamp(1.0 - (lightDistance * lightDistance) / (spotLight.Range * spotLight.Range), 0.0, 1.0);
+		attenuation *= lerp(attenuation, 1.0, spotLight.Falloff);
+		attenuation *= 1.0 - pow(max(rim, 0.001), spotLight.AngleAttenuation);
+
+        float3 Lradiance = spotLight.Radiance * spotLight.Intensity * attenuation;
+		float3 Lh = normalize(Li + params.View);
+
+        // Calculate angles between surface normal and various light vectors.
+		float cosLi = max(0.0, dot(params.WorldNormal, Li));
+		float cosLh = max(0.0, dot(params.WorldNormal, Lh));
+
+        float3 F = FresnelSchlickRoughness(F0, max(0.0, dot(Lh, params.View)), params.Roughness);
+		float D = NdfGGX(cosLh, params.Roughness);
+		float G = GaSchlickGGX(cosLi, params.NdotV, params.Roughness);
+
+		float3 kd = (1.0 - F) * (1.0 - params.Metalness);
+		float3 diffuseBRDF = kd * params.Albedo;
+
+        // Cook-Torrance
+		float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * params.NdotV);
+		specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
+		result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
     }
     return result;
 }

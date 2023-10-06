@@ -7,6 +7,7 @@
 
 #type:pixel
 #include "Buffers.hlsl"
+#include "Lighting.hlsl"
 
 struct PixelInput
 {
@@ -20,29 +21,46 @@ struct PixelOutput
 };
 
 Texture2D u_AlbedoBuffer : register(t3);
-Texture2D u_MetalnessRoughnessBuffer : register(t4);
+Texture2D u_MREBuffer : register(t4);
 Texture2D u_NormalBuffer : register(t5);
 Texture2D u_PositionBuffer : register(t6);
 
 SamplerState u_SSLinearWrap : register(s0);
 
+// Constant normal incidence Fresnel factor for all dielectrics.
+const float3 Fdielectric = float3(0.04f, 0.04f, 0.04f);
+
 PixelOutput main(PixelInput Input)
 {
     PixelOutput output;
-    //PBRParameters params;
+    PBRParameters params;
     float2 texCoord = float2(Input.TexCoord.x, 1.0 - Input.TexCoord.y);
-    //params.DiffuseColor = u_DiffuseBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
-    //params.SpecularColor = u_SpecularBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
-    //params.WorldNormal = u_NormalBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
-    //params.WorldPosition = u_PositionBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
-    //params.PixelToCamera = normalize(u_CameraPosition - material.WorldPosition);
+    params.Albedo = u_AlbedoBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
+    float4 MRE = u_MREBuffer.Sample(u_SSLinearWrap, texCoord);
+    params.Metalness = MRE.x;
+    params.Roughness = max(MRE.y, 0.05); // Minimum roughness of 0.05 to keep specular highlight
+    params.WorldNormal = u_NormalBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
+    params.WorldPosition = u_PositionBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
+    params.View = normalize(u_CameraPosition - params.WorldPosition);
 
-    //float3 ambient = u_SkyLightIntensity * float3(1.0f, 1.0f, 1.0f) * material.DiffuseColor;
+    params.NdotV = max(dot(params.WorldNormal, params.View), 0.0);
 
-    //float3 dirLightResult = CalcDirectionalLight(params);
-    //float3 pointLightResult = CalcPointLight(params);
-    //float3 spotLightResult = CalcSpotLight(params);
-    //Output.Color = float4(saturate(ambient + dirLightResult + pointLightResult + spotLightResult), 1.0f);
-    output.Color = u_AlbedoBuffer.Sample(u_SSLinearWrap, texCoord);
+    // Specular reflection vector
+	float3 Lr = 2.0 * params.NdotV * params.WorldNormal - params.View;
+
+	// Fresnel reflectance, metals use albedo
+	float3 F0 = lerp(Fdielectric, params.Albedo, params.Metalness);
+
+    // Direct lighting
+	float3 lightContribution = CalculateDirLights(params, F0);
+	lightContribution += CalculatePointLights(params, F0);
+	lightContribution += CalculateSpotLights(params, F0);
+	lightContribution += params.Albedo * MRE.z; // MRE.z -> Emission
+
+    // Indirect lighting (TODO: Implement IBL)
+    float3 iblContribution = u_SkyLightIntensity * float3(1.0f, 1.0f, 1.0f);
+
+	// Final color
+	output.Color = float4(iblContribution + lightContribution, 1.0);
     return output;
 }

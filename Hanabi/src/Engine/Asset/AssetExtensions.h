@@ -19,5 +19,6 @@ namespace Hanabi
 		// MeshSource
 		{ ".fbx", AssetType::MeshSource },
 		{ ".obj", AssetType::MeshSource },
+		{ ".gltf", AssetType::MeshSource },
 	};
 }

@@ -26,16 +26,27 @@ namespace Hanabi
 	class MeshSource :public Asset
 	{
 	public:
+		MeshSource() = default;
 		MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices);
 
 		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 		const std::vector<Index>& GetIndices() const { return m_Indices; }
 
+		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
+		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
+
 		static AssetType GetStaticType() { return AssetType::MeshSource; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
+		void Invalidate();
+
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
+
+		Ref<VertexBuffer> m_VertexBuffer;
+		Ref<IndexBuffer> m_IndexBuffer;
+
+		friend class MeshSourceSerializer;
 	};
 
 	class Mesh :public Asset
@@ -44,18 +55,11 @@ namespace Hanabi
 		Mesh(Ref<MeshSource> source);
 		~Mesh() = default;
 
-		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
-		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
 		const Ref<MeshSource>& GetMeshSource() const { return m_MeshSource; }
 
 		static AssetType GetStaticType() { return AssetType::Mesh; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
 		Ref<MeshSource> m_MeshSource;
-		std::vector<Vertex> m_Vertices;
-		std::vector<Index> m_Indices;
-
-		Ref<VertexBuffer> m_VertexBuffer;
-		Ref<IndexBuffer> m_IndexBuffer;
 	};
 }

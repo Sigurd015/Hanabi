@@ -93,10 +93,11 @@ namespace Hanabi
 
 	void OpenGLRendererAPI::DrawMesh(const Ref<Mesh>& mesh)
 	{
-		mesh->GetVertexBuffer()->Bind();
-		mesh->GetIndexBuffer()->Bind();
+		Ref<MeshSource> source = mesh->GetMeshSource();
+		source->GetVertexBuffer()->Bind();
+		source->GetIndexBuffer()->Bind();
 
-		//glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), mesh->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
+		//glDrawElements(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), source->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 	}
 
 	void OpenGLRendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material, uint32_t indexCount)

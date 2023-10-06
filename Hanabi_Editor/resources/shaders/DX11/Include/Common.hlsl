@@ -2,6 +2,7 @@
 #define COMMON_HEADER
 
 const float PI = 3.141592;
+const float Epsilon = 0.00001;
 
 // Gamma correction
 float3 LinearToSRGB(float3 color)

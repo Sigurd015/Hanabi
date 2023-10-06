@@ -8,6 +8,19 @@
 
 namespace Hanabi
 {
+	static const uint32_t s_MeshImportFlags =
+		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
+		aiProcess_Triangulate |             // Make sure we're triangles
+		aiProcess_SortByPType |             // Split meshes by primitive type
+		aiProcess_GenNormals |              // Make sure we have legit normals
+		aiProcess_GenUVCoords |             // Convert UVs if required 
+		//aiProcess_OptimizeGraph |
+		aiProcess_OptimizeMeshes |          // Batch draws where possible
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
+		aiProcess_ValidateDataStructure;   // Validation
+		//aiProcess_GlobalScale;              // e.g. convert cm to m for fbx import (and other formats where cm is native)
+
 	bool MeshSourceSerializer::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const
 	{
 		asset = LoadMeshSource(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
@@ -21,50 +34,46 @@ namespace Hanabi
 
 	Ref<MeshSource> MeshSourceSerializer::LoadMeshSource(const std::filesystem::path& path)
 	{
+		Ref<MeshSource> meshSource = CreateRef<MeshSource>();
+
 		Assimp::Importer importer;
-		auto pAssimpScene = importer.ReadFile(path.string(),
-			aiProcess_ConvertToLeftHanded |
-			aiProcess_Triangulate |
-			aiProcess_SortByPType |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_GenNormals |
-			aiProcess_GenUVCoords |
-			aiProcess_CalcTangentSpace
-		);
+		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 
-		std::vector<Vertex> vertices;
-		std::vector<Index> indices;
+		const aiScene* pScene = importer.ReadFile(path.string(), s_MeshImportFlags);
 
-		if (pAssimpScene && !(pAssimpScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) && pAssimpScene->HasMeshes())
+		if (!pScene && !pScene->HasMeshes())
 		{
-			auto pMesh = pAssimpScene->mMeshes[0];
-			uint32_t numVertices = pMesh->mNumVertices;
-			for (uint32_t i = 0; i < numVertices; ++i)
-			{
-				aiVector3D vertex = pMesh->mVertices[i];
-				aiVector3D normal = pMesh->mNormals[i];
-				aiVector3D texCoord = pMesh->mTextureCoords[0][i];
-				aiVector3D tangent = pMesh->mTangents[i];
-				aiVector3D bitangent = pMesh->mBitangents[i];
-				vertices.push_back({
-					{vertex.x, vertex.y, vertex.z},
-					{normal.x, normal.y, normal.z},
-					{tangent.x,tangent.y,tangent.z},
-					{bitangent.x,bitangent.y,bitangent.z},
-					{texCoord.x, texCoord.y},
-					});
-			}
-
-			for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
-			{
-				const auto& face = pMesh->mFaces[i];
-				indices.push_back({ face.mIndices[0],face.mIndices[1],face.mIndices[2] });
-			}
-
-			importer.FreeScene();
-
-			return CreateRef<MeshSource>(vertices, indices);
+			HNB_CORE_ERROR("Failed to load mesh source: {0}", importer.GetErrorString());
+			return nullptr;
 		}
-		return nullptr;
+
+		// TODO: Support multiple meshes
+		aiMesh* pMesh = pScene->mMeshes[0];
+		for (uint32_t i = 0; i < pMesh->mNumVertices; i++)
+		{
+			Vertex vertex;
+			vertex.Position = { pMesh->mVertices[i].x, pMesh->mVertices[i].y, pMesh->mVertices[i].z };
+			vertex.Normal = { pMesh->mNormals[i].x, pMesh->mNormals[i].y, pMesh->mNormals[i].z };
+
+			if (pMesh->HasTangentsAndBitangents())
+			{
+				vertex.Tangent = { pMesh->mTangents[i].x, pMesh->mTangents[i].y, pMesh->mTangents[i].z };
+				vertex.Binormal = { pMesh->mBitangents[i].x, pMesh->mBitangents[i].y, pMesh->mBitangents[i].z };
+			}
+
+			if (pMesh->HasTextureCoords(0))
+				vertex.TexCoord = { pMesh->mTextureCoords[0][i].x, pMesh->mTextureCoords[0][i].y };
+			
+			meshSource->m_Vertices.push_back(vertex);
+		}
+
+		for (uint32_t i = 0; i < pMesh->mNumFaces; i++)
+		{
+			Index index = { pMesh->mFaces[i].mIndices[0], pMesh->mFaces[i].mIndices[1], pMesh->mFaces[i].mIndices[2] };
+			meshSource->m_Indices.push_back(index);
+		}
+
+		meshSource->Invalidate();
+		return meshSource;
 	}
 }

@@ -128,8 +128,8 @@ namespace Hanabi
 		case SettingManager::ViewportDebugMode::GBufferAlbedo:
 			m_ViewPortImage = SceneRenderer::GetGBufferAlbedo();
 			break;
-		case SettingManager::ViewportDebugMode::GBufferMetalnessRoughness:
-			m_ViewPortImage = SceneRenderer::GetGBufferMetalnessRoughness();
+		case SettingManager::ViewportDebugMode::GBufferMRE:
+			m_ViewPortImage = SceneRenderer::GetGBufferMRE();
 			break;
 		case SettingManager::ViewportDebugMode::GBufferNormal:
 			m_ViewPortImage = SceneRenderer::GetGBufferNormal();

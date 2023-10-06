@@ -10,7 +10,7 @@ namespace Hanabi
 		{
 			None = 0,
 			GBufferAlbedo,
-			GBufferMetalnessRoughness,
+			GBufferMRE,
 			GBufferNormal,
 			GBufferPosition,
 			Count
@@ -43,7 +43,7 @@ namespace Hanabi
 			ImGui::Text("GBuffer Debug:");
 
 			const char* debugModeTypeStrings[] = { "None","Albedo",
-				"MetalnessRoughness", "Normal", "Position" };
+				"MRE", "Normal", "Position" };
 			const char* currentTypeString = debugModeTypeStrings[(uint32_t)DebugDrawMode];
 			if (ImGui::BeginCombo("Rendering Debug", currentTypeString))
 			{

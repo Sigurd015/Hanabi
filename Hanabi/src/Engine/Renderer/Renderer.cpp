@@ -58,8 +58,8 @@ namespace Hanabi
 
 		//Load default meshes
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });
-		//s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
-		//s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
+		s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
+		s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
 
 		// Create fullscreen quad
 		{

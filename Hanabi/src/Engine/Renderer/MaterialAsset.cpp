@@ -5,12 +5,17 @@
 
 namespace Hanabi
 {
+	static const std::string s_AlbedoMap= "u_AlbedoTex";
+	static const std::string s_NormalMap = "u_NormalTex";
+	static const std::string s_MetalnessMap = "u_MetalnessTex";
+	static const std::string s_RoughnessMap = "u_RoughnessTex";
+
 	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetDefaultShader()))
 	{
-		m_Material->SetTexture<Texture2D>("u_AlbedoTex", Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>("u_MetalnessTex", Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>("u_RoughnessTex", Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>("u_NormalTex", Renderer::GetTexture<Texture2D>("Black"));
+		m_Material->SetTexture<Texture2D>(s_AlbedoMap, Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>(s_MetalnessMap, Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>(s_RoughnessMap, Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>(s_NormalMap, Renderer::GetTexture<Texture2D>("Black"));
 	}
 
 	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))
@@ -18,46 +23,46 @@ namespace Hanabi
 
 	Ref<Texture2D> MaterialAsset::GetAlbedoTex()
 	{
-		return m_Material->GetTexture<Texture2D>("u_AlbedoTex");
+		return m_Material->GetTexture<Texture2D>(s_AlbedoMap);
 	}
 
 	Ref<Texture2D> MaterialAsset::GetNormalTex()
 	{
-		return m_Material->GetTexture<Texture2D>("u_NormalTex");
+		return m_Material->GetTexture<Texture2D>(s_NormalMap);
 	}
 
 	Ref<Texture2D> MaterialAsset::GetMetalnessTex()
 	{
-		return m_Material->GetTexture<Texture2D>("u_MetalnessTex");
+		return m_Material->GetTexture<Texture2D>(s_MetalnessMap);
 	}
 
 	Ref<Texture2D> MaterialAsset::GetRoughnessTex()
 	{
-		return m_Material->GetTexture<Texture2D>("u_RoughnessTex");
+		return m_Material->GetTexture<Texture2D>(s_RoughnessMap);
 	}
 
 	void MaterialAsset::SetAlbedoTex(AssetHandle handle)
 	{
 		m_AlbedoTexture = handle;
-		SetTextureInternal("u_AlbedoTex", m_AlbedoTexture);
+		SetTextureInternal(s_AlbedoMap, m_AlbedoTexture);
 	}
 
 	void MaterialAsset::SetMetalnessTex(AssetHandle handle)
 	{
 		m_MetalnessTexture = handle;
-		SetTextureInternal("u_MetalnessTex", m_MetalnessTexture);
+		SetTextureInternal(s_MetalnessMap, m_MetalnessTexture);
 	}
 
 	void MaterialAsset::SetRoughnessTex(AssetHandle handle)
 	{
 		m_RoughnessTexture = handle;
-		SetTextureInternal("u_RoughnessTex", m_RoughnessTexture);
+		SetTextureInternal(s_RoughnessMap, m_RoughnessTexture);
 	}
 
 	void MaterialAsset::SetNormalTex(AssetHandle handle)
 	{
 		m_NormalTexture = handle;
-		SetTextureInternal("u_NormalTex", m_NormalTexture);
+		SetTextureInternal(s_NormalMap, m_NormalTexture);
 	}
 
 	void MaterialAsset::SetTextureInternal(const std::string& name, AssetHandle handle, const std::string& defaultTexName)

@@ -143,10 +143,11 @@ namespace Hanabi
 
 	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh)
 	{
-		mesh->GetVertexBuffer()->Bind();
-		mesh->GetIndexBuffer()->Bind();
+		Ref<MeshSource> source = mesh->GetMeshSource();
+		source->GetVertexBuffer()->Bind();
+		source->GetIndexBuffer()->Bind();
 
-		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);
+		m_DeviceContext->DrawIndexed(source->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
 	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,

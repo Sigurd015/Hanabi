@@ -4,13 +4,14 @@
 namespace Hanabi
 {
 	MeshSource::MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices) :m_Vertices(vertices), m_Indices(indices)
-	{}
-
-	Mesh::Mesh(Ref<MeshSource> source) : m_Vertices(source->GetVertices()), m_Indices(source->GetIndices()), m_MeshSource(source)
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_Vertices.size() * sizeof(Vertex));
-		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), m_Indices.size() * sizeof(Index));
-		m_VertexBuffer->SetData(m_Vertices.data(), m_Vertices.size() * sizeof(Vertex));
+		Invalidate();
+	}
+
+	void MeshSource::Invalidate()
+	{
+		m_VertexBuffer = VertexBuffer::Create(m_Vertices.data(), (uint32_t)(m_Vertices.size() * sizeof(Vertex)));
+		m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32_t)(m_Indices.size() * sizeof(Index)));
 
 		m_VertexBuffer->SetLayout({
 		  { ShaderDataType::Float3, "a_Position" },
@@ -20,4 +21,6 @@ namespace Hanabi
 		  { ShaderDataType::Float2, "a_TexCoord" },
 			});
 	}
+
+	Mesh::Mesh(Ref<MeshSource> source) : m_MeshSource(source) {}
 }

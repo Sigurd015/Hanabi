@@ -20,7 +20,7 @@ namespace Hanabi
 			glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
 
 			// Padding
-			float padding;
+			char padding[4];
 		};
 
 		struct PointLight
@@ -32,7 +32,7 @@ namespace Hanabi
 			float Falloff;
 
 			// Padding
-			float padding[3];
+			char padding[12];
 		};
 
 		struct SpotLight
@@ -47,7 +47,7 @@ namespace Hanabi
 			float Falloff;
 
 			// Padding
-			float padding[2];
+			char padding[8];
 		};
 
 		struct MaterialData
@@ -57,9 +57,10 @@ namespace Hanabi
 			float Metalness;
 			float Roughness;
 			bool UseNormalMap;
-
+		
 			// Padding
-			float padding;
+			// Notice : bool is 1 byte in C++ but 4 bytes in HLSL
+			char padding[7];
 		};
 
 		struct CBModel
@@ -74,7 +75,7 @@ namespace Hanabi
 			glm::vec3 CameraPosition;
 
 			// Padding
-			float padding;
+			char padding[4];
 		};
 
 		struct CBScene
@@ -82,7 +83,7 @@ namespace Hanabi
 			float SkyLightIntensity = 0.0f;
 
 			// Padding
-			float padding[3];
+			char padding[12];
 
 			DirectionalLight Light;
 		};
@@ -92,7 +93,7 @@ namespace Hanabi
 			uint32_t Count = 0;
 
 			// Padding
-			float padding[3];
+			char padding[12];
 
 			PointLight PointLights[MAX_POINT_LIGHT]{};
 		};
@@ -102,7 +103,7 @@ namespace Hanabi
 			uint32_t Count = 0;
 
 			// Padding
-			float padding[3];
+			char padding[12];
 
 			SpotLight SpotLights[MAX_SPOT_LIGHT]{};
 		};
@@ -114,7 +115,7 @@ namespace Hanabi
 			uint32_t LightType = 0;
 
 			// Padding
-			float padding[2];
+			char padding[8];
 		};
 
 		Ref<Environment> SceneEnvironment;
@@ -357,7 +358,7 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("u_AlbedoBuffer", s_Data->DeferredGeoPass->GetOutput(0));
-		s_Data->DeferredLightingPass->SetInput("u_MetalnessRoughnessBuffer", s_Data->DeferredGeoPass->GetOutput(1));
+		s_Data->DeferredLightingPass->SetInput("u_MREBuffer", s_Data->DeferredGeoPass->GetOutput(1));
 		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
 		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
 
@@ -489,7 +490,7 @@ namespace Hanabi
 		return s_Data->DeferredGeoPass->GetOutput(0);
 	}
 
-	Ref<Image2D> SceneRenderer::GetGBufferMetalnessRoughness()
+	Ref<Image2D> SceneRenderer::GetGBufferMRE()
 	{
 		return s_Data->DeferredGeoPass->GetOutput(1);
 	}

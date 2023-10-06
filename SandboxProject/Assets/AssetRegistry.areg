@@ -1,15 +1,18 @@
 AssetRegistry:
+  - Handle: 946699168653530697
+    FilePath: Materials/Red.hmat
+    Type: AssetType::Material
   - Handle: 1632207768508466527
     FilePath: Textures/universe-skybox/bottom.png
     Type: AssetType::Texture2D
-  - Handle: 1661060954224083329
-    FilePath: Materials/mat1.hmat
-    Type: AssetType::Material
   - Handle: 2135390756550958898
     FilePath: Textures/universe-skybox/front.png
     Type: AssetType::Texture2D
-  - Handle: 5025462131848195016
-    FilePath: Models/Plane.fbx
+  - Handle: 2605795154723237914
+    FilePath: Models/Cube.gltf
+    Type: AssetType::MeshSource
+  - Handle: 5715407682404485611
+    FilePath: Models/Sphere.gltf
     Type: AssetType::MeshSource
   - Handle: 5775838104344894305
     FilePath: Scenes/3DLightingExample.hscene
@@ -23,21 +26,18 @@ AssetRegistry:
   - Handle: 9644760195236910386
     FilePath: Textures/universe-skybox/top.png
     Type: AssetType::Texture2D
-  - Handle: 12104991068264146629
-    FilePath: Models/Sphere.fbx
-    Type: AssetType::MeshSource
   - Handle: 13655973308143711059
     FilePath: Textures/universe-skybox/back.png
     Type: AssetType::Texture2D
-  - Handle: 14535960835168578140
-    FilePath: Models/Box.fbx
-    Type: AssetType::MeshSource
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
-  - Handle: 17058150480603569601
-    FilePath: Models/Cylinder.fbx
-    Type: AssetType::MeshSource
+  - Handle: 16588612859980762098
+    FilePath: Materials/Green.hmat
+    Type: AssetType::Material
+  - Handle: 16955974004500943799
+    FilePath: Materials/White.hmat
+    Type: AssetType::Material
   - Handle: 17746566452886661726
     FilePath: Materials/universeSkybox.henv
     Type: AssetType::EnvMap
