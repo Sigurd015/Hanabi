@@ -35,13 +35,14 @@ float3 CalculateDirLights(PBRParameters params, float3 F0)
 	float D = NdfGGX(cosLh, params.Roughness);
 	float G = GaSchlickGGX(cosLi, params.NdotV, params.Roughness);
 
-    float3 kd = (1.0 - F) * (1.0 - params.Metalness);
+	float3 kd = float3(1.0f, 1.0f, 1.0f) - F * (1.0 - params.Metalness);
 	float3 diffuseBRDF = kd * params.Albedo;
     
     // Cook-Torrance
 	float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * params.NdotV);
-	specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
-	result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+	//specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
+	//result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
+    result += (diffuseBRDF / PI + specularBRDF) * Lradiance * cosLi;
 
     return result;
 }
@@ -74,7 +75,7 @@ float3 CalculatePointLights(PBRParameters params, float3 F0)
 		float D = NdfGGX(cosLh, params.Roughness);
 		float G = GaSchlickGGX(cosLi, params.NdotV, params.Roughness);
 
-        float3 kd = (1.0 - F) * (1.0 - params.Metalness);
+		float3 kd = float3(1.0f, 1.0f, 1.0f) - F * (1.0 - params.Metalness);
 		float3 diffuseBRDF = kd * params.Albedo;
 
         // Cook-Torrance
@@ -118,7 +119,7 @@ float3 CalculateSpotLights(PBRParameters params, float3 F0)
 		float D = NdfGGX(cosLh, params.Roughness);
 		float G = GaSchlickGGX(cosLi, params.NdotV, params.Roughness);
 
-		float3 kd = (1.0 - F) * (1.0 - params.Metalness);
+		float3 kd = float3(1.0f, 1.0f, 1.0f) - F * (1.0 - params.Metalness);
 		float3 diffuseBRDF = kd * params.Albedo;
 
         // Cook-Torrance

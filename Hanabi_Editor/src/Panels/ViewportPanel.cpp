@@ -47,7 +47,7 @@ namespace Hanabi
 
 		switch (e.GetKeyCode())
 		{
-			// Scene Commands
+		// Scene Commands
 		case Key::D:
 		{
 			if (control)
@@ -71,6 +71,17 @@ namespace Hanabi
 			if (!ImGuizmo::IsUsing())
 				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
+
+		// Camera Controls
+		case Key::F:
+		{
+			if (SelectionManager::GetSelectedEntity())
+				break;
+
+			Entity selectedEntityID = SelectionManager::GetSelectedEntity();
+			m_EditorCamera.Focus(m_Context->GetWorldSpaceTransform(selectedEntityID).Translation);
+			break;
+		}
 		}
 		return false;
 	}

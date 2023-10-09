@@ -86,6 +86,7 @@ namespace Hanabi
 		Entity DuplicateEntity(Entity entity);
 		Entity GetEntityByUUID(UUID uuid);
 		Entity FindEntityByName(std::string_view name);
+		TransformComponent GetWorldSpaceTransform(Entity entity);
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()

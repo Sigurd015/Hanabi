@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "MeshFactory.h"
 #include "SceneRenderer.h"
+#include "Engine/Asset/AssetSerializer/AssetSerializer.h"
 
 namespace Hanabi
 {
@@ -38,7 +39,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("ShadowMapping");
 		s_Data->ShaderLibrary->Load("Composite");
 		s_Data->ShaderLibrary->Load("ShadowMap");
-		s_Data->ShaderLibrary->Load("EnvMap");
+		s_Data->ShaderLibrary->Load("Skybox");
 
 		//Setup textures
 		TextureSpecification spec;
@@ -55,6 +56,12 @@ namespace Hanabi
 
 		constexpr uint32_t blackCubeTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->Textures["BlackCube"] = TextureCube::Create(spec, Buffer(blackCubeTextureData, sizeof(blackCubeTextureData)));
+
+		{
+			TextureSpecification spec;
+			spec.SamplerWrap = TextureWrap::Clamp;
+			s_Data->Textures["BRDFLut"] = Texture2D::Create(spec, TextureSerializer::ToBufferFromFile("Resources/Renderer/BRDF_LUT.tga", spec));
+		}
 
 		//Load default meshes
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });
@@ -165,11 +172,6 @@ namespace Hanabi
 			return nullptr;
 
 		return s_Data->Meshes[name];
-	}
-
-	Ref<Shader> Renderer::GetDefaultShader()
-	{
-		return s_Data->ShaderLibrary->Get("DeferredGeometry");
 	}
 
 	Ref<Texture> Renderer::GetTextureInternal(const std::string& name)

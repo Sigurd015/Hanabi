@@ -43,8 +43,6 @@ namespace Hanabi
 			Ref<Texture> texture = GetTextureInternal(name);
 			return std::static_pointer_cast<T>(texture);
 		}
-
-		static Ref<Shader> GetDefaultShader();
 	private:
 		static Ref<Texture> GetTextureInternal(const std::string& name);
 	};

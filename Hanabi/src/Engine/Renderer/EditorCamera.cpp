@@ -53,6 +53,13 @@ namespace Hanabi
 		return speed;
 	}
 
+	void EditorCamera::Focus(const glm::vec3& focusPoint)
+	{
+		m_FocalPoint = focusPoint;
+
+		UpdateView();
+	}
+
 	void EditorCamera::OnUpdate(Timestep ts)
 	{
 		if (Input::IsKeyPressed(Key::LeftAlt))
@@ -70,18 +77,27 @@ namespace Hanabi
 		}
 		else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
 		{
+			float speed = m_MoveSpeed;
+			if (Input::IsKeyPressed(Key::LeftControl))
+				speed /= 2 - glm::log(m_MoveSpeed);
+			if (Input::IsKeyPressed(Key::LeftShift))
+				speed *= 2 - glm::log(m_MoveSpeed);
+			speed = glm::clamp(speed, MIN_SPEED, MAX_SPEED);
+
 			if (Input::IsKeyPressed(Key::W))
-				m_FocalPoint += GetForwardDirection() * m_MoveSpeed * 0.05f;
+				m_Position += GetForwardDirection() * speed * 0.05f;
 			if (Input::IsKeyPressed(Key::S))
-				m_FocalPoint -= GetForwardDirection() * m_MoveSpeed * 0.05f;
+				m_Position -= GetForwardDirection() * speed * 0.05f;
 			if (Input::IsKeyPressed(Key::A))
-				m_FocalPoint -= GetRightDirection() * m_MoveSpeed * 0.05f;
+				m_Position -= GetRightDirection() * speed * 0.05f;
 			if (Input::IsKeyPressed(Key::D))
-				m_FocalPoint += GetRightDirection() * m_MoveSpeed * 0.05f;
+				m_Position += GetRightDirection() * speed * 0.05f;
 			if (Input::IsKeyPressed(Key::Q))
-				m_FocalPoint += GetUpDirection() * m_MoveSpeed * 0.05f;
+				m_Position += GetUpDirection() * speed * 0.05f;
 			if (Input::IsKeyPressed(Key::E))
-				m_FocalPoint -= GetUpDirection() * m_MoveSpeed * 0.05f;
+				m_Position -= GetUpDirection() * speed * 0.05f;
+
+			m_FocalPoint = m_Position + GetForwardDirection() * m_Distance;
 
 			const glm::vec2& mouse = Input::GetMousePosition();
 			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;

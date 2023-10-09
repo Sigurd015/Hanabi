@@ -5,12 +5,18 @@ AssetRegistry:
   - Handle: 1632207768508466527
     FilePath: Textures/universe-skybox/bottom.png
     Type: AssetType::Texture2D
+  - Handle: 2025733275361624633
+    FilePath: Textures/rustediron1-alt2-bl/rustediron2_metallic.png
+    Type: AssetType::Texture2D
   - Handle: 2135390756550958898
     FilePath: Textures/universe-skybox/front.png
     Type: AssetType::Texture2D
   - Handle: 2605795154723237914
     FilePath: Models/Cube.gltf
     Type: AssetType::MeshSource
+  - Handle: 4277542860935985066
+    FilePath: Textures/rustediron1-alt2-bl/rustediron2_basecolor.png
+    Type: AssetType::Texture2D
   - Handle: 5715407682404485611
     FilePath: Models/Sphere.gltf
     Type: AssetType::MeshSource
@@ -23,14 +29,23 @@ AssetRegistry:
   - Handle: 8012010214947151524
     FilePath: Scenes/2DExample.hscene
     Type: AssetType::Scene
+  - Handle: 8768036028020490977
+    FilePath: Materials/rustediron.hmat
+    Type: AssetType::Material
   - Handle: 9644760195236910386
     FilePath: Textures/universe-skybox/top.png
+    Type: AssetType::Texture2D
+  - Handle: 13482911859211230360
+    FilePath: Textures/rustediron1-alt2-bl/rustediron2_normal.png
     Type: AssetType::Texture2D
   - Handle: 13655973308143711059
     FilePath: Textures/universe-skybox/back.png
     Type: AssetType::Texture2D
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
+    Type: AssetType::Texture2D
+  - Handle: 15652741369683370252
+    FilePath: Textures/rustediron1-alt2-bl/rustediron2_roughness.png
     Type: AssetType::Texture2D
   - Handle: 16588612859980762098
     FilePath: Materials/Green.hmat

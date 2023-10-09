@@ -38,6 +38,6 @@ namespace Hanabi
 		static void ShadowMappingPass();
 
 		static void CompositePass();
-		static void EnvMapPass();
+		static void SkyboxPass();
 	};
 }

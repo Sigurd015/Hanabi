@@ -5,14 +5,15 @@ const float PI = 3.141592;
 const float Epsilon = 0.00001;
 
 // Gamma correction
-float3 LinearToSRGB(float3 color)
+float3 LinearToSRGB(float3 color, float gamma)
 {
-    return pow(color, 1.0 / 2.2);
+    float temp = 1.0f / gamma;
+    return pow(color, float3(temp, temp, temp));
 }
 
 float3 SRGBToLinear(float3 color)
 {
-    return pow(color, 2.2);
+    return pow(color, float3(2.2f, 2.2f, 2.2f));
 }
 
 #endif

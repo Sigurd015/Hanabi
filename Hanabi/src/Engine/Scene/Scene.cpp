@@ -116,6 +116,14 @@ namespace Hanabi
 		return {};
 	}
 
+	TransformComponent Scene::GetWorldSpaceTransform(Entity entity)
+	{
+		if (entity)
+			return entity.GetComponent<TransformComponent>();
+		else
+			return {};
+	}
+
 	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
 	{
 		Entity entity = { m_Registry.create(), this };

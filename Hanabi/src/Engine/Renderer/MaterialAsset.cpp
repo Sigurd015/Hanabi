@@ -10,12 +10,12 @@ namespace Hanabi
 	static const std::string s_MetalnessMap = "u_MetalnessTex";
 	static const std::string s_RoughnessMap = "u_RoughnessTex";
 
-	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetDefaultShader()))
+	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetShader("DeferredGeometry")))
 	{
 		m_Material->SetTexture<Texture2D>(s_AlbedoMap, Renderer::GetTexture<Texture2D>("White"));
 		m_Material->SetTexture<Texture2D>(s_MetalnessMap, Renderer::GetTexture<Texture2D>("White"));
 		m_Material->SetTexture<Texture2D>(s_RoughnessMap, Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>(s_NormalMap, Renderer::GetTexture<Texture2D>("Black"));
+		m_Material->SetTexture<Texture2D>(s_NormalMap, Renderer::GetTexture<Texture2D>("White"));
 	}
 
 	MaterialAsset::MaterialAsset(Ref<Material> material) :m_Material(Material::Copy(material))

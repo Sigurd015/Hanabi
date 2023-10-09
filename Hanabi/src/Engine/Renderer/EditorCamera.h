@@ -14,6 +14,7 @@ namespace Hanabi
 		EditorCamera() = default;
 		EditorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
+		void Focus(const glm::vec3& focusPoint);
 		void OnUpdate(Timestep ts);
 		void OnEvent(Event& e);
 
@@ -61,5 +62,7 @@ namespace Hanabi
 		float m_RotationSpeed = 0.8f, m_MoveSpeed = 1.5f;
 
 		float m_ViewportWidth = 1280, m_ViewportHeight = 720;
+
+		constexpr static float MIN_SPEED{ 0.0005f }, MAX_SPEED{ 2.0f };
 	};
 }

@@ -17,19 +17,14 @@ namespace Hanabi
 
 		static void Init()
 		{
-			PlayIcon = LoadTexture("Resources/Icons/PlayButton.png");
-			StopIcon = LoadTexture("Resources/Icons/StopButton.png");
-			PauseIcon = LoadTexture("Resources/Icons/PauseButton.png");
-			StepIcon = LoadTexture("Resources/Icons/StepButton.png");
+			PlayIcon = TextureSerializer::LoadTexture2D("Resources/Icons/PlayButton.png");
+			StopIcon = TextureSerializer::LoadTexture2D("Resources/Icons/StopButton.png");
+			PauseIcon = TextureSerializer::LoadTexture2D("Resources/Icons/PauseButton.png");
+			StepIcon = TextureSerializer::LoadTexture2D("Resources/Icons/StepButton.png");
 
-			DirectoryIcon = LoadTexture("Resources/Icons/ContentBrowser/DirectoryIcon.png");
-			FileIcon = LoadTexture("Resources/Icons/ContentBrowser/FileIcon.png");
-			ImportedFileIcon = LoadTexture("Resources/Icons/ContentBrowser/ImportedFileIcon.png");
-		}
-	private:
-		static Ref<Texture2D> LoadTexture(const std::filesystem::path& relativePath)
-		{
-			return TextureSerializer::LoadTexture2D(relativePath);
+			DirectoryIcon = TextureSerializer::LoadTexture2D("Resources/Icons/ContentBrowser/DirectoryIcon.png");
+			FileIcon = TextureSerializer::LoadTexture2D("Resources/Icons/ContentBrowser/FileIcon.png");
+			ImportedFileIcon = TextureSerializer::LoadTexture2D("Resources/Icons/ContentBrowser/ImportedFileIcon.png");
 		}
 	};
 }

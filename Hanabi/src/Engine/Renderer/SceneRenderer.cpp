@@ -57,7 +57,7 @@ namespace Hanabi
 			float Metalness;
 			float Roughness;
 			bool UseNormalMap;
-		
+
 			// Padding
 			// Notice : bool is 1 byte in C++ but 4 bytes in HLSL
 			char padding[7];
@@ -138,7 +138,7 @@ namespace Hanabi
 		Ref<RenderPass> ShadowMappingPass;
 		Ref<RenderPass> DeferredGeoPass;
 		Ref<RenderPass> DeferredLightingPass;
-		Ref<RenderPass> EnvMapPass;
+		Ref<RenderPass> SkyboxPass;
 		Ref<RenderPass> CompositePass;
 
 		Ref<Material> DefaultMaterial;
@@ -337,7 +337,7 @@ namespace Hanabi
 				pipelineSpec.Layout = {
 				   { ShaderDataType::Float3, "a_Position" },
 				};
-				pipelineSpec.Shader = Renderer::GetShader("EnvMap");
+				pipelineSpec.Shader = Renderer::GetShader("Skybox");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = false;
 				pipelineSpec.DepthTest = true;
@@ -346,7 +346,7 @@ namespace Hanabi
 
 				RenderPassSpecification renderPassSpec;
 				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->EnvMapPass = RenderPass::Create(renderPassSpec);
+				s_Data->SkyboxPass = RenderPass::Create(renderPassSpec);
 			}
 		}
 
@@ -361,6 +361,7 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("u_MREBuffer", s_Data->DeferredGeoPass->GetOutput(1));
 		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
 		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
+		s_Data->DeferredLightingPass->SetInput("u_BRDFLut", Renderer::GetTexture<Texture2D>("BRDFLut"));
 
 		s_Data->ShadowMapPass->SetInput("CBModel", s_Data->ModelDataBuffer);
 		s_Data->ShadowMapPass->SetInput("CBShadow", s_Data->ShadowDataBuffer);
@@ -373,7 +374,7 @@ namespace Hanabi
 
 		s_Data->CompositePass->SetInput("u_Color", s_Data->ShadowMappingPass->GetOutput());
 
-		s_Data->EnvMapPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
+		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
 		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
 		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
@@ -460,11 +461,11 @@ namespace Hanabi
 		{
 			Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
 			Ref<TextureCube> textureCube = asset->GetEnvMap();
-			s_Data->EnvMapPass->SetInput("u_EnvMap", textureCube);
+			s_Data->SkyboxPass->SetInput("u_EnvMap", textureCube);
 		}
 		else
 		{
-			s_Data->EnvMapPass->SetInput("u_EnvMap", Renderer::GetTexture<TextureCube>("BlackCube"));
+			s_Data->SkyboxPass->SetInput("u_EnvMap", Renderer::GetTexture<TextureCube>("BlackCube"));
 		}
 	}
 
@@ -477,12 +478,12 @@ namespace Hanabi
 		ShadowMappingPass();
 
 		CompositePass();
-		EnvMapPass();
+		SkyboxPass();
 	}
 
 	Ref<RenderPass> SceneRenderer::GetFinalPass()
 	{
-		return s_Data->EnvMapPass;
+		return s_Data->SkyboxPass;
 	}
 
 	Ref<Image2D> SceneRenderer::GetGBufferAlbedo()
@@ -623,9 +624,9 @@ namespace Hanabi
 		Renderer::EndRenderPass();
 	}
 
-	void SceneRenderer::EnvMapPass()
+	void SceneRenderer::SkyboxPass()
 	{
-		Renderer::BeginRenderPass(s_Data->EnvMapPass, false);
+		Renderer::BeginRenderPass(s_Data->SkyboxPass, false);
 		Ref<Mesh> mesh = Renderer::GetMesh("Box");
 		Renderer::DrawMesh(mesh);
 		Renderer::EndRenderPass();
