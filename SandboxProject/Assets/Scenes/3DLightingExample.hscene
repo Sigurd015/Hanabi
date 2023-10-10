@@ -44,7 +44,7 @@ Entities:
       Tag: DirectionalLight
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [0.577703953, -2.43473434, 0]
+      Rotation: [0, -5.33896208, 0]
       Scale: [1, 1, 1]
     LightComponent:
       LightType: Directional
@@ -71,12 +71,12 @@ Entities:
     TagComponent:
       Tag: PointLight
     TransformComponent:
-      Translation: [-6.13191414, 0.690446496, 2.63670897]
+      Translation: [-7.43132877, 0.690446496, 3.19997954]
       Rotation: [0, 0, 0]
       Scale: [0.100000001, 0.100000001, 1]
     LightComponent:
       LightType: Point
-      Intensity: 0
+      Intensity: 1.89999998
       Radiance: [1, 1, 1]
       Radius: 15
       Range: 0
@@ -93,7 +93,7 @@ Entities:
       Scale: [0.100000001, 0.100000001, 1]
     LightComponent:
       LightType: Point
-      Intensity: 0.800000012
+      Intensity: 0
       Radiance: [1, 1, 1]
       Radius: 18.1000004
       Range: 0

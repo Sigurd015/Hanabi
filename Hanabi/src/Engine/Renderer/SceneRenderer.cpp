@@ -171,7 +171,7 @@ namespace Hanabi
 			{
 				FramebufferSpecification spec;
 				spec.Attachments = { ImageFormat::RGBA8,ImageFormat::RGBA8,
-					ImageFormat::RGBA8F,ImageFormat::RGBA16F,ImageFormat::Depth };
+					ImageFormat::RGBA16F,ImageFormat::RGBA16F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;

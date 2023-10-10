@@ -1,6 +1,8 @@
 #pragma once
 #include "Hanabi.h"
 
+#include <imgui.h>
+
 namespace Hanabi
 {
 	class SettingManager

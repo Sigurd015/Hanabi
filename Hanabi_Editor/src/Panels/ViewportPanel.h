@@ -8,7 +8,6 @@ namespace Hanabi
 	{
 	public:
 		ViewPortPanel();
-		ViewPortPanel(const Ref<Scene>& scene);
 
 		void SetContext(const Ref<Scene>& scene);
 

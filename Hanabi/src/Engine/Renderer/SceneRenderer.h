@@ -2,7 +2,6 @@
 #include "Renderer2D.h"
 #include "ConstantBuffer.h"
 #include "Camera.h"
-#include "EditorCamera.h"
 #include "Engine/Scene/Scene.h"
 
 namespace Hanabi

@@ -14,11 +14,11 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return new ImGuiLayerOpenGL();
+			return new OpenGLImGuiLayer();
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			return new ImGuiLayerDX11();
+			return new DX11ImGuiLayer();
 #endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

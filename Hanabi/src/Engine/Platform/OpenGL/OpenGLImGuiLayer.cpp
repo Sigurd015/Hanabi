@@ -1,5 +1,5 @@
 #include "hnbpch.h"
-#include "ImGuiLayer.h"
+#include "Engine/Layer/ImGui/ImGuiLayer.h"
 #include "Engine/Core/Application.h"
 
 #include <imgui.h>
@@ -10,7 +10,7 @@
 
 namespace Hanabi
 {
-	void ImGuiLayerOpenGL::OnAttach()
+	void OpenGLImGuiLayer::OnAttach()
 	{
 		Init();
 
@@ -21,14 +21,14 @@ namespace Hanabi
 		ImGui_ImplOpenGL3_Init("#version 410");
 	}
 
-	void ImGuiLayerOpenGL::OnDetach()
+	void OpenGLImGuiLayer::OnDetach()
 	{
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayerOpenGL::Begin()
+	void OpenGLImGuiLayer::Begin()
 	{
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -36,7 +36,7 @@ namespace Hanabi
 		ImGuizmo::BeginFrame();
 	}
 
-	void ImGuiLayerOpenGL::End()
+	void OpenGLImGuiLayer::End()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();

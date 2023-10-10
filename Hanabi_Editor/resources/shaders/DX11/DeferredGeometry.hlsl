@@ -79,7 +79,8 @@ PixelOutput main(PixelInput Input)
     }
 
     Output.Albedo = float4(SRGBToLinear(albedo.xyz) * u_Material.Albedo, albedo.w);
-    Output.MRE = float4(metalness, roughness, u_Material.Emission, 1.0f);
+    // Minimum roughness of 0.05 to keep specular highlight
+    Output.MRE = float4(metalness, max(roughness, 0.05f), u_Material.Emission, 1.0f);
     Output.Normal = float4(normal, 1.0f);
     Output.Position = float4(Input.WorldPosition, 1.0f);
 

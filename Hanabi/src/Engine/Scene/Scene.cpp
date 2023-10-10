@@ -286,6 +286,7 @@ namespace Hanabi
 						m_Environment->DirLight = {
 							light.Radiance,
 							light.Intensity,
+							//-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
 							-glm::normalize(glm::rotate(transform.GetRotation(), glm::vec3(0.0f,0.0f,-1.0f))),
 							light.Shadow,
 						};

@@ -1,7 +1,7 @@
 #include "hnbpch.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
-#include "ImGuiLayer.h"
+#include "Engine/Layer/ImGui/ImGuiLayer.h"
 #include "Engine/Core/Application.h"
 #include "Engine/Platform/D3D/DX11/DX11Context.h"
 
@@ -12,7 +12,7 @@
 
 namespace Hanabi
 {
-	void ImGuiLayerDX11::OnAttach()
+	void DX11ImGuiLayer::OnAttach()
 	{
 		Init();
 
@@ -23,14 +23,14 @@ namespace Hanabi
 		ImGui_ImplDX11_Init(DX11Context::GetDevice().Get(), DX11Context::GetDeviceContext().Get());
 	}
 
-	void ImGuiLayerDX11::OnDetach()
+	void DX11ImGuiLayer::OnDetach()
 	{
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayerDX11::Begin()
+	void DX11ImGuiLayer::Begin()
 	{
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -38,7 +38,7 @@ namespace Hanabi
 		ImGuizmo::BeginFrame();
 	}
 
-	void ImGuiLayerDX11::End()
+	void DX11ImGuiLayer::End()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();

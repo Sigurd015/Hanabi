@@ -40,7 +40,7 @@ PixelOutput main(PixelInput Input)
     params.Albedo = u_AlbedoBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
     float4 MRE = u_MREBuffer.Sample(u_SSLinearWrap, texCoord);
     params.Metalness = MRE.x;
-    params.Roughness = max(MRE.y, 0.05); // Minimum roughness of 0.05 to keep specular highlight
+    params.Roughness = MRE.y; 
     params.WorldNormal = u_NormalBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
     params.WorldPosition = u_PositionBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
     

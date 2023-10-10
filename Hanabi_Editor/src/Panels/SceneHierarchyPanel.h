@@ -8,7 +8,6 @@ namespace Hanabi
 	{
 	public:
 		SceneHierarchyPanel() = default;
-		SceneHierarchyPanel(const Ref<Scene>& scene);
 		void SetContext(const Ref<Scene>& scene);
 		virtual void OnEvent(Event& e) override;
 		virtual void OnUpdate(Timestep ts) override;

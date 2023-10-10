@@ -1,6 +1,5 @@
 #pragma once
 #include "Camera.h"
-#include "EditorCamera.h"
 #include "Texture.h"
 #include "UI/Font.h"
 #include "Engine/Scene/Components.h"

@@ -22,9 +22,8 @@ float3 CalculateDirLights(PBRParameters params, float3 F0)
     if (u_DirLight.Intensity == 0)
         return result;
     
-    float3 Li = normalize(u_DirLight.Direction);
+    float3 Li = -normalize(u_DirLight.Direction);
 	float3 Lradiance = u_DirLight.Radiance * u_DirLight.Intensity;
-    // half-vector
 	float3 Lh = normalize(Li + params.View);
 
     // Calculate angles between surface normal and various light vectors.
@@ -40,9 +39,8 @@ float3 CalculateDirLights(PBRParameters params, float3 F0)
     
     // Cook-Torrance
 	float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * params.NdotV);
-	//specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
-	//result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
-    result += (diffuseBRDF / PI + specularBRDF) * Lradiance * cosLi;
+	specularBRDF = clamp(specularBRDF, float3(0, 0, 0), float3(10.0f, 10.0f, 10.0f));
+	result += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
 
     return result;
 }

@@ -1,193 +1,9 @@
 ﻿#include "SceneHierarchyPanel.h"
 #include "CommonStates/SelectionManager.h"
-
-#include <imgui.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <imgui_internal.h>
-#include <misc/cpp/imgui_stdlib.h>
+#include "Utils/UICore.h"
 
 namespace Hanabi
 {
-	namespace Utils
-	{
-		static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
-		{
-			ImGuiIO& io = ImGui::GetIO();
-			auto boldFont = io.Fonts->Fonts[0];
-
-			ImGui::PushID(label.c_str());
-
-			ImGui::Columns(2);
-			ImGui::SetColumnWidth(0, columnWidth);
-			ImGui::Text(label.c_str());
-			ImGui::NextColumn();
-
-			ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-			ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-			ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
-
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-			ImGui::PushFont(boldFont);
-			if (ImGui::Button("X", buttonSize))
-				values.x = resetValue;
-			ImGui::PopFont();
-			ImGui::PopStyleColor(3);
-
-			ImGui::SameLine();
-			ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
-
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-			ImGui::PushFont(boldFont);
-			if (ImGui::Button("Y", buttonSize))
-				values.y = resetValue;
-			ImGui::PopFont();
-			ImGui::PopStyleColor(3);
-
-			ImGui::SameLine();
-			ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-			ImGui::PopItemWidth();
-			ImGui::SameLine();
-
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-			ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-			ImGui::PushFont(boldFont);
-			if (ImGui::Button("Z", buttonSize))
-				values.z = resetValue;
-			ImGui::PopFont();
-			ImGui::PopStyleColor(3);
-
-			ImGui::SameLine();
-			ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-			ImGui::PopItemWidth();
-
-			ImGui::PopStyleVar();
-
-			ImGui::Columns(1);
-
-			ImGui::PopID();
-		}
-
-		template<typename T, typename UIFunction>
-		static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool removable = true)
-		{
-			const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-			if (entity.HasComponent<T>())
-			{
-				auto& component = entity.GetComponent<T>();
-				ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
-
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
-				float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-				ImGui::Separator();
-				bool open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
-				ImGui::PopStyleVar();
-				if (removable)
-				{
-					ImGui::SameLine(contentRegionAvailable.x - lineHeight * 0.5f);
-					if (ImGui::Button("X", ImVec2{ lineHeight, lineHeight }))
-					{
-						entity.RemoveComponent<T>();
-					}
-				}
-				if (open)
-				{
-					uiFunction(component);
-					ImGui::TreePop();
-				}
-			}
-		}
-
-		template<typename UIFunction>
-		static void DrawDragDropContent(AssetHandle& handle, AssetType validType, UIFunction uiFunction)
-		{
-			uiFunction();
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-				{
-					AssetHandle tempHandle = *(AssetHandle*)payload->Data;
-					if (AssetManager::GetAssetType(tempHandle) == validType)
-					{
-						handle = tempHandle;
-					}
-					else
-					{
-						//TODO: Show message to user
-						HNB_CORE_ERROR("Wrong asset type!");
-					}
-				}
-				ImGui::EndDragDropTarget();
-			}
-		}
-
-		template<typename UIFunction = std::function<void()>>
-		static void DrawTextureControl(const std::string& name, AssetHandle& handle, UIFunction uiFunction = []() {})
-		{
-			if (ImGui::CollapsingHeader(name.c_str(), nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				DrawDragDropContent(handle, AssetType::Texture2D, [&handle]()
-					{
-						std::string label = "None";
-						if (AssetManager::IsAssetHandleValid(handle)
-							&& AssetManager::GetAssetType(handle) == AssetType::Texture2D)
-						{
-							Ref<Texture2D> texture = AssetManager::GetAsset<Texture2D>(handle);
-							//TODO: UV flip for directx 11
-							ImGui::Image(texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-							const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(handle);
-							label = metadata.FilePath.filename().string();
-						}
-						else
-						{
-							ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
-							ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-							ImGui::Button("Texture", ImVec2(100.0f, 100.0f));
-							ImGui::PopItemFlag();
-							ImGui::PopStyleColor();
-						}
-						ImGui::SameLine();
-						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
-						{
-							handle = 0;
-						}
-					});
-				uiFunction();
-			}
-		}
-
-		template<typename T>
-		static void DrawComboControl(const std::string& name, const char** typeStrings, uint32_t typeCount, T& type)
-		{
-			const char* currentTypeString = typeStrings[(uint32_t)type];
-			if (ImGui::BeginCombo(name.c_str(), currentTypeString))
-			{
-				for (uint32_t i = 0; i < typeCount; i++)
-				{
-					bool isSelected = currentTypeString == typeStrings[i];
-					if (ImGui::Selectable(typeStrings[i], isSelected))
-					{
-						currentTypeString = typeStrings[i];
-						type = (T)i;
-					}
-
-					if (isSelected)
-						ImGui::SetItemDefaultFocus();
-				}
-
-				ImGui::EndCombo();
-			}
-		}
-	}
-
 	template<typename T>
 	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
 	{
@@ -200,11 +16,6 @@ namespace Hanabi
 				ImGui::CloseCurrentPopup();
 			}
 		}
-	}
-
-	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& context)
-	{
-		SetContext(context);
 	}
 
 	void SceneHierarchyPanel::SetContext(const Ref<Scene>& context)
@@ -327,16 +138,16 @@ namespace Hanabi
 
 		ImGui::PopItemWidth();
 
-		Utils::DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
+		UI::DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 			{
-				Utils::DrawVec3Control("Translation", component.Translation);
+				UI::DrawVec3Control("Translation", component.Translation);
 				glm::vec3 rotation = glm::degrees(component.Rotation);
-				Utils::DrawVec3Control("Rotation", rotation);
+				UI::DrawVec3Control("Rotation", rotation);
 				component.Rotation = glm::radians(rotation);
-				Utils::DrawVec3Control("Scale", component.Scale, 1.0f);
+				UI::DrawVec3Control("Scale", component.Scale, 1.0f);
 			}, false);
 
-		Utils::DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
+		UI::DrawComponent<CameraComponent>("Camera", entity, [](auto& component)
 			{
 				auto& camera = component.Camera;
 
@@ -345,7 +156,7 @@ namespace Hanabi
 				const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
 				SceneCamera::ProjectionType type = camera.GetProjectionType();
 				SceneCamera::ProjectionType tempType = type;
-				Utils::DrawComboControl("Projection", projectionTypeStrings, 2, tempType);
+				UI::DrawComboControl("Projection", projectionTypeStrings, 2, tempType);
 				if (tempType != type)
 					camera.SetProjectionType(tempType);
 
@@ -381,14 +192,14 @@ namespace Hanabi
 				}
 			});
 
-		Utils::DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
+		UI::DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
 			{
 				bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
 
 				static char buffer[64];
 				strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
 
-				Utils::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
+				UI::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
 
 				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
 				{
@@ -457,18 +268,18 @@ namespace Hanabi
 				}
 			});
 
-		Utils::DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
+		UI::DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				Utils::DrawTextureControl("Texture", component.TextureHandle);
+				UI::DrawTextureControl("Texture", component.TextureHandle);
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
 				ImGui::DragFloat2("UV End", glm::value_ptr(component.UVEnd), 0.01f, 0.0f, 1.0f);
 			});
 
-		Utils::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
+		UI::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
 				std::string label = "None";
 				if (AssetManager::IsAssetHandleValid(component.MeshSourceHandle)
@@ -480,7 +291,7 @@ namespace Hanabi
 
 				AssetHandle meshSourceHandle = component.MeshSourceHandle;
 
-				Utils::DrawDragDropContent(component.MeshSourceHandle, AssetType::MeshSource, [&]()
+				UI::DrawDragDropContent(component.MeshSourceHandle, AssetType::MeshSource, [&]()
 					{
 						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
 						{
@@ -494,7 +305,7 @@ namespace Hanabi
 				}
 			});
 
-		Utils::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
+		UI::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
 			{
 				Ref<MaterialAsset> materialAsset = nullptr;
 				std::string label = "None";
@@ -506,7 +317,7 @@ namespace Hanabi
 					label = metadata.FilePath.filename().string();
 				}
 
-				Utils::DrawDragDropContent(component.MaterialAssetHandle, AssetType::Material, [&]()
+				UI::DrawDragDropContent(component.MaterialAssetHandle, AssetType::Material, [&]()
 					{
 						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
 						{
@@ -532,23 +343,23 @@ namespace Hanabi
 					float tempEmission = materialAsset->GetEmission();
 					glm::vec3 tempAlbedo = materialAsset->GetAlbedo();
 
-					Utils::DrawTextureControl("Albedo Texture", tempAlbedoHandle, [&]()
+					UI::DrawTextureControl("Albedo Texture", tempAlbedoHandle, [&]()
 						{
 							ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo));
 							ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f);
 						});
 
-					Utils::DrawTextureControl("Metalness Texture", tempMetalnessHandle, [&]()
+					UI::DrawTextureControl("Metalness Texture", tempMetalnessHandle, [&]()
 						{
 							ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f);
 						});
 
-					Utils::DrawTextureControl("Roughness Texture", tempRoughnessHandle, [&]()
+					UI::DrawTextureControl("Roughness Texture", tempRoughnessHandle, [&]()
 						{
 							ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f);
 						});
 
-					Utils::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
+					UI::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
 						{
 							bool useNormalMap = materialAsset->IsUsingNormalMap();
 							if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
@@ -614,7 +425,7 @@ namespace Hanabi
 				}
 			});
 
-		Utils::DrawComponent<SkyLightComponent>("SkyLight", entity, [](auto& component)
+		UI::DrawComponent<SkyLightComponent>("SkyLight", entity, [](auto& component)
 			{
 				ImGui::DragFloat("Intensity", &component.Intensity, 0.1f, 0.0f, 5.0f);
 
@@ -628,7 +439,7 @@ namespace Hanabi
 					label = metadata.FilePath.filename().string();
 				}
 
-				Utils::DrawDragDropContent(component.EnvMapHandle, AssetType::EnvMap, [&]()
+				UI::DrawDragDropContent(component.EnvMapHandle, AssetType::EnvMap, [&]()
 					{
 						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
 						{
@@ -653,12 +464,12 @@ namespace Hanabi
 					AssetHandle tempFrontHandle = frontHandle;
 					AssetHandle tempBackHandle = backHandle;
 
-					Utils::DrawTextureControl("Top Texture", tempTopHandle);
-					Utils::DrawTextureControl("Bottom Texture", tempBottomHandle);
-					Utils::DrawTextureControl("Left Texture", tempLeftHandle);
-					Utils::DrawTextureControl("Right Texture", tempRightHandle);
-					Utils::DrawTextureControl("Front Texture", tempFrontHandle);
-					Utils::DrawTextureControl("Back Texture", tempBackHandle);
+					UI::DrawTextureControl("Top Texture", tempTopHandle);
+					UI::DrawTextureControl("Bottom Texture", tempBottomHandle);
+					UI::DrawTextureControl("Left Texture", tempLeftHandle);
+					UI::DrawTextureControl("Right Texture", tempRightHandle);
+					UI::DrawTextureControl("Front Texture", tempFrontHandle);
+					UI::DrawTextureControl("Back Texture", tempBackHandle);
 
 					bool topChanged = tempTopHandle != topHandle;
 					bool bottomChanged = tempBottomHandle != bottomHandle;
@@ -705,10 +516,10 @@ namespace Hanabi
 				}
 			});
 
-		Utils::DrawComponent<LightComponent>("Light", entity, [](auto& component)
+		UI::DrawComponent<LightComponent>("Light", entity, [](auto& component)
 			{
 				const char* lightTypeStrings[] = { "None","Directional Light","Point Light", "Spot Light" };
-				Utils::DrawComboControl("Light Type", lightTypeStrings, 4, component.Type);
+				UI::DrawComboControl("Light Type", lightTypeStrings, 4, component.Type);
 
 				switch (component.Type)
 				{
@@ -735,19 +546,19 @@ namespace Hanabi
 				}
 
 				const char* shadowTypeStrings[] = { "None", "Hard Shadow", "Soft Shadow" };
-				Utils::DrawComboControl("Shadow Type", shadowTypeStrings, 3, component.Shadow);
+				UI::DrawComboControl("Shadow Type", shadowTypeStrings, 3, component.Shadow);
 			});
 
-		Utils::DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
+		UI::DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component)
 			{
 				const char* bodyTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
-				Utils::DrawComboControl("Body Type", bodyTypeStrings, 3, component.Type);
+				UI::DrawComboControl("Body Type", bodyTypeStrings, 3, component.Type);
 
 				ImGui::Checkbox("Fixed Rotation", &component.FixedRotation);
 				ImGui::DragFloat("Gravity Scale", &component.GravityScale, 0.01f, -1.0f, 1.0f);
 			});
 
-		Utils::DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
+		UI::DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](auto& component)
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
 				ImGui::DragFloat2("Size", glm::value_ptr(component.Size));
@@ -757,14 +568,14 @@ namespace Hanabi
 				ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 			});
 
-		Utils::DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
+		UI::DrawComponent<CircleRendererComponent>("Circle Renderer", entity, [](auto& component)
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 				ImGui::DragFloat("Thickness", &component.Thickness, 0.025f, 0.0f, 1.0f);
 				ImGui::DragFloat("Fade", &component.Fade, 0.00025f, 0.0f, 1.0f);
 			});
 
-		Utils::DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& component)
+		UI::DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](auto& component)
 			{
 				ImGui::DragFloat2("Offset", glm::value_ptr(component.Offset));
 				ImGui::DragFloat("Radius", &component.Radius);
@@ -774,7 +585,7 @@ namespace Hanabi
 				ImGui::DragFloat("Restitution Threshold", &component.RestitutionThreshold, 0.01f, 0.0f);
 			});
 
-		Utils::DrawComponent<TextComponent>("Text Renderer", entity, [](auto& component)
+		UI::DrawComponent<TextComponent>("Text Renderer", entity, [](auto& component)
 			{
 				ImGui::InputTextMultiline("Text String", &component.TextString);
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));

@@ -10,15 +10,7 @@
 
 namespace Hanabi
 {
-	ViewPortPanel::ViewPortPanel()
-	{
-		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
-	}
-
-	ViewPortPanel::ViewPortPanel(const Ref<Scene>& scene)
-	{
-		SetContext(scene);
-	}
+	ViewPortPanel::ViewPortPanel() : m_EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f) {}
 
 	void ViewPortPanel::SetContext(const Ref<Scene>& scene)
 	{
@@ -47,7 +39,7 @@ namespace Hanabi
 
 		switch (e.GetKeyCode())
 		{
-		// Scene Commands
+			// Scene Commands
 		case Key::D:
 		{
 			if (control)
@@ -72,7 +64,7 @@ namespace Hanabi
 				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 
-		// Camera Controls
+			// Camera Controls
 		case Key::F:
 		{
 			if (SelectionManager::GetSelectedEntity())
