@@ -1,4 +1,4 @@
-#include "hnbpch.h"
+﻿#include "hnbpch.h"
 #include "Font.h"
 #include "Engine/Renderer/Texture.h"
 
@@ -23,13 +23,27 @@ namespace Hanabi
 
 		msdfgen::BitmapConstRef<T, N> bitmap = (msdfgen::BitmapConstRef<T, N>)generator.atlasStorage();
 
+		// Convert to RGBA8
+		Buffer imageBuffer(bitmap.width * bitmap.height * 4);
+		for (int y = 0; y < bitmap.height; y++)
+		{
+			for (int x = 0; x < bitmap.width; x++)
+			{
+				uint32_t yOffset = (y * bitmap.width + x) * 4;
+				imageBuffer.Data[yOffset + 0] = bitmap(x, y)[0]; // R
+				imageBuffer.Data[yOffset + 1] = bitmap(x, y)[1]; // G
+				imageBuffer.Data[yOffset + 2] = bitmap(x, y)[2]; // B
+				imageBuffer.Data[yOffset + 3] = 255;             // A
+			}
+		}
+
 		TextureSpecification spec;
 		spec.Width = bitmap.width;
 		spec.Height = bitmap.height;
-		spec.Format = ImageFormat::RGB8;
+		spec.Format = ImageFormat::RGBA8;
 		spec.GenerateMips = false;
 
-		Ref<Texture2D> texture = Texture2D::Create(spec, Buffer((void*)bitmap.pixels, bitmap.width * bitmap.height * 3));
+		Ref<Texture2D> texture = Texture2D::Create(spec, imageBuffer);
 		return texture;
 	}
 

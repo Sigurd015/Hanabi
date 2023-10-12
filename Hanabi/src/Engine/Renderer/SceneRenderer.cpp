@@ -460,7 +460,7 @@ namespace Hanabi
 		if (environment->EnvMapHandle)
 		{
 			Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
-			Ref<TextureCube> textureCube = asset->GetEnvMap();
+			Ref<TextureCube> textureCube = asset->GetIrradianceMap();
 			s_Data->SkyboxPass->SetInput("u_EnvMap", textureCube);
 		}
 		else

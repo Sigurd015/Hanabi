@@ -23,26 +23,6 @@ namespace Hanabi
 
 		Buffer(const Buffer&) = default;
 
-		Buffer(Buffer* buffers, uint32_t size)
-		{
-			uint64_t totalSize = 0;
-			for (size_t i = 0; i < size; i++)
-			{
-				totalSize += buffers[i].Size;
-			}
-
-			Allocate(totalSize);
-
-			uint8_t* destination = Data;
-
-			for (size_t i = 0; i < size; i++)
-			{
-				memcpy(destination, buffers[i].Data, buffers[i].Size);
-				destination += buffers[i].Size;
-				buffers[i].Release();
-			}
-		}
-
 		static Buffer Copy(Buffer& other)
 		{
 			Buffer result(other.Size);

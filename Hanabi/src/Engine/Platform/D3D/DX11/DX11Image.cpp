@@ -60,59 +60,7 @@ namespace Hanabi
 	DX11Image2D::DX11Image2D(const ImageSpecification& specification, Buffer buffer) :m_Specification(specification)
 	{
 		m_DataFormat = Utils::ImageFormatToDXTextureFormat(m_Specification.Format);
-
-		// Set Alpha to 255 for RGB8, because DX11 doesn't support RGB8
-		if (m_Specification.Format == ImageFormat::RGB8 && m_Specification.Usage == ImageUsage::Texture2D)
-		{
-			m_ImageData = Buffer(m_Specification.Width * m_Specification.Height * 4);
-			uint8_t* targetData = static_cast<uint8_t*>(m_ImageData.Data);
-			uint8_t* srcData = static_cast<uint8_t*>(buffer.Data);
-
-			// Set Alpha to 255	
-			for (uint32_t i = 0; i < buffer.Size / 3; i++)
-			{
-				targetData[i * 4] = srcData[i * 3];     // R
-				targetData[i * 4 + 1] = srcData[i * 3 + 1]; // G
-				targetData[i * 4 + 2] = srcData[i * 3 + 2]; // B
-				targetData[i * 4 + 3] = 255;           // Alpha
-			}
-		}
-		else
-		{
-			m_ImageData = Buffer::Copy(buffer);
-		}
-
-		//TODO: Fix
-		switch (m_Specification.Usage)
-		{
-		case ImageUsage::Texture2D:
-		{
-			D3D11_TEXTURE2D_DESC textureDesc = {};
-			textureDesc.Width = m_Specification.Width;
-			textureDesc.Height = m_Specification.Height;
-			textureDesc.MipLevels = 1;
-			textureDesc.ArraySize = 1;
-			textureDesc.Format = m_DataFormat;
-			textureDesc.SampleDesc.Count = 1;
-			textureDesc.SampleDesc.Quality = 0;
-			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-			textureDesc.MiscFlags = 0;
-			textureDesc.Usage = D3D11_USAGE_DEFAULT;
-			textureDesc.CPUAccessFlags = 0;
-			D3D11_SUBRESOURCE_DATA subresourceData = {};
-			subresourceData.pSysMem = buffer.Data;
-			subresourceData.SysMemPitch = m_Specification.Width * 4;  // size of one row in bytes
-			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, &subresourceData, m_Texture.GetAddressOf()));
-
-			D3D11_SHADER_RESOURCE_VIEW_DESC resourceView = {};
-			resourceView.Format = m_DataFormat;
-			resourceView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			resourceView.Texture2D.MostDetailedMip = 0;
-			resourceView.Texture2D.MipLevels = 1;
-			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &resourceView, m_TextureSRV.GetAddressOf()));
-			break;
-		}
-		}
+		m_ImageData = Buffer::Copy(buffer);
 	}
 
 	DX11Image2D::~DX11Image2D()
@@ -168,33 +116,33 @@ namespace Hanabi
 			DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &shaderResourceDesc, m_TextureSRV.GetAddressOf());
 			break;
 		}
-		//case ImageUsage::Texture2D:
-		//{
-		//	D3D11_TEXTURE2D_DESC textureDesc = {};
-		//	textureDesc.Width = m_Specification.Width;
-		//	textureDesc.Height = m_Specification.Height;
-		//	textureDesc.MipLevels = 1;
-		//	textureDesc.ArraySize = 1;
-		//	textureDesc.Format = m_DataFormat;
-		//	textureDesc.SampleDesc.Count = 1;
-		//	textureDesc.SampleDesc.Quality = 0;
-		//	textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		//	textureDesc.MiscFlags = 0;
-		//	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-		//	textureDesc.CPUAccessFlags = 0;
-		//	D3D11_SUBRESOURCE_DATA subresourceData = {};
-		//	subresourceData.pSysMem = m_ImageData.Data;
-		//	subresourceData.SysMemPitch = m_Specification.Width * 4;  // size of one row in bytes
-		//	DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, &subresourceData, m_Texture.GetAddressOf()));
+		case ImageUsage::Texture2D:
+		{
+			D3D11_TEXTURE2D_DESC textureDesc = {};
+			textureDesc.Width = m_Specification.Width;
+			textureDesc.Height = m_Specification.Height;
+			textureDesc.MipLevels = 1;
+			textureDesc.ArraySize = 1;
+			textureDesc.Format = m_DataFormat;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
+			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			textureDesc.MiscFlags = 0;
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.CPUAccessFlags = 0;
+			D3D11_SUBRESOURCE_DATA subresourceData = {};
+			subresourceData.pSysMem = m_ImageData.Data;
+			subresourceData.SysMemPitch = m_Specification.Width * 4;  // size of one row in bytes
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, &subresourceData, m_Texture.GetAddressOf()));
 
-		//	D3D11_SHADER_RESOURCE_VIEW_DESC resourceView = {};
-		//	resourceView.Format = m_DataFormat;
-		//	resourceView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		//	resourceView.Texture2D.MostDetailedMip = 0;
-		//	resourceView.Texture2D.MipLevels = 1;
-		//	DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &resourceView, m_TextureSRV.GetAddressOf()));
-		//	break;
-		//}
+			D3D11_SHADER_RESOURCE_VIEW_DESC resourceView = {};
+			resourceView.Format = m_DataFormat;
+			resourceView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			resourceView.Texture2D.MostDetailedMip = 0;
+			resourceView.Texture2D.MipLevels = 1;
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &resourceView, m_TextureSRV.GetAddressOf()));
+			break;
+		}
 		case ImageUsage::TextureCube:
 		{
 			D3D11_TEXTURE2D_DESC textureDesc = {};

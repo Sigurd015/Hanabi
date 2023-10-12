@@ -11,6 +11,7 @@ namespace Hanabi
 		{ ".png", AssetType::Texture2D },
 		{ ".jpg", AssetType::Texture2D },
 		{ ".jpeg", AssetType::Texture2D },
+		{ ".tga", AssetType::Texture2D },
 
 		// Materials
 		{ ".hmat", AssetType::Material },

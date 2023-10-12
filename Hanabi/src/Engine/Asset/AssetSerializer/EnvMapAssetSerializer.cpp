@@ -9,12 +9,8 @@
 namespace Hanabi
 {
 	static std::string s_DefaultEnvMaplYAML = R"(EnvMap:
-  TopHandle: 0
-  BottomHandle: 0
-  LeftHandle: 0
-  RightHandle: 0
-  FrontHandle: 0
-  BackHandle: 0)";
+  RadianceMapHandle: 0
+  IrradianceMapHandle: 0)";
 
 	void EnvMapAssetSerializer::Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const
 	{
@@ -38,8 +34,6 @@ namespace Hanabi
 		if (!success)
 			return false;
 
-		envMap->Invalidate();
-
 		asset = envMap;
 		asset->Handle = metadata.Handle;
 		return true;
@@ -59,12 +53,8 @@ namespace Hanabi
 			out << YAML::Key << "EnvMap" << YAML::Value;
 			{
 				out << YAML::BeginMap;// EnvMap
-				out << YAML::Key << "TopHandle" << YAML::Value << envMapAsset->GetTopHandle();
-				out << YAML::Key << "BottomHandle" << YAML::Value << envMapAsset->GetBottomHandle();
-				out << YAML::Key << "LeftHandle" << YAML::Value << envMapAsset->GetLeftHandle();
-				out << YAML::Key << "RightHandle" << YAML::Value << envMapAsset->GetRightHandle();
-				out << YAML::Key << "FrontHandle" << YAML::Value << envMapAsset->GetFrontHandle();
-				out << YAML::Key << "BackHandle" << YAML::Value << envMapAsset->GetBackHandle();
+				out << YAML::Key << "RadianceMapHandle" << YAML::Value << envMapAsset->GetRadianceMapHandle();
+				out << YAML::Key << "IrradianceMapHandle" << YAML::Value << envMapAsset->GetIrradianceMapHandle();
 				out << YAML::EndMap; // EnvMap
 			}
 			out << YAML::EndMap; // Root
@@ -78,32 +68,13 @@ namespace Hanabi
 		YAML::Node root = YAML::Load(yamlString);
 		YAML::Node envMapNode = root["EnvMap"];
 
-		TextureSpecification spec;
-		std::vector<Buffer> textureData;
+		AssetHandle radianceMapHandle = envMapNode["RadianceMapHandle"].as<uint64_t>();
+		if (AssetManager::IsAssetHandleValid(radianceMapHandle))
+			targetEnvMapAsset->SetRadianceMapHandle(radianceMapHandle);
 
-		AssetHandle topHandle = envMapNode["TopHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(topHandle))
-			targetEnvMapAsset->SetTopHandle(topHandle);
-
-		AssetHandle bottomHandle = envMapNode["BottomHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(bottomHandle))
-			targetEnvMapAsset->SetBottomHandle(bottomHandle);
-
-		AssetHandle leftHandle = envMapNode["LeftHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(leftHandle))
-			targetEnvMapAsset->SetLeftHandle(leftHandle);
-
-		AssetHandle rightHandle = envMapNode["RightHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(rightHandle))
-			targetEnvMapAsset->SetRightHandle(rightHandle);
-
-		AssetHandle frontHandle = envMapNode["FrontHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(frontHandle))
-			targetEnvMapAsset->SetFrontHandle(frontHandle);
-
-		AssetHandle backHandle = envMapNode["BackHandle"].as<uint64_t>();
-		if (AssetManager::IsAssetHandleValid(backHandle))
-			targetEnvMapAsset->SetBackHandle(backHandle);
+		AssetHandle irradianceMapHandle = envMapNode["IrradianceMapHandle"].as<uint64_t>();
+		if (AssetManager::IsAssetHandleValid(irradianceMapHandle))
+			targetEnvMapAsset->SetIrradianceMapHandle(irradianceMapHandle);
 
 		return true;
 	}

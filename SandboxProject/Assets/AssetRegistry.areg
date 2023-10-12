@@ -21,7 +21,7 @@ AssetRegistry:
     FilePath: Models/Sphere.gltf
     Type: AssetType::MeshSource
   - Handle: 5775838104344894305
-    FilePath: Scenes/3DLightingExample.hscene
+    FilePath: Scenes/PBRTest.hscene
     Type: AssetType::Scene
   - Handle: 7061154424694109801
     FilePath: Textures/universe-skybox/left.png

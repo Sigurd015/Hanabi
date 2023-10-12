@@ -328,36 +328,65 @@ namespace Hanabi
 
 				if (materialAsset != nullptr)
 				{
-					AssetHandle albedoHandle = materialAsset->GetAlbedoTexHandle();
-					AssetHandle metalnessHandle = materialAsset->GetMetalnessTexHandle();
-					AssetHandle roughnessHandle = materialAsset->GetRoughnessTexHandle();
-					AssetHandle normalHandle = materialAsset->GetNormalTexHandle();
-
-					AssetHandle tempAlbedoHandle = albedoHandle;
-					AssetHandle tempMetalnessHandle = metalnessHandle;
-					AssetHandle tempRoughnessHandle = roughnessHandle;
-					AssetHandle tempNormalHandle = normalHandle;
-					bool tempUseNormalMap = materialAsset->IsUsingNormalMap();
-					float tempMetalness = materialAsset->GetMetalness();
-					float tempRoughness = materialAsset->GetRoughness();
-					float tempEmission = materialAsset->GetEmission();
-					glm::vec3 tempAlbedo = materialAsset->GetAlbedo();
+					AssetHandle tempAlbedoHandle = materialAsset->GetAlbedoTexHandle();
+					AssetHandle tempMetalnessHandle = materialAsset->GetMetalnessTexHandle();
+					AssetHandle tempRoughnessHandle = materialAsset->GetRoughnessTexHandle();
+					AssetHandle tempNormalHandle = materialAsset->GetNormalTexHandle();
 
 					UI::DrawTextureControl("Albedo Texture", tempAlbedoHandle, [&]()
 						{
-							ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo));
-							ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f);
+							float tempEmission = materialAsset->GetEmission();
+							glm::vec3 tempAlbedo = materialAsset->GetAlbedo();
+
+							if (ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo)))
+							{
+								materialAsset->SetAlbedo(tempAlbedo);
+								AssetImporter::Serialize(materialAsset);
+							}
+							if (ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f))
+							{
+								materialAsset->SetEmission(tempEmission);
+								AssetImporter::Serialize(materialAsset);
+							}
 						});
+
+					if (tempAlbedoHandle != materialAsset->GetAlbedoTexHandle())
+					{
+						materialAsset->SetAlbedoTex(tempAlbedoHandle);
+						AssetImporter::Serialize(materialAsset);
+					}
 
 					UI::DrawTextureControl("Metalness Texture", tempMetalnessHandle, [&]()
 						{
-							ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f);
+							float tempMetalness = materialAsset->GetMetalness();
+							if (ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f))
+							{
+								materialAsset->SetMetalness(tempMetalness);
+								AssetImporter::Serialize(materialAsset);
+							}
 						});
+
+					if (tempMetalnessHandle != materialAsset->GetMetalnessTexHandle())
+					{
+						materialAsset->SetMetalnessTex(tempMetalnessHandle);
+						AssetImporter::Serialize(materialAsset);
+					}
 
 					UI::DrawTextureControl("Roughness Texture", tempRoughnessHandle, [&]()
 						{
-							ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f);
+							float tempRoughness = materialAsset->GetRoughness();
+							if (ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f))
+							{
+								materialAsset->SetRoughness(tempRoughness);
+								AssetImporter::Serialize(materialAsset);
+							}
 						});
+
+					if (tempRoughnessHandle != materialAsset->GetRoughnessTexHandle())
+					{
+						materialAsset->SetRoughnessTex(tempRoughnessHandle);
+						AssetImporter::Serialize(materialAsset);
+					}
 
 					UI::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
 						{
@@ -365,63 +394,15 @@ namespace Hanabi
 							if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
 							{
 								materialAsset->SetUseNormalMap(useNormalMap);
+								AssetImporter::Serialize(materialAsset);
 							}
 						});
 
-					bool albedoChanged = tempAlbedoHandle != albedoHandle;
-					bool metalnessChanged = tempMetalnessHandle != metalnessHandle;
-					bool roughnessChanged = tempRoughnessHandle != roughnessHandle;
-					bool normalChanged = tempNormalHandle != normalHandle;
-					bool useNormalMapChanged = tempUseNormalMap != materialAsset->IsUsingNormalMap();
-					bool metalnessValueChange = tempMetalness != materialAsset->GetMetalness();
-					bool roughnessValueChange = tempRoughness != materialAsset->GetRoughness();
-					bool albedoValueChange = tempAlbedo != materialAsset->GetAlbedo();
-					bool emissionValueChange = tempEmission != materialAsset->GetEmission();
-
-					if (albedoChanged)
-					{
-						materialAsset->SetAlbedoTex(tempAlbedoHandle);
-					}
-
-					if (metalnessChanged)
-					{
-						materialAsset->SetMetalnessTex(tempMetalnessHandle);
-					}
-
-					if (roughnessChanged)
-					{
-						materialAsset->SetRoughnessTex(tempRoughnessHandle);
-					}
-
-					if (normalChanged)
+					if (tempNormalHandle != materialAsset->GetNormalTexHandle())
 					{
 						materialAsset->SetNormalTex(tempNormalHandle);
-					}
-
-					if (albedoValueChange)
-					{
-						materialAsset->SetAlbedo(tempAlbedo);
-					}
-
-					if (emissionValueChange)
-					{
-						materialAsset->SetEmission(tempEmission);
-					}
-
-					if (metalnessValueChange)
-					{
-						materialAsset->SetMetalness(tempMetalness);
-					}
-
-					if (roughnessValueChange)
-					{
-						materialAsset->SetRoughness(tempRoughness);
-					}
-
-					if (albedoChanged || metalnessChanged || roughnessChanged || normalChanged
-						|| useNormalMapChanged || emissionValueChange || albedoValueChange
-						|| metalnessValueChange || roughnessValueChange)
 						AssetImporter::Serialize(materialAsset);
+					}
 				}
 			});
 
@@ -450,68 +431,22 @@ namespace Hanabi
 
 				if (envMapAsset != nullptr)
 				{
-					AssetHandle topHandle = envMapAsset->GetTopHandle();
-					AssetHandle bottomHandle = envMapAsset->GetBottomHandle();
-					AssetHandle leftHandle = envMapAsset->GetLeftHandle();
-					AssetHandle rightHandle = envMapAsset->GetRightHandle();
-					AssetHandle frontHandle = envMapAsset->GetFrontHandle();
-					AssetHandle backHandle = envMapAsset->GetBackHandle();
+					AssetHandle tempRadianceMapHandle = envMapAsset->GetRadianceMapHandle();
+					AssetHandle tempIrradianceMapHandle = envMapAsset->GetIrradianceMapHandle();
 
-					AssetHandle tempTopHandle = topHandle;
-					AssetHandle tempBottomHandle = bottomHandle;
-					AssetHandle tempLeftHandle = leftHandle;
-					AssetHandle tempRightHandle = rightHandle;
-					AssetHandle tempFrontHandle = frontHandle;
-					AssetHandle tempBackHandle = backHandle;
-
-					UI::DrawTextureControl("Top Texture", tempTopHandle);
-					UI::DrawTextureControl("Bottom Texture", tempBottomHandle);
-					UI::DrawTextureControl("Left Texture", tempLeftHandle);
-					UI::DrawTextureControl("Right Texture", tempRightHandle);
-					UI::DrawTextureControl("Front Texture", tempFrontHandle);
-					UI::DrawTextureControl("Back Texture", tempBackHandle);
-
-					bool topChanged = tempTopHandle != topHandle;
-					bool bottomChanged = tempBottomHandle != bottomHandle;
-					bool leftChanged = tempLeftHandle != leftHandle;
-					bool rightChanged = tempRightHandle != rightHandle;
-					bool frontChanged = tempFrontHandle != frontHandle;
-					bool backChanged = tempBackHandle != backHandle;
-
-					if (topChanged)
+					UI::DrawTextureControl("RadianceMap", tempRadianceMapHandle);
+					UI::DrawTextureControl("IrradianceMapHandle", tempIrradianceMapHandle);
+					
+					if (tempRadianceMapHandle!= envMapAsset->GetRadianceMapHandle())
 					{
-						envMapAsset->SetTopHandle(tempTopHandle);
-					}
-
-					if (bottomChanged)
-					{
-						envMapAsset->SetBottomHandle(tempBottomHandle);
-					}
-
-					if (leftChanged)
-					{
-						envMapAsset->SetLeftHandle(tempLeftHandle);
-					}
-
-					if (rightChanged)
-					{
-						envMapAsset->SetRightHandle(tempRightHandle);
-					}
-
-					if (frontChanged)
-					{
-						envMapAsset->SetFrontHandle(tempFrontHandle);
-					}
-
-					if (backChanged)
-					{
-						envMapAsset->SetBackHandle(tempBackHandle);
-					}
-
-					if (topChanged || bottomChanged || leftChanged || rightChanged || frontChanged || backChanged)
-					{
+						envMapAsset->SetRadianceMapHandle(tempRadianceMapHandle);
 						AssetImporter::Serialize(envMapAsset);
-						envMapAsset->Invalidate();
+					}
+
+					if (tempIrradianceMapHandle != envMapAsset->GetIrradianceMapHandle())
+					{
+						envMapAsset->SetIrradianceMapHandle(tempIrradianceMapHandle);
+						AssetImporter::Serialize(envMapAsset);
 					}
 				}
 			});

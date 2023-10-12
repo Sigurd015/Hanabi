@@ -21,32 +21,29 @@ namespace Hanabi
 
 	Buffer TextureSerializer::ToBufferFromFile(const std::filesystem::path& path, TextureSpecification& spec)
 	{
+		Buffer imageBuffer;
+		std::string pathString = path.string();
+
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(1);
-		Buffer imageBuffer;
-		std::string pathStr = path.string();
-		imageBuffer.Data = stbi_load(pathStr.c_str(), &width, &height, &channels, 4);
-
-		if (!imageBuffer)
+		if (stbi_is_hdr(pathString.c_str()))
 		{
-			HNB_CORE_ERROR("TextureSerializer::LoadTexture2D - Could not load texture from filepath: {}", path.string());
-			return {};
+			imageBuffer.Data = (uint8_t*)stbi_loadf(pathString.c_str(), &width, &height, &channels, 4);
+			imageBuffer.Size = width * height * 4 * sizeof(float);
+			spec.Format = ImageFormat::RGBA32F;
+		}
+		else
+		{
+			imageBuffer.Data = stbi_load(pathString.c_str(), &width, &height, &channels, 4);
+			imageBuffer.Size = width * height * 4;
+			spec.Format = ImageFormat::RGBA8;
 		}
 
-		imageBuffer.Size = width * height * channels;
+		if (!imageBuffer)
+			return {};
 
 		spec.Width = width;
 		spec.Height = height;
-		switch (channels)
-		{
-		case 3:
-			spec.Format = ImageFormat::RGB8;
-			break;
-		case 4:
-			spec.Format = ImageFormat::RGBA8;
-			break;
-		}
-
 		return imageBuffer;
 	}
 
