@@ -36,9 +36,8 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
 		s_Data->ShaderLibrary->Load("DeferredGeometry");
 		s_Data->ShaderLibrary->Load("DeferredLighting");
-		s_Data->ShaderLibrary->Load("ShadowMapping");
 		s_Data->ShaderLibrary->Load("Composite");
-		s_Data->ShaderLibrary->Load("ShadowMap");
+		s_Data->ShaderLibrary->Load("DirShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
 
 		//Setup textures
@@ -99,7 +98,7 @@ namespace Hanabi
 				{ ShaderDataType::Float2, "a_TexCoord" },
 				});
 
-			uint32_t indices[6] = { 2, 1, 0, 0, 3, 2, };
+			uint32_t indices[6] = { 0, 1, 2, 2, 3, 0, };
 			s_Data->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32_t));
 
 			delete[] data;

@@ -31,7 +31,7 @@ VertexOutput main(VertexInput Input)
     Output.TexCoord = Input.a_TexCoord;
     Output.Normal = mul((float3x3)(u_Transform), Input.a_Normal);
     Output.TBN = (float3x3)(u_Transform) * float3x3(normalize(Input.a_Tangent), normalize(Input.a_Bitangent), normalize(Input.a_Normal));
-    
+
     Output.Position = mul(u_ViewProjection, worldPosition);
     return Output;
 }

@@ -18,16 +18,8 @@ struct VertexOutput
 VertexOutput main(VertexInput Input)
 {
     VertexOutput Output;
-    switch(u_LightType)
-    {
-        case 0: // Directional
-        {
-           	float3 worldPos = mul(u_Transform, float4(Input.a_Position, 1.0f));
-            Output.Position = mul(u_LightViewProjection, float4(worldPos, 1.0));
-            break;
-        }
-    }
-
+    float3 worldPos = mul(u_Transform, float4(Input.a_Position, 1.0f));
+    Output.Position = mul(u_DirLightViewProjection, float4(worldPos, 1.0));
     return Output;
 }
 

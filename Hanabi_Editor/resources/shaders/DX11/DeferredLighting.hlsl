@@ -8,6 +8,7 @@
 #type:pixel
 #include "Buffers.hlsl"
 #include "Lighting.hlsl"
+#include "ShadowMappingUtils.hlsl"
 
 struct PixelInput
 {
@@ -43,6 +44,7 @@ PixelOutput main(PixelInput Input)
     params.Roughness = MRE.y; 
     params.WorldNormal = u_NormalBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
     params.WorldPosition = u_PositionBuffer.Sample(u_SSLinearWrap, texCoord).xyz;
+    float4 lightTransformedPosition = mul(u_DirLightViewProjection, float4(params.WorldPosition, 1.0));
     
 	params.View = normalize(u_CameraPosition - params.WorldPosition);
     params.NdotV = max(dot(params.WorldNormal, params.View), 0.0);
@@ -53,16 +55,28 @@ PixelOutput main(PixelInput Input)
 	// Fresnel reflectance, metals use albedo
 	float3 F0 = lerp(Fdielectric, params.Albedo, params.Metalness);
 
+    // Calculate direct light shadow factor
+    float dirShadowFactor = 1.0f;
+    switch (u_DirShadowType)
+    {
+        case 1:
+            dirShadowFactor = CalculateHardShadow(lightTransformedPosition, params.WorldNormal);
+            break;
+        case 2:
+            dirShadowFactor = CalculateSoftShadow(lightTransformedPosition, params.WorldNormal);
+            break;
+    }
+
     // Direct lighting
-	float3 lightContribution = CalculateDirLights(params, F0);
+	float3 lightContribution = CalculateDirLights(params, F0) * dirShadowFactor;
 	lightContribution += CalculatePointLights(params, F0);
 	lightContribution += CalculateSpotLights(params, F0);
 	lightContribution += params.Albedo * MRE.z; // MRE.z -> Emission
 
     // Indirect lighting (TODO: Implement IBL)
-    float3 iblContribution = u_SkyLightIntensity * float3(1.0f, 1.0f, 1.0f) * params.Albedo;
+    float3 iblContribution = u_SkyLightIntensity * float3(0.03f, 0.03f, 0.03f) * params.Albedo;
 
 	// Final color
-	output.Color = float4(iblContribution + lightContribution, 1.0);
+	output.Color = float4(iblContribution + lightContribution, 1.0f);
     return output;
 }

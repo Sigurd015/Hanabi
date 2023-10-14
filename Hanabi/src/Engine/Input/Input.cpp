@@ -9,14 +9,14 @@ namespace Hanabi
 	bool Input::IsKeyPressed(const KeyCode key)
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetKey(window, key);
+		auto state = glfwGetKey(window, (int)key);
 		return state == GLFW_PRESS || state == GLFW_REPEAT;
 	}
 
-	bool Input::IsMouseButtonPressed(const MouseCode button)
+	bool Input::IsMouseButtonPressed(const MouseButton button)
 	{
 		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
-		auto state = glfwGetMouseButton(window, button);
+		auto state = glfwGetMouseButton(window, (int)button);
 		return state == GLFW_PRESS;
 	}
 
@@ -26,5 +26,17 @@ namespace Hanabi
 		double x, y;
 		glfwGetCursorPos(window, &x, &y);
 		return { x,y };
+	}
+
+	void Input::SetCursorMode(CursorMode mode)
+	{
+		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL + (int)mode);
+	}
+
+	CursorMode Input::GetCursorMode()
+	{
+		auto* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindow());
+		return (CursorMode)(glfwGetInputMode(window, GLFW_CURSOR) - GLFW_CURSOR_NORMAL);
 	}
 }

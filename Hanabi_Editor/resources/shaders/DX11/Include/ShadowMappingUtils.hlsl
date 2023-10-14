@@ -1,7 +1,9 @@
 #ifndef SHADOW_HEADER
 #define SHADOW_HEADER
-
 #include "Buffers.hlsl"
+
+Texture2D u_ShadowDepth : register(t8);
+SamplerState u_SSLinearClamp : register(s8);
 
 float GetDirShadowBias(float3 worldNormal)
 {

@@ -16,6 +16,7 @@ namespace Hanabi
 
 		inline static ComPtr <ID3D11RasterizerState> RSNoCull = nullptr;
 		inline static ComPtr <ID3D11RasterizerState> RSCullBack = nullptr;
+		inline static ComPtr <ID3D11RasterizerState> RSCullFront = nullptr;
 
 		inline static ComPtr <ID3D11BlendState> BSNoBlend = nullptr;
 		inline static ComPtr <ID3D11BlendState> BSAlpha = nullptr;
@@ -52,11 +53,12 @@ namespace Hanabi
 			}
 
 			// Rasterizer States
+			// FrontCounterClockwise - Use CCW winding order for front faces
 			{
 				D3D11_RASTERIZER_DESC rasterizerDesc = {};
 				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 				rasterizerDesc.CullMode = D3D11_CULL_NONE;
-				rasterizerDesc.FrontCounterClockwise = false;
+				rasterizerDesc.FrontCounterClockwise = true;
 				rasterizerDesc.DepthClipEnable = true;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRasterizerState(&rasterizerDesc, RSNoCull.GetAddressOf()));
 			}
@@ -64,9 +66,17 @@ namespace Hanabi
 				D3D11_RASTERIZER_DESC rasterizerDesc = {};
 				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 				rasterizerDesc.CullMode = D3D11_CULL_BACK;
-				rasterizerDesc.FrontCounterClockwise = false;
+				rasterizerDesc.FrontCounterClockwise = true;
 				rasterizerDesc.DepthClipEnable = true;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRasterizerState(&rasterizerDesc, RSCullBack.GetAddressOf()));
+			}
+			{
+				D3D11_RASTERIZER_DESC rasterizerDesc = {};
+				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+				rasterizerDesc.CullMode = D3D11_CULL_FRONT;
+				rasterizerDesc.FrontCounterClockwise = true;
+				rasterizerDesc.DepthClipEnable = true;
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRasterizerState(&rasterizerDesc, RSCullFront.GetAddressOf()));
 			}
 
 			// Blend States

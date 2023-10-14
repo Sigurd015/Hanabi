@@ -9,7 +9,6 @@
 namespace Hanabi
 {
 	static const uint32_t s_MeshImportFlags =
-		aiProcess_ConvertToLeftHanded |     // Convert to left-handed coordinate system
 		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
 		aiProcess_Triangulate |             // Make sure we're triangles
 		aiProcess_SortByPType |             // Split meshes by primitive type
@@ -42,7 +41,7 @@ namespace Hanabi
 
 		const aiScene* pScene = importer.ReadFile(path.string(), s_MeshImportFlags);
 
-		if (!pScene && !pScene->HasMeshes())
+		if (!pScene || !pScene->HasMeshes())
 		{
 			HNB_CORE_ERROR("Failed to load mesh source: {0}", importer.GetErrorString());
 			return nullptr;

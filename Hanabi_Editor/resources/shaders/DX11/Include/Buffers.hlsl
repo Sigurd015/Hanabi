@@ -70,10 +70,9 @@ cbuffer CBSpotLight : register(b4)
     SpotLight u_SpotLights[MAX_SPOT_LIGHT];
 };
 
-cbuffer CBShadow : register(b5)
+cbuffer CBDirShadow : register(b5)
 {
-    float4x4 u_LightViewProjection;
-    uint u_ShadowType;
-    uint u_LightType;
+    float4x4 u_DirLightViewProjection;
+    uint u_DirShadowType;
 };
 #endif

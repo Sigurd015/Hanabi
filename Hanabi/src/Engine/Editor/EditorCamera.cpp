@@ -2,7 +2,6 @@
 #include "EditorCamera.h"
 #include "Engine/Input/Input.h"
 #include "Engine/Input/KeyCodes.h"
-#include "Engine/Input/MouseCodes.h"
 
 #include <glfw/glfw3.h>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -97,30 +96,41 @@ namespace Hanabi
 		UpdateView();
 	}
 
+	static void DisableMouse()
+	{
+		Input::SetCursorMode(CursorMode::Locked);
+	}
+
+	static void EnableMouse()
+	{
+		Input::SetCursorMode(CursorMode::Normal);
+	}
+
 	void EditorCamera::OnUpdate(Timestep ts)
 	{
 		const glm::vec2& mouse = Input::GetMousePosition();
 		const glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.002f;
 
-		if (Input::IsMouseButtonPressed(Mouse::ButtonRight) && !Input::IsKeyPressed(Key::LeftAlt))
+		if (Input::IsMouseButtonPressed(MouseButton::Right) && !Input::IsKeyPressed(KeyCode::LeftAlt))
 		{
 			m_CameraMode = CameraMode::FLYCAM;
+			DisableMouse();
 			const float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 
 			const float speed = GetCameraSpeed();
 
-			if (Input::IsKeyPressed(Key::Q))
-				m_PositionDelta += ts.GetMilliseconds() * speed * glm::vec3{ 0.f, yawSign, 0.f };
-			if (Input::IsKeyPressed(Key::E))
+			if (Input::IsKeyPressed(KeyCode::Q))
 				m_PositionDelta -= ts.GetMilliseconds() * speed * glm::vec3{ 0.f, yawSign, 0.f };
-			if (Input::IsKeyPressed(Key::S))
+			if (Input::IsKeyPressed(KeyCode::E))
+				m_PositionDelta += ts.GetMilliseconds() * speed * glm::vec3{ 0.f, yawSign, 0.f };
+			if (Input::IsKeyPressed(KeyCode::S))
 				m_PositionDelta -= ts.GetMilliseconds() * speed * m_Direction;
-			if (Input::IsKeyPressed(Key::W))
+			if (Input::IsKeyPressed(KeyCode::W))
 				m_PositionDelta += ts.GetMilliseconds() * speed * m_Direction;
-			if (Input::IsKeyPressed(Key::A))
-				m_PositionDelta += ts.GetMilliseconds() * speed * m_RightDirection;
-			if (Input::IsKeyPressed(Key::D))
+			if (Input::IsKeyPressed(KeyCode::A))
 				m_PositionDelta -= ts.GetMilliseconds() * speed * m_RightDirection;
+			if (Input::IsKeyPressed(KeyCode::D))
+				m_PositionDelta += ts.GetMilliseconds() * speed * m_RightDirection;
 
 			constexpr float maxRate{ 0.12f };
 			m_YawDelta += glm::clamp(yawSign * delta.x * RotationSpeed(), -maxRate, maxRate);
@@ -135,22 +145,31 @@ namespace Hanabi
 			m_FocalPoint = m_Position + GetForwardDirection() * distance;
 			m_Distance = distance;
 		}
-		else if (Input::IsKeyPressed(Key::LeftAlt))
+		else if (Input::IsKeyPressed(KeyCode::LeftAlt))
 		{
 			m_CameraMode = CameraMode::ARCBALL;
 
-			if (Input::IsMouseButtonPressed(Mouse::ButtonMiddle))
+			if (Input::IsMouseButtonPressed(MouseButton::Middle))
 			{
+				DisableMouse();
 				MousePan(delta);
 			}
-			else if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
+			else if (Input::IsMouseButtonPressed(MouseButton::Left))
 			{
+				DisableMouse();
 				MouseRotate(delta);
 			}
-			else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
+			else if (Input::IsMouseButtonPressed(MouseButton::Right))
 			{
+				DisableMouse();
 				MouseZoom((delta.x + delta.y) * 0.1f);
 			}
+			else
+				EnableMouse();
+		}
+		else
+		{
+			EnableMouse();
 		}
 
 		m_InitialMousePosition = mouse;
@@ -183,7 +202,7 @@ namespace Hanabi
 
 	bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e)
 	{
-		if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
+		if (Input::IsMouseButtonPressed(MouseButton::Right))
 		{
 			m_NormalSpeed += e.GetYOffset() * 0.3f * m_NormalSpeed;
 			m_NormalSpeed = std::clamp(m_NormalSpeed, MIN_SPEED, MAX_SPEED);
@@ -236,7 +255,7 @@ namespace Hanabi
 
 	glm::vec3 EditorCamera::GetForwardDirection() const
 	{
-		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, 1.0f));
+		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
 	}
 
 	glm::vec3 EditorCamera::CalculatePosition() const
@@ -246,6 +265,6 @@ namespace Hanabi
 
 	glm::quat EditorCamera::GetOrientation() const
 	{
-		return glm::quat(glm::vec3(m_Pitch - m_PitchDelta, m_Yaw - m_YawDelta, 0.0f));
+		return glm::quat(glm::vec3(-m_Pitch - m_PitchDelta, -m_Yaw - m_YawDelta, 0.0f));
 	}
 }

@@ -19,6 +19,8 @@ namespace Hanabi
 		void RegisterOnSceneStopCallback(const std::function<void()>& callback) { m_OnSceneStopCallback = callback; }
 		void RegisterOnSceneOpenCallback(const std::function<void(AssetHandle)>& callback) { m_OnSceneOpenCallback = callback; }
 	private:
+		void DrawGizmos();
+
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 		void OnDuplicateEntity();

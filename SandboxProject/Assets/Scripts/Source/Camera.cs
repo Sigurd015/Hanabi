@@ -27,11 +27,11 @@ namespace Sandbox
             float rotSpeed = (float)(RotationSpeed * (Math.PI / 180.0));
             if (Input.IsKeyDown(KeyCode.W))
             {
-                pos.Z += Speed;
+                pos.Z -= Speed;
             }
             else if (Input.IsKeyDown(KeyCode.S))
             {
-                pos.Z -= Speed;
+                pos.Z += Speed;
             }
 
             if (Input.IsKeyDown(KeyCode.A))
@@ -45,20 +45,20 @@ namespace Sandbox
 
             if (Input.IsKeyDown(KeyCode.Q))
             {
-                rot.Y -= rotSpeed;
+                rot.Y += rotSpeed;
             }
             else if (Input.IsKeyDown(KeyCode.E))
             {
-                rot.Y += rotSpeed;
+                rot.Y -= rotSpeed;
             }
 
             if (Input.IsKeyDown(KeyCode.T))
             {
-                rot.X -= rotSpeed;
+                rot.X += rotSpeed;
             }
             else if (Input.IsKeyDown(KeyCode.G))
             {
-                rot.X += rotSpeed;
+                rot.X -= rotSpeed;
             }
 
             Transform.Translation += pos * ts;
