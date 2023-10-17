@@ -13,7 +13,6 @@ namespace Hanabi
 		OpenGLShader(const std::string& fileName);
 		~OpenGLShader();
 		void Bind() const override;
-		void Unbind() const override;
 		const std::string& GetName() const override { return m_Name; }
 		virtual const ShaderReflectionData& GetReflectionData() const override { return m_ReflectionData; }
 	private:

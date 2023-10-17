@@ -31,6 +31,7 @@ namespace Hanabi
 
 		static void DrawFullScreenQuad();
 
+		static std::pair<Ref<TextureCube>, Ref<TextureCube>> Renderer::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap);
 
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);

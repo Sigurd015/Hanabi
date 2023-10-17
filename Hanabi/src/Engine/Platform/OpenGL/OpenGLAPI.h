@@ -20,6 +20,7 @@ namespace Hanabi
 		virtual void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount = 0) override;
 		virtual void DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount) override;
 
+		virtual std::pair<Ref<TextureCube>, Ref<TextureCube>> CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap) override;
 	private:
 		void Clear();
 		Ref<RenderPass> m_RenderPass;

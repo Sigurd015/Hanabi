@@ -1,5 +1,6 @@
 #include "hnbpch.h"
 #include "OpenGLAPI.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include <glad/glad.h>
 
@@ -119,5 +120,10 @@ namespace Hanabi
 		vertexBuffer->Bind();
 
 		//glDrawArrays(PrimitiveTopologyTypeToOpenGL(pipeline->GetSpecification().Topology), 0, vertexCount);
+	}
+
+	std::pair<Ref<TextureCube>, Ref<TextureCube>> OpenGLRendererAPI::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
+	{
+		return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
 	}
 }

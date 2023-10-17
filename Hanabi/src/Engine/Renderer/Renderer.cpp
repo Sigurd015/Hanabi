@@ -160,6 +160,11 @@ namespace Hanabi
 		Renderer::DrawIndexed(s_Data->FullscreenQuadVertexBuffer, s_Data->FullscreenQuadIndexBuffer);
 	}
 
+	std::pair<Ref<TextureCube>, Ref<TextureCube>> Renderer::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
+	{
+		return s_RendererAPI->CreateEnvironmentMap(equirectangularMap);
+	}
+
 	Ref<Shader> Renderer::GetShader(const std::string& name)
 	{
 		return s_Data->ShaderLibrary->Get(name);

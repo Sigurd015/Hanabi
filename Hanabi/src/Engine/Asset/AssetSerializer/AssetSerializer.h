@@ -38,14 +38,8 @@ namespace Hanabi
 	class EnvMapAssetSerializer : public AssetSerializer
 	{
 	public:
-		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override;
+		virtual void Serialize(const AssetMetadata& metadata, const Ref<Asset>& asset) const override {}
 		virtual bool TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const override;
-
-		// Use for creating new env map assets
-		static void SerializeToYAML(const std::filesystem::path& path);
-	private:
-		static std::string SerializeToYAML(Ref<EnvMapAsset> envMapAsset);
-		static bool DeserializeFromYAML(const std::string& yamlString, Ref<EnvMapAsset>& targetEnvMapAsset);
 	};
 
 	class MaterialAssetSerializer : public AssetSerializer

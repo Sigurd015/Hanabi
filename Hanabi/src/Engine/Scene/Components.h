@@ -113,7 +113,7 @@ namespace Hanabi
 
 	struct SkyLightComponent
 	{
-		AssetHandle EnvMapHandle;
+		AssetHandle EnvMapHandle = 0;
 		float Intensity = 1.0f;
 	};
 

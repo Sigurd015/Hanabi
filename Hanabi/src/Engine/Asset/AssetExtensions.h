@@ -12,10 +12,10 @@ namespace Hanabi
 		{ ".jpg", AssetType::Texture2D },
 		{ ".jpeg", AssetType::Texture2D },
 		{ ".tga", AssetType::Texture2D },
+		{ ".hdr", AssetType::EnvMap },
 
 		// Materials
 		{ ".hmat", AssetType::Material },
-		{ ".henv", AssetType::EnvMap },
 
 		// MeshSource
 		{ ".fbx", AssetType::MeshSource },

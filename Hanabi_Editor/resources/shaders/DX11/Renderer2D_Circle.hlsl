@@ -33,7 +33,7 @@ VertexOutput main(VertexInput Input)
     Output.Color = Input.a_Color;
     Output.Thickness = Input.a_Thickness;
     Output.Fade = Input.a_Fade;
-    Output.Pos = mul(u_ViewProjection,float4(Input.a_WorldPosition, 1.0f));
+    Output.Pos = mul(u_ViewProjection, float4(Input.a_WorldPosition, 1.0f));
     return Output;
 }
 

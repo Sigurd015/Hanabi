@@ -581,7 +581,7 @@ namespace Hanabi
 		if (s_Data->QuadIndexCount >= Renderer2DData::MaxIndices)
 			NextBatch();
 
-		const float texIndex = 0.0f; // White Texture
+		const uint32_t texIndex = 0; // White Texture
 		const float tilingFactor = 1.0f;
 
 		SetQuadVertex(transform, color, s_Data->QuadTexCoord, texIndex, tilingFactor);
@@ -599,23 +599,23 @@ namespace Hanabi
 		SetQuadVertex(transform, tintColor, textureCoords, GetTextureID(texture), tilingFactor);
 	}
 
-	float Renderer2D::GetTextureID(const Ref<Texture2D>& texture)
+	uint32_t Renderer2D::GetTextureID(const Ref<Texture2D>& texture)
 	{
-		float texIndex = 0.0f;
+		uint32_t texIndex = 0;
 		for (uint32_t i = 1; i < s_Data->TextureSlotIndex; i++)
 		{
 			if (*s_Data->TextureSlots[i] == *texture)
 			{
-				texIndex = (float)i;
+				texIndex = i;
 				break;
 			}
 		}
 
-		if (texIndex == 0.0f)
+		if (texIndex == 0)
 		{
 			if (s_Data->TextureSlotIndex >= Renderer2DData::MaxTextureSlots)
 				NextBatch();
-			texIndex = (float)s_Data->TextureSlotIndex;
+			texIndex = s_Data->TextureSlotIndex;
 			s_Data->TextureSlots[s_Data->TextureSlotIndex] = texture;
 			s_Data->TextureSlotIndex++;
 		}
@@ -623,7 +623,7 @@ namespace Hanabi
 	}
 
 	void Renderer2D::SetQuadVertex(const glm::mat4& transform,
-		const glm::vec4& color, const glm::vec2* texCoord, float texIndex, float tilingFactor)
+		const glm::vec4& color, const glm::vec2* texCoord, uint32_t texIndex, float tilingFactor)
 	{
 		for (size_t i = 0; i < 4; i++)
 		{

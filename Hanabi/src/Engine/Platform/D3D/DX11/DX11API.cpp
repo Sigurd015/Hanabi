@@ -5,6 +5,7 @@
 #include "DX11Context.h"
 #include "Engine/Core/Application.h"
 #include "DX11RenderStates.h"
+#include "Engine/Renderer/Renderer.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -131,7 +132,7 @@ namespace Hanabi
 
 	void DX11RendererAPI::EndRenderPass()
 	{
-		DX11Context::GetDeviceContext()->OMSetRenderTargets(0, nullptr, nullptr);
+		m_DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 		Clear();
 	}
 
@@ -174,6 +175,12 @@ namespace Hanabi
 		vertexBuffer->Bind();
 
 		m_DeviceContext->Draw(vertexCount, 0);
+	}
+
+	std::pair<Ref<TextureCube>, Ref<TextureCube>> DX11RendererAPI::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
+	{
+		// TODO: Implement this
+		return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
 	}
 }
 #endif

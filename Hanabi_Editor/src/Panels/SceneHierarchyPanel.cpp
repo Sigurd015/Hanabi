@@ -428,27 +428,6 @@ namespace Hanabi
 							envMapAsset = nullptr;
 						}
 					});
-
-				if (envMapAsset != nullptr)
-				{
-					AssetHandle tempRadianceMapHandle = envMapAsset->GetRadianceMapHandle();
-					AssetHandle tempIrradianceMapHandle = envMapAsset->GetIrradianceMapHandle();
-
-					UI::DrawTextureControl("RadianceMap", tempRadianceMapHandle);
-					UI::DrawTextureControl("IrradianceMapHandle", tempIrradianceMapHandle);
-					
-					if (tempRadianceMapHandle!= envMapAsset->GetRadianceMapHandle())
-					{
-						envMapAsset->SetRadianceMapHandle(tempRadianceMapHandle);
-						AssetImporter::Serialize(envMapAsset);
-					}
-
-					if (tempIrradianceMapHandle != envMapAsset->GetIrradianceMapHandle())
-					{
-						envMapAsset->SetIrradianceMapHandle(tempIrradianceMapHandle);
-						AssetImporter::Serialize(envMapAsset);
-					}
-				}
 			});
 
 		UI::DrawComponent<LightComponent>("Light", entity, [](auto& component)

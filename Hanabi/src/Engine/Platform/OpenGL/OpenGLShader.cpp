@@ -154,9 +154,4 @@ namespace Hanabi
 	{
 		glUseProgram(m_RendererID);
 	}
-
-	void OpenGLShader::Unbind() const
-	{
-		glUseProgram(0);
-	}
 }

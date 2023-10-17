@@ -16,6 +16,8 @@ namespace Hanabi
 			return VERTEX_SHADER;
 		if (type == "fragment" || type == "pixel")
 			return PIXEL_SHADER;
+		if (type == "compute")
+			return COMPUTE_SHADER;
 
 		HNB_CORE_ASSERT(false, "Unknown shader type!");
 		return UNKNOWN;
@@ -154,6 +156,17 @@ namespace Hanabi
 				CreateReflectionData(blob);
 				break;
 			}
+			case COMPUTE_SHADER:
+			{
+				ComPtr<ID3DBlob> blob;
+				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
+					"main", "cs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, blob.ReleaseAndGetAddressOf(), nullptr));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateComputeShader(blob->GetBufferPointer(),
+					blob->GetBufferSize(), nullptr, m_ComputeShader.GetAddressOf()));
+
+				CreateReflectionData(blob);
+				break;
+			}
 			}
 		}
 	}
@@ -162,18 +175,14 @@ namespace Hanabi
 	{
 		DX11Context::GetDeviceContext()->VSSetShader(m_VertexShader.Get(), nullptr, 0);
 		DX11Context::GetDeviceContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
-	}
-
-	void DX11Shader::Unbind() const
-	{
-		DX11Context::GetDeviceContext()->VSSetShader(nullptr, nullptr, 0);
-		DX11Context::GetDeviceContext()->PSSetShader(nullptr, nullptr, 0);
+		DX11Context::GetDeviceContext()->CSSetShader(m_ComputeShader.Get(), nullptr, 0);
 	}
 
 	DX11Shader::~DX11Shader()
 	{
 		m_VertexShader.Reset();
 		m_PixelShader.Reset();
+		m_ComputeShader.Reset();
 	}
 }
 #endif

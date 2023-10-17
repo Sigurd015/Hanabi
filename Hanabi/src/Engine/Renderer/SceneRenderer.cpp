@@ -422,12 +422,12 @@ namespace Hanabi
 		if (environment->EnvMapHandle)
 		{
 			Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
-			Ref<TextureCube> textureCube = asset->GetIrradianceMap();
-			s_Data->SkyboxPass->SetInput("u_EnvMap", textureCube);
+			s_Data->SkyboxPass->SetInput("u_RadianceMap", asset->RadianceMap);
+			// TODO: Bind Irradiance Map to lighting pass
 		}
 		else
 		{
-			s_Data->SkyboxPass->SetInput("u_EnvMap", Renderer::GetTexture<TextureCube>("BlackCube"));
+			s_Data->SkyboxPass->SetInput("u_RadianceMap", Renderer::GetTexture<TextureCube>("BlackCube"));
 		}
 	}
 

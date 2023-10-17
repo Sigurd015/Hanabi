@@ -8,23 +8,15 @@ namespace Hanabi
 	class EnvMapAsset : public Asset
 	{
 	public:
+		Ref<TextureCube> RadianceMap;
+		Ref<TextureCube> IrradianceMap;
+
 		EnvMapAsset() = default;
-
-		AssetHandle GetRadianceMapHandle() const { return m_RadianceMapHandle; }
-		AssetHandle GetIrradianceMapHandle() const { return m_IrradianceMapHandle; }
-
-		void SetRadianceMapHandle(AssetHandle handle) { m_RadianceMapHandle = handle; Invalidate(); }
-		void SetIrradianceMapHandle(AssetHandle handle) { m_IrradianceMapHandle = handle; Invalidate(); }
-
-		Ref<TextureCube> GetRadianceMap() const;
-		Ref<TextureCube> GetIrradianceMap() const;
+		EnvMapAsset(const Ref<TextureCube>& radianceMap, const Ref<TextureCube>& irradianceMap)
+			: RadianceMap(radianceMap), IrradianceMap(irradianceMap)
+		{}
 
 		static AssetType GetStaticType() { return AssetType::EnvMap; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
-	private:
-		void Invalidate();
-
-		AssetHandle m_RadianceMapHandle;
-		AssetHandle m_IrradianceMapHandle;
 	};
 }

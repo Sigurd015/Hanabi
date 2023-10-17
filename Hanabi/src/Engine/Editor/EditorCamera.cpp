@@ -98,12 +98,13 @@ namespace Hanabi
 
 	static void DisableMouse()
 	{
-		Input::SetCursorMode(CursorMode::Locked);
+		// TODO: Make sure this dont't block the mouse when the window is not focused
+		//Input::SetCursorMode(CursorMode::Locked);
 	}
 
 	static void EnableMouse()
 	{
-		Input::SetCursorMode(CursorMode::Normal);
+		//Input::SetCursorMode(CursorMode::Normal);
 	}
 
 	void EditorCamera::OnUpdate(Timestep ts)

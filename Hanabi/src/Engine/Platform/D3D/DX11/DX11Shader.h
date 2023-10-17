@@ -10,7 +10,7 @@ namespace Hanabi
 {
 	enum ShaderType
 	{
-		UNKNOWN = 0, VERTEX_SHADER, PIXEL_SHADER
+		UNKNOWN = 0, VERTEX_SHADER, PIXEL_SHADER, COMPUTE_SHADER
 	};
 
 	class DX11Shader :public Shader
@@ -19,7 +19,6 @@ namespace Hanabi
 		DX11Shader(const std::string& fileName);
 		~DX11Shader();
 		void Bind() const override;
-		void Unbind() const override;
 		const std::string& GetName() const override { return m_Name; }
 		virtual const ShaderReflectionData& GetReflectionData() const override { return m_ReflectionData; }
 		LPVOID GetVertextBufferPointer() { return m_VertexShaderBlob->GetBufferPointer(); }
@@ -32,6 +31,7 @@ namespace Hanabi
 		std::string m_Name;
 		ComPtr<ID3D11VertexShader> m_VertexShader;
 		ComPtr<ID3D11PixelShader> m_PixelShader;
+		ComPtr<ID3D11ComputeShader> m_ComputeShader;
 		ComPtr<ID3DBlob> m_VertexShaderBlob;
 		ShaderReflectionData m_ReflectionData;
 	};
