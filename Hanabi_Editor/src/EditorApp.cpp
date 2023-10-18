@@ -31,7 +31,8 @@ Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 	spec.EnableImGui = true;
 	spec.EnableScripting = true;
 	spec.ScriptConfig.CoreAssemblyPath = "Resources/Scripts/Hanabi_ScriptCore.dll";
-
+	// TODO: When we have spirv compiler, set this
+	//spec.RendererConfig.ShaderPackPath = "Resources/Shaders";
 	if (spec.CommandLineArgs.Count > 2)
 	{
 		spec.RendererConfig.APIType = static_cast<RendererAPIType>(std::stoi(spec.CommandLineArgs[2]));

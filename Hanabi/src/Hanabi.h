@@ -30,6 +30,7 @@
 
 // ---Renderer---------------------
 #include "Engine/Renderer/RenderPass.h"
+#include "Engine/Renderer/RendererConfig.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Renderer2D.h"

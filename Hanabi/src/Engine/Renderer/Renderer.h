@@ -5,6 +5,7 @@
 #include "RenderPass.h"
 #include "Mesh.h"
 #include "MaterialAsset.h"
+#include "RendererConfig.h"
 
 namespace Hanabi
 {
@@ -32,6 +33,9 @@ namespace Hanabi
 		static void DrawFullScreenQuad();
 
 		static std::pair<Ref<TextureCube>, Ref<TextureCube>> Renderer::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap);
+
+		static RendererConfig& GetConfig();
+		static void SetConfig(const RendererConfig& config);
 
 		static Ref<Shader> GetShader(const std::string& name);
 		static Ref<Mesh> GetMesh(const std::string& name);

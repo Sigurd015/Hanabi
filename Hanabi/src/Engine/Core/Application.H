@@ -6,8 +6,7 @@
 #include "Engine/Layer/Imgui/ImGuiLayer.h"
 #include "Engine/Scripting/ScriptEngine.h"
 #include "Engine/Renderer/RendererAPI.h"
-
-int main(int argc, char** argv);
+#include "Engine/Renderer/RendererConfig.h"
 
 namespace Hanabi
 {

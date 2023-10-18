@@ -179,6 +179,9 @@ namespace Hanabi
 
 	std::pair<Ref<TextureCube>, Ref<TextureCube>> DX11RendererAPI::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
 	{
+		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
+			return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
+
 		// TODO: Implement this
 		return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
 	}

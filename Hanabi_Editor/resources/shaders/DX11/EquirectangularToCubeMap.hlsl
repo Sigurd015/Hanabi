@@ -2,58 +2,30 @@
 // Equirectangular To CubeMap Shader
 // --------------------------
 
-#type:vertex
-#include "Buffers.hlsl"
-
-struct VertexInput
-{
-    float3 a_Position : a_Position;
-};
-
-struct VertexOutput
-{
-    float4 Position : SV_Position;
-    float3 LocalPosition : LoP;
-};
-
-VertexOutput main(VertexInput Input)
-{
-	VertexOutput Output;
-	Output.Position = mul(u_ViewProjection, float4(Input.a_Position, 1.0));
-	Output.LocalPosition = Input.a_Position;
-	return Output;
-}
-
-#type:pixel
-
-struct PixelInput
-{
-    float4 Position : SV_Position;
-    float3 LocalPosition : LoP;
-};
-
-struct PixelOutput
-{
-    float4 Color : SV_Target0;
-};
-
-static const float2 invAtan = float2(0.1591, 0.3183);
-float2 SampleSphericalMap(float3 v)
-{
-    float2 uv = float2(atan2(v.z, v.x), asin(v.y));
-    uv *= invAtan;
-    uv += 0.5;
-    return uv;
-}
+#type:compute
+#include "EnvironmentMapping.hlsl"
 
 Texture2D u_EquirectangularMap : register(t0);
-
 SamplerState u_SSLinearWrap : register(s0);
 
-PixelOutput main(PixelInput Input)
+RWTexture2DArray<float4> o_Tex : register(u0);
+
+[numthreads(32, 32, 1)]
+void main(uint3 ThreadID : SV_DispatchThreadID)
 {
-    PixelOutput Output;
-	float2 texCoord = SampleSphericalMap(normalize(Input.LocalPosition));
-	Output.Colour = float4(u_EquirectangularMap.Sample(u_SSLinearWrap, texCoord).rgb, 1.0f);
-    return Output;
+    float outputWidth, outputHeight, outputDepth;
+    o_Tex.GetDimensions(outputWidth, outputHeight, outputDepth);
+    float3 cubeTC = GetCubeMapTexCoord(ThreadID, float2(outputWidth, outputHeight));
+	
+    // Calculate sampling coords for equirectangular texture
+	// https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates
+	float phi = atan2(cubeTC.z, cubeTC.x);
+	float theta = acos(cubeTC.y);
+    float2 uv = float2(phi / (2.0 * PI) + 0.5, theta / PI);
+	
+    // Sample equirectangular texture.
+    float4 color = u_EquirectangularMap.SampleLevel(u_SSLinearWrap, uv, 0);
+
+	// Write out color to output cubemap.
+    o_Tex[ThreadID] = color;
 }

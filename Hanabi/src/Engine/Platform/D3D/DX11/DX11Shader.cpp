@@ -44,8 +44,14 @@ namespace Hanabi
 			D3D11_SHADER_INPUT_BIND_DESC bindDesc;
 			shaderReflection->GetResourceBindingDesc(i, &bindDesc);
 
+			// D3D_SIT_CBUFFER --> Constant Buffer
+			// D3D_SIT_TEXTURE --> Texture
+			// D3D_SIT_SAMPLER --> Sampler
+			// D3D_SIT_TBUFFER --> Structured Buffer
+			// D3D_SIT_UAV_RWTYPED --> RWTexture2D/Texture2DArray
 			if (bindDesc.Type == D3D_SIT_CBUFFER || bindDesc.Type == D3D_SIT_TEXTURE
-				|| bindDesc.Type == D3D_SIT_SAMPLER || bindDesc.Type == D3D_SIT_TBUFFER)
+				|| bindDesc.Type == D3D_SIT_SAMPLER || bindDesc.Type == D3D_SIT_TBUFFER
+				|| bindDesc.Type == D3D_SIT_UAV_RWTYPED)
 			{
 				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
 			}

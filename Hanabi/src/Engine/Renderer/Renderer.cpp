@@ -10,6 +10,8 @@ namespace Hanabi
 {
 	static Scope<RendererAPI> s_RendererAPI = nullptr;
 
+	static RendererConfig s_Config;
+
 	struct RendererData
 	{
 		Ref<ShaderLibrary> ShaderLibrary;
@@ -39,6 +41,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Composite");
 		s_Data->ShaderLibrary->Load("DirShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
+		s_Data->ShaderLibrary->Load("EquirectangularToCubemap");
 
 		//Setup textures
 		TextureSpecification spec;
@@ -163,6 +166,17 @@ namespace Hanabi
 	std::pair<Ref<TextureCube>, Ref<TextureCube>> Renderer::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
 	{
 		return s_RendererAPI->CreateEnvironmentMap(equirectangularMap);
+	}
+
+	RendererConfig& Renderer::GetConfig()
+	{
+		return s_Config;
+	}
+
+	void Renderer::SetConfig(const RendererConfig& config)
+	{
+		s_Config = config;
+		RendererAPI::SetAPI(s_Config.APIType);
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)
