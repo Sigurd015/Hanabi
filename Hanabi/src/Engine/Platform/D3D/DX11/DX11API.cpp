@@ -6,6 +6,7 @@
 #include "Engine/Core/Application.h"
 #include "DX11RenderStates.h"
 #include "Engine/Renderer/Renderer.h"
+#include "DX11Texture.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -182,8 +183,83 @@ namespace Hanabi
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
 			return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
 
+		HNB_CORE_ASSERT(equirectangularMap->GetFormat() == ImageFormat::RGBA32F, "Texture is not HDR!");
+
+		const uint32_t cubemapSize = Renderer::GetConfig().EnvironmentMapResolution;
+		static const uint32_t irradianceMapSize = 32;
+		static ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
+
+		TextureSpecification cubemapSpec = {};
+		cubemapSpec.Width = cubemapSize;
+		cubemapSpec.Height = cubemapSize;
+		cubemapSpec.Format = ImageFormat::RGBA32F;
+
+		Ref<DX11TextureCube> envUnfiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
+		Ref<DX11TextureCube> envFiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
+
+		Ref<DX11Texture2D> envMap = std::static_pointer_cast<DX11Texture2D>(equirectangularMap);
+
+		// Radiance map(Equirectangular to cubemap) 
+		{
+			Ref<Shader> equirectangularToCubemapShader = Renderer::GetShader("EquirectangularToCubemap");
+
+			const ShaderReflectionData& reflectionData = equirectangularToCubemapShader->GetReflectionData();
+			uint32_t uavSlot = 0;
+			{
+				auto it = reflectionData.find("o_Tex");
+				if (it != reflectionData.end())
+				{
+					uavSlot = it->second;
+					m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envUnfiltered->GetUAV().GetAddressOf(), nullptr);
+				}
+				else
+				{
+					HNB_CORE_WARN("RendererResource o_Tex not found in shader!");
+				}
+			}
+			{
+				auto it = reflectionData.find("u_EquirectangularMap");
+				if (it != reflectionData.end())
+				{
+					uint32_t slot = it->second;
+					m_DeviceContext->CSSetShaderResources(slot, 1, envMap->GetTextureSRV().GetAddressOf());
+				}
+				else
+				{
+					HNB_CORE_WARN("RendererResource u_EquirectangularMap not found in shader!");
+				}
+			}
+			{
+				auto it = reflectionData.find("u_SSLinearWrap");
+				if (it != reflectionData.end())
+				{
+					uint32_t slot = it->second;
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				}
+			}
+
+			equirectangularToCubemapShader->Bind();
+			uint32_t width = equirectangularMap->GetWidth();
+			uint32_t height = equirectangularMap->GetHeight();
+			m_DeviceContext->Dispatch(width / 32, height / 32, 6);
+
+			// Unbind uav
+			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+
+			envUnfiltered->GenerateMips();
+		}
+
+		// Irradiance map
+		cubemapSpec.Width = irradianceMapSize;
+		cubemapSpec.Height = irradianceMapSize;
+		Ref<TextureCube> irradianceMap = TextureCube::Create(cubemapSpec);
+
+		{
+
+		}
+
 		// TODO: Implement this
-		return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
+		return { envUnfiltered, Renderer::GetTexture<TextureCube>("BlackCube") };
 	}
 }
 #endif

@@ -13,6 +13,7 @@ namespace Hanabi
 		DX11Texture2D(const TextureSpecification& specification, Buffer data = Buffer());
 		~DX11Texture2D();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
+		virtual ImageFormat GetFormat() const override { return m_Specification.Format; }
 		uint32_t GetWidth() const override { return m_Specification.Width; }
 		uint32_t GetHeight() const override { return m_Specification.Height; }
 		void* GetRendererID() const override { return m_Image->GetRendererID(); }
@@ -20,6 +21,8 @@ namespace Hanabi
 		virtual Ref<Image2D> GetImage() const override { return m_Image; }
 		virtual Buffer GetWriteableBuffer() override { return m_Image->GetBuffer(); }
 		bool operator==(const Texture& other) const override;
+
+		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_Image->GetTextureSRV(); }
 	private:
 		Ref<DX11Image2D> m_Image;
 		TextureSpecification m_Specification;
@@ -31,13 +34,23 @@ namespace Hanabi
 		DX11TextureCube(const TextureSpecification& specification, Buffer data = Buffer());
 		~DX11TextureCube();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
+		virtual ImageFormat GetFormat() const override { return m_Specification.Format; }
 		uint32_t GetWidth() const override { return m_Specification.Width; }
 		uint32_t GetHeight() const override { return m_Specification.Height; }
-		void* GetRendererID() const override { return m_Image->GetRendererID(); }
+		void* GetRendererID() const override { return m_TextureCubeSRV.Get(); }
 		void Bind(uint32_t slot = 0) const override;
 		bool operator==(const Texture& other) const override;
+
+		// Only for compute shader
+		void GenerateMips() const;
+
+		ComPtr<ID3D11UnorderedAccessView> GetUAV() const { return m_TextureCubeUAV; }
+		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_TextureCubeSRV; }
 	private:
-		Ref<DX11Image2D> m_Image;
+		Buffer m_ImageData;
+		ComPtr<ID3D11Texture2D> m_TextureCube;
+		ComPtr<ID3D11ShaderResourceView> m_TextureCubeSRV;
+		ComPtr<ID3D11UnorderedAccessView> m_TextureCubeUAV;
 		TextureSpecification m_Specification;
 	};
 }

@@ -34,7 +34,7 @@ namespace Hanabi
 		bool SwapChainTarget = false;
 
 		FramebufferAttachmentSpecification Attachments;
-		uint32_t Samples = 1;
+		uint32_t Samples = 1; // Multisampling
 
 		std::map<uint32_t, Ref<Image2D>> ExistingImages;
 	};

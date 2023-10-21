@@ -9,13 +9,18 @@
 
 namespace Hanabi
 {
+	enum class TextureType
+	{
+		None = 0,
+		Texture2D,
+		TextureCube
+	};
+
 	struct TextureSpecification
 	{
 		uint32_t Width = 1;
 		uint32_t Height = 1;
 		ImageFormat Format = ImageFormat::RGBA8;
-		TextureWrap SamplerWrap = TextureWrap::Repeat;
-		TextureFilter SamplerFilter = TextureFilter::Linear;
 		bool GenerateMips = true;
 	};
 
@@ -24,6 +29,7 @@ namespace Hanabi
 	public:
 		virtual ~Texture() = default;
 		virtual const TextureSpecification& GetSpecification() const = 0;
+		virtual ImageFormat GetFormat() const = 0;
 		virtual uint32_t GetWidth() const = 0;
 		virtual uint32_t GetHeight() const = 0;
 		virtual void* GetRendererID() const = 0;

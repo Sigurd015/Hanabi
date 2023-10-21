@@ -11,20 +11,6 @@
 namespace Hanabi
 {
 	static const uint32_t s_MaxFramebufferSize = 8192;
-	namespace Utils
-	{
-		static DXGI_FORMAT ImageFormatToDXDepthDSVFormat(ImageFormat format)
-		{
-			switch (format)
-			{
-			case ImageFormat::DEPTH24STENCIL8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
-			case ImageFormat::DEPTH32F: return DXGI_FORMAT_D32_FLOAT;
-			}
-
-			HNB_CORE_ASSERT(false);
-			return DXGI_FORMAT_UNKNOWN;
-		}
-	}
 
 	DX11Framebuffer::DX11Framebuffer(const FramebufferSpecification& spec) : m_Specification(spec)
 	{
@@ -81,7 +67,7 @@ namespace Hanabi
 
 				ComPtr<ID3D11RenderTargetView> targetView;
 				D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
-				targetViewDesc.Format = image->GetFormat();
+				targetViewDesc.Format = image->GetDXGIFormat();
 				targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 				targetViewDesc.Texture2D.MipSlice = 0;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRenderTargetView(image->GetTexture().Get(), &targetViewDesc, &targetView));

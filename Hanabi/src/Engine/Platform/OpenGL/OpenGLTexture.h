@@ -11,6 +11,7 @@ namespace Hanabi
 		OpenGLTexture2D(const TextureSpecification& specification, Buffer data = Buffer());
 		~OpenGLTexture2D();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
+		virtual ImageFormat GetFormat() const override { return m_Specification.Format; }
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
 		void* GetRendererID() const override { return (void*)m_RendererID; }
@@ -29,10 +30,10 @@ namespace Hanabi
 	class OpenGLTextureCube : public TextureCube
 	{
 	public:
-		OpenGLTextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers);
 		OpenGLTextureCube(const TextureSpecification& specification, Buffer data = Buffer());
 		~OpenGLTextureCube();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
+		virtual ImageFormat GetFormat() const override { return m_Specification.Format; }
 		uint32_t GetWidth() const override { return m_Width; }
 		uint32_t GetHeight() const override { return m_Height; }
 		void* GetRendererID() const override { return (void*)m_RendererID; }
