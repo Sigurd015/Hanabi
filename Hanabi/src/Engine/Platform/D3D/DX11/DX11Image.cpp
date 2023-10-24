@@ -104,7 +104,13 @@ namespace Hanabi
 
 				D3D11_SUBRESOURCE_DATA subresourceData = {};
 				subresourceData.pSysMem = m_ImageData.Data;
-				subresourceData.SysMemPitch = m_Specification.Width * defalutDataSize;  // size of one row in bytes
+
+				// Notice: RGBA32F format used for HDR image
+				if(m_Specification.Format == ImageFormat::RGBA32F)
+					subresourceData.SysMemPitch = m_Specification.Width * defalutDataSize * sizeof(float);  // size of one row in bytes
+				else
+					subresourceData.SysMemPitch = m_Specification.Width * defalutDataSize;  // size of one row in bytes
+
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, &subresourceData, m_Texture.GetAddressOf()));
 
 				resourceView.Texture2D.MipLevels = 1;

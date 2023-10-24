@@ -51,9 +51,8 @@ namespace Hanabi
 			auto it = reflectionData.find(texture.first);
 			if (it != reflectionData.end())
 			{
-				uint32_t slot = it->second;
 				if (texture.second)
-					texture.second->Bind(slot);
+					texture.second->Bind(it->second);
 			}
 			else
 			{

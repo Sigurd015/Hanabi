@@ -221,8 +221,7 @@ namespace Hanabi
 				auto it = reflectionData.find("u_EquirectangularMap");
 				if (it != reflectionData.end())
 				{
-					uint32_t slot = it->second;
-					m_DeviceContext->CSSetShaderResources(slot, 1, envMap->GetTextureSRV().GetAddressOf());
+					m_DeviceContext->CSSetShaderResources(it->second, 1, envMap->GetTextureSRV().GetAddressOf());
 				}
 				else
 				{
@@ -233,14 +232,13 @@ namespace Hanabi
 				auto it = reflectionData.find("u_SSLinearWrap");
 				if (it != reflectionData.end())
 				{
-					uint32_t slot = it->second;
-					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+					m_DeviceContext->CSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
 				}
 			}
 
 			equirectangularToCubemapShader->Bind();
-			uint32_t width = equirectangularMap->GetWidth();
-			uint32_t height = equirectangularMap->GetHeight();
+			uint32_t width = envMap->GetWidth();
+			uint32_t height = envMap->GetHeight();
 			m_DeviceContext->Dispatch(width / 32, height / 32, 6);
 
 			// Unbind uav
@@ -249,6 +247,7 @@ namespace Hanabi
 			envUnfiltered->GenerateMips();
 		}
 
+		// TODO: Implement this
 		// Irradiance map
 		cubemapSpec.Width = irradianceMapSize;
 		cubemapSpec.Height = irradianceMapSize;
@@ -257,8 +256,7 @@ namespace Hanabi
 		{
 
 		}
-
-		// TODO: Implement this
+	
 		return { envUnfiltered, Renderer::GetTexture<TextureCube>("BlackCube") };
 	}
 }

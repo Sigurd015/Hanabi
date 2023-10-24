@@ -48,6 +48,7 @@ namespace Hanabi
 		spec.Format = ImageFormat::RGBA8;
 		spec.Width = 1;
 		spec.Height = 1;
+		spec.GenerateMips = false;
 
 		constexpr uint32_t whiteTextureData = 0xffffffff;
 		s_Data->Textures["White"] = Texture2D::Create(spec, Buffer(&whiteTextureData, sizeof(uint32_t)));
@@ -57,7 +58,8 @@ namespace Hanabi
 		constexpr uint32_t blackCubeTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->Textures["BlackCube"] = TextureCube::Create(spec, Buffer(blackCubeTextureData, sizeof(blackCubeTextureData)));
 
-		s_Data->Textures["BRDFLut"] = TextureSerializer::LoadTexture2D("Resources/Renderer/BRDF_LUT.tga");
+		// Notice: format, width and height are automatically set by TextureSerializer::LoadTexture2D, so we can reuse spec
+		s_Data->Textures["BRDFLut"] = TextureSerializer::LoadTexture2D("Resources/Renderer/BRDF_LUT.tga", spec);
 
 		//Load default meshes
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });

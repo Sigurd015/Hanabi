@@ -97,6 +97,7 @@ namespace Hanabi
 		virtual Buffer GetBuffer() const override { return m_ImageData; }
 		virtual Buffer& GetBuffer() override { return m_ImageData; }
 
+		// D3D Interop API
 		DXGI_FORMAT GetDXGIFormat() const { return m_DataFormat; }
 		ComPtr<ID3D11Texture2D> GetTexture() const { return m_Texture; }
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_TextureSRV; }

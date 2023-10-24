@@ -26,8 +26,7 @@ namespace Hanabi
 			auto it = reflectionData.find(name);
 			if (it != reflectionData.end())
 			{
-				uint32_t slot = it->second;
-				bindable->Bind(slot);
+				bindable->Bind(it->second);
 			}
 			else
 			{
@@ -40,16 +39,14 @@ namespace Hanabi
 			auto it = reflectionData.find("u_SSLinearWrap");
 			if (it != reflectionData.end())
 			{
-				uint32_t slot = it->second;
-				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
 			}
 		}
 		{
 			auto it = reflectionData.find("u_SSLinearClamp");
 			if (it != reflectionData.end())
 			{
-				uint32_t slot = it->second;
-				DX11Context::GetDeviceContext()->PSSetSamplers(slot, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
 			}
 		}
 	}
