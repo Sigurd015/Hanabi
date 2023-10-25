@@ -29,11 +29,11 @@ VertexOutput main(VertexInput Input)
     float4 worldPosition = mul(u_Transform, float4(Input.a_Position, 1.0f));
     Output.WorldPosition = worldPosition.xyz;  
     Output.TexCoord = Input.a_TexCoord;
-    float3 T = normalize(mul(u_Transform, float4(Input.a_Tangent, 0.0f)).xyz);
-    float3 B = normalize(mul(u_Transform, float4(Input.a_Bitangent, 0.0f)).xyz);
-    Output.Normal = normalize(mul(u_Transform, float4(Input.a_Normal, 0.0f)).xyz);
-    Output.TBN = float3x3(T, B, Output.Normal);
-
+    //float3 T = normalize(mul(u_Transform, float4(Input.a_Tangent, 0.0f)).xyz);
+    //float3 B = normalize(mul(u_Transform, float4(Input.a_Bitangent, 0.0f)).xyz);
+    Output.Normal = mul((float3x3)(u_Transform), Input.a_Normal);
+    //Output.TBN = float3x3(T, B, Output.Normal);
+    Output.TBN = (float3x3)(u_Transform) * float3x3(Input.a_Tangent, Input.a_Bitangent, Input.a_Normal);
     Output.Position = mul(u_ViewProjection, worldPosition);
     return Output;
 }

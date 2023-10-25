@@ -1,8 +1,8 @@
 #ifndef COMMON_HEADER
 #define COMMON_HEADER
 
-const float PI = 3.141592;
-const float Epsilon = 0.00001;
+static const float PI = 3.141592f;
+static const float Epsilon = 0.00001f;
 
 // Gamma correction
 float3 LinearToSRGB(float3 color, float gamma)

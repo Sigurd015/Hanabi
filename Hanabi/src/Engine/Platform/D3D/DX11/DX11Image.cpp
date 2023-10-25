@@ -28,8 +28,6 @@ namespace Hanabi
 		{
 		case ImageUsage::Attachment:
 		{
-			bool isdepth = Utils::IsDepthFormat(m_Specification.Format);
-
 			D3D11_TEXTURE2D_DESC textureDesc = {};
 			textureDesc.Width = m_Specification.Width;
 			textureDesc.Height = m_Specification.Height;
@@ -46,7 +44,7 @@ namespace Hanabi
 			shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			shaderResourceDesc.Texture2D.MipLevels = 1;
 
-			if (isdepth)
+			if (Utils::IsDepthFormat(m_Specification.Format))
 			{
 				// If it's a depth attachment, we need to create a depth stencil view and usa a depth stencil format
 				textureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;

@@ -210,7 +210,7 @@ namespace Hanabi
 				if (it != reflectionData.end())
 				{
 					uavSlot = it->second;
-					m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envUnfiltered->GetUAV().GetAddressOf(), nullptr);
+					m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envUnfiltered->GetUAV().GetAddressOf(), 0);
 				}
 				else
 				{
@@ -237,9 +237,7 @@ namespace Hanabi
 			}
 
 			equirectangularToCubemapShader->Bind();
-			uint32_t width = envMap->GetWidth();
-			uint32_t height = envMap->GetHeight();
-			m_DeviceContext->Dispatch(width / 32, height / 32, 6);
+			m_DeviceContext->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
 
 			// Unbind uav
 			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);

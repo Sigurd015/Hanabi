@@ -18,7 +18,7 @@ Entities:
       Scale: [1, 1, 1]
     SkyLightComponent:
       Intensity: 0.200000003
-      EnvMapHandle: 0
+      EnvMapHandle: 10066814809449201864
   - Entity: 3265185506109202002
     TagComponent:
       Tag: Camera

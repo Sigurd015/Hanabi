@@ -25,7 +25,7 @@ void main(uint3 ThreadID : SV_DispatchThreadID)
 	
     // Sample equirectangular texture.
     float4 color = u_EquirectangularMap.SampleLevel(u_SSLinearWrap, uv, 0);
-    //float4 color = float4(0.0, 1.0, 0.0, 1.0);
+
 	// Write out color to output cubemap.
     o_Tex[ThreadID] = color;
 }
