@@ -5,7 +5,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 
-![](https://github.com/Sigurd015/Hanabi/blob/main/images/preview.gif)
+![](https://github.com/Sigurd015/Hanabi/blob/main/images/preview.png)
 
 ## Goals
 - Support multiple rendering APIs (such as DX12, Vulkan, Metal, etc.)
@@ -76,8 +76,8 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] Physically based rendering (PBR)
   - [ ] Screen space ambient occulsion
   - [ ] Screen space reflection
-  - [ ] Ray/Path tracing
-    - [ ] Vulkan & DX12
+- [ ] Ray/Path tracing
+  - [ ] Vulkan & DX12
 - [ ] Metal support
 - [ ] Runtime
   - [ ] Asset Package Serialize & Deserialize

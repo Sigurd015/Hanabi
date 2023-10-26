@@ -1,0 +1,10 @@
+Material:
+  AlbedoTexHandle: 3219176255442515245
+  MetalnessTexHandle: 6623241671699836529
+  RoughnessTexHandle: 6953762117268242453
+  NormalTexHandle: 10039684136208536076
+  AlbedoColor: [1, 1, 1]
+  Emission: 0
+  Metalness: 1
+  Roughness: 1
+  UseNormalMap: false
