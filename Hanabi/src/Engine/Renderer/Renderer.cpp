@@ -42,6 +42,8 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("DirShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
 		s_Data->ShaderLibrary->Load("EquirectangularToCubemap");
+		s_Data->ShaderLibrary->Load("EnvironmentMipFilter");
+		s_Data->ShaderLibrary->Load("EnvironmentIrradiance");
 
 		//Setup textures
 		TextureSpecification spec;

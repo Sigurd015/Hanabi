@@ -1,6 +1,8 @@
 #pragma once
 #include "RendererResource.h"
 
+#include <glm/gtc/integer.hpp>
+
 namespace Hanabi
 {
 	enum class ImageFormat
@@ -76,6 +78,11 @@ namespace Hanabi
 
 	namespace Utils
 	{
+		inline uint32_t CalculateMipCount(uint32_t width, uint32_t height)
+		{
+			return (uint32_t)glm::floor(glm::log2(glm::min(width, height))) + 1;
+		}
+
 		inline bool IsDepthFormat(ImageFormat format)
 		{
 			if (format == ImageFormat::DEPTH24STENCIL8 || format == ImageFormat::DEPTH32F)

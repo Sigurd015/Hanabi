@@ -206,7 +206,7 @@ namespace Hanabi
 			const ShaderReflectionData& reflectionData = equirectangularToCubemapShader->GetReflectionData();
 			uint32_t uavSlot = 0;
 			{
-				auto it = reflectionData.find("o_Tex");
+				auto it = reflectionData.find("o_OutputTex");
 				if (it != reflectionData.end())
 				{
 					uavSlot = it->second;
@@ -214,7 +214,7 @@ namespace Hanabi
 				}
 				else
 				{
-					HNB_CORE_WARN("RendererResource o_Tex not found in shader!");
+					HNB_CORE_WARN("RendererResource o_OutputTex not found in shader!");
 				}
 			}
 			{
@@ -245,6 +245,50 @@ namespace Hanabi
 			envUnfiltered->GenerateMips();
 		}
 
+		//// Environment Mip Filter
+		//{
+		//	Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
+		//	uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
+		//	
+		//	const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();			uint32_t uavSlot = 0;
+		//	{
+		//		auto it = reflectionData.find("u_InputTex");
+		//		if (it != reflectionData.end())
+		//		{
+		//			m_DeviceContext->CSGetShaderResources(it->second, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
+		//		}
+		//		else
+		//		{
+		//			HNB_CORE_WARN("RendererResource u_InputTex not found in shader!");
+		//		}
+		//	}	
+		//	//uint32_t uavSlot = 0;
+		//	{
+		//		auto it = reflectionData.find("o_OutputTex");
+		//		if (it != reflectionData.end())
+		//		{
+		//			uavSlot = it->second;
+		//			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);
+		//		}
+		//		else
+		//		{
+		//			HNB_CORE_WARN("RendererResource o_OutputTex not found in shader!");
+		//		}
+		//	}
+		//	{
+		//		auto it = reflectionData.find("u_SSLinearWrap");
+		//		if (it != reflectionData.end())
+		//		{
+		//			m_DeviceContext->CSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+		//		}
+		//	}
+
+		//	// TODO: Constant buffer for roughness
+
+		//	environmentMipFilterShader->Bind();
+		//	m_DeviceContext->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
+		//}
+
 		// TODO: Implement this
 		// Irradiance map
 		cubemapSpec.Width = irradianceMapSize;
@@ -254,7 +298,7 @@ namespace Hanabi
 		{
 
 		}
-	
+
 		return { envUnfiltered, Renderer::GetTexture<TextureCube>("BlackCube") };
 	}
 }

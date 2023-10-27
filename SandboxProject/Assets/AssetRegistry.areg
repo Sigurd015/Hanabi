@@ -1,33 +1,24 @@
 AssetRegistry:
-  - Handle: 144419431162609125
-    FilePath: Materials/used-stainless-steel2.hmat
-    Type: AssetType::Material
-  - Handle: 600866174613728687
+  - Handle: 841372594545168923
     FilePath: Materials/gray-granite-flecks.hmat
     Type: AssetType::Material
-  - Handle: 695600366802586142
-    FilePath: Textures/gray-granite-flecks-bl/gray-granite-flecks-Roughness.png
+  - Handle: 2333949280243433075
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_roughness.png
     Type: AssetType::Texture2D
-  - Handle: 919044517148295743
-    FilePath: Textures/gray-granite-flecks-bl/gray-granite-flecks-Normal-ogl.png
-    Type: AssetType::Texture2D
-  - Handle: 2025733275361624633
-    FilePath: Textures/rustediron1-alt2-bl/rustediron2_metallic.png
+  - Handle: 2537504928911656905
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_albedo.png
     Type: AssetType::Texture2D
   - Handle: 2605795154723237914
     FilePath: Models/Cube.gltf
     Type: AssetType::MeshSource
-  - Handle: 2915896783008124796
-    FilePath: Materials/rustediron-streaks2.hmat
+  - Handle: 3676138274874464056
+    FilePath: Materials/used-stainless.hmat
     Type: AssetType::Material
-  - Handle: 3219176255442515245
-    FilePath: Textures/used-stainless-steel2-bl/used-stainless-steel2_albedo.png
+  - Handle: 4589171769343660080
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-albedo.png
     Type: AssetType::Texture2D
-  - Handle: 3226036206584099993
-    FilePath: Textures/rustediron-streaks2-bl/rustediron-streaks_basecolor.png
-    Type: AssetType::Texture2D
-  - Handle: 4277542860935985066
-    FilePath: Textures/rustediron1-alt2-bl/rustediron2_basecolor.png
+  - Handle: 4704208569905331786
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_roughness.png
     Type: AssetType::Texture2D
   - Handle: 5715407682404485611
     FilePath: Models/Sphere.gltf
@@ -35,66 +26,60 @@ AssetRegistry:
   - Handle: 5775838104344894305
     FilePath: Scenes/PBRTest.hscene
     Type: AssetType::Scene
-  - Handle: 6392705222962650032
-    FilePath: Textures/laminate-flooring-brown-bl/laminate-flooring-brown_normal-ogl.png
+  - Handle: 6548672909131543686
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_normal-dx.png
     Type: AssetType::Texture2D
-  - Handle: 6623241671699836529
-    FilePath: Textures/used-stainless-steel2-bl/used-stainless-steel2_metallic.png
-    Type: AssetType::Texture2D
-  - Handle: 6666293771930219173
-    FilePath: Textures/rustediron-streaks2-bl/rustediron-streaks_metallic.png
-    Type: AssetType::Texture2D
-  - Handle: 6953762117268242453
-    FilePath: Textures/used-stainless-steel2-bl/used-stainless-steel2_roughness.png
-    Type: AssetType::Texture2D
-  - Handle: 7149683215505740225
-    FilePath: Textures/laminate-flooring-brown-bl/laminate-flooring-brown_roughness.png
-    Type: AssetType::Texture2D
-  - Handle: 7663058388085827509
-    FilePath: Textures/rustediron-streaks2-bl/rustediron-streaks_normal.png
+  - Handle: 6782582854069637355
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_metallic.png
     Type: AssetType::Texture2D
   - Handle: 8012010214947151524
     FilePath: Scenes/2DExample.hscene
     Type: AssetType::Scene
-  - Handle: 8328445367457002775
-    FilePath: Textures/laminate-flooring-brown-bl/laminate-flooring-brown_metallic.png
-    Type: AssetType::Texture2D
-  - Handle: 8891555121835151257
+  - Handle: 8230805411470845587
     FilePath: Materials/laminate-flooring-brown.hmat
     Type: AssetType::Material
+  - Handle: 8903819486709350489
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Normal-dx.png
+    Type: AssetType::Texture2D
+  - Handle: 9496776747364153426
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Metallic.png
+    Type: AssetType::Texture2D
   - Handle: 9798693481466945810
     FilePath: Textures/TestNormal.png
-    Type: AssetType::Texture2D
-  - Handle: 10039684136208536076
-    FilePath: Textures/used-stainless-steel2-bl/used-stainless-steel2_normal-ogl.png
     Type: AssetType::Texture2D
   - Handle: 10066814809449201864
     FilePath: Textures/envmap/hilly_terrain_01_4k.hdr
     Type: AssetType::EnvMap
-  - Handle: 11789296589250349521
+  - Handle: 10864898568509953569
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_normal-dx.png
+    Type: AssetType::Texture2D
+  - Handle: 11767140759291818488
     FilePath: Materials/rustediron1-alt2.hmat
     Type: AssetType::Material
+  - Handle: 12049005096031057341
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_normal.png
+    Type: AssetType::Texture2D
   - Handle: 12490738633885367934
     FilePath: Textures/envmap/rustig_koppie_puresky_4k.hdr
     Type: AssetType::EnvMap
-  - Handle: 13482911859211230360
-    FilePath: Textures/rustediron1-alt2-bl/rustediron2_normal.png
+  - Handle: 13566442178785289733
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_albedo.png
     Type: AssetType::Texture2D
-  - Handle: 13488710452065358681
-    FilePath: Textures/gray-granite-flecks-bl/gray-granite-flecks-albedo.png
+  - Handle: 13744182516866292656
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Roughness.png
+    Type: AssetType::Texture2D
+  - Handle: 14057650850447361125
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_metallic.png
+    Type: AssetType::Texture2D
+  - Handle: 14548778339704962245
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_metallic.png
     Type: AssetType::Texture2D
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
-  - Handle: 14731231912339749151
-    FilePath: Textures/laminate-flooring-brown-bl/laminate-flooring-brown_albedo.png
+  - Handle: 15063411845910190571
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_basecolor.png
     Type: AssetType::Texture2D
-  - Handle: 15589513600685785464
-    FilePath: Textures/rustediron-streaks2-bl/rustediron-streaks_roughness.png
-    Type: AssetType::Texture2D
-  - Handle: 15652741369683370252
-    FilePath: Textures/rustediron1-alt2-bl/rustediron2_roughness.png
-    Type: AssetType::Texture2D
-  - Handle: 17201142891239705458
-    FilePath: Textures/gray-granite-flecks-bl/gray-granite-flecks-Metallic.png
+  - Handle: 17032317040619436040
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_roughness.png
     Type: AssetType::Texture2D

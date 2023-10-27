@@ -32,6 +32,7 @@ namespace Hanabi
 		std::string pathString = path.string();
 
 		int width, height, channels;
+		stbi_set_flip_vertically_on_load(1);
 		if (stbi_is_hdr(pathString.c_str()))
 		{
 			imageBuffer.Data = (uint8_t*)stbi_loadf(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
@@ -41,7 +42,6 @@ namespace Hanabi
 		}
 		else
 		{
-			stbi_set_flip_vertically_on_load(1);
 			imageBuffer.Data = stbi_load(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 			imageBuffer.Size = width * height * 4;
 			spec.Format = ImageFormat::RGBA8;
