@@ -7,6 +7,7 @@
 #include "DX11RenderStates.h"
 #include "Engine/Renderer/Renderer.h"
 #include "DX11Texture.h"
+#include "DX11ConstantBuffer.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -199,7 +200,7 @@ namespace Hanabi
 
 		Ref<DX11Texture2D> envMap = std::static_pointer_cast<DX11Texture2D>(equirectangularMap);
 
-		// Radiance map(Equirectangular to cubemap) 
+		// Radiance map (Equirectangular to cubemap) 
 		{
 			Ref<Shader> equirectangularToCubemapShader = Renderer::GetShader("EquirectangularToCubemap");
 
@@ -245,61 +246,95 @@ namespace Hanabi
 			envUnfiltered->GenerateMips();
 		}
 
-		//// Environment Mip Filter
-		//{
-		//	Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
-		//	uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
-		//	
-		//	const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();			uint32_t uavSlot = 0;
-		//	{
-		//		auto it = reflectionData.find("u_InputTex");
-		//		if (it != reflectionData.end())
-		//		{
-		//			m_DeviceContext->CSGetShaderResources(it->second, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
-		//		}
-		//		else
-		//		{
-		//			HNB_CORE_WARN("RendererResource u_InputTex not found in shader!");
-		//		}
-		//	}	
-		//	//uint32_t uavSlot = 0;
-		//	{
-		//		auto it = reflectionData.find("o_OutputTex");
-		//		if (it != reflectionData.end())
-		//		{
-		//			uavSlot = it->second;
-		//			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);
-		//		}
-		//		else
-		//		{
-		//			HNB_CORE_WARN("RendererResource o_OutputTex not found in shader!");
-		//		}
-		//	}
-		//	{
-		//		auto it = reflectionData.find("u_SSLinearWrap");
-		//		if (it != reflectionData.end())
-		//		{
-		//			m_DeviceContext->CSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-		//		}
-		//	}
-
-		//	// TODO: Constant buffer for roughness
-
-		//	environmentMipFilterShader->Bind();
-		//	m_DeviceContext->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
-		//}
-
-		// TODO: Implement this
-		// Irradiance map
-		cubemapSpec.Width = irradianceMapSize;
-		cubemapSpec.Height = irradianceMapSize;
-		Ref<TextureCube> irradianceMap = TextureCube::Create(cubemapSpec);
-
+		// Radiance map (Filter)
 		{
+			Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
+			uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
+			const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();
+			{
+				auto it = reflectionData.find("u_InputTex");
+				if (it != reflectionData.end())
+				{
+					m_DeviceContext->CSSetShaderResources(it->second, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
+				}
+				else
+				{
+					HNB_CORE_WARN("RendererResource u_InputTex not found in shader!");
+				}
+			}
+			{
+				auto it = reflectionData.find("u_SSLinearWrap");
+				if (it != reflectionData.end())
+				{
+					m_DeviceContext->CSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				}
+			}
+			uint32_t uavSlot = 0;
+			{
+				auto it = reflectionData.find("o_OutputTex");
+				if (it != reflectionData.end())
+				{
+					uavSlot = it->second;
+				}
+				else
+				{
+					HNB_CORE_WARN("RendererResource o_OutputTex not found in shader!");
+				}
+			}
 
+			struct CBFilterParam
+			{
+				float Roughness;
+
+				char padding[12];
+			};
+
+			static Ref<DX11ConstantBuffer> s_FilterParam;
+
+			if (!s_FilterParam)
+				s_FilterParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBFilterParam)));
+
+			{
+				auto it = reflectionData.find("CBFilterParam");
+				if (it != reflectionData.end())
+				{
+					m_DeviceContext->CSSetConstantBuffers(it->second, 1, s_FilterParam->GetBuffer().GetAddressOf());
+				}
+				else
+				{
+					HNB_CORE_WARN("RendererResource CBFilterParam not found in shader!");
+				}
+			}
+
+			environmentMipFilterShader->Bind();
+			const float deltaRoughness = 1.0f / glm::max((float)mipCount - 1.0f, 1.0f);
+			for (uint32_t i = 0, size = cubemapSize; i < mipCount; i++, size /= 2)
+			{
+				uint32_t numGroups = glm::max(1u, size / 32);
+				float roughness = i * deltaRoughness;
+				roughness = glm::max(roughness, 0.05f);
+
+				CBFilterParam filterParam = { roughness };
+				s_FilterParam->SetData(&filterParam, sizeof(CBFilterParam));
+
+				m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);
+				m_DeviceContext->Dispatch(numGroups, numGroups, 6);
+			}
+
+			// Unbind uav
+			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
 		}
 
-		return { envUnfiltered, Renderer::GetTexture<TextureCube>("BlackCube") };
+		// Irradiance map
+		{
+			cubemapSpec.Width = irradianceMapSize;
+			cubemapSpec.Height = irradianceMapSize;
+			Ref<TextureCube> irradianceMap = TextureCube::Create(cubemapSpec);
+
+			// TODO: Implement this
+		}
+
+		return { envFiltered, Renderer::GetTexture<TextureCube>("BlackCube") };
 	}
 }
 #endif

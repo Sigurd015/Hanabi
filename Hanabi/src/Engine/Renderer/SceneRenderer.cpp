@@ -370,8 +370,18 @@ namespace Hanabi
 
 		// Sky Light
 		{
-			// TODO: Handle SceneEnvironment Map
 			s_Data->SceneData.SkyLightIntensity = environment->SkyLightIntensity;
+
+			if (environment->EnvMapHandle)
+			{
+				Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
+				s_Data->SkyboxPass->SetInput("u_RadianceMap", asset->RadianceMap);
+				// TODO: Bind Irradiance Map to lighting pass
+			}
+			else
+			{
+				s_Data->SkyboxPass->SetInput("u_RadianceMap", Renderer::GetTexture<TextureCube>("BlackCube"));
+			}
 		}
 
 		// Directional Light
@@ -418,17 +428,6 @@ namespace Hanabi
 		}
 
 		s_Data->DrawCommands.clear();
-
-		if (environment->EnvMapHandle)
-		{
-			Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
-			s_Data->SkyboxPass->SetInput("u_RadianceMap", asset->RadianceMap);
-			// TODO: Bind Irradiance Map to lighting pass
-		}
-		else
-		{
-			s_Data->SkyboxPass->SetInput("u_RadianceMap", Renderer::GetTexture<TextureCube>("BlackCube"));
-		}
 	}
 
 	void SceneRenderer::EndScene()

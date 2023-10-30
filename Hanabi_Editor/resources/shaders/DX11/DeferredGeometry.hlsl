@@ -87,4 +87,3 @@ PixelOutput main(PixelInput Input)
 
     return Output;
 }
-

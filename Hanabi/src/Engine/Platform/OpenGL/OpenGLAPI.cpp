@@ -50,7 +50,6 @@ namespace Hanabi
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_LINE_SMOOTH);
 
-		//TODO: Same index buffer, get a different result
 		//glEnable(GL_CULL_FACE);
 		//glCullFace(GL_BACK);
 		glDisable(GL_CULL_FACE);
