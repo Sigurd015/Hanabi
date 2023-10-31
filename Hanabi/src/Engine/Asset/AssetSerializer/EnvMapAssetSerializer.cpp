@@ -16,6 +16,10 @@ namespace Hanabi
 		auto [radiance, irradiance] = Renderer::CreateEnvironmentMap(equirectangularMap);
 		asset = CreateRef<EnvMapAsset>(radiance, irradiance);
 		asset->Handle = metadata.Handle;
+
+		// Debug
+		//asset = TextureSerializer::LoadTexture2D(Project::GetEditorAssetManager()->GetFileSystemPath(metadata), spec);
+		//asset->Handle = metadata.Handle;
 		return true;
 	}
 }

@@ -54,7 +54,7 @@ cbuffer CBCamera : register(b1)
 
 cbuffer CBScene : register(b2)
 {
-    float u_SkyLightIntensity;
+    float u_EnvironmentMapIntensity;
     DirectionalLight u_DirLight;
 };
 

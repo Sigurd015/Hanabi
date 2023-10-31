@@ -14,8 +14,6 @@ float2 SampleHammersley(uint i)
 	return float2(i * InvNumSamples, RadicalInverse_VdC(i));
 }
 
-static const int NumMipLevels = 1;
-
 TextureCube u_InputTex : register(t0);
 RWTexture2DArray<float4> o_OutputTex : register(u0);
 

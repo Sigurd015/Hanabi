@@ -117,14 +117,6 @@ namespace Hanabi
 			textureDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
 			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, m_TextureCube.GetAddressOf()));
 
-			D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc{};
-			uavDesc.Format = textureDesc.Format;
-			uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
-			uavDesc.Texture2DArray.MipSlice = 0;
-			uavDesc.Texture2DArray.FirstArraySlice = 0;
-			uavDesc.Texture2DArray.ArraySize = textureDesc.ArraySize;
-			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateUnorderedAccessView(m_TextureCube.Get(), &uavDesc, m_TextureCubeUAV.GetAddressOf()));
-
 			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(m_TextureCube.Get(), &resourceView, m_TextureCubeSRV.GetAddressOf()));
 		}
 	}
@@ -149,6 +141,26 @@ namespace Hanabi
 	void DX11TextureCube::GenerateMips() const
 	{
 		DX11Context::GetDeviceContext()->GenerateMips(m_TextureCubeSRV.Get());
+	}
+
+	/// <summary>
+	/// Notice: Default mipSlice is 0, which means the first mip level
+	/// When call this function at 0 mipSlice, make sure call GenerateMips() after that to generate mips
+	/// Call this function at other mipSlice, means manually generate mips, like use compute shader to generate mips, no need to call GenerateMips()
+	/// </summary>
+	void DX11TextureCube::CreateUAV(uint32_t mipSlice)
+	{
+		D3D11_TEXTURE2D_DESC desc;
+		m_TextureCube->GetDesc(&desc);
+
+		D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+		uavDesc.Format = desc.Format;
+		uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+		uavDesc.Texture2DArray.MipSlice = mipSlice;
+		uavDesc.Texture2DArray.FirstArraySlice = 0;
+		uavDesc.Texture2DArray.ArraySize = desc.ArraySize;
+
+		DX_CHECK_RESULT(DX11Context::GetDevice()->CreateUnorderedAccessView(m_TextureCube.Get(), &uavDesc, m_TextureCubeUAV.GetAddressOf()));
 	}
 }
 #endif

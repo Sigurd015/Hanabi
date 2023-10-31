@@ -13,7 +13,7 @@ SamplerState u_SSLinearWrap : register(s0);
 
 RWTexture2DArray<float4> o_IrradianceMap : register(u0);
 
-cbuffer CBParam : register(b0)
+cbuffer CBSamplesParams : register(b0)
 {
     uint u_Samples;
 };

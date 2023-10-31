@@ -206,36 +206,20 @@ namespace Hanabi
 
 			const ShaderReflectionData& reflectionData = equirectangularToCubemapShader->GetReflectionData();
 			uint32_t uavSlot = 0;
-			{
-				auto it = reflectionData.find("o_OutputTex");
-				if (it != reflectionData.end())
+			envUnfiltered->CreateUAV();
+			Utils::BindResource(reflectionData, "o_OutputTex", [&](auto& slot)
 				{
-					uavSlot = it->second;
-					m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envUnfiltered->GetUAV().GetAddressOf(), 0);
-				}
-				else
+					uavSlot = slot;
+					m_DeviceContext->CSSetUnorderedAccessViews(slot, 1, envUnfiltered->GetUAV().GetAddressOf(), 0);
+				});
+			Utils::BindResource(reflectionData, "u_EquirectangularMap", [&](auto& slot)
 				{
-					HNB_CORE_WARN("RendererResource o_OutputTex not found in shader!");
-				}
-			}
-			{
-				auto it = reflectionData.find("u_EquirectangularMap");
-				if (it != reflectionData.end())
+					m_DeviceContext->CSSetShaderResources(slot, 1, envMap->GetTextureSRV().GetAddressOf());
+				});
+			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
 				{
-					m_DeviceContext->CSSetShaderResources(it->second, 1, envMap->GetTextureSRV().GetAddressOf());
-				}
-				else
-				{
-					HNB_CORE_WARN("RendererResource u_EquirectangularMap not found in shader!");
-				}
-			}
-			{
-				auto it = reflectionData.find("u_SSLinearWrap");
-				if (it != reflectionData.end())
-				{
-					m_DeviceContext->CSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-				}
-			}
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				});
 
 			equirectangularToCubemapShader->Bind();
 			m_DeviceContext->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
@@ -251,36 +235,19 @@ namespace Hanabi
 			Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
 			uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
 			const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();
-			{
-				auto it = reflectionData.find("u_InputTex");
-				if (it != reflectionData.end())
+			Utils::BindResource(reflectionData, "u_InputTex", [&](auto& slot)
 				{
-					m_DeviceContext->CSSetShaderResources(it->second, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
-				}
-				else
+					m_DeviceContext->CSSetShaderResources(slot, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
+				});
+			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
 				{
-					HNB_CORE_WARN("RendererResource u_InputTex not found in shader!");
-				}
-			}
-			{
-				auto it = reflectionData.find("u_SSLinearWrap");
-				if (it != reflectionData.end())
-				{
-					m_DeviceContext->CSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-				}
-			}
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				});
 			uint32_t uavSlot = 0;
-			{
-				auto it = reflectionData.find("o_OutputTex");
-				if (it != reflectionData.end())
+			Utils::BindResource(reflectionData, "o_OutputTex", [&](auto& slot)
 				{
-					uavSlot = it->second;
-				}
-				else
-				{
-					HNB_CORE_WARN("RendererResource o_OutputTex not found in shader!");
-				}
-			}
+					uavSlot = slot;
+				});
 
 			struct CBFilterParam
 			{
@@ -294,29 +261,19 @@ namespace Hanabi
 			if (!s_FilterParam)
 				s_FilterParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBFilterParam)));
 
-			{
-				auto it = reflectionData.find("CBFilterParam");
-				if (it != reflectionData.end())
+			Utils::BindResource(reflectionData, "CBFilterParam", [&](auto& slot)
 				{
-					m_DeviceContext->CSSetConstantBuffers(it->second, 1, s_FilterParam->GetBuffer().GetAddressOf());
-				}
-				else
-				{
-					HNB_CORE_WARN("RendererResource CBFilterParam not found in shader!");
-				}
-			}
+					m_DeviceContext->CSSetConstantBuffers(slot, 1, s_FilterParam->GetBuffer().GetAddressOf());
+				});
 
 			environmentMipFilterShader->Bind();
 			const float deltaRoughness = 1.0f / glm::max((float)mipCount - 1.0f, 1.0f);
 			for (uint32_t i = 0, size = cubemapSize; i < mipCount; i++, size /= 2)
 			{
 				uint32_t numGroups = glm::max(1u, size / 32);
-				float roughness = i * deltaRoughness;
-				roughness = glm::max(roughness, 0.05f);
-
-				CBFilterParam filterParam = { roughness };
+				CBFilterParam filterParam = { glm::max(i * deltaRoughness, 0.05f) };
 				s_FilterParam->SetData(&filterParam, sizeof(CBFilterParam));
-
+				envFiltered->CreateUAV(i);
 				m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);
 				m_DeviceContext->Dispatch(numGroups, numGroups, 6);
 			}
@@ -326,15 +283,59 @@ namespace Hanabi
 		}
 
 		// Irradiance map
+		Ref<DX11TextureCube> irradianceMap = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
 		{
 			cubemapSpec.Width = irradianceMapSize;
 			cubemapSpec.Height = irradianceMapSize;
-			Ref<TextureCube> irradianceMap = TextureCube::Create(cubemapSpec);
+			Ref<Shader> environmentIrradianceShader = Renderer::GetShader("EnvironmentIrradiance");
 
-			// TODO: Implement this
+			const ShaderReflectionData& reflectionData = environmentIrradianceShader->GetReflectionData();
+			Utils::BindResource(reflectionData, "u_RadianceMap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetShaderResources(slot, 1, envFiltered->GetTextureSRV().GetAddressOf());
+				});
+			uint32_t uavSlot = 0;
+			irradianceMap->CreateUAV();
+			Utils::BindResource(reflectionData, "o_IrradianceMap", [&](auto& slot)
+				{
+					uavSlot = slot;
+					m_DeviceContext->CSSetUnorderedAccessViews(slot, 1, irradianceMap->GetUAV().GetAddressOf(), 0);
+				});
+			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				});
+
+			struct CBSamplesParams
+			{
+				uint32_t Samples;
+
+				char padding[12];
+			};
+
+			static Ref<DX11ConstantBuffer> s_SamplesParam;
+
+			if (!s_SamplesParam)
+				s_SamplesParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBSamplesParams)));
+
+			Utils::BindResource(reflectionData, "CBSamplesParams", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetConstantBuffers(slot, 1, s_SamplesParam->GetBuffer().GetAddressOf());
+				});
+
+			CBSamplesParams samplesParams = { Renderer::GetConfig().IrradianceMapComputeSamples };
+			s_SamplesParam->SetData(&samplesParams, sizeof(CBSamplesParams));
+
+			environmentIrradianceShader->Bind();
+			m_DeviceContext->Dispatch(irradianceMapSize / 32, irradianceMapSize / 32, 6);
+
+			// Unbind uav
+			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+
+			irradianceMap->GenerateMips();
 		}
 
-		return { envFiltered, Renderer::GetTexture<TextureCube>("BlackCube") };
+		return { envFiltered, irradianceMap };
 	}
 }
 #endif

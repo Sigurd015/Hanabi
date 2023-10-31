@@ -45,6 +45,7 @@ namespace Hanabi
 		void GenerateMips() const;
 
 		ComPtr<ID3D11Texture2D> GetTextureCube() const { return m_TextureCube; }
+		void CreateUAV(uint32_t mipSlice = 0);
 		ComPtr<ID3D11UnorderedAccessView> GetUAV() const { return m_TextureCubeUAV; }
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_TextureCubeSRV; }
 	private:

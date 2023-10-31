@@ -23,15 +23,10 @@ namespace Hanabi
 			const std::string& name = input.first;
 			Ref<RendererResource> bindable = input.second;
 
-			auto it = reflectionData.find(name);
-			if (it != reflectionData.end())
-			{
-				bindable->Bind(it->second);
-			}
-			else
-			{
-				HNB_CORE_WARN("RendererResource '{}' not found in shader!", name);
-			}
+			Utils::BindResource(reflectionData, name, [&](auto& slot)
+				{
+					bindable->Bind(slot);
+				});
 		}
 
 		// Bind Common States

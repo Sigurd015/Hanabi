@@ -26,8 +26,8 @@ PixelOutput main(PixelInput Input)
 {
     PixelOutput output;
     float2 texCoord = float2(Input.TexCoord.x, 1.0 - Input.TexCoord.y);
-    float3 color = u_Color.Sample(u_SSLinearWrap, texCoord).xyz;
-    //color = color / (color + float3(1.0, 1.0, 1.0));
-    output.Color = float4(LinearToSRGB(color.xyz, 2.2f).xyz, 1.0f);
+    float4 color = u_Color.Sample(u_SSLinearWrap, texCoord);
+    output.Color.xyz = LinearToSRGB(color.xyz);
+    //output.Color = color;
     return output;
 }

@@ -326,13 +326,13 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("CBScene", s_Data->SceneDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("CBDirShadow", s_Data->DirShadowDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("u_AlbedoBuffer", s_Data->DeferredGeoPass->GetOutput(0));
 		s_Data->DeferredLightingPass->SetInput("u_MREBuffer", s_Data->DeferredGeoPass->GetOutput(1));
 		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
 		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
-		//s_Data->DeferredLightingPass->SetInput("u_BRDFLut", Renderer::GetTexture<Texture2D>("BRDFLut"));
-		s_Data->DeferredLightingPass->SetInput("CBDirShadow", s_Data->DirShadowDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("u_ShadowDepth", s_Data->DirShadowMapPass->GetDepthOutput());
+		s_Data->DeferredLightingPass->SetInput("u_BRDFLUTTex", Renderer::GetTexture<Texture2D>("BRDFLut"));
 
 		s_Data->CompositePass->SetInput("u_Color", s_Data->DeferredLightingPass->GetOutput());
 
@@ -376,7 +376,14 @@ namespace Hanabi
 			{
 				Ref<EnvMapAsset> asset = AssetManager::GetAsset<EnvMapAsset>(environment->EnvMapHandle);
 				s_Data->SkyboxPass->SetInput("u_RadianceMap", asset->RadianceMap);
+				s_Data->DeferredLightingPass->SetInput("u_EnvRadianceTex", asset->RadianceMap);
+				s_Data->DeferredLightingPass->SetInput("u_EnvIrradianceTex", asset->IrradianceMap);
 				// TODO: Bind Irradiance Map to lighting pass
+
+				// Debug
+				//Ref<Texture2D> equirectangularMap = AssetManager::GetAsset<Texture2D>(environment->EnvMapHandle);
+				//auto [radiance, irradiance] = Renderer::CreateEnvironmentMap(equirectangularMap);
+				//s_Data->SkyboxPass->SetInput("u_RadianceMap", radiance);
 			}
 			else
 			{

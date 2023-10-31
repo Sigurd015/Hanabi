@@ -9,7 +9,7 @@ struct PBRParameters
 	float Roughness;
 	float Metalness;
 
-    float3 WorldNormal;
+    float3 Normal;
     float3 WorldPosition;
     float3 View;  // Pixel to camera
     float NdotV;
@@ -27,8 +27,8 @@ float3 CalculateDirLights(PBRParameters params, float3 F0)
 	float3 Lh = normalize(Li + params.View);
 
     // Calculate angles between surface normal and various light vectors.
-	float cosLi = max(0.0, dot(params.WorldNormal, Li));
-	float cosLh = max(0.0, dot(params.WorldNormal, Lh));
+	float cosLi = max(0.0, dot(params.Normal, Li));
+	float cosLh = max(0.0, dot(params.Normal, Lh));
 
 	float3 F = FresnelSchlickRoughness(F0, max(0.0, dot(Lh, params.View)), params.Roughness);
 	float D = NdfGGX(cosLh, params.Roughness);
@@ -66,8 +66,8 @@ float3 CalculatePointLights(PBRParameters params, float3 F0)
         float3 Lradiance = pointLight.Radiance * pointLight.Intensity * attenuation;
 
         // Calculate angles between surface normal and various light vectors.
-		float cosLi = max(0.0, dot(params.WorldNormal, Li));
-		float cosLh = max(0.0, dot(params.WorldNormal, Lh));
+		float cosLi = max(0.0, dot(params.Normal, Li));
+		float cosLh = max(0.0, dot(params.Normal, Lh));
 
         float3 F = FresnelSchlickRoughness(F0, max(0.0, dot(Lh, params.View)), params.Roughness);
 		float D = NdfGGX(cosLh, params.Roughness);
@@ -110,8 +110,8 @@ float3 CalculateSpotLights(PBRParameters params, float3 F0)
 		float3 Lh = normalize(Li + params.View);
 
         // Calculate angles between surface normal and various light vectors.
-		float cosLi = max(0.0, dot(params.WorldNormal, Li));
-		float cosLh = max(0.0, dot(params.WorldNormal, Lh));
+		float cosLi = max(0.0, dot(params.Normal, Li));
+		float cosLh = max(0.0, dot(params.Normal, Lh));
 
         float3 F = FresnelSchlickRoughness(F0, max(0.0, dot(Lh, params.View)), params.Roughness);
 		float D = NdfGGX(cosLh, params.Roughness);

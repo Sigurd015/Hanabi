@@ -48,16 +48,11 @@ namespace Hanabi
 
 		for (auto& texture : m_Textures)
 		{
-			auto it = reflectionData.find(texture.first);
-			if (it != reflectionData.end())
-			{
-				if (texture.second)
-					texture.second->Bind(it->second);
-			}
-			else
-			{
-				HNB_CORE_WARN("Texture '{}' not found in shader!", texture.first);
-			}
+			Utils::BindResource(reflectionData, texture.first, [&](auto& slot)
+				{
+					if (texture.second)
+						texture.second->Bind(slot);
+				});
 		}
 	}
 }
