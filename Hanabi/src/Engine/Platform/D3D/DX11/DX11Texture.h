@@ -22,6 +22,7 @@ namespace Hanabi
 		virtual Buffer GetWriteableBuffer() override { return m_Image->GetBuffer(); }
 		bool operator==(const Texture& other) const override;
 
+		// D3D Interop API
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_Image->GetTextureSRV(); }
 	private:
 		Ref<DX11Image2D> m_Image;
@@ -41,11 +42,10 @@ namespace Hanabi
 		void Bind(uint32_t slot = 0) const override;
 		bool operator==(const Texture& other) const override;
 
-		// Only for compute shader
-		void GenerateMips() const;
-
-		ComPtr<ID3D11Texture2D> GetTextureCube() const { return m_TextureCube; }
+		// D3D Interop API
 		void CreateUAV(uint32_t mipSlice = 0);
+		void GenerateMips() const;
+		ComPtr<ID3D11Texture2D> GetTextureCube() const { return m_TextureCube; }
 		ComPtr<ID3D11UnorderedAccessView> GetUAV() const { return m_TextureCubeUAV; }
 		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_TextureCubeSRV; }
 	private:

@@ -168,7 +168,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8,ImageFormat::RGBA8,
+				spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::RGBA,
 					ImageFormat::RGBA16F,ImageFormat::RGBA16F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
@@ -234,7 +234,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8 };
+				spec.Attachments = { ImageFormat::RGBA32F };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
@@ -262,7 +262,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8 };
+				spec.Attachments = { ImageFormat::RGBA32F };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
@@ -290,7 +290,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA8,ImageFormat::Depth };
+				spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
@@ -355,7 +355,6 @@ namespace Hanabi
 			// TODO: Resize color attachment and depth attachment
 			//s_Data->DeferredGeoPass->GetTargetFramebuffer()->Resize(width, height);
 			//s_Data->DeferredLightingPass->GetTargetFramebuffer()->Resize(width, height);
-			//s_Data->ShadowMappingPass->GetTargetFramebuffer()->Resize(width, height);
 			//s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
 		}
 	}

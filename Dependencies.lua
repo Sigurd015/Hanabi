@@ -2,7 +2,6 @@ IncludeDir = {}
 IncludeDir["spdlog"] = "%{wks.location}/Hanabi/vendor/spdlog/include"
 IncludeDir["filewatch"] = "%{wks.location}/Hanabi/vendor/filewatch"
 IncludeDir["GLFW"] = "%{wks.location}/Hanabi/vendor/GLFW/include"
-IncludeDir["Glad"] = "%{wks.location}/Hanabi/vendor/Glad/include"
 IncludeDir["ImGui"] = "%{wks.location}/Hanabi/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/Hanabi/vendor/glm"
 IncludeDir["stb_image"] = "%{wks.location}/Hanabi/vendor/stb_image"

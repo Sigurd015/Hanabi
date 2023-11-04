@@ -17,7 +17,6 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] Mac
 
 - [ ] Rendering APIs
-  - [x] OpenGL 4.5 (Focus on DX11, OpenGL is not working for now) [Last OpenGL stable version](https://github.com/Sigurd015/Hanabi/tree/db3dd61f69282f66c70edad9f264cac89a241c83)
   - [ ] Vulkan
   - [x] DirectX 11
   - [ ] DirectX 12

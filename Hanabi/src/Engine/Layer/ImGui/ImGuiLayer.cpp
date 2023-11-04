@@ -13,8 +13,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return new OpenGLImGuiLayer();
 
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:

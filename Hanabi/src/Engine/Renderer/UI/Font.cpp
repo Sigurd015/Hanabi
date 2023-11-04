@@ -40,7 +40,7 @@ namespace Hanabi
 		TextureSpecification spec;
 		spec.Width = bitmap.width;
 		spec.Height = bitmap.height;
-		spec.Format = ImageFormat::RGBA8;
+		spec.Format = ImageFormat::RGBA;
 		spec.GenerateMips = false;
 
 		Ref<Texture2D> texture = Texture2D::Create(spec, imageBuffer);

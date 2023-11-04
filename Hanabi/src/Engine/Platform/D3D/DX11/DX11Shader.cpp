@@ -14,7 +14,7 @@ namespace Hanabi
 	{
 		if (type == "vertex")
 			return VERTEX_SHADER;
-		if (type == "fragment" || type == "pixel")
+		if (type == "pixel")
 			return PIXEL_SHADER;
 		if (type == "compute")
 			return COMPUTE_SHADER;
@@ -25,7 +25,7 @@ namespace Hanabi
 
 	DX11Shader::DX11Shader(const std::string& fileName) :m_Name(fileName)
 	{
-		std::string filePath = std::string(GetShaderDirectoryPath()) + "DX11/" + fileName + ".hlsl";
+		std::string filePath = std::string(GetShaderDirectoryPath()) + fileName + ".hlsl";
 		std::string source = ReadFile(filePath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
@@ -122,7 +122,7 @@ namespace Hanabi
 					size_t begin = pos + includeTokenLength;
 					std::string fileName = code.second.substr(begin, eol - begin - fileTypeLength);
 					size_t nextLinePos = code.second.find_first_not_of("\r\n", eol);
-					std::string filePath = std::string(GetShaderDirectoryPath()) + "DX11/include/" + fileName + ".hlsl";
+					std::string filePath = std::string(GetShaderDirectoryPath()) + "include/" + fileName + ".hlsl";
 					std::string includeSource = ReadFile(filePath);
 					code.second.replace(pos, eol - pos, includeSource);
 					pos = code.second.find(includeToken, nextLinePos);

@@ -9,17 +9,17 @@
 namespace Hanabi
 {
 	static const uint32_t s_MeshImportFlags =
-		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
-		aiProcess_Triangulate |             // Make sure we're triangles
-		aiProcess_SortByPType |             // Split meshes by primitive type
 		aiProcess_GenNormals |              // Make sure we have legit normals
 		aiProcess_GenUVCoords |             // Convert UVs if required 
-		//aiProcess_OptimizeGraph |
-		aiProcess_OptimizeMeshes |          // Batch draws where possible
-		aiProcess_JoinIdenticalVertices |
-		aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
-		aiProcess_ValidateDataStructure;   // Validation
-		//aiProcess_GlobalScale;              // e.g. convert cm to m for fbx import (and other formats where cm is native)
+		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
+		aiProcess_SortByPType |             // Split meshes by primitive type
+		aiProcess_Triangulate;            // Make sure we're triangles
+	    //aiProcess_OptimizeGraph |
+	    //aiProcess_OptimizeMeshes |          // Batch draws where possible
+	    //aiProcess_JoinIdenticalVertices |
+	    //aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
+	    //aiProcess_ValidateDataStructure   // Validation
+	    //aiProcess_GlobalScale              // e.g. convert cm to m for fbx import (and other formats where cm is native)
 
 	bool MeshSourceSerializer::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const
 	{
@@ -63,7 +63,7 @@ namespace Hanabi
 
 			if (pMesh->HasTextureCoords(0))
 				vertex.TexCoord = { pMesh->mTextureCoords[0][i].x, pMesh->mTextureCoords[0][i].y };
-			
+
 			meshSource->m_Vertices.push_back(vertex);
 		}
 

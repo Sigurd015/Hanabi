@@ -21,59 +21,29 @@ namespace Hanabi
 
 		DX11RenderStates::Init();
 
-		SetBuffer(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
+		SetViewport(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
 	}
 
-	void DX11RendererAPI::Clear()
+	void DX11RendererAPI::SetViewport(uint32_t width, uint32_t height)
 	{
-		D3D11_VIEWPORT viewPort{};
-		viewPort.Width = m_Width;
-		viewPort.Height = m_Height;
-		viewPort.MinDepth = 0;
-		viewPort.MaxDepth = 1.0f;
-		viewPort.TopLeftX = 0;
-		viewPort.TopLeftY = 0;
-		m_DeviceContext->RSSetViewports(1, &viewPort);
+		m_RenderTargetView.Reset();
+		m_DepthStencilBuffer.Reset();
 
-		static const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), glm::value_ptr(clearColor));
-		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
-		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-	}
+		m_Width = width;
+		m_Height = height;
 
-	void DX11RendererAPI::SetBuffer(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
-	{
+		DX_CHECK_RESULT(m_SwapChain->ResizeBuffers(1, m_Width, m_Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 		DX_CHECK_RESULT(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer));
 		DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
 
-		D3D11_TEXTURE2D_DESC depthStencilDesc = {};
-		depthStencilDesc.Width = width;
-		depthStencilDesc.Height = height;
-		depthStencilDesc.MipLevels = 1;
-		depthStencilDesc.ArraySize = 1;
-		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthStencilDesc.SampleDesc.Count = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-		depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-		depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		DX_CHECK_RESULT(m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilBuffer.GetAddressOf()));
-		DX_CHECK_RESULT(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
-		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-
-		m_Width = width;
-		m_Height = height;
-	}
-
-	void DX11RendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-	{
-		m_RenderTargetView.Reset();
-		m_DepthStencilView.Reset();
-		m_DepthStencilBuffer.Reset();
-
-		DX_CHECK_RESULT(m_SwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
-
-		SetBuffer(width, height, x, y);
+		// TODO: May need to support SRGB backbuffer
+        //D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
+        //targetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+        //targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+        //targetViewDesc.Texture2D.MipSlice = 0;
+        //DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), &targetViewDesc, m_RenderTargetView.GetAddressOf()));
 	}
 
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
@@ -135,7 +105,19 @@ namespace Hanabi
 	void DX11RendererAPI::EndRenderPass()
 	{
 		m_DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
-		Clear();
+
+		D3D11_VIEWPORT viewPort{};
+		viewPort.Width = m_Width;
+		viewPort.Height = m_Height;
+		viewPort.MinDepth = 0;
+		viewPort.MaxDepth = 1.0f;
+		viewPort.TopLeftX = 0;
+		viewPort.TopLeftY = 0;
+		m_DeviceContext->RSSetViewports(1, &viewPort);
+
+		static const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), glm::value_ptr(clearColor));
+		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
 	}
 
 	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
@@ -179,6 +161,11 @@ namespace Hanabi
 		m_DeviceContext->Draw(vertexCount, 0);
 	}
 
+	void DX11RendererAPI::DrawFullScreenQuad()
+	{
+		m_DeviceContext->Draw(3, 0);
+	}
+
 	std::pair<Ref<TextureCube>, Ref<TextureCube>> DX11RendererAPI::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
 	{
 		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
@@ -190,15 +177,14 @@ namespace Hanabi
 		static const uint32_t irradianceMapSize = 32;
 		static ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
 
+		Ref<DX11Texture2D> envMap = std::static_pointer_cast<DX11Texture2D>(equirectangularMap);
+
 		TextureSpecification cubemapSpec = {};
 		cubemapSpec.Width = cubemapSize;
 		cubemapSpec.Height = cubemapSize;
 		cubemapSpec.Format = ImageFormat::RGBA32F;
 
 		Ref<DX11TextureCube> envUnfiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
-		Ref<DX11TextureCube> envFiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
-
-		Ref<DX11Texture2D> envMap = std::static_pointer_cast<DX11Texture2D>(equirectangularMap);
 
 		// Radiance map (Equirectangular to cubemap) 
 		{
@@ -231,6 +217,7 @@ namespace Hanabi
 		}
 
 		// Radiance map (Filter)
+		Ref<DX11TextureCube> envFiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
 		{
 			Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
 			uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
@@ -283,10 +270,10 @@ namespace Hanabi
 		}
 
 		// Irradiance map
+		cubemapSpec.Width = irradianceMapSize;
+		cubemapSpec.Height = irradianceMapSize;
 		Ref<DX11TextureCube> irradianceMap = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
 		{
-			cubemapSpec.Width = irradianceMapSize;
-			cubemapSpec.Height = irradianceMapSize;
 			Ref<Shader> environmentIrradianceShader = Renderer::GetShader("EnvironmentIrradiance");
 
 			const ShaderReflectionData& reflectionData = environmentIrradianceShader->GetReflectionData();

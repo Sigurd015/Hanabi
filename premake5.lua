@@ -21,7 +21,6 @@ intdir = "%{wks.location}/build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architec
 
 group "Dependencies"
 	include "Hanabi/vendor/GLFW"
-	include "Hanabi/vendor/Glad"
 	include "Hanabi/vendor/imgui"
 	include "Hanabi/vendor/Box2D"
 	include "Hanabi/vendor/yaml_cpp"

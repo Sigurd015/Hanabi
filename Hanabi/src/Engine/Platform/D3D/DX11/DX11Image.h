@@ -17,9 +17,8 @@ namespace Hanabi
 		{
 			switch (format)
 			{
-			case ImageFormat::RGB8:            return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			case ImageFormat::RGBA8:           return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-			case ImageFormat::RGBA8F:          return DXGI_FORMAT_R8G8B8A8_SNORM;
+			case ImageFormat::SRGB:           return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+			case ImageFormat::RGBA:            return DXGI_FORMAT_R8G8B8A8_UNORM;
 			case ImageFormat::RGBA16F:         return DXGI_FORMAT_R16G16B16A16_FLOAT;
 			case ImageFormat::RGBA32F:         return DXGI_FORMAT_R32G32B32A32_FLOAT;
 			case ImageFormat::DEPTH24STENCIL8: return DXGI_FORMAT_R24G8_TYPELESS;

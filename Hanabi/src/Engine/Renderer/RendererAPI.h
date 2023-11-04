@@ -8,14 +8,14 @@ namespace Hanabi
 {
 	enum class RendererAPIType
 	{
-		None = 0, OpenGL = 1, Vulkan = 2, DX11 = 3, DX12 = 4, Metal = 5,
+		None = 0, Vulkan = 1, DX12 = 2, Metal = 3, DX11 = 4,
 	};
 
 	class RendererAPI
 	{
 	public:
 		virtual void Init() = 0;
-		virtual void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) = 0;
+		virtual void SetViewport(uint32_t width, uint32_t height) = 0;
 
 		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear) = 0;
 		virtual void EndRenderPass() = 0;
@@ -27,6 +27,7 @@ namespace Hanabi
 			uint32_t indexCount) = 0;
 		virtual void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount = 0) = 0;
 		virtual void DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount) = 0;
+		virtual void DrawFullScreenQuad() = 0;
 
 		virtual std::pair<Ref<TextureCube>, Ref<TextureCube>> CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap) = 0;
 

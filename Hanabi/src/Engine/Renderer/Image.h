@@ -7,15 +7,8 @@ namespace Hanabi
 {
 	enum class ImageFormat
 	{
-		// Unsigned normalized
 		None = 0,
-		R8,
-		RGB8,
-		RGBA8,
-
-		RED8UI,
-
-		// Color - signed float
+		RGBA,
 		RGBA8F,
 		RGBA16F,
 		RGBA32F,
@@ -23,6 +16,8 @@ namespace Hanabi
 		// Depth/stencil
 		DEPTH24STENCIL8,
 		DEPTH32F,
+
+		SRGB,
 
 		// Defaults
 		Depth = DEPTH24STENCIL8,
@@ -38,7 +33,7 @@ namespace Hanabi
 
 	struct ImageSpecification
 	{
-		ImageFormat Format = ImageFormat::RGBA8;
+		ImageFormat Format = ImageFormat::RGBA;
 		ImageUsage Usage = ImageUsage::Texture2D;
 		uint32_t Width = 1;
 		uint32_t Height = 1;

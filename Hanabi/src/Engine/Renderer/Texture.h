@@ -20,7 +20,7 @@ namespace Hanabi
 	{
 		uint32_t Width = 1;
 		uint32_t Height = 1;
-		ImageFormat Format = ImageFormat::RGBA8;
+		ImageFormat Format = ImageFormat::RGBA;
 		bool GenerateMips = true;
 	};
 

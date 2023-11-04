@@ -18,8 +18,6 @@ namespace Hanabi
 
 		std::unordered_map<std::string, Ref<Texture>> Textures;
 		std::unordered_map<std::string, Ref<Mesh>> Meshes;
-		Ref<VertexBuffer> FullscreenQuadVertexBuffer;
-		Ref<IndexBuffer> FullscreenQuadIndexBuffer;
 	};
 
 	static RendererData* s_Data = nullptr;
@@ -47,7 +45,7 @@ namespace Hanabi
 
 		//Setup textures
 		TextureSpecification spec;
-		spec.Format = ImageFormat::RGBA8;
+		spec.Format = ImageFormat::RGBA;
 		spec.Width = 1;
 		spec.Height = 1;
 		spec.GenerateMips = false;
@@ -68,43 +66,6 @@ namespace Hanabi
 		s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
 		s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
 
-		// Create fullscreen quad
-		{
-			float x = -1;
-			float y = -1;
-			float width = 2, height = 2;
-			struct QuadVertex
-			{
-				glm::vec3 Position;
-				glm::vec2 TexCoord;
-			};
-
-			QuadVertex* data = new QuadVertex[4];
-
-			data[0].Position = glm::vec3(x, y, 0.0f);
-			data[0].TexCoord = glm::vec2(0, 0);
-
-			data[1].Position = glm::vec3(x + width, y, 0.0f);
-			data[1].TexCoord = glm::vec2(1, 0);
-
-			data[2].Position = glm::vec3(x + width, y + height, 0.0f);
-			data[2].TexCoord = glm::vec2(1, 1);
-
-			data[3].Position = glm::vec3(x, y + height, 0.0f);
-			data[3].TexCoord = glm::vec2(0, 1);
-
-			s_Data->FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
-			s_Data->FullscreenQuadVertexBuffer->SetLayout({
-				{ ShaderDataType::Float3, "a_Position" },
-				{ ShaderDataType::Float2, "a_TexCoord" },
-				});
-
-			uint32_t indices[6] = { 0, 1, 2, 2, 3, 0, };
-			s_Data->FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32_t));
-
-			delete[] data;
-		}
-
 		Renderer2D::Init();
 		SceneRenderer::Init();
 	}
@@ -117,7 +78,7 @@ namespace Hanabi
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		s_RendererAPI->SetViewport(0, 0, width, height);
+		s_RendererAPI->SetViewport(width, height);
 	}
 
 	void Renderer::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
@@ -158,7 +119,8 @@ namespace Hanabi
 
 	void Renderer::DrawFullScreenQuad()
 	{
-		Renderer::DrawIndexed(s_Data->FullscreenQuadVertexBuffer, s_Data->FullscreenQuadIndexBuffer);
+		s_RendererAPI->DrawFullScreenQuad();
+		//Renderer::DrawIndexed(s_Data->FullscreenQuadVertexBuffer, s_Data->FullscreenQuadIndexBuffer);
 	}
 
 	std::pair<Ref<TextureCube>, Ref<TextureCube>> Renderer::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)

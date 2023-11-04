@@ -44,6 +44,13 @@ namespace Hanabi
 				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
 			}
 		}
+		{
+			auto it = reflectionData.find("u_SSAnisotropicWrap");
+			if (it != reflectionData.end())
+			{
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSAnisotropicWrap.GetAddressOf());
+			}
+		}
 	}
 
 	Ref<Image2D> DX11RenderPass::GetOutput(uint32_t index)

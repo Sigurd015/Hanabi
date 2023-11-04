@@ -36,7 +36,6 @@ project "Hanabi"
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
@@ -53,11 +52,9 @@ project "Hanabi"
 	links 
 	{ 
 		"GLFW",
-		"Glad",
 		"ImGui",
 		"yaml_cpp",
 		"Box2D",
-		"opengl32.lib",
 		"msdf_atlas_gen"
 	}
 

@@ -1,16 +1,5 @@
 #include "hnbpch.h"
 
-//----------OpenGL----------------------------------------
-#include "Engine/Platform/OpenGL/OpenGLVertexBuffer.h"
-#include "Engine/Platform/OpenGL/OpenGLIndexBuffer.h"
-#include "Engine/Platform/OpenGL/OpenGLAPI.h"
-#include "Engine/Platform/OpenGL/OpenGLContext.h"
-#include "Engine/Platform/OpenGL/OpenGLShader.h"
-#include "Engine/Platform/OpenGL/OpenGLTexture.h"
-#include "Engine/Platform/OpenGL/OpenGLFramebuffer.h"
-#include "Engine/Platform/OpenGL/OpenGLUniformBuffer.h"
-#include "Engine/Platform/OpenGL/OpenGLPipeline.h"
-
 #if defined(HNB_PLATFORM_WINDOWS)
 //----------DX11----------------------------------------
 #include "Engine/Platform/D3D/DX11/DX11VertexBuffer.h"
@@ -37,8 +26,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateScope<OpenGLRendererAPI>();
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -56,9 +43,6 @@ namespace Hanabi
 		{
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPIType::OpenGL:
-			HNB_CORE_ASSERT(false, "OpenGL RenderPass is currently not implemented!");
 			return nullptr;
 
 			#if defined(HNB_PLATFORM_WINDOWS)
@@ -78,8 +62,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateScope<OpenGLContext>(static_cast<GLFWwindow*>(window));
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -98,8 +80,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLPipeline>(spec);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -117,8 +97,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLShader>(fileName);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -136,8 +114,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLVertexBuffer>(size);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -155,8 +131,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLVertexBuffer>(vertices, size);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -174,8 +148,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLIndexBuffer>(indices, count);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -192,9 +164,6 @@ namespace Hanabi
 		{
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-		case RendererAPIType::OpenGL:
-			HNB_CORE_ASSERT(false, "OpenGL Image2D is currently not implemented!");
 			return nullptr;
 
 			#if defined(HNB_PLATFORM_WINDOWS)
@@ -214,8 +183,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLTexture2D>(specification, data);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -233,8 +200,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLTextureCube>(specification, data);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -252,8 +217,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLFramebuffer>(spec);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
@@ -272,8 +235,6 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPIType::OpenGL:
-			return CreateRef<OpenGLUniformBuffer>(size);
 
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
