@@ -30,7 +30,7 @@ VertexOutput main(VertexInput Input)
     Output.WorldPosition = worldPosition.xyz;  
     Output.TexCoord = Input.a_TexCoord;
     Output.Normal = mul((float3x3)u_Transform, Input.a_Normal);
-    Output.TBN = mul((float3x3)u_Transform, float3x3(Input.a_Tangent, Input.a_Bitangent, Input.a_Normal));
+    Output.TBN = mul((float3x3)u_Transform, transpose(float3x3(Input.a_Tangent, Input.a_Bitangent, Input.a_Normal)));
     Output.Position = mul(u_ViewProjection, worldPosition);
     return Output;
 }
@@ -65,18 +65,19 @@ PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
     float4 albedo = u_AlbedoTex.Sample(u_SSAnisotropicWrap, Input.TexCoord);
-    float metalness = u_MetalnessTex.Sample(u_SSLinearWrap, Input.TexCoord).x * u_Material.Metalness;
-    float roughness = u_RoughnessTex.Sample(u_SSLinearWrap, Input.TexCoord).x * u_Material.Roughness;
+    float metalness = u_MetalnessTex.Sample(u_SSLinearWrap, Input.TexCoord).r * u_Material.Metalness;
+    float roughness = u_RoughnessTex.Sample(u_SSLinearWrap, Input.TexCoord).r * u_Material.Roughness;
 
     float3 normal = normalize(Input.Normal);
     if (u_Material.UseNormalMap)
     {
-        normal = u_NormalTex.Sample(u_SSLinearWrap, Input.TexCoord).xyz * 2.0f - 1.0f; // from RGB[0, 1] to [-1, 1]
+        normal = normalize(u_NormalTex.Sample(u_SSLinearWrap, Input.TexCoord).rgb * 2.0f - 1.0f); // from RGB[0, 1] to [-1, 1]
         normal = normalize(mul(Input.TBN, normal));
     }
 
-    albedo = SRGBToLinear(albedo);
-    Output.Albedo = float4(albedo.rgb * u_Material.Albedo, albedo.w);
+    // Texture is created in UNORM format, but we need to convert it to linear space
+    albedo.rgb = SRGBToLinear(albedo.rgb, 2.2f);
+    Output.Albedo = float4(albedo.rgb * u_Material.Albedo, albedo.a);
     // Minimum roughness of 0.05 to keep specular highlight
     Output.MRE = float4(metalness, max(roughness, 0.05f), u_Material.Emission, 1.0f);
     Output.Normal = float4(normal, 1.0f);

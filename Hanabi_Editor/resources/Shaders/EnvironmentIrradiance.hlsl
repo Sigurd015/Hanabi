@@ -40,7 +40,7 @@ void main(uint3 ThreadID : SV_DispatchThreadID)
 		float cosTheta = max(0.0, dot(Li, N));
 
 		// PIs here cancel out because of division by pdf.
-		irradiance += 2.0 * u_RadianceMap.SampleLevel(u_SSLinearWrap,Li,0).rgb * cosTheta;
+		irradiance += 2.0 * u_RadianceMap.SampleLevel(u_SSLinearWrap, Li, 0).rgb * cosTheta;
 	}
 	irradiance /= samples;
 

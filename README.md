@@ -34,6 +34,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
     - [x] 2D Batch Renderer
     - [ ] 3D Renderer
       - [x] Deferred Rendering 
+      - [x] PBR + IBL
       - [ ] .....
 
 - [ ] Editor  
@@ -72,7 +73,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
     - [ ] Cascaded Shadow Maps
     - [ ] Omnidirectional Shadow Maps
   - [x] Skyboxes
-  - [ ] Physically based rendering (PBR)
+  - [x] Physically based rendering (PBR)
   - [ ] Screen space ambient occulsion
   - [ ] Screen space reflection
 - [ ] Ray/Path tracing

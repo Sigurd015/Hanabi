@@ -19,25 +19,31 @@ Texture2D u_BRDFLUTTex : register(t9);
 TextureCube u_EnvRadianceTex : register(t10);
 TextureCube u_EnvIrradianceTex : register(t11);
 
+// Returns number of mipmap levels for specular IBL environment map.
+uint QuerySpecularTextureLevels()
+{
+    uint width, height, levels;
+    u_EnvRadianceTex.GetDimensions(0, width, height, levels);
+    return levels;
+}
+
 float3 IBL(float3 F0, float3 Lr, PBRParameters params)
 {
 	float3 irradiance = u_EnvIrradianceTex.Sample(u_SSLinearWrap, params.Normal).rgb;
 	float3 F = FresnelSchlickRoughness(F0, params.NdotV, params.Roughness);
 	float3 kd = (1.0 - F) * (1.0 - params.Metalness);
-	float3 diffuseIBL = params.Albedo * irradiance;
+	float3 diffuseIBL = kd * params.Albedo * irradiance;
 
-	float width, height;
-    uint envRadianceTexLevels;
-	u_EnvRadianceTex.GetDimensions(0, width, height, envRadianceTexLevels);
+    uint envRadianceTexLevels = QuerySpecularTextureLevels();
 	float NoV = clamp(params.NdotV, 0.0, 1.0);
 	float3 R = 2.0 * dot(params.View, params.Normal) * params.Normal - params.View;
-	//float3 specularIrradiance = u_EnvRadianceTex.Sample(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), (params.Roughness) * envRadianceTexLevels).rgb;
-	float3 specularIrradiance = u_EnvRadianceTex.Sample(u_SSLinearWrap, Lr, (params.Roughness) * envRadianceTexLevels).rgb;
+	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), (params.Roughness) * envRadianceTexLevels).rgb;
+	float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, (params.Roughness) * envRadianceTexLevels).rgb;
 
-	float2 specularBRDF = u_BRDFLUTTex.Sample(u_SSLinearWrap, float2(params.NdotV, 1.0 - params.Roughness)).rg;
+	float2 specularBRDF = u_BRDFLUTTex.Sample(u_SSPointClamp, float2(params.NdotV, 1.0 - params.Roughness)).rg;
 	float3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
 
-	return kd * diffuseIBL + specularIBL;
+	return diffuseIBL + specularIBL;
 }
 
 // Constant normal incidence Fresnel factor for all dielectrics.

@@ -44,7 +44,7 @@ namespace Hanabi
 			stbi_set_flip_vertically_on_load(1);
 			imageBuffer.Data = stbi_load(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 			imageBuffer.Size = width * height * 4;
-			spec.Format = ImageFormat::SRGB;
+			spec.Format = ImageFormat::RGBA;
 			spec.GenerateMips = true;
 		}
 

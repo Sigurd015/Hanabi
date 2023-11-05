@@ -31,6 +31,13 @@ namespace Hanabi
 
 		// Bind Common States
 		{
+			auto it = reflectionData.find("u_SSPointClamp");
+			if (it != reflectionData.end())
+			{
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSPointClamp.GetAddressOf());
+			}
+		}
+		{
 			auto it = reflectionData.find("u_SSLinearWrap");
 			if (it != reflectionData.end())
 			{
