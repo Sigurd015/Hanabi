@@ -44,7 +44,6 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 
 ## Dependencies
 - [glfw](https://github.com/glfw/glfw)
-- [glad](https://github.com/Dav1dde/glad)
 - [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo)
 - [box2d](https://github.com/erincatto/box2d)
 - [entt](https://github.com/skypjack/entt)

@@ -331,7 +331,7 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("u_MREBuffer", s_Data->DeferredGeoPass->GetOutput(1));
 		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
 		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
-		s_Data->DeferredLightingPass->SetInput("u_ShadowDepth", s_Data->DirShadowMapPass->GetDepthOutput());
+		s_Data->DeferredLightingPass->SetInput("u_ShadowMap", s_Data->DirShadowMapPass->GetDepthOutput());
 		s_Data->DeferredLightingPass->SetInput("u_BRDFLUTTex", Renderer::GetTexture<Texture2D>("BRDFLut"));
 
 		s_Data->CompositePass->SetInput("u_Color", s_Data->DeferredLightingPass->GetOutput());
@@ -387,6 +387,8 @@ namespace Hanabi
 			else
 			{
 				s_Data->SkyboxPass->SetInput("u_RadianceMap", Renderer::GetTexture<TextureCube>("BlackCube"));
+				s_Data->DeferredLightingPass->SetInput("u_EnvRadianceTex", Renderer::GetTexture<TextureCube>("BlackCube"));
+				s_Data->DeferredLightingPass->SetInput("u_EnvIrradianceTex", Renderer::GetTexture<TextureCube>("BlackCube"));
 			}
 		}
 

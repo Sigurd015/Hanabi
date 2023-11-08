@@ -75,7 +75,7 @@ PixelOutput main(PixelInput Input)
         normal = normalize(mul(Input.TBN, normal));
     }
 
-    // Texture is created in UNORM format, but we need to convert it to linear space
+    // Texture is created in UNORM format, so we need to convert it to linear space
     albedo.rgb = SRGBToLinear(albedo.rgb, 2.2f);
     Output.Albedo = float4(albedo.rgb * u_Material.Albedo, albedo.a);
     // Minimum roughness of 0.05 to keep specular highlight

@@ -34,6 +34,8 @@ namespace Hanabi
 		int width, height, channels;	
 		if (stbi_is_hdr(pathString.c_str()))
 		{
+			// Notice: Look like stbi_set_flip_vertically_on_load is global state, so remember to reset it
+			stbi_set_flip_vertically_on_load(0);
 			imageBuffer.Data = (uint8_t*)stbi_loadf(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 			imageBuffer.Size = width * height * 4 * sizeof(float);
 			spec.Format = ImageFormat::RGBA32F;

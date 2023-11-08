@@ -3,7 +3,7 @@
 #include "Buffers.hlsl"
 #include "Common.hlsl"
 
-Texture2D u_ShadowDepth : register(t8);
+Texture2D u_ShadowMap : register(t8);
 
 float GetDirShadowBias(float3 worldNormal)
 {
@@ -28,21 +28,18 @@ float CalculateSoftShadow(float4 position, float3 worldNormal)
     shadowPosition.x = 0.5f * shadowPosition.x + 0.5f;
     shadowPosition.y = -0.5f * shadowPosition.y + 0.5f;
 
-    float currentDepth = shadowPosition.z;
-
-    float shadow = 0.0f;
     float bias = GetDirShadowBias(worldNormal);
-    float texelSize =0.00008f;
-
     // PCF Sample with 8x8 kernel
     static const int SampleSize = 4;
+    static float texelSize =0.00008f;
 
+    float shadow = 0.0f;
     for (int i = -SampleSize; i <= SampleSize; i++)
     {
         for (int j = -SampleSize; j <= SampleSize; j++)
         {
-            float pcfDepth = u_ShadowDepth.Sample(u_SSLinearClamp, shadowPosition.xy + float2(i, j) * texelSize).r;
-            shadow += step(currentDepth - bias , pcfDepth);
+            float pcfDepth = u_ShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy + float2(i, j) * texelSize, 0).r;
+            shadow += step(shadowPosition.z - bias , pcfDepth);
         }
     }
 
@@ -65,12 +62,10 @@ float CalculateHardShadow(float4 position, float3 worldNormal)
     shadowPosition.x = 0.5f * shadowPosition.x + 0.5f;
     shadowPosition.y = -0.5f * shadowPosition.y + 0.5f;
 
-    float currentDepth = shadowPosition.z;
-
     float shadow = 1.0f;
     float bias = GetDirShadowBias(worldNormal);
-    float depthFromLight = u_ShadowDepth.Sample(u_SSLinearClamp, shadowPosition.xy).r;
-    if(currentDepth > depthFromLight + bias)
+    float depthFromLight = u_ShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy, 0).r;
+    if(shadowPosition.z > depthFromLight + bias)
     {
         shadow = 0.0f;
     }

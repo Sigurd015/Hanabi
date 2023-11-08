@@ -19,14 +19,6 @@ Texture2D u_BRDFLUTTex : register(t9);
 TextureCube u_EnvRadianceTex : register(t10);
 TextureCube u_EnvIrradianceTex : register(t11);
 
-// Returns number of mipmap levels for specular IBL environment map.
-uint QuerySpecularTextureLevels()
-{
-    uint width, height, levels;
-    u_EnvRadianceTex.GetDimensions(0, width, height, levels);
-    return levels;
-}
-
 float3 IBL(float3 F0, float3 Lr, PBRParameters params)
 {
 	float3 irradiance = u_EnvIrradianceTex.Sample(u_SSLinearWrap, params.Normal).rgb;
@@ -34,7 +26,8 @@ float3 IBL(float3 F0, float3 Lr, PBRParameters params)
 	float3 kd = (1.0 - F) * (1.0 - params.Metalness);
 	float3 diffuseIBL = kd * params.Albedo * irradiance;
 
-    uint envRadianceTexLevels = QuerySpecularTextureLevels();
+    uint width, height, envRadianceTexLevels;
+    u_EnvRadianceTex.GetDimensions(0, width, height, envRadianceTexLevels);
 	float NoV = clamp(params.NdotV, 0.0, 1.0);
 	float3 R = 2.0 * dot(params.View, params.Normal) * params.Normal - params.View;
 	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), (params.Roughness) * envRadianceTexLevels).rgb;

@@ -26,8 +26,8 @@ cbuffer CBFilterParam : register(b0)
 void main(uint3 ThreadID : SV_DispatchThreadID)
 {
     // Make sure we won't write past output when computing higher mipmap levels.
-    float outputWidth, outputHeight, outputDepth;
-    o_OutputTex.GetDimensions(outputWidth, outputHeight, outputDepth);
+    float outputWidth, outputHeight, outputLevel;
+    o_OutputTex.GetDimensions(outputWidth, outputHeight, outputLevel);
     if(ThreadID.x >= outputWidth || ThreadID.y >= outputHeight) 
 	{
 		return;
@@ -35,8 +35,8 @@ void main(uint3 ThreadID : SV_DispatchThreadID)
 
     // Solid angle associated with a single cubemap texel at zero mipmap level.
 	// This will come in handy for importance sampling below.
-	float inputWidth, inputHeight, numberOfLevels;
-	u_InputTex.GetDimensions(0, inputWidth, inputHeight, numberOfLevels);
+	float inputWidth, inputHeight, inputLevel;
+	u_InputTex.GetDimensions(0, inputWidth, inputHeight, inputLevel);
 
 	float wt = 4.0 * PI / (6 * inputWidth * inputHeight);
 

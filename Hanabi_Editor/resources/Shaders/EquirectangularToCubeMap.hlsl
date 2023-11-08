@@ -12,9 +12,9 @@ RWTexture2DArray<float4> o_OutputTex : register(u0);
 [numthreads(32, 32, 1)]
 void main(uint3 ThreadID : SV_DispatchThreadID)
 {
-    float outputWidth, outputHeight, outputDepth;
-    o_OutputTex.GetDimensions(outputWidth, outputHeight, outputDepth);
-    float3 cubeTC = GetCubeMapTexCoord(ThreadID, float2(outputWidth, outputHeight));
+    float width, height, level;
+    o_OutputTex.GetDimensions(width, height, level);
+    float3 cubeTC = GetCubeMapTexCoord(ThreadID, float2(width, height));
 	
     // Calculate sampling coords for equirectangular texture
 	// https://en.wikipedia.org/wiki/Spherical_coordinate_system#Cartesian_coordinates

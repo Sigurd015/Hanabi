@@ -74,6 +74,8 @@ namespace Hanabi
 	{
 		Renderer2D::Shutdown();
 		SceneRenderer::Shutdown();
+
+		delete s_Data;
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)

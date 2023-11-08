@@ -1,4 +1,6 @@
 #pragma once
+#include "AABB.h"
+
 #include <glm/glm.hpp>
 
 namespace Hanabi
