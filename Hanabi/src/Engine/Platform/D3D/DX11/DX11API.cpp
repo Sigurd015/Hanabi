@@ -39,11 +39,11 @@ namespace Hanabi
 		DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
 
 		// TODO: May need to support SRGB backbuffer
-        //D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
-        //targetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-        //targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-        //targetViewDesc.Texture2D.MipSlice = 0;
-        //DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), &targetViewDesc, m_RenderTargetView.GetAddressOf()));
+		//D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
+		//targetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		//targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		//targetViewDesc.Texture2D.MipSlice = 0;
+		//DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), &targetViewDesc, m_RenderTargetView.GetAddressOf()));
 	}
 
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
@@ -216,9 +216,12 @@ namespace Hanabi
 			envUnfiltered->GenerateMips();
 		}
 
-		// Radiance map (Filter)
+		// Radiance map (Filter)	
 		Ref<DX11TextureCube> envFiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
 		{
+			// Copy Unfiltered envmap to Filtered envmap (Keep the first mip level)
+			m_DeviceContext->CopyResource(envFiltered->GetTextureCube().Get(), envUnfiltered->GetTextureCube().Get());
+
 			Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
 			uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
 			const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();
@@ -255,10 +258,10 @@ namespace Hanabi
 
 			environmentMipFilterShader->Bind();
 			const float deltaRoughness = 1.0f / glm::max((float)mipCount - 1.0f, 1.0f);
-			for (uint32_t i = 0, size = cubemapSize; i < mipCount; i++, size /= 2)
+			for (uint32_t i = 1, size = cubemapSize; i < mipCount; i++, size /= 2)
 			{
 				uint32_t numGroups = glm::max(1u, size / 32);
-				CBFilterParam filterParam = { glm::max(i * deltaRoughness, 0.05f) };
+				CBFilterParam filterParam = { i * deltaRoughness };
 				s_FilterParam->SetData(&filterParam, sizeof(CBFilterParam));
 				envFiltered->CreateUAV(i);
 				m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);

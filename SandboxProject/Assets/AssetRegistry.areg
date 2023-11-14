@@ -2,6 +2,9 @@ AssetRegistry:
   - Handle: 841372594545168923
     FilePath: Materials/gray-granite-flecks.hmat
     Type: AssetType::Material
+  - Handle: 1991723713832931260
+    FilePath: Textures/envmap/brown_photostudio_02_4k.hdr
+    Type: AssetType::EnvMap
   - Handle: 2333949280243433075
     FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_roughness.png
     Type: AssetType::Texture2D
@@ -26,6 +29,12 @@ AssetRegistry:
   - Handle: 5775838104344894305
     FilePath: Scenes/PBRTest.hscene
     Type: AssetType::Scene
+  - Handle: 5796823861923018421
+    FilePath: Textures/envmap/kloppenheim_02_puresky_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 6311326570274108486
+    FilePath: Textures/envmap/dark_autumn_forest_4k.hdr
+    Type: AssetType::EnvMap
   - Handle: 6548672909131543686
     FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_normal-dx.png
     Type: AssetType::Texture2D
@@ -50,9 +59,15 @@ AssetRegistry:
   - Handle: 10066814809449201864
     FilePath: Textures/envmap/hilly_terrain_01_4k.hdr
     Type: AssetType::EnvMap
+  - Handle: 10801380211512351879
+    FilePath: Materials/white.hmat
+    Type: AssetType::Material
   - Handle: 10864898568509953569
     FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_normal-dx.png
     Type: AssetType::Texture2D
+  - Handle: 11712703148928652040
+    FilePath: Textures/envmap/lago_disola_4k.hdr
+    Type: AssetType::EnvMap
   - Handle: 11767140759291818488
     FilePath: Materials/rustediron1-alt2.hmat
     Type: AssetType::Material

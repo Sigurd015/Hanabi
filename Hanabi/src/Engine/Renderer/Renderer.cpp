@@ -59,7 +59,7 @@ namespace Hanabi
 		s_Data->Textures["BlackCube"] = TextureCube::Create(spec, Buffer(blackCubeTextureData, sizeof(blackCubeTextureData)));
 
 		// Notice: format, width and height are automatically set by TextureSerializer::LoadTexture2D, so we can reuse spec
-		s_Data->Textures["BRDFLut"] = TextureSerializer::LoadTexture2D("Resources/Renderer/BRDF_LUT.tga", spec);
+		s_Data->Textures["BRDFLut"] = TextureSerializer::LoadTexture2D("Resources/Renderer/BRDF_LUT.png", spec);
 
 		//Load default meshes
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });

@@ -28,10 +28,8 @@ float3 IBL(float3 F0, float3 Lr, PBRParameters params)
 
     uint width, height, envRadianceTexLevels;
     u_EnvRadianceTex.GetDimensions(0, width, height, envRadianceTexLevels);
-	float NoV = clamp(params.NdotV, 0.0, 1.0);
-	float3 R = 2.0 * dot(params.View, params.Normal) * params.Normal - params.View;
-	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), (params.Roughness) * envRadianceTexLevels).rgb;
-	float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, (params.Roughness) * envRadianceTexLevels).rgb;
+	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), params.Roughness * envRadianceTexLevels).rgb;
+	float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, params.Roughness * envRadianceTexLevels).rgb;
 
 	float2 specularBRDF = u_BRDFLUTTex.Sample(u_SSPointClamp, float2(params.NdotV, 1.0 - params.Roughness)).rg;
 	float3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
