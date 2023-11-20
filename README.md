@@ -92,7 +92,7 @@ git clone https://github.com/Sigurd015/Hanabi
 git submodule update --init --recursive
 ```
 
-<ins>**2. Run the [Win-GenProjects.bat](https://github.com/Sigurd015/Hanabi/blob/main/Win-GenProjects.bat)**</ins>
+<ins>**2. Run the [Setup-Windows.bat](https://github.com/Sigurd015/Hanabi/blob/main/Scripts/Setup-Windows.bat)**</ins>
 
 You can change the .bat file to generate a different version project file, but that is not tested.
 

@@ -6,5 +6,5 @@ Material:
   AlbedoColor: [1, 1, 1]
   Emission: 0
   Metalness: 0
-  Roughness: 0
+  Roughness: 1
   UseNormalMap: true

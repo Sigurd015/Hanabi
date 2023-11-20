@@ -5,7 +5,7 @@ project "Hanabi_ScriptCore"
 	namespace "Hanabi"
 
     targetdir ("../Hanabi_Editor/Resources/Scripts")
-	objdir ("../build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
+	objdir (intdir .. "/%{prj.name}")
 
 	files 
 	{
