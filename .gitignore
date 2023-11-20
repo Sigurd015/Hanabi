@@ -1,5 +1,5 @@
 .vs/
-Binaries/
+/Binaries/
 *.user
 *.filters
 *.vcxproj
