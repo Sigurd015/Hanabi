@@ -28,7 +28,7 @@ namespace Hanabi
 		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle = 0);
 
 	private:
-		static void ExecuteDrawCommands(bool useMaterial = true);
+		static void ExecuteDrawCommands();
 
 		static void DeferredGeoPass();
 		static void DeferredLightPass();
