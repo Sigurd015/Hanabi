@@ -163,6 +163,23 @@ namespace Hanabi
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
 		s_Data->DirShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBDirShadow));
 
+		VertexBufferLayout GeoLayout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float3, "a_Normal" },
+			{ ShaderDataType::Float3, "a_Tangent" },
+			{ ShaderDataType::Float3, "a_Bitangent" },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+		};
+
+		VertexBufferLayout FullScreenQuadLayout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" },
+		};
+
+		VertexBufferLayout SkyboxLayout = {
+			{ ShaderDataType::Float3, "a_Position" },
+		};
+
 		// Deferred Geometry Pass
 		{
 			Ref<Framebuffer> framebuffer;
@@ -176,16 +193,8 @@ namespace Hanabi
 				framebuffer = Framebuffer::Create(spec);
 			}
 			{
-				VertexBufferLayout vertexLayout = {
-					{ ShaderDataType::Float3, "a_Position" },
-					{ ShaderDataType::Float3, "a_Normal" },
-					{ ShaderDataType::Float3, "a_Tangent" },
-					{ ShaderDataType::Float3, "a_Bitangent" },
-					{ ShaderDataType::Float2, "a_TexCoord" },
-				};
-
 				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = vertexLayout;
+				pipelineSpec.Layout = GeoLayout;
 				pipelineSpec.Shader = Renderer::GetShader("DeferredGeometry");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = true;
@@ -211,12 +220,10 @@ namespace Hanabi
 				framebuffer = Framebuffer::Create(spec);
 			}
 			{
-				VertexBufferLayout vertexLayout = {
-					{ ShaderDataType::Float3, "a_Position" },
-				};
-
 				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = vertexLayout;
+				// Notice: Use the same layout as DeferredGeoPass, 
+				// because transparent objects need check alpha value from Albedo Texture
+				pipelineSpec.Layout = GeoLayout;
 				pipelineSpec.Shader = Renderer::GetShader("DirShadowMap");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = true;
@@ -242,10 +249,7 @@ namespace Hanabi
 			}
 			{
 				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = {
-				   { ShaderDataType::Float3, "a_Position" },
-				   { ShaderDataType::Float2, "a_TexCoord" },
-				};
+				pipelineSpec.Layout = FullScreenQuadLayout;
 				pipelineSpec.Shader = Renderer::GetShader("DeferredLighting");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = false;
@@ -270,10 +274,7 @@ namespace Hanabi
 			}
 			{
 				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = {
-				   { ShaderDataType::Float3, "a_Position" },
-				   { ShaderDataType::Float2, "a_TexCoord" },
-				};
+				pipelineSpec.Layout = FullScreenQuadLayout;
 				pipelineSpec.Shader = Renderer::GetShader("Composite");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = false;
@@ -300,9 +301,7 @@ namespace Hanabi
 			}
 			{
 				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = {
-				   { ShaderDataType::Float3, "a_Position" },
-				};
+				pipelineSpec.Layout = SkyboxLayout;
 				pipelineSpec.Shader = Renderer::GetShader("Skybox");
 				pipelineSpec.TargetFramebuffer = framebuffer;
 				pipelineSpec.BackfaceCulling = false;
@@ -377,7 +376,6 @@ namespace Hanabi
 				s_Data->SkyboxPass->SetInput("u_RadianceMap", asset->RadianceMap);
 				s_Data->DeferredLightingPass->SetInput("u_EnvRadianceTex", asset->RadianceMap);
 				s_Data->DeferredLightingPass->SetInput("u_EnvIrradianceTex", asset->IrradianceMap);
-				// TODO: Bind Irradiance Map to lighting pass
 
 				// Debug
 				//Ref<Texture2D> equirectangularMap = AssetManager::GetAsset<Texture2D>(environment->EnvMapHandle);
@@ -521,7 +519,7 @@ namespace Hanabi
 		}
 	}
 
-	void SceneRenderer::ExecuteDrawCommands(bool useMaterial)
+	void SceneRenderer::ExecuteDrawCommands()
 	{
 		for (auto& command : s_Data->DrawCommands)
 		{
@@ -530,10 +528,7 @@ namespace Hanabi
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 
-			if (useMaterial)
-				Renderer::DrawMesh(command.Mesh, command.Material);
-			else
-				Renderer::DrawMesh(command.Mesh);
+			Renderer::DrawMesh(command.Mesh, command.Material);
 		}
 	}
 
@@ -566,7 +561,7 @@ namespace Hanabi
 
 				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
 
-				ExecuteDrawCommands(false);
+				ExecuteDrawCommands();
 			}
 			else
 			{

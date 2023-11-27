@@ -44,7 +44,7 @@ float CalculateSoftShadow(float4 position, float3 worldNormal)
     }
 
     // Number of iterations of inner + outer loop combined.
-    return shadow / pow(SampleSize * SampleSize, 2);
+    return shadow / pow(SampleSize * 2 + 1, 2);
 }
 
 // Hard Shadows
@@ -65,10 +65,6 @@ float CalculateHardShadow(float4 position, float3 worldNormal)
     float shadow = 1.0f;
     float bias = GetDirShadowBias(worldNormal);
     float depthFromLight = u_ShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy, 0).r;
-    if(shadowPosition.z > depthFromLight + bias)
-    {
-        shadow = 0.0f;
-    }
-    return shadow;
+    return step(shadowPosition.z, depthFromLight + bias);
 }
 #endif
