@@ -129,8 +129,8 @@ namespace Hanabi
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<IDComponent>(uuid);
 		entity.AddComponent<TransformComponent>();
-		auto& tag = entity.AddComponent<TagComponent>();
-		tag.Tag = name.empty() ? "Entity" : name;
+		entity.AddComponent<TagComponent>(name.empty() ? Entity::NoName : name);
+		entity.AddComponent<RelationshipComponent>();
 
 		m_EntityMap[uuid] = entity;
 

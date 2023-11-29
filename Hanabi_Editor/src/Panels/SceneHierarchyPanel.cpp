@@ -38,8 +38,10 @@ namespace Hanabi
 			m_Context->m_Registry.each([&](auto entityID)
 				{
 					Entity entity{ entityID , m_Context.get() };
-					DrawEntityNode(entity);
+					if (entity.GetParentUUID() == 0)
+						DrawEntityNode(entity);
 				});
+
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 				SelectionManager::SetSelectedEntity({});
 
@@ -68,7 +70,12 @@ namespace Hanabi
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 		Entity selectedEntity = SelectionManager::GetSelectedEntity();
+		std::vector<UUID>& children = entity.GetChildren();
+		
 		ImGuiTreeNodeFlags flags = ((selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+		if (children.empty())
+			flags |= ImGuiTreeNodeFlags_Leaf;
+
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, tag.c_str());
 		if (ImGui::IsItemClicked())
 		{
@@ -89,11 +96,10 @@ namespace Hanabi
 
 		if (opened)
 		{
-			//TODO: Draw Children Entity
-			ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow;
-			bool opened = ImGui::TreeNodeEx((void*)9817239, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
+			for (auto child : children)
+			{
+				DrawEntityNode(m_Context->GetEntityByUUID(child));
+			}
 			ImGui::TreePop();
 		}
 	}

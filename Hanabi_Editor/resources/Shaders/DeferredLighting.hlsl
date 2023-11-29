@@ -19,19 +19,19 @@ Texture2D u_BRDFLUTTex : register(t9);
 TextureCube u_EnvRadianceTex : register(t10);
 TextureCube u_EnvIrradianceTex : register(t11);
 
-float3 IBL(float3 F0, float3 Lr, PBRParameters params)
+float3 IBL(float3 F0, float3 Lr)
 {
-	float3 irradiance = u_EnvIrradianceTex.Sample(u_SSLinearWrap, params.Normal).rgb;
-	float3 F = FresnelSchlickRoughness(F0, params.NdotV, params.Roughness);
-	float3 kd = (1.0 - F) * (1.0 - params.Metalness);
-	float3 diffuseIBL = kd * params.Albedo * irradiance;
+	float3 irradiance = u_EnvIrradianceTex.Sample(u_SSLinearWrap, m_Params.Normal).rgb;
+	float3 F = FresnelSchlickRoughness(F0, m_Params.NdotV, m_Params.Roughness);
+	float3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
+	float3 diffuseIBL = kd * m_Params.Albedo * irradiance;
 
     uint width, height, envRadianceTexLevels;
     u_EnvRadianceTex.GetDimensions(0, width, height, envRadianceTexLevels);
-	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), params.Roughness * envRadianceTexLevels).rgb;
-	float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, params.Roughness * envRadianceTexLevels).rgb;
+	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), m_Params.Roughness * envRadianceTexLevels).rgb;
+	float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, m_Params.Roughness * envRadianceTexLevels).rgb;
 
-	float2 specularBRDF = u_BRDFLUTTex.Sample(u_SSPointClamp, float2(params.NdotV, 1.0 - params.Roughness)).rg;
+	float2 specularBRDF = u_BRDFLUTTex.Sample(u_SSPointClamp, float2(m_Params.NdotV, 1.0 - m_Params.Roughness)).rg;
 	float3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
 
 	return diffuseIBL + specularIBL;
@@ -42,46 +42,45 @@ const float3 Fdielectric = float3(0.04f, 0.04f, 0.04f);
 
 float4 main(float4 Position : SV_Position) : SV_Target
 {
-    PBRParameters params;
     float4 albedoTexColor = u_AlbedoBuffer.Load(uint3(Position.xy, 0));
-    params.Albedo = albedoTexColor.rgb;
+    m_Params.Albedo = albedoTexColor.rgb;
     float alpha = albedoTexColor.a;
     float4 MRE = u_MREBuffer.Load(uint3(Position.xy, 0));
-    params.Metalness = MRE.x;
-    params.Roughness = MRE.y; 
-    params.Normal = u_NormalBuffer.Load(uint3(Position.xy, 0)).xyz;
-    params.WorldPosition = u_PositionBuffer.Load(uint3(Position.xy, 0)).xyz;
-    float4 lightTransformedPosition = mul(u_DirLightViewProjection, float4(params.WorldPosition, 1.0));
+    m_Params.Metalness = MRE.x;
+    m_Params.Roughness = MRE.y; 
+    m_Params.Normal = u_NormalBuffer.Load(uint3(Position.xy, 0)).xyz;
+    m_Params.WorldPosition = u_PositionBuffer.Load(uint3(Position.xy, 0)).xyz;
+    float4 lightTransformedPosition = mul(u_DirLightViewProjection, float4(m_Params.WorldPosition, 1.0));
     
-	params.View = normalize(u_CameraPosition - params.WorldPosition);
-    params.NdotV = max(dot(params.Normal, params.View), 0.0);
+	m_Params.View = normalize(u_CameraPosition - m_Params.WorldPosition);
+    m_Params.NdotV = max(dot(m_Params.Normal, m_Params.View), 0.0);
 
     // Specular reflection vector
-	float3 Lr = 2.0 * params.NdotV * params.Normal - params.View;
+	float3 Lr = 2.0 * m_Params.NdotV * m_Params.Normal - m_Params.View;
 
 	// Fresnel reflectance, metals use albedo
-	float3 F0 = lerp(Fdielectric, params.Albedo, params.Metalness);
+	float3 F0 = lerp(Fdielectric, m_Params.Albedo, m_Params.Metalness);
 
     // Calculate direct light shadow factor
     float dirShadowFactor = 1.0f;
     switch (u_DirShadowType)
     {
         case 1:
-            dirShadowFactor = CalculateHardShadow(lightTransformedPosition, params.Normal);
+            dirShadowFactor = DirHardShadow(lightTransformedPosition);
             break;
         case 2:
-            dirShadowFactor = CalculateSoftShadow(lightTransformedPosition, params.Normal);
+            dirShadowFactor = DirSoftShadow(lightTransformedPosition);
             break;
     }
 
     // Direct lighting
-	float3 lightContribution = CalculateDirLights(params, F0) * dirShadowFactor;
-	lightContribution += CalculatePointLights(params, F0);
-	lightContribution += CalculateSpotLights(params, F0);
-	lightContribution += params.Albedo * MRE.z; // MRE.z -> Emission
+	float3 lightContribution = CalculateDirLights(F0) * dirShadowFactor;
+	lightContribution += CalculatePointLights(F0);
+	lightContribution += CalculateSpotLights(F0);
+	lightContribution += m_Params.Albedo * MRE.z; // MRE.z -> Emission
 
     // Indirect lighting
-    float3 iblContribution = IBL(F0, Lr, params) * u_EnvironmentMapIntensity;
+    float3 iblContribution = IBL(F0, Lr) * u_EnvironmentMapIntensity;
 
 	// Final color
     return float4(iblContribution + lightContribution, 1.0f);

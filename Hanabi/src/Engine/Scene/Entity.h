@@ -15,6 +15,8 @@ namespace Hanabi
 		Entity(entt::entity handle, Scene* scene) : m_EntityHandle(handle), m_Scene(scene) {}
 		Entity(const Entity& other) = default;
 
+		inline static std::string NoName = "Unnamed";
+
 		template<typename T, typename... Args>
 		T& AddComponent(Args&&... args)
 		{
@@ -40,7 +42,20 @@ namespace Hanabi
 		}
 
 		template<typename T>
+		const T& GetComponent() const
+		{
+			HNB_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
+			return m_Scene->m_Registry.get<T>(m_EntityHandle);
+		}
+
+		template<typename T>
 		bool HasComponent()
+		{
+			return m_Scene->m_Registry.has<T>(m_EntityHandle);
+		}
+
+		template<typename T>
+		bool HasComponent() const
 		{
 			return m_Scene->m_Registry.has<T>(m_EntityHandle);
 		}
@@ -50,6 +65,25 @@ namespace Hanabi
 		{
 			HNB_CORE_ASSERT(HasComponent<T>(), "Entity does not have component!");
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
+		}
+
+		void SetParentUUID(UUID parent) { GetComponent<RelationshipComponent>().ParentHandle = parent; }
+		UUID GetParentUUID() { return GetComponent<RelationshipComponent>().ParentHandle; }
+		std::vector<UUID>& GetChildren() { return GetComponent<RelationshipComponent>().Children; }
+		const std::vector<UUID>& GetChildren() const { return GetComponent<RelationshipComponent>().Children; }
+
+		bool RemoveChild(Entity child)
+		{
+			UUID childId = child.GetUUID();
+			std::vector<UUID>& children = GetChildren();
+			auto it = std::find(children.begin(), children.end(), childId);
+			if (it != children.end())
+			{
+				children.erase(it);
+				return true;
+			}
+
+			return false;
 		}
 
 		operator bool() const { return m_EntityHandle != entt::null; }
