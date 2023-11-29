@@ -116,6 +116,23 @@ namespace Hanabi
 				out << YAML::Key << "Tag" << YAML::Value << tag;
 			});
 
+		SerializeComponent<RelationshipComponent>("RelationshipComponent", entity, out, [&]()
+			{
+				auto& relationshipComponent = entity.GetComponent<RelationshipComponent>();
+				out << YAML::Key << "Parent" << YAML::Value << relationshipComponent.ParentHandle;
+
+				out << YAML::Key << "Children";
+				out << YAML::Value << YAML::BeginSeq;
+
+				for (auto child : relationshipComponent.Children)
+				{
+					out << YAML::BeginMap;
+					out << YAML::Key << "Handle" << YAML::Value << child;
+					out << YAML::EndMap;
+				}
+				out << YAML::EndSeq;
+			});
+
 		SerializeComponent<TransformComponent>("TransformComponent", entity, out, [&]()
 			{
 				auto& tc = entity.GetComponent<TransformComponent>();
@@ -341,6 +358,20 @@ namespace Hanabi
 
 				Entity deserializedEntity = scene->CreateEntityWithUUID(uuid, name);
 
+				auto& relationshipComponent = deserializedEntity.GetComponent<RelationshipComponent>();
+				uint64_t parentHandle = entity["Parent"] ? entity["Parent"].as<uint64_t>() : 0;
+				relationshipComponent.ParentHandle = parentHandle;
+
+				auto children = entity["Children"];
+				if (children)
+				{
+					for (auto child : children)
+					{
+						uint64_t childHandle = child["Handle"].as<uint64_t>();
+						relationshipComponent.Children.push_back(childHandle);
+					}
+				}
+
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
@@ -407,7 +438,7 @@ namespace Hanabi
 				{
 					auto& slc = deserializedEntity.AddComponent<SkyLightComponent>();
 					slc.Intensity = skyLightComponent["Intensity"].as<float>();
-					slc.EnvMapHandle = skyLightComponent["EnvMapHandle"].as<AssetHandle>();					
+					slc.EnvMapHandle = skyLightComponent["EnvMapHandle"].as<AssetHandle>();
 				}
 
 				auto scriptComponent = entity["ScriptComponent"];
