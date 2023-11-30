@@ -104,6 +104,13 @@ namespace Hanabi
 		return { m_EntityMap.at(uuid), this };
 	}
 
+	Entity Scene::TryGetEntityByUUID(UUID uuid)
+	{
+		if (auto iter = m_EntityMap.find(uuid); iter != m_EntityMap.end())
+			return { iter->second, this };
+		return Entity{};
+	}
+
 	Entity Scene::FindEntityByName(std::string_view name)
 	{
 		auto view = m_Registry.view<TagComponent>();
@@ -118,10 +125,103 @@ namespace Hanabi
 
 	TransformComponent Scene::GetWorldSpaceTransform(Entity entity)
 	{
-		if (entity)
-			return entity.GetComponent<TransformComponent>();
+		glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
+		TransformComponent transformComponent;
+		transformComponent.SetTransform(transform);
+		return transformComponent;
+	}
+
+	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
+	{
+		glm::mat4 transform(1.0f);
+
+		Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+		if (parent)
+			transform = GetWorldSpaceTransformMatrix(parent);
+
+		return transform * entity.Transform().GetTransform();
+	}
+
+	Entity Scene::GetMainCameraEntity()
+	{
+		auto view = m_Registry.view<CameraComponent>();
+		for (auto entity : view)
+		{
+			auto& cc = view.get<CameraComponent>(entity);
+			if (cc.Primary)
+			{
+				HNB_CORE_ASSERT(cc.Camera.GetOrthographicSize() || cc.Camera.GetPerspectiveVerticalFOV(), "Camera is not fully initialized");
+				return { entity, this };
+			}
+		}
+		return {};
+	}
+
+	void Scene::ParentEntity(Entity entity, Entity parent)
+	{
+		if (parent.IsDescendantOf(entity))
+		{
+			UnparentEntity(parent);
+
+			Entity newParent = TryGetEntityByUUID(entity.GetParentUUID());
+			if (newParent)
+			{
+				UnparentEntity(entity);
+				ParentEntity(parent, newParent);
+			}
+		}
 		else
-			return {};
+		{
+			Entity previousParent = TryGetEntityByUUID(entity.GetParentUUID());
+
+			if (previousParent)
+				UnparentEntity(entity);
+		}
+
+		entity.SetParentUUID(parent.GetUUID());
+		parent.GetChildren().push_back(entity.GetUUID());
+
+		ConvertToLocalSpace(entity);
+	}
+
+	void Scene::UnparentEntity(Entity entity, bool convertToWorldSpace)
+	{
+		Entity parent = GetEntityByUUID(entity.GetParentUUID());
+		if (!parent)
+			return;
+
+		auto& parentChildren = parent.GetChildren();
+		parentChildren.erase(std::remove(parentChildren.begin(), parentChildren.end(), entity.GetUUID()), parentChildren.end());
+
+		if (convertToWorldSpace)
+			ConvertToWorldSpace(entity);
+
+		entity.SetParentUUID(0);
+	}
+
+	void Scene::ConvertToLocalSpace(Entity entity)
+	{
+		Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+
+		if (!parent)
+			return;
+
+		auto& transform = entity.Transform();
+		glm::mat4 parentTransform = GetWorldSpaceTransformMatrix(parent);
+		glm::mat4 localTransform = glm::inverse(parentTransform) * transform.GetTransform();
+		transform.SetTransform(localTransform);
+	}
+
+	void Scene::ConvertToWorldSpace(Entity entity)
+	{
+		Entity parent = TryGetEntityByUUID(entity.GetParentUUID());
+
+		if (!parent)
+			return;
+
+		glm::mat4 transform = GetWorldSpaceTransformMatrix(entity);
+		auto& entityTransform = entity.Transform();
+		entityTransform.SetTransform(transform);
 	}
 
 	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
@@ -206,7 +306,7 @@ namespace Hanabi
 				for (auto e : view)
 				{
 					Entity entity = { e, this };
-					auto& transform = entity.GetComponent<TransformComponent>();
+					auto& transform = GetWorldSpaceTransform(entity);
 					auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 					b2Body* body = (b2Body*)rb2d.RuntimeBody;
@@ -218,27 +318,18 @@ namespace Hanabi
 			}
 		}
 
-		Camera* mainCamera = nullptr;
-		glm::mat4 cameraTransform;
-		m_Environment->PointLights.clear();
-		m_Environment->SpotLights.clear();
-		auto view = m_Registry.view<TransformComponent, CameraComponent>();
-		for (auto entity : view)
-		{
-			auto [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+		// Find main camera
+		Entity mainCameraEntity = GetMainCameraEntity();
 
-			if (camera.Primary)
-			{
-				mainCamera = &camera.Camera;
-				cameraTransform = transform.GetTransform();
-				m_Environment->CameraPosition = transform.Translation;
-				break;
-			}
-		}
-
-		if (mainCamera)
+		if (mainCameraEntity)
 		{
-			glm::mat4 viewProjection = mainCamera->GetProjection() * glm::inverse(cameraTransform);
+			glm::mat4 cameraTransform = glm::inverse(GetWorldSpaceTransformMatrix(mainCameraEntity));
+			m_Environment->PointLights.clear();
+			m_Environment->SpotLights.clear();
+			auto worldTransform = GetWorldSpaceTransform({ mainCameraEntity, this });
+			m_Environment->CameraPosition = worldTransform.Translation;
+
+			glm::mat4 viewProjection = mainCameraEntity.GetComponent<CameraComponent>().Camera.GetProjection() * cameraTransform;
 			m_Environment->ViewProjection = viewProjection;
 			RenderScene(selectedEntity, enableOverlayRender);
 		}
@@ -278,7 +369,8 @@ namespace Hanabi
 				auto view = m_Registry.view<TransformComponent, LightComponent>();
 				for (auto entity : view)
 				{
-					auto [transform, light] = view.get<TransformComponent, LightComponent>(entity);
+					auto light = view.get<LightComponent>(entity);
+					auto worldTransform = GetWorldSpaceTransform({ entity, this });
 					switch (light.Type)
 					{
 					case LightComponent::LightType::Directional:
@@ -286,7 +378,7 @@ namespace Hanabi
 						m_Environment->DirLight = {
 							light.Radiance,
 							light.Intensity,
-							-glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f)),
+							-glm::normalize(glm::mat3(worldTransform.GetTransform()) * glm::vec3(1.0f)),
 							//-glm::normalize(glm::rotate(transform.GetRotation(), glm::vec3(0.0f,0.0f,-1.0f))),
 							light.Shadow,
 						};
@@ -295,7 +387,7 @@ namespace Hanabi
 					case LightComponent::LightType::Point:
 					{
 						m_Environment->PointLights.push_back({
-							transform.Translation,
+							worldTransform.Translation,
 							light.Intensity,
 							light.Radiance,
 							light.Radius,
@@ -307,11 +399,11 @@ namespace Hanabi
 					case LightComponent::LightType::Spot:
 					{
 						m_Environment->SpotLights.push_back({
-							transform.Translation,
+							worldTransform.Translation,
 							light.Intensity,
 							light.Radiance,
 							light.AngleAttenuation,
-							glm::normalize(glm::rotate(transform.GetRotation(), glm::vec3(1.0f, 0.0f, 0.0f))),
+							glm::normalize(glm::rotate(worldTransform.GetRotation(), glm::vec3(1.0f, 0.0f, 0.0f))),
 							light.Range,
 							light.Angle,
 							light.Falloff,
@@ -331,8 +423,9 @@ namespace Hanabi
 			auto view = m_Registry.view<TransformComponent, MeshComponent, MaterialComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, mesh, material] = view.get<TransformComponent, MeshComponent, MaterialComponent>(entity);
-				SceneRenderer::SubmitStaticMesh(transform.GetTransform(), mesh, material.MaterialAssetHandle);
+				auto [mesh, material] = view.get<MeshComponent, MaterialComponent>(entity);
+				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+				SceneRenderer::SubmitStaticMesh(worldTransform, mesh, material.MaterialAssetHandle);
 			}
 		}
 
@@ -341,8 +434,9 @@ namespace Hanabi
 			auto view = m_Registry.view<TransformComponent, MeshComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, mesh] = view.get<TransformComponent, MeshComponent>(entity);
-				SceneRenderer::SubmitStaticMesh(transform.GetTransform(), mesh);
+				auto mesh = view.get<MeshComponent>(entity);
+				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+				SceneRenderer::SubmitStaticMesh(worldTransform, mesh);
 			}
 		}
 
@@ -356,8 +450,9 @@ namespace Hanabi
 			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, sprite] = view.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::DrawSprite(transform.GetTransform(), sprite);
+				auto sprite = view.get<SpriteRendererComponent>(entity);
+				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+				Renderer2D::DrawSprite(worldTransform, sprite);
 			}
 		}
 
@@ -366,9 +461,9 @@ namespace Hanabi
 			auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, circle] = view.get<TransformComponent, CircleRendererComponent>(entity);
-
-				Renderer2D::DrawCircle(transform.GetTransform(), circle);
+				auto circle = view.get<CircleRendererComponent>(entity);
+				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+				Renderer2D::DrawCircle(worldTransform, circle);
 			}
 		}
 
@@ -377,9 +472,9 @@ namespace Hanabi
 			auto view = m_Registry.view<TransformComponent, TextComponent>();
 			for (auto entity : view)
 			{
-				auto [transform, text] = view.get<TransformComponent, TextComponent>(entity);
-
-				Renderer2D::DrawString(transform.GetTransform(), text);
+				auto text = view.get<TextComponent>(entity);
+				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+				Renderer2D::DrawString(worldTransform, text);
 			}
 		}
 
@@ -398,13 +493,13 @@ namespace Hanabi
 				auto view = GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
 				for (auto entity : view)
 				{
-					auto [tc, bc2d] = view.get<TransformComponent, BoxCollider2DComponent>(entity);
+					auto bc2d = view.get<BoxCollider2DComponent>(entity);
+					auto worldTransform = GetWorldSpaceTransform({ entity, this });
+					glm::vec3 translation = worldTransform.Translation + glm::vec3(bc2d.Offset, 0.001f);
+					glm::vec3 scale = worldTransform.Scale * glm::vec3(bc2d.Size * 2.05f, 1.0f);
 
-					glm::vec3 translation = tc.Translation + glm::vec3(bc2d.Offset, 0.001f);
-					glm::vec3 scale = tc.Scale * glm::vec3(bc2d.Size * 2.05f, 1.0f);
-
-					glm::mat4 transform = glm::translate(glm::mat4(1.0f), tc.Translation)
-						* glm::rotate(glm::mat4(1.0f), tc.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+					glm::mat4 transform = glm::translate(glm::mat4(1.0f), worldTransform.Translation)
+						* glm::rotate(glm::mat4(1.0f), worldTransform.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
 						* glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.Offset, 0.001f))
 						* glm::scale(glm::mat4(1.0f), scale);
 
@@ -417,10 +512,10 @@ namespace Hanabi
 				auto view = GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
 				for (auto entity : view)
 				{
-					auto [tc, cc2d] = view.get<TransformComponent, CircleCollider2DComponent>(entity);
-
-					glm::vec3 translation = tc.Translation + glm::vec3(cc2d.Offset, 0.001f);
-					glm::vec3 scale = tc.Scale * glm::vec3(cc2d.Radius * 2.05f);
+					auto cc2d = view.get<CircleCollider2DComponent>(entity);
+					auto worldTransform = GetWorldSpaceTransform({ entity, this });
+					glm::vec3 translation = worldTransform.Translation + glm::vec3(cc2d.Offset, 0.001f);
+					glm::vec3 scale = worldTransform.Scale * glm::vec3(cc2d.Radius * 2.05f);
 
 					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
 						* glm::scale(glm::mat4(1.0f), scale);
@@ -434,8 +529,8 @@ namespace Hanabi
 		// TODO: Make this work for 3D Objects
 		if (selectedEntity)
 		{
-			const TransformComponent& transform = selectedEntity.GetComponent<TransformComponent>();
-			Renderer2D::DrawRect(transform.GetTransform(), glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+			auto worldTransform = GetWorldSpaceTransformMatrix({ selectedEntity, this });
+			Renderer2D::DrawRect(worldTransform, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
 		}
 	}
 
@@ -447,7 +542,7 @@ namespace Hanabi
 		for (auto e : view)
 		{
 			Entity entity = { e, this };
-			auto& transform = entity.GetComponent<TransformComponent>();
+			auto& transform = GetWorldSpaceTransform(entity);
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 			b2BodyDef bodyDef;

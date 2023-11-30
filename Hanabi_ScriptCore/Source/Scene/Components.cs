@@ -5,6 +5,9 @@
         public Entity Entity { get; internal set; }
     }
 
+    public class RelationshipComponent : Component
+    { }
+
     public class TransformComponent : Component
     {
         public Vector3 Translation
@@ -106,7 +109,5 @@
             get => InternalCalls.TextComponent_GetLineSpacing(Entity.ID);
             set => InternalCalls.TextComponent_SetLineSpacing(Entity.ID, value);
         }
-
     }
-
 }

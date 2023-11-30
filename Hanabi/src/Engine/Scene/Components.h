@@ -70,6 +70,11 @@ namespace Hanabi
 		{
 			return glm::quat(Rotation);
 		}
+
+		void SetTransform(const glm::mat4& transform)
+		{
+			Math::DecomposeTransform(transform, Translation, Rotation, Scale);
+		}
 	};
 
 	struct CameraComponent
@@ -80,6 +85,9 @@ namespace Hanabi
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
+
+		operator SceneCamera& () { return Camera; }
+		operator const SceneCamera& () const { return Camera; }
 	};
 
 	struct CircleRendererComponent
@@ -224,8 +232,8 @@ namespace Hanabi
 	{};
 
 	using AllComponents =
-		ComponentGroup<
-		TransformComponent, SpriteRendererComponent, CircleRendererComponent,
+		ComponentGroup<RelationshipComponent, TransformComponent,
+		SpriteRendererComponent, CircleRendererComponent,
 		MeshComponent, MaterialComponent,
 		LightComponent, SkyLightComponent,
 		CameraComponent,

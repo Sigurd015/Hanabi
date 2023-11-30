@@ -67,6 +67,33 @@ namespace Hanabi
 			m_Scene->m_Registry.remove<T>(m_EntityHandle);
 		}
 
+		bool IsAncestorOf(Entity entity) const
+		{
+			const auto& children = GetChildren();
+
+			if (children.empty())
+				return false;
+
+			for (UUID child : children)
+			{
+				if (child == entity.GetUUID())
+					return true;
+			}
+
+			for (UUID child : children)
+			{
+				if (m_Scene->GetEntityByUUID(child).IsAncestorOf(entity))
+					return true;
+			}
+
+			return false;
+		}
+
+		bool IsDescendantOf(Entity entity) const { return entity.IsAncestorOf(*this); }
+
+		TransformComponent& Transform() { return GetComponent<TransformComponent>(); }
+		const glm::mat4& Transform() const { return GetComponent<TransformComponent>().GetTransform(); }
+
 		void SetParentUUID(UUID parent) { GetComponent<RelationshipComponent>().ParentHandle = parent; }
 		UUID GetParentUUID() { return GetComponent<RelationshipComponent>().ParentHandle; }
 		std::vector<UUID>& GetChildren() { return GetComponent<RelationshipComponent>().Children; }

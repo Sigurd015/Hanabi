@@ -33,46 +33,59 @@ namespace Hanabi
 	void ViewPortPanel::DrawGizmos()
 	{
 		Entity selectedEntity = SelectionManager::GetSelectedEntity();
-		if (selectedEntity && m_GizmoType != -1)
+
+		if (!selectedEntity || m_GizmoType == -1)
+			return;
+
+		glm::mat4 projectionMatrix, viewMatrix;
+		if (m_SceneState == SceneState::Play)
 		{
-			ImGuizmo::SetOrthographic(false);
-			ImGuizmo::SetDrawlist();
+			Entity cameraEntity = m_Context->GetMainCameraEntity();
+			SceneCamera& camera = cameraEntity.GetComponent<CameraComponent>();
+			projectionMatrix = camera.GetProjection();
+			viewMatrix = glm::inverse(m_Context->GetWorldSpaceTransformMatrix(cameraEntity));
+		}
+		else
+		{
+			projectionMatrix = m_EditorCamera.GetProjection();
+			viewMatrix = m_EditorCamera.GetViewMatrix();
+		}
 
-			float windowWidth = (float)ImGui::GetWindowWidth();
-			float windowHeight = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, ImGui::GetWindowWidth(), ImGui::GetWindowHeight());
 
-			// Editor camera
-			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
-			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+		// Entity transform
+		glm::mat4 transform = m_Context->GetWorldSpaceTransformMatrix(selectedEntity);
+		auto& tc = selectedEntity.GetComponent<TransformComponent>();
 
-			// Entity transform
-			auto& tc = selectedEntity.GetComponent<TransformComponent>();
-			glm::mat4 transform = tc.GetTransform();
+		// Snapping
+		bool snap = Input::IsKeyPressed(Key::LeftControl);
+		float snapValue = 0.5f; // Snap to 0.5m for translation/scale
+		// Snap to 45 degrees for rotation
+		if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
+			snapValue = 45.0f;
+		float snapValues[3] = { snapValue, snapValue, snapValue };
 
-			// Snapping
-			bool snap = Input::IsKeyPressed(Key::LeftControl);
-			float snapValue = 0.5f; // Snap to 0.5m for translation/scale
-			// Snap to 45 degrees for rotation
-			if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
-				snapValue = 45.0f;
-
-			float snapValues[3] = { snapValue, snapValue, snapValue };
-
-			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
-				nullptr, snap ? snapValues : nullptr);
-
-			if (ImGuizmo::IsUsing())
+		if (ImGuizmo::Manipulate(glm::value_ptr(viewMatrix),
+			glm::value_ptr(projectionMatrix),
+			(ImGuizmo::OPERATION)m_GizmoType,
+			ImGuizmo::LOCAL,
+			glm::value_ptr(transform),
+			nullptr, snap ? snapValues : nullptr))
+		{
+			Entity parent = m_Context->TryGetEntityByUUID(selectedEntity.GetParentUUID());
+			if (parent)
 			{
-				glm::vec3 translation, rotation, scale;
-				Math::DecomposeTransform(transform, translation, rotation, scale);
-
-				glm::vec3 deltaRotation = rotation - tc.Rotation;
-				tc.Translation = translation;
-				tc.Rotation += deltaRotation;
-				tc.Scale = scale;
+				glm::mat4 parentTransform = m_Context->GetWorldSpaceTransformMatrix(parent);
+				transform = glm::inverse(parentTransform) * transform;
 			}
+
+			glm::vec3 rotation;
+			Math::DecomposeTransform(transform, tc.Translation, rotation, tc.Scale);
+
+			glm::vec3 deltaRotation = rotation - tc.Rotation;
+			tc.Rotation += deltaRotation;
 		}
 	}
 
@@ -314,8 +327,7 @@ namespace Hanabi
 		}
 
 		// Gizmos
-		if(m_SceneState == SceneState::Edit)
-			DrawGizmos();
+		DrawGizmos();
 
 		ImGui::End();
 		ImGui::PopStyleVar();
