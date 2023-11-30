@@ -358,17 +358,20 @@ namespace Hanabi
 
 				Entity deserializedEntity = scene->CreateEntityWithUUID(uuid, name);
 
-				auto& relationshipComponent = deserializedEntity.GetComponent<RelationshipComponent>();
-				uint64_t parentHandle = entity["Parent"] ? entity["Parent"].as<uint64_t>() : 0;
-				relationshipComponent.ParentHandle = parentHandle;
-
-				auto children = entity["Children"];
-				if (children)
+				auto relationshipComponent = entity["RelationshipComponent"];
+				if (relationshipComponent)
 				{
-					for (auto child : children)
+					auto& rsc = deserializedEntity.GetComponent<RelationshipComponent>();
+					rsc.ParentHandle = relationshipComponent["Parent"] ? relationshipComponent["Parent"].as<uint64_t>() : 0;
+
+					auto children = relationshipComponent["Children"];
+					if (children)
 					{
-						uint64_t childHandle = child["Handle"].as<uint64_t>();
-						relationshipComponent.Children.push_back(childHandle);
+						for (auto child : children)
+						{
+							uint64_t childHandle = child["Handle"].as<uint64_t>();
+							rsc.Children.push_back(childHandle);
+						}
 					}
 				}
 

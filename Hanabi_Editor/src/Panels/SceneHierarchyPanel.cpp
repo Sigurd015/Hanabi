@@ -71,7 +71,7 @@ namespace Hanabi
 
 		Entity selectedEntity = SelectionManager::GetSelectedEntity();
 		std::vector<UUID>& children = entity.GetChildren();
-		
+
 		ImGuiTreeNodeFlags flags = ((selectedEntity == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
 		if (children.empty())
 			flags |= ImGuiTreeNodeFlags_Leaf;
@@ -84,6 +84,12 @@ namespace Hanabi
 
 		if (ImGui::BeginPopupContextItem())
 		{
+			if (entity.GetParentUUID())
+			{
+				if (ImGui::MenuItem("Unparent"))
+					m_Context->UnparentEntity(entity, true);
+			}
+
 			if (ImGui::MenuItem("Delete Entity"))
 			{
 				m_Context->DestroyEntity(entity);
@@ -91,7 +97,35 @@ namespace Hanabi
 					SelectionManager::SetSelectedEntity({});
 			}
 
+			if (ImGui::MenuItem("Create Empty Entity"))
+			{
+				Entity childEntity = m_Context->CreateEntity("Empty Entity");
+				m_Context->ParentEntity(childEntity, entity);
+			}
+
 			ImGui::EndPopup();
+		}
+
+		if (ImGui::BeginDragDropSource())
+		{
+			Entity selectedEntity = SelectionManager::GetSelectedEntity();
+			UUID entityID = entity.GetUUID();
+
+			ImGui::SetDragDropPayload("SCENE_HIERARCHY_ENTITY", &entityID, sizeof(UUID));
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SCENE_HIERARCHY_ENTITY"))
+			{
+				UUID droppedEntityID = *(UUID*)payload->Data;
+				HNB_CORE_INFO("Dropped entity with ID: {0}", droppedEntityID);
+
+				Entity droppedEntity = m_Context->GetEntityByUUID(droppedEntityID);
+				m_Context->ParentEntity(droppedEntity, entity);
+			}
+			ImGui::EndDragDropTarget();
 		}
 
 		if (opened)

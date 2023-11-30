@@ -85,8 +85,16 @@ namespace Hanabi
 		Entity GetPrimaryCameraEntity();
 		Entity DuplicateEntity(Entity entity);
 		Entity GetEntityByUUID(UUID uuid);
+		Entity TryGetEntityByUUID(UUID uuid);
 		Entity FindEntityByName(std::string_view name);
 		TransformComponent GetWorldSpaceTransform(Entity entity);
+		glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
+		Entity GetMainCameraEntity();
+
+		void ParentEntity(Entity entity, Entity parent);
+		void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
+		void ConvertToLocalSpace(Entity entity);
+		void ConvertToWorldSpace(Entity entity);
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()
