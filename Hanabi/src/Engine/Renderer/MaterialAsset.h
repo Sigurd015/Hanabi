@@ -10,6 +10,8 @@ namespace Hanabi
 		MaterialAsset(Ref<Material> material);
 		~MaterialAsset() = default;
 
+		static Ref<MaterialAsset> Create() { return CreateRef<MaterialAsset>(); }
+
 		Ref<Texture2D> GetAlbedoTex();
 		Ref<Texture2D> GetNormalTex();
 		Ref<Texture2D> GetMetalnessTex();

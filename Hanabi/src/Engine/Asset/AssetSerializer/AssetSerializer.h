@@ -64,6 +64,7 @@ namespace Hanabi
 		// Reads file directly from filesystem
 		// (i.e. path has to be relative / absolute to working directory)
 		static Buffer ToBufferFromFile(const std::filesystem::path& path, TextureSpecification& spec);
+		static Buffer ToBufferFromMemory(Buffer buffer, TextureSpecification& spec);
 		static Ref<Texture2D> LoadTexture2D(const std::filesystem::path& path, TextureSpecification& spec);
 	};
 }

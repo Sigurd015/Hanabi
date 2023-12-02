@@ -166,7 +166,6 @@ namespace Hanabi
 			Entity newParent = TryGetEntityByUUID(entity.GetParentUUID());
 			if (newParent)
 			{
-				UnparentEntity(entity);
 				ParentEntity(parent, newParent);
 			}
 		}
@@ -244,6 +243,15 @@ namespace Hanabi
 
 	void Scene::DestroyEntity(Entity entity)
 	{
+		// TODO: Fix crash when destroying entity with children
+		//// If entity has children, destroy them first
+		//auto& children = entity.GetChildren();
+		//for (size_t i = 0; i < children.size(); i++)
+		//{
+		//	auto childId = children[i];
+		//	DestroyEntity(GetEntityByUUID(childId));
+		//}
+
 		m_EntityMap.erase(entity.GetUUID());
 		m_Registry.destroy(entity);
 	}

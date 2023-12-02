@@ -35,12 +35,12 @@ namespace Hanabi
 
 		if (m_Context)
 		{
-			m_Context->m_Registry.each([&](auto entityID)
-				{
-					Entity entity{ entityID , m_Context.get() };
-					if (entity.GetParentUUID() == 0)
-						DrawEntityNode(entity);
-				});
+			for (auto entity : m_Context->GetAllEntitiesWith<IDComponent, RelationshipComponent>())
+			{
+				Entity e(entity, m_Context.get());
+				if (e.GetParentUUID() == 0)
+					DrawEntityNode(e);
+			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 				SelectionManager::SetSelectedEntity({});
@@ -82,6 +82,7 @@ namespace Hanabi
 			SelectionManager::SetSelectedEntity(entity);
 		}
 
+		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
 			if (entity.GetParentUUID())
@@ -92,9 +93,7 @@ namespace Hanabi
 
 			if (ImGui::MenuItem("Delete Entity"))
 			{
-				m_Context->DestroyEntity(entity);
-				if (selectedEntity == entity)
-					SelectionManager::SetSelectedEntity({});
+				entityDeleted = true;
 			}
 
 			if (ImGui::MenuItem("Create Empty Entity"))
@@ -108,7 +107,6 @@ namespace Hanabi
 
 		if (ImGui::BeginDragDropSource())
 		{
-			Entity selectedEntity = SelectionManager::GetSelectedEntity();
 			UUID entityID = entity.GetUUID();
 
 			ImGui::SetDragDropPayload("SCENE_HIERARCHY_ENTITY", &entityID, sizeof(UUID));
@@ -132,9 +130,21 @@ namespace Hanabi
 		{
 			for (auto child : children)
 			{
-				DrawEntityNode(m_Context->GetEntityByUUID(child));
+				Entity childEntity = m_Context->GetEntityByUUID(child);
+				if (childEntity)
+					DrawEntityNode(childEntity);
 			}
 			ImGui::TreePop();
+		}
+
+		if (entityDeleted)
+		{
+			if (entity.GetParentUUID())
+				m_Context->UnparentEntity(entity, false);
+
+			m_Context->DestroyEntity(entity);
+			if (selectedEntity == entity)
+				SelectionManager::SetSelectedEntity({});
 		}
 	}
 

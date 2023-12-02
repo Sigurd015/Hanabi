@@ -24,14 +24,30 @@ namespace Hanabi
 		uint32_t V1, V2, V3;
 	};
 
+	class Submesh
+	{
+	public:
+		uint32_t BaseVertex;
+		uint32_t BaseIndex;
+		uint32_t MaterialIndex;
+		uint32_t IndexCount;
+		uint32_t VertexCount;
+
+		AABB BoundingBox;
+
+		glm::mat4 Transform{ 1.0f }; // World transform
+
+		std::string MeshName;
+	};
+
 	class MeshSource :public Asset
 	{
 	public:
 		MeshSource() = default;
 		MeshSource(const std::vector<Vertex>& vertices, const std::vector<Index>& indices);
 
-		//std::vector<Submesh>& GetSubmeshes() { return m_Submeshes; }
-		//const std::vector<Submesh>& GetSubmeshes() const { return m_Submeshes; }
+		std::vector<Submesh>& GetSubmeshes() { return m_Submeshes; }
+		const std::vector<Submesh>& GetSubmeshes() const { return m_Submeshes; }
 
 		const std::vector<Vertex>& GetVertices() const { return m_Vertices; }
 		const std::vector<Index>& GetIndices() const { return m_Indices; }
@@ -46,7 +62,9 @@ namespace Hanabi
 	private:
 		void Invalidate();
 
-		//std::vector<Submesh> m_Submeshes;
+		std::vector<Submesh> m_Submeshes;
+
+		std::vector<AssetHandle> m_Materials;
 
 		AABB m_BoundingBox;
 
@@ -62,8 +80,11 @@ namespace Hanabi
 	class Mesh :public Asset
 	{
 	public:
-		Mesh(Ref<MeshSource> source);
+		Mesh() = default;
 		~Mesh() = default;
+		Mesh(Ref<MeshSource> source);
+
+		static Ref<Mesh> Create(Ref<MeshSource> source) { return CreateRef<Mesh>(source); }
 
 		const Ref<MeshSource>& GetMeshSource() const { return m_MeshSource; }
 
