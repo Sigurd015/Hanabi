@@ -40,7 +40,7 @@ namespace Hanabi
 		{
 			static_assert(std::is_base_of<Asset, TAsset>::value, "CreateMemoryOnlyAsset only works for types derived from Asset");
 
-			Ref<TAsset> asset = CreateRef<TAsset>(std::forward<TArgs>(args)...);
+			Ref<TAsset> asset = TAsset::Create(std::forward<TArgs>(args)...);
 			asset->Handle = AssetHandle();
 
 			Project::GetAssetManager()->AddMemoryOnlyAsset(asset);

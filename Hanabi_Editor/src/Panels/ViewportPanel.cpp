@@ -74,6 +74,7 @@ namespace Hanabi
 			glm::value_ptr(transform),
 			nullptr, snap ? snapValues : nullptr))
 		{
+			// Cover to local space, if parented
 			Entity parent = m_Context->TryGetEntityByUUID(selectedEntity.GetParentUUID());
 			if (parent)
 			{

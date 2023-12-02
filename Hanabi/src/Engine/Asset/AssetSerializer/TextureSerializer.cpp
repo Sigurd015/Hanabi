@@ -31,7 +31,7 @@ namespace Hanabi
 		Buffer imageBuffer;
 		std::string pathString = path.string();
 
-		int width, height, channels;	
+		int width, height, channels;
 		if (stbi_is_hdr(pathString.c_str()))
 		{
 			// Notice: Look like stbi_set_flip_vertically_on_load is global state, so remember to reset it
@@ -45,6 +45,36 @@ namespace Hanabi
 		{
 			stbi_set_flip_vertically_on_load(1);
 			imageBuffer.Data = stbi_load(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			imageBuffer.Size = width * height * 4;
+			spec.Format = ImageFormat::RGBA;
+			spec.GenerateMips = true;
+		}
+
+		if (!imageBuffer)
+			return {};
+
+		spec.Width = width;
+		spec.Height = height;
+		return imageBuffer;
+	}
+
+	Buffer TextureSerializer::ToBufferFromMemory(Buffer buffer, TextureSpecification& spec)
+	{
+		Buffer imageBuffer;
+
+		int width, height, channels;
+		if (stbi_is_hdr_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size))
+		{
+			stbi_set_flip_vertically_on_load(0);
+			imageBuffer.Data = (uint8_t*)stbi_loadf_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size, &width, &height, &channels, STBI_rgb_alpha);
+			imageBuffer.Size = width * height * 4 * sizeof(float);
+			spec.Format = ImageFormat::RGBA32F;
+			spec.GenerateMips = false;
+		}
+		else
+		{
+			stbi_set_flip_vertically_on_load(1);
+			imageBuffer.Data = stbi_load_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size, &width, &height, &channels, STBI_rgb_alpha);
 			imageBuffer.Size = width * height * 4;
 			spec.Format = ImageFormat::RGBA;
 			spec.GenerateMips = true;
