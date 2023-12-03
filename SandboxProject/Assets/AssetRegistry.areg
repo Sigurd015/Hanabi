@@ -1,4 +1,7 @@
 AssetRegistry:
+  - Handle: 666927332699581675
+    FilePath: Models/Sponza/Sponza.gltf
+    Type: AssetType::MeshSource
   - Handle: 841372594545168923
     FilePath: Materials/gray-granite-flecks.hmat
     Type: AssetType::Material
