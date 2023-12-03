@@ -1,24 +1,17 @@
 ﻿#include "hnbpch.h"
+#if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11RenderPass.h"
+#include "DX11Context.h"
+#include "DX11RenderStates.h"
 
 namespace Hanabi
 {
 	DX11RenderPass::DX11RenderPass(const RenderPassSpecification& spec) : m_Specification(spec)
 	{}
 
-	void DX11RenderPass::SetInput(std::string_view name, Ref<ConstantBuffer> constantBuffer)
+	void DX11RenderPass::SetInput(std::string_view name, Ref<RendererResource> resource)
 	{
-		m_Inputs[name.data()] = constantBuffer;
-	}
-
-	void DX11RenderPass::SetInput(std::string_view name, Ref<TextureCube> textureCube)
-	{
-		m_Inputs[name.data()] = textureCube;
-	}
-
-	void DX11RenderPass::SetInput(std::string_view name, Ref<Texture2D> texture)
-	{
-		m_Inputs[name.data()] = texture;
+		m_Inputs[name.data()] = resource;
 	}
 
 	void DX11RenderPass::BindInputs()
@@ -30,62 +23,51 @@ namespace Hanabi
 			const std::string& name = input.first;
 			Ref<RendererResource> bindable = input.second;
 
-			if (bindable->GetRendererResourceType() == RendererResourceType::ConstantBuffer)
-			{
-				Ref<ConstantBuffer> constantBuffer = bindable->GetAs<ConstantBuffer>();
+			Utils::BindResource(reflectionData, name, [&](auto& slot)
+				{
+					bindable->Bind(slot);
+				});
+		}
 
-				auto it = reflectionData.find(name);
-				if (it != reflectionData.end())
-				{
-					uint32_t slot = it->second;
-					constantBuffer->Bind(slot);
-				}
-				else
-				{
-					HNB_CORE_WARN("Constant buffer '{}' not found in shader!", name);
-				}
+		// Bind Common States
+		{
+			auto it = reflectionData.find("u_SSPointClamp");
+			if (it != reflectionData.end())
+			{
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSPointClamp.GetAddressOf());
 			}
-			else if (bindable->GetRendererResourceType() == RendererResourceType::Texture2D)
+		}
+		{
+			auto it = reflectionData.find("u_SSLinearWrap");
+			if (it != reflectionData.end())
 			{
-				Ref<Texture2D> texture = bindable->GetAs<Texture2D>();
-
-				auto it = reflectionData.find(name);
-				if (it != reflectionData.end())
-				{
-					uint32_t slot = it->second;
-					texture->Bind(slot);
-				}
-				else
-				{
-					HNB_CORE_WARN("Texture2D '{}' not found in shader!", name);
-				}
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
 			}
-			else if (bindable->GetRendererResourceType() == RendererResourceType::TextureCube)
+		}
+		{
+			auto it = reflectionData.find("u_SSLinearClamp");
+			if (it != reflectionData.end())
 			{
-				Ref<TextureCube> textureCube = bindable->GetAs<TextureCube>();
-
-				auto it = reflectionData.find(name);
-				if (it != reflectionData.end())
-				{
-					uint32_t slot = it->second;
-					textureCube->Bind(slot);
-				}
-				else
-				{
-					HNB_CORE_WARN("TextureCube '{}' not found in shader!", name);
-				}
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
+			}
+		}
+		{
+			auto it = reflectionData.find("u_SSAnisotropicWrap");
+			if (it != reflectionData.end())
+			{
+				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSAnisotropicWrap.GetAddressOf());
 			}
 		}
 	}
 
-	Ref<Texture2D> DX11RenderPass::GetOutput(uint32_t index)
+	Ref<Image2D> DX11RenderPass::GetOutput(uint32_t index)
 	{
-		return Ref<Texture2D>();
+		return m_Specification.Pipeline->GetSpecification().TargetFramebuffer->GetImage(index);
 	}
 
-	Ref<Texture2D> DX11RenderPass::GetDepthOutput()
+	Ref<Image2D> DX11RenderPass::GetDepthOutput()
 	{
-		return Ref<Texture2D>();
+		return  m_Specification.Pipeline->GetSpecification().TargetFramebuffer->GetDepthImage();
 	}
 }
-
+#endif

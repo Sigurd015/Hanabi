@@ -39,17 +39,13 @@ namespace Hanabi
 	{
 		if (m_ProjectionType == ProjectionType::Perspective)
 		{
-			m_Projection = glm::perspective(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
+			SetPerspectiveProjectionMatrix(m_PerspectiveFOV, m_AspectRatio, m_PerspectiveNear, m_PerspectiveFar);
 		}
 		else
 		{
-			float orthoLeft = -m_OrthographicSize * m_AspectRatio * 0.5f;
-			float orthoRight = -orthoLeft;
-			float orthoBottom = -m_OrthographicSize * 0.5f;
-			float orthoTop = -orthoBottom;
-
-			m_Projection = glm::ortho(orthoLeft, orthoRight,
-				orthoBottom, orthoTop, m_OrthographicNear, m_OrthographicFar);
+			float width = m_OrthographicSize * m_AspectRatio;
+			float height = m_OrthographicSize;
+			SetOrthoProjectionMatrix(width, height, m_OrthographicNear, m_OrthographicFar);
 		}
 	}
 }

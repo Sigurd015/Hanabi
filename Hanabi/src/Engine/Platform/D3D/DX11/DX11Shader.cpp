@@ -3,12 +3,10 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11Shader.h"
 #include "DX11Context.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <fstream>
 #include <d3dcompiler.h>
-#include <D3D11Shader.h>
-#pragma pack_matrix(row_major)
+#include <d3d11Shader.h>
 
 namespace Hanabi
 {
@@ -16,8 +14,10 @@ namespace Hanabi
 	{
 		if (type == "vertex")
 			return VERTEX_SHADER;
-		if (type == "fragment" || type == "pixel")
+		if (type == "pixel")
 			return PIXEL_SHADER;
+		if (type == "compute")
+			return COMPUTE_SHADER;
 
 		HNB_CORE_ASSERT(false, "Unknown shader type!");
 		return UNKNOWN;
@@ -25,15 +25,15 @@ namespace Hanabi
 
 	DX11Shader::DX11Shader(const std::string& fileName) :m_Name(fileName)
 	{
-		std::string filePath = std::string(GetShaderDirectoryPath()) + "DX11/" + fileName + ".hlsl";
+		std::string filePath = std::string(GetShaderDirectoryPath()) + fileName + ".hlsl";
 		std::string source = ReadFile(filePath);
 		auto shaderSources = PreProcess(source);
 		Compile(shaderSources);
 	}
 
-	void DX11Shader::CreateReflectionData(const Microsoft::WRL::ComPtr<ID3DBlob>& shaderBlob)
+	void DX11Shader::CreateReflectionData(const ComPtr<ID3DBlob>& shaderBlob)
 	{
-		Microsoft::WRL::ComPtr<ID3D11ShaderReflection> shaderReflection;
+		ComPtr<ID3D11ShaderReflection> shaderReflection;
 		DX_CHECK_RESULT(D3DReflect(shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&shaderReflection));
 
 		D3D11_SHADER_DESC shaderDesc;
@@ -44,12 +44,14 @@ namespace Hanabi
 			D3D11_SHADER_INPUT_BIND_DESC bindDesc;
 			shaderReflection->GetResourceBindingDesc(i, &bindDesc);
 
-			if (bindDesc.Type == D3D_SIT_CBUFFER)
-			{
-				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
-			}
-
-			if (bindDesc.Type == D3D_SIT_TEXTURE)
+			// D3D_SIT_CBUFFER --> Constant Buffer
+			// D3D_SIT_TEXTURE --> Texture
+			// D3D_SIT_SAMPLER --> Sampler
+			// D3D_SIT_TBUFFER --> Structured Buffer
+			// D3D_SIT_UAV_RWTYPED --> RWTexture2D/Texture2DArray
+			if (bindDesc.Type == D3D_SIT_CBUFFER || bindDesc.Type == D3D_SIT_TEXTURE
+				|| bindDesc.Type == D3D_SIT_SAMPLER || bindDesc.Type == D3D_SIT_TBUFFER
+				|| bindDesc.Type == D3D_SIT_UAV_RWTYPED)
 			{
 				m_ReflectionData[bindDesc.Name] = bindDesc.BindPoint;
 			}
@@ -120,7 +122,8 @@ namespace Hanabi
 					size_t begin = pos + includeTokenLength;
 					std::string fileName = code.second.substr(begin, eol - begin - fileTypeLength);
 					size_t nextLinePos = code.second.find_first_not_of("\r\n", eol);
-					std::string includeSource = ReadFile("resources/shaders/DX11/include/" + fileName + ".hlsl");
+					std::string filePath = std::string(GetShaderDirectoryPath()) + "include/" + fileName + ".hlsl";
+					std::string includeSource = ReadFile(filePath);
 					code.second.replace(pos, eol - pos, includeSource);
 					pos = code.second.find(includeToken, nextLinePos);
 				}
@@ -138,7 +141,7 @@ namespace Hanabi
 			const std::string& source = kv.second;
 			switch (type)
 			{
-			case Hanabi::VERTEX_SHADER:
+			case VERTEX_SHADER:
 			{
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
 					"main", "vs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, m_VertexShaderBlob.GetAddressOf(), nullptr));
@@ -148,13 +151,24 @@ namespace Hanabi
 				CreateReflectionData(m_VertexShaderBlob);
 				break;
 			}
-			case Hanabi::PIXEL_SHADER:
+			case PIXEL_SHADER:
 			{
-				Microsoft::WRL::ComPtr<ID3DBlob> blob;
+				ComPtr<ID3DBlob> blob;
 				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
 					"main", "ps_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, blob.ReleaseAndGetAddressOf(), nullptr));
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreatePixelShader(blob->GetBufferPointer(),
 					blob->GetBufferSize(), nullptr, m_PixelShader.GetAddressOf()));
+
+				CreateReflectionData(blob);
+				break;
+			}
+			case COMPUTE_SHADER:
+			{
+				ComPtr<ID3DBlob> blob;
+				DX_CHECK_RESULT(D3DCompile(source.c_str(), source.length(), nullptr, nullptr, nullptr,
+					"main", "cs_5_0", D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, 0, blob.ReleaseAndGetAddressOf(), nullptr));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateComputeShader(blob->GetBufferPointer(),
+					blob->GetBufferSize(), nullptr, m_ComputeShader.GetAddressOf()));
 
 				CreateReflectionData(blob);
 				break;
@@ -167,18 +181,14 @@ namespace Hanabi
 	{
 		DX11Context::GetDeviceContext()->VSSetShader(m_VertexShader.Get(), nullptr, 0);
 		DX11Context::GetDeviceContext()->PSSetShader(m_PixelShader.Get(), nullptr, 0);
-	}
-
-	void DX11Shader::Unbind() const
-	{
-		DX11Context::GetDeviceContext()->VSSetShader(nullptr, nullptr, 0);
-		DX11Context::GetDeviceContext()->PSSetShader(nullptr, nullptr, 0);
+		DX11Context::GetDeviceContext()->CSSetShader(m_ComputeShader.Get(), nullptr, 0);
 	}
 
 	DX11Shader::~DX11Shader()
 	{
 		m_VertexShader.Reset();
 		m_PixelShader.Reset();
+		m_ComputeShader.Reset();
 	}
 }
 #endif

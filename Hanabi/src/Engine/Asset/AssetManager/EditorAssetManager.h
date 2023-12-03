@@ -26,6 +26,7 @@ namespace Hanabi
 		AssetType GetAssetTypeFromPath(const std::filesystem::path& path);
 
 		AssetHandle ImportAsset(const std::filesystem::path& filepath);
+		void RemoveAsset(AssetHandle handle);
 
 		virtual void AddMemoryOnlyAsset(Ref<Asset> asset) override;
 

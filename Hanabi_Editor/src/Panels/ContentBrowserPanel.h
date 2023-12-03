@@ -1,15 +1,20 @@
 #pragma once
 #include "Hanabi.h"
+#include "PanelManager.h"
 
 #include <filesystem>
 
 namespace Hanabi
 {
-	class ContentBrowserPanel
+	class ContentBrowserPanel : public Panel
 	{
 	public:
-		ContentBrowserPanel();
-		void OnImGuiRender();
+		ContentBrowserPanel() = default;
+		ContentBrowserPanel(const std::filesystem::path& projectDirectory);
+		void SetContext(const std::filesystem::path& projectDirectory);
+		virtual void OnEvent(Event& e) override;
+		virtual void OnUpdate(Timestep ts) override;
+		virtual void OnImGuiRender() override;
 
 		AssetHandle ImportAsset(const std::filesystem::path& path);
 	private:

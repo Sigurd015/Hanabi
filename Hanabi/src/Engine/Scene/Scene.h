@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Base.h"
 #include "Engine/Core/Timestep.h"
-#include "Engine/Renderer/EditorCamera.h"
+#include "Engine/Editor/EditorCamera.h"
 #include "Engine/Core/UUID.h"
 #include "Components.h"
 
@@ -53,9 +53,8 @@ namespace Hanabi
 		glm::vec3 CameraPosition;
 		glm::mat4 ViewProjection;
 
-		CameraComponent::ClearMethod ClearType = CameraComponent::ClearMethod::None;
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		AssetHandle SkyboxAssetHandle = 0;
+		AssetHandle EnvMapHandle = 0;
+		float SkyLightIntensity = 0.0f;
 
 		DirectionalLight DirLight;
 
@@ -90,7 +89,16 @@ namespace Hanabi
 		Entity GetPrimaryCameraEntity();
 		Entity DuplicateEntity(Entity entity);
 		Entity GetEntityByUUID(UUID uuid);
+		Entity TryGetEntityByUUID(UUID uuid);
 		Entity FindEntityByName(std::string_view name);
+		TransformComponent GetWorldSpaceTransform(Entity entity);
+		glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
+		Entity GetMainCameraEntity();
+
+		void ParentEntity(Entity entity, Entity parent);
+		void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
+		void ConvertToLocalSpace(Entity entity);
+		void ConvertToWorldSpace(Entity entity);
 
 		template<typename... Components>
 		auto GetAllEntitiesWith()

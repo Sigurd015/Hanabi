@@ -1,70 +1,103 @@
 AssetRegistry:
-  - Handle: 1312796883771253977
-    FilePath: Textures/wall-10-brick/wall-10-brick-DIFFUSE.jpg
-    Type: AssetType::Texture2D
-  - Handle: 1632207768508466527
-    FilePath: Textures/universe-skybox/bottom.png
-    Type: AssetType::Texture2D
-  - Handle: 1661060954224083329
-    FilePath: Materials/mat1.hmat
+  - Handle: 666927332699581675
+    FilePath: Models/Sponza/Sponza.gltf
+    Type: AssetType::MeshSource
+  - Handle: 841372594545168923
+    FilePath: Materials/gray-granite-flecks.hmat
     Type: AssetType::Material
-  - Handle: 2135390756550958898
-    FilePath: Textures/universe-skybox/front.png
+  - Handle: 1991723713832931260
+    FilePath: Textures/envmap/brown_photostudio_02_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 2333949280243433075
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_roughness.png
     Type: AssetType::Texture2D
-  - Handle: 3301359757521532587
-    FilePath: Textures/wall-10-brick/wall-10-brick-NORM.jpg
+  - Handle: 2537504928911656905
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_albedo.png
     Type: AssetType::Texture2D
-  - Handle: 3830939339728664841
-    FilePath: Textures/Checkerboard.png
-    Type: AssetType::Texture2D
-  - Handle: 4137013318427118749
-    FilePath: Materials/mat2.hmat
+  - Handle: 2605795154723237914
+    FilePath: Models/Cube.gltf
+    Type: AssetType::MeshSource
+  - Handle: 3676138274874464056
+    FilePath: Materials/used-stainless.hmat
     Type: AssetType::Material
-  - Handle: 4559566493173355299
-    FilePath: Textures/Container_Diffuse.png
+  - Handle: 4589171769343660080
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-albedo.png
     Type: AssetType::Texture2D
-  - Handle: 5025462131848195016
-    FilePath: Models/Plane.fbx
+  - Handle: 4704208569905331786
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_roughness.png
+    Type: AssetType::Texture2D
+  - Handle: 5715407682404485611
+    FilePath: Models/Sphere.gltf
     Type: AssetType::MeshSource
   - Handle: 5775838104344894305
-    FilePath: Scenes/3DLightingExample.hscene
+    FilePath: Scenes/PBRTest.hscene
     Type: AssetType::Scene
-  - Handle: 7061154424694109801
-    FilePath: Textures/universe-skybox/left.png
+  - Handle: 5796823861923018421
+    FilePath: Textures/envmap/kloppenheim_02_puresky_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 6311326570274108486
+    FilePath: Textures/envmap/dark_autumn_forest_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 6548672909131543686
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_normal-dx.png
+    Type: AssetType::Texture2D
+  - Handle: 6782582854069637355
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_metallic.png
     Type: AssetType::Texture2D
   - Handle: 8012010214947151524
     FilePath: Scenes/2DExample.hscene
     Type: AssetType::Scene
-  - Handle: 8249847587482819021
-    FilePath: Textures/Container_Specular.png
+  - Handle: 8230805411470845587
+    FilePath: Materials/laminate-flooring-brown.hmat
+    Type: AssetType::Material
+  - Handle: 8903819486709350489
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Normal-dx.png
     Type: AssetType::Texture2D
-  - Handle: 9328707022816709312
-    FilePath: Textures/wall-10-brick/wall-10-brick-DISP.jpg
+  - Handle: 9496776747364153426
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Metallic.png
     Type: AssetType::Texture2D
-  - Handle: 9644760195236910386
-    FilePath: Textures/universe-skybox/top.png
+  - Handle: 9798693481466945810
+    FilePath: Textures/TestNormal.png
     Type: AssetType::Texture2D
-  - Handle: 12104991068264146629
-    FilePath: Models/Sphere.fbx
-    Type: AssetType::MeshSource
-  - Handle: 13655973308143711059
-    FilePath: Textures/universe-skybox/back.png
+  - Handle: 10066814809449201864
+    FilePath: Textures/envmap/hilly_terrain_01_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 10801380211512351879
+    FilePath: Materials/white.hmat
+    Type: AssetType::Material
+  - Handle: 10864898568509953569
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_normal-dx.png
     Type: AssetType::Texture2D
-  - Handle: 14535960835168578140
-    FilePath: Models/Box.fbx
-    Type: AssetType::MeshSource
+  - Handle: 11712703148928652040
+    FilePath: Textures/envmap/lago_disola_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 11767140759291818488
+    FilePath: Materials/rustediron1-alt2.hmat
+    Type: AssetType::Material
+  - Handle: 12049005096031057341
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_normal.png
+    Type: AssetType::Texture2D
+  - Handle: 12490738633885367934
+    FilePath: Textures/envmap/rustig_koppie_puresky_4k.hdr
+    Type: AssetType::EnvMap
+  - Handle: 13566442178785289733
+    FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_albedo.png
+    Type: AssetType::Texture2D
+  - Handle: 13744182516866292656
+    FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Roughness.png
+    Type: AssetType::Texture2D
+  - Handle: 14057650850447361125
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_metallic.png
+    Type: AssetType::Texture2D
+  - Handle: 14548778339704962245
+    FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_metallic.png
+    Type: AssetType::Texture2D
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
-  - Handle: 15452597858793361030
-    FilePath: Materials/mat3.hmat
-    Type: AssetType::Material
-  - Handle: 17058150480603569601
-    FilePath: Models/Cylinder.fbx
-    Type: AssetType::MeshSource
-  - Handle: 17746566452886661726
-    FilePath: Materials/universeSkybox.henv
-    Type: AssetType::EnvMap
-  - Handle: 18104625788437832565
-    FilePath: Textures/universe-skybox/right.png
+  - Handle: 15063411845910190571
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_basecolor.png
+    Type: AssetType::Texture2D
+  - Handle: 17032317040619436040
+    FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_roughness.png
     Type: AssetType::Texture2D

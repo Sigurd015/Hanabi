@@ -23,6 +23,18 @@ namespace Hanabi
 		IDComponent(const IDComponent&) = default;
 	};
 
+	struct RelationshipComponent
+	{
+		UUID ParentHandle = 0;
+		std::vector<UUID> Children;
+
+		RelationshipComponent() = default;
+		RelationshipComponent(const RelationshipComponent& other) = default;
+		RelationshipComponent(UUID parent)
+			: ParentHandle(parent)
+		{}
+	};
+
 	struct TagComponent
 	{
 		std::string Tag;
@@ -58,21 +70,24 @@ namespace Hanabi
 		{
 			return glm::quat(Rotation);
 		}
+
+		void SetTransform(const glm::mat4& transform)
+		{
+			Math::DecomposeTransform(transform, Translation, Rotation, Scale);
+		}
 	};
 
 	struct CameraComponent
 	{
 		SceneCamera Camera;
-		bool Primary = true; // TODO: think about moving to Scene
+		bool Primary = true;
 		bool FixedAspectRatio = false;
-
-		enum class ClearMethod { None = 0, Soild_Color, Skybox };
-		ClearMethod ClearType = ClearMethod::None;
-		glm::vec4 ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		AssetHandle SkyboxHandle = 0;
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
+
+		operator SceneCamera& () { return Camera; }
+		operator const SceneCamera& () const { return Camera; }
 	};
 
 	struct CircleRendererComponent
@@ -114,6 +129,12 @@ namespace Hanabi
 
 		MaterialComponent() = default;
 		MaterialComponent(const MaterialComponent&) = default;
+	};
+
+	struct SkyLightComponent
+	{
+		AssetHandle EnvMapHandle = 0;
+		float Intensity = 1.0f;
 	};
 
 	struct LightComponent
@@ -211,10 +232,10 @@ namespace Hanabi
 	{};
 
 	using AllComponents =
-		ComponentGroup<
-		TransformComponent, SpriteRendererComponent, CircleRendererComponent,
+		ComponentGroup<RelationshipComponent, TransformComponent,
+		SpriteRendererComponent, CircleRendererComponent,
 		MeshComponent, MaterialComponent,
-		LightComponent,
+		LightComponent, SkyLightComponent,
 		CameraComponent,
 		ScriptComponent,
 		Rigidbody2DComponent, BoxCollider2DComponent, CircleCollider2DComponent,

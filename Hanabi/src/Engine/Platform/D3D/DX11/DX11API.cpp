@@ -2,103 +2,63 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11API.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 #include "DX11Context.h"
 #include "Engine/Core/Application.h"
 #include "DX11RenderStates.h"
+#include "Engine/Renderer/Renderer.h"
+#include "DX11Texture.h"
+#include "DX11ConstantBuffer.h"
+
+#include <glm/gtc/type_ptr.hpp>
 
 namespace Hanabi
 {
-	static D3D11_PRIMITIVE_TOPOLOGY PrimitiveTopologyTypeToD3D(PrimitiveTopology type)
-	{
-		switch (type)
-		{
-		case PrimitiveTopology::Points:
-			return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-		case PrimitiveTopology::Lines:
-			return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-		case PrimitiveTopology::Triangles:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		}
-
-		HNB_CORE_ASSERT(false, "Unknown Primitive Topology!");
-	}
-
 	void DX11RendererAPI::Init()
 	{
 		m_DeviceContext = DX11Context::GetDeviceContext();
 		m_Device = DX11Context::GetDevice();
 		m_SwapChain = DX11Context::GetSwapChain();
 
-		SetBuffer(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
+		DX11RenderStates::Init();
+
+		SetViewport(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight());
 	}
 
-	void DX11RendererAPI::SetClearColor(const glm::vec4& color)
+	void DX11RendererAPI::SetViewport(uint32_t width, uint32_t height)
 	{
-		m_ClearColor = color;
-	}
+		m_RenderTargetView.Reset();
+		m_DepthStencilBuffer.Reset();
 
-	void DX11RendererAPI::Clear()
-	{
-		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), &m_ClearColor.x);
-		m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
-		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-	}
+		m_Width = width;
+		m_Height = height;
 
-	void DX11RendererAPI::SetBuffer(uint32_t width, uint32_t height, uint32_t x, uint32_t y)
-	{
+		DX_CHECK_RESULT(m_SwapChain->ResizeBuffers(1, m_Width, m_Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
+
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
 		DX_CHECK_RESULT(m_SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer));
 		DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_RenderTargetView.GetAddressOf()));
 
-		D3D11_TEXTURE2D_DESC depthStencilDesc = {};
-		depthStencilDesc.Width = width;
-		depthStencilDesc.Height = height;
-		depthStencilDesc.MipLevels = 1;
-		depthStencilDesc.ArraySize = 1;
-		depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthStencilDesc.SampleDesc.Count = 1;
-		depthStencilDesc.SampleDesc.Quality = 0;
-		depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
-		depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		DX_CHECK_RESULT(m_Device->CreateTexture2D(&depthStencilDesc, nullptr, m_DepthStencilBuffer.GetAddressOf()));
-		DX_CHECK_RESULT(m_Device->CreateDepthStencilView(m_DepthStencilBuffer.Get(), nullptr, m_DepthStencilView.GetAddressOf()));
-		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), m_DepthStencilView.Get());
-
-		D3D11_VIEWPORT viewPort{};
-		viewPort.Width = width;
-		viewPort.Height = height;
-		viewPort.MinDepth = 0;
-		viewPort.MaxDepth = 1.0f;
-		viewPort.TopLeftX = x;
-		viewPort.TopLeftY = y;
-		m_DeviceContext->RSSetViewports(1, &viewPort);
-
-		m_Width = width;
-		m_Height = height;
-	}
-
-	void DX11RendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
-	{
-		m_RenderTargetView.Reset();
-		m_DepthStencilView.Reset();
-		m_DepthStencilBuffer.Reset();
-
-		DX_CHECK_RESULT(m_SwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0));
-
-		SetBuffer(width, height, x, y);
+		// TODO: May need to support SRGB backbuffer
+		//D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
+		//targetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		//targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		//targetViewDesc.Texture2D.MipSlice = 0;
+		//DX_CHECK_RESULT(m_Device->CreateRenderTargetView(backBuffer.Get(), &targetViewDesc, m_RenderTargetView.GetAddressOf()));
 	}
 
 	void DX11RendererAPI::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
 	{
 		if (clear)
-			renderPass->GetTargetFramebuffer()->ClearAttachment(m_ClearColor);
+		{
+			renderPass->GetTargetFramebuffer()->ClearAttachment();
+		}
+
 		renderPass->GetTargetFramebuffer()->Bind();
 
-		Ref<Pipeline> pipeline = renderPass->GetPipeline();
+		Ref<Pipeline>& pipeline = renderPass->GetPipeline();
+		pipeline->Bind();
 
 		PipelineSpecification& spec = pipeline->GetSpecification();
-		m_DeviceContext->IASetPrimitiveTopology(PrimitiveTopologyTypeToD3D(spec.Topology));
 
 		if (!spec.DepthTest)
 			m_DeviceContext->OMSetDepthStencilState(DX11RenderStates::DSSNoDepthTest.Get(), 0);
@@ -142,40 +102,230 @@ namespace Hanabi
 		renderPass->BindInputs();
 	}
 
-	void DX11RendererAPI::EndRenderPass(const Ref<RenderPass>& renderPass)
+	void DX11RendererAPI::EndRenderPass()
 	{
-		renderPass->GetTargetFramebuffer()->Unbind();
-		Clear();
+		m_DeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+
+		D3D11_VIEWPORT viewPort{};
+		viewPort.Width = m_Width;
+		viewPort.Height = m_Height;
+		viewPort.MinDepth = 0;
+		viewPort.MaxDepth = 1.0f;
+		viewPort.TopLeftX = 0;
+		viewPort.TopLeftY = 0;
+		m_DeviceContext->RSSetViewports(1, &viewPort);
+
+		static const glm::vec4 clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), glm::value_ptr(clearColor));
+		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
 	}
 
-	void DX11RendererAPI::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
-		mesh->GetVertexBuffer()->Bind();
-		mesh->GetIndexBuffer()->Bind();
-		pipeline->Bind();
 		material->Bind();
+		DrawMesh(mesh);
+	}
 
-		m_DeviceContext->DrawIndexed(mesh->GetIndexBuffer()->GetCount(), 0, 0);
+	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh)
+	{
+		Ref<MeshSource> source = mesh->GetMeshSource();
+		source->GetVertexBuffer()->Bind();
+		source->GetIndexBuffer()->Bind();
+
+		m_DeviceContext->DrawIndexed(source->GetIndexBuffer()->GetCount(), 0, 0);
 	}
 
 	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
-		const Ref<Pipeline>& pipeline, uint32_t indexCount)
+		uint32_t indexCount)
+	{
+		material->Bind();
+
+		DrawIndexed(vertexBuffer, indexBuffer, indexCount);
+	}
+
+	void DX11RendererAPI::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount)
 	{
 		vertexBuffer->Bind();
 		indexBuffer->Bind();
-		pipeline->Bind();
-		material->Bind();
 
-		m_DeviceContext->DrawIndexed(indexCount, 0, 0);
+		if (indexCount == 0)
+			m_DeviceContext->DrawIndexed(indexBuffer->GetCount(), 0, 0);
+		else
+			m_DeviceContext->DrawIndexed(indexCount, 0, 0);
 	}
 
-	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void DX11RendererAPI::DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount)
 	{
 		vertexBuffer->Bind();
-		pipeline->Bind();
-		material->Bind();
 
 		m_DeviceContext->Draw(vertexCount, 0);
+	}
+
+	void DX11RendererAPI::DrawFullScreenQuad()
+	{
+		m_DeviceContext->Draw(3, 0);
+	}
+
+	std::pair<Ref<TextureCube>, Ref<TextureCube>> DX11RendererAPI::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
+	{
+		if (!Renderer::GetConfig().ComputeEnvironmentMaps)
+			return { Renderer::GetTexture<TextureCube>("BlackCube"), Renderer::GetTexture<TextureCube>("BlackCube") };
+
+		HNB_CORE_ASSERT(equirectangularMap->GetFormat() == ImageFormat::RGBA32F, "Texture is not HDR!");
+
+		const uint32_t cubemapSize = Renderer::GetConfig().EnvironmentMapResolution;
+		static const uint32_t irradianceMapSize = 32;
+		static ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
+
+		Ref<DX11Texture2D> envMap = std::static_pointer_cast<DX11Texture2D>(equirectangularMap);
+
+		TextureSpecification cubemapSpec = {};
+		cubemapSpec.Width = cubemapSize;
+		cubemapSpec.Height = cubemapSize;
+		cubemapSpec.Format = ImageFormat::RGBA32F;
+
+		Ref<DX11TextureCube> envUnfiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
+
+		// Radiance map (Equirectangular to cubemap) 
+		{
+			Ref<Shader> equirectangularToCubemapShader = Renderer::GetShader("EquirectangularToCubemap");
+
+			const ShaderReflectionData& reflectionData = equirectangularToCubemapShader->GetReflectionData();
+			uint32_t uavSlot = 0;
+			envUnfiltered->CreateUAV();
+			Utils::BindResource(reflectionData, "o_OutputTex", [&](auto& slot)
+				{
+					uavSlot = slot;
+					m_DeviceContext->CSSetUnorderedAccessViews(slot, 1, envUnfiltered->GetUAV().GetAddressOf(), 0);
+				});
+			Utils::BindResource(reflectionData, "u_EquirectangularMap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetShaderResources(slot, 1, envMap->GetTextureSRV().GetAddressOf());
+				});
+			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				});
+
+			equirectangularToCubemapShader->Bind();
+			m_DeviceContext->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
+
+			// Unbind uav
+			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+
+			envUnfiltered->GenerateMips();
+		}
+
+		// Radiance map (Filter)	
+		Ref<DX11TextureCube> envFiltered = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
+		{
+			// Copy Unfiltered envmap to Filtered envmap (Keep the first mip level)
+			m_DeviceContext->CopyResource(envFiltered->GetTextureCube().Get(), envUnfiltered->GetTextureCube().Get());
+
+			Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
+			uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
+			const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();
+			Utils::BindResource(reflectionData, "u_InputTex", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetShaderResources(slot, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
+				});
+			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				});
+			uint32_t uavSlot = 0;
+			Utils::BindResource(reflectionData, "o_OutputTex", [&](auto& slot)
+				{
+					uavSlot = slot;
+				});
+
+			struct CBFilterParam
+			{
+				float Roughness;
+
+				char padding[12];
+			};
+
+			static Ref<DX11ConstantBuffer> s_FilterParam;
+
+			if (!s_FilterParam)
+				s_FilterParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBFilterParam)));
+
+			Utils::BindResource(reflectionData, "CBFilterParam", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetConstantBuffers(slot, 1, s_FilterParam->GetBuffer().GetAddressOf());
+				});
+
+			environmentMipFilterShader->Bind();
+			const float deltaRoughness = 1.0f / glm::max((float)mipCount - 1.0f, 1.0f);
+			for (uint32_t i = 1, size = cubemapSize; i < mipCount; i++, size /= 2)
+			{
+				uint32_t numGroups = glm::max(1u, size / 32);
+				CBFilterParam filterParam = { i * deltaRoughness };
+				s_FilterParam->SetData(&filterParam, sizeof(CBFilterParam));
+				envFiltered->CreateUAV(i);
+				m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);
+				m_DeviceContext->Dispatch(numGroups, numGroups, 6);
+			}
+
+			// Unbind uav
+			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+		}
+
+		// Irradiance map
+		cubemapSpec.Width = irradianceMapSize;
+		cubemapSpec.Height = irradianceMapSize;
+		Ref<DX11TextureCube> irradianceMap = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
+		{
+			Ref<Shader> environmentIrradianceShader = Renderer::GetShader("EnvironmentIrradiance");
+
+			const ShaderReflectionData& reflectionData = environmentIrradianceShader->GetReflectionData();
+			Utils::BindResource(reflectionData, "u_RadianceMap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetShaderResources(slot, 1, envFiltered->GetTextureSRV().GetAddressOf());
+				});
+			uint32_t uavSlot = 0;
+			irradianceMap->CreateUAV();
+			Utils::BindResource(reflectionData, "o_IrradianceMap", [&](auto& slot)
+				{
+					uavSlot = slot;
+					m_DeviceContext->CSSetUnorderedAccessViews(slot, 1, irradianceMap->GetUAV().GetAddressOf(), 0);
+				});
+			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
+				});
+
+			struct CBSamplesParams
+			{
+				uint32_t Samples;
+
+				char padding[12];
+			};
+
+			static Ref<DX11ConstantBuffer> s_SamplesParam;
+
+			if (!s_SamplesParam)
+				s_SamplesParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBSamplesParams)));
+
+			Utils::BindResource(reflectionData, "CBSamplesParams", [&](auto& slot)
+				{
+					m_DeviceContext->CSSetConstantBuffers(slot, 1, s_SamplesParam->GetBuffer().GetAddressOf());
+				});
+
+			CBSamplesParams samplesParams = { Renderer::GetConfig().IrradianceMapComputeSamples };
+			s_SamplesParam->SetData(&samplesParams, sizeof(CBSamplesParams));
+
+			environmentIrradianceShader->Bind();
+			m_DeviceContext->Dispatch(irradianceMapSize / 32, irradianceMapSize / 32, 6);
+
+			// Unbind uav
+			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+
+			irradianceMap->GenerateMips();
+		}
+
+		return { envFiltered, irradianceMap };
 	}
 }
 #endif

@@ -4,8 +4,8 @@ project "Hanabi_ScriptCore"
 	dotnetframework "4.7.2"
 	namespace "Hanabi"
 
-    targetdir ("../Hanabi_Editor/resources/scripts")
-	objdir ("../build/int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}")
+    targetdir ("../Hanabi_Editor/Resources/Scripts")
+	objdir (intdir .. "/%{prj.name}")
 
 	files 
 	{

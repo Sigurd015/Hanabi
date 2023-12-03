@@ -7,9 +7,16 @@
 
 namespace Hanabi
 {
+	/// <summary>
+	/// Notice: This function is only used for loading textures, so we generate mipmaps for all textures by default
+	/// Environment maps, Editor icons, etc. should be loaded using the LoadTexture2D function
+	/// Which allows us to specify whether we want to generate mipmaps or not
+	/// </summary>
 	bool TextureSerializer::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const
 	{
-		asset = LoadTexture2D(Project::GetEditorAssetManager()->GetFileSystemPath(metadata));
+		TextureSpecification spec = {};
+		spec.GenerateMips = true;
+		asset = LoadTexture2D(Project::GetEditorAssetManager()->GetFileSystemPath(metadata), spec);
 		if (asset)
 		{
 			asset->Handle = metadata.Handle;
@@ -19,41 +26,71 @@ namespace Hanabi
 		return false;
 	}
 
-	Buffer TextureSerializer::LoadTextureData(const std::filesystem::path& path, ImageFormat& outFormat, uint32_t& outWidth, uint32_t& outHeight)
+	Buffer TextureSerializer::ToBufferFromFile(const std::filesystem::path& path, TextureSpecification& spec)
 	{
+		Buffer imageBuffer;
+		std::string pathString = path.string();
+
 		int width, height, channels;
-		stbi_set_flip_vertically_on_load(1);
-		Buffer data;
-		std::string pathStr = path.string();
-		data.Data = stbi_load(pathStr.c_str(), &width, &height, &channels, 4);
-
-		if (data.Data == nullptr)
+		if (stbi_is_hdr(pathString.c_str()))
 		{
-			HNB_CORE_ERROR("TextureSerializer::LoadTexture2D - Could not load texture from filepath: {}", path.string());
-			return 0;
+			// Notice: Look like stbi_set_flip_vertically_on_load is global state, so remember to reset it
+			stbi_set_flip_vertically_on_load(0);
+			imageBuffer.Data = (uint8_t*)stbi_loadf(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			imageBuffer.Size = width * height * 4 * sizeof(float);
+			spec.Format = ImageFormat::RGBA32F;
+			spec.GenerateMips = false;
+		}
+		else
+		{
+			stbi_set_flip_vertically_on_load(1);
+			imageBuffer.Data = stbi_load(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+			imageBuffer.Size = width * height * 4;
+			spec.Format = ImageFormat::RGBA;
+			spec.GenerateMips = true;
 		}
 
-		data.Size = width * height * channels;
+		if (!imageBuffer)
+			return {};
 
-		outWidth = width;
-		outHeight = height;
-		switch (channels)
-		{
-		case 3:
-			outFormat = ImageFormat::RGB8;
-			break;
-		case 4:
-			outFormat = ImageFormat::RGBA8;
-			break;
-		}
-
-		return data;
+		spec.Width = width;
+		spec.Height = height;
+		return imageBuffer;
 	}
 
-	Ref<Texture2D> TextureSerializer::LoadTexture2D(const std::filesystem::path& path)
+	Buffer TextureSerializer::ToBufferFromMemory(Buffer buffer, TextureSpecification& spec)
 	{
-		TextureSpecification spec;
-		Buffer data = LoadTextureData(path, spec.Format, spec.Width, spec.Height);
+		Buffer imageBuffer;
+
+		int width, height, channels;
+		if (stbi_is_hdr_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size))
+		{
+			stbi_set_flip_vertically_on_load(0);
+			imageBuffer.Data = (uint8_t*)stbi_loadf_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size, &width, &height, &channels, STBI_rgb_alpha);
+			imageBuffer.Size = width * height * 4 * sizeof(float);
+			spec.Format = ImageFormat::RGBA32F;
+			spec.GenerateMips = false;
+		}
+		else
+		{
+			stbi_set_flip_vertically_on_load(1);
+			imageBuffer.Data = stbi_load_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size, &width, &height, &channels, STBI_rgb_alpha);
+			imageBuffer.Size = width * height * 4;
+			spec.Format = ImageFormat::RGBA;
+			spec.GenerateMips = true;
+		}
+
+		if (!imageBuffer)
+			return {};
+
+		spec.Width = width;
+		spec.Height = height;
+		return imageBuffer;
+	}
+
+	Ref<Texture2D> TextureSerializer::LoadTexture2D(const std::filesystem::path& path, TextureSpecification& spec)
+	{
+		Buffer data = ToBufferFromFile(path, spec);
 
 		if (data)
 		{

@@ -19,10 +19,22 @@ namespace Hanabi
 		}
 	}
 
-	ContentBrowserPanel::ContentBrowserPanel() :m_ProjectDirectory(Project::GetProjectDirectory())
+	ContentBrowserPanel::ContentBrowserPanel(const std::filesystem::path& projectDirectory)
 	{
+		SetContext(projectDirectory);
+	}
+
+	void ContentBrowserPanel::SetContext(const std::filesystem::path& projectDirectory)
+	{
+		m_ProjectDirectory = projectDirectory;
 		RefreshAssetsMap();
 	}
+
+	void ContentBrowserPanel::OnEvent(Event& e)
+	{}
+
+	void ContentBrowserPanel::OnUpdate(Timestep ts)
+	{}
 
 	void ContentBrowserPanel::OnImGuiRender()
 	{
@@ -60,15 +72,6 @@ namespace Hanabi
 							{
 								ImportAsset(filepath);
 								MaterialAssetSerializer::SerializeToYAML(filepath);
-							}
-						}
-						if (ImGui::MenuItem("Create EnvMap"))
-						{
-							std::string filepath = FileDialogs::SaveFile("EnvMap (*.henv)\0*.henv\0");
-							if (!filepath.empty())
-							{
-								ImportAsset(filepath);
-								EnvMapAssetSerializer::SerializeToYAML(filepath);
 							}
 						}
 						ImGui::EndPopup();
@@ -188,6 +191,17 @@ namespace Hanabi
 
 			if (isAsset)
 			{
+				if (ImGui::BeginPopupContextItem())
+				{
+					if (ImGui::MenuItem("Remove"))
+					{
+						Project::GetEditorAssetManager()->RemoveAsset(m_ImportedFiles[relativePath]);
+						m_ImportedFiles.erase(relativePath);
+					}
+
+					ImGui::EndPopup();
+				}
+
 				if (ImGui::BeginDragDropSource())
 				{
 					AssetHandle temp = m_ImportedFiles[relativePath];

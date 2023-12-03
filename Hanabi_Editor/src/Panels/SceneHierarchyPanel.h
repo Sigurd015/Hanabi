@@ -1,17 +1,17 @@
 #pragma once
 #include "Hanabi.h"
+#include "PanelManager.h"
 
 namespace Hanabi
 {
-	class SceneHierarchyPanel
+	class SceneHierarchyPanel : public Panel
 	{
 	public:
 		SceneHierarchyPanel() = default;
-		SceneHierarchyPanel(const Ref<Scene>& scene);
 		void SetContext(const Ref<Scene>& scene);
-		void OnImGuiRender();
-		void SetSelectedEntity(Entity entity);
-		Entity GetSelectedEntity() const { return m_SelectionContext; }
+		virtual void OnEvent(Event& e) override;
+		virtual void OnUpdate(Timestep ts) override;
+		virtual void OnImGuiRender() override;
 	private:
 		template<typename T>
 		void DisplayAddComponentEntry(const std::string& entryName);
@@ -19,6 +19,5 @@ namespace Hanabi
 		void DrawComponents(Entity entity);
 	private:
 		Ref<Scene> m_Context;
-		Entity m_SelectionContext;
 	};
 }

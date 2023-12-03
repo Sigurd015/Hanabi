@@ -1,10 +1,7 @@
 #include "EditorLayer.h"
 #include "EditorResources.h"
-
-#include <imgui.h>
-#include <ImGuizmo.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "CommonStates/SelectionManager.h"
+#include "CommonStates/SettingManager.h"
 
 namespace Hanabi
 {
@@ -13,10 +10,10 @@ namespace Hanabi
 
 	void EditorLayer::OnAttach()
 	{
-		m_ViewportFramebuffer = SceneRenderer::GetFinalRenderPass()->GetTargetFramebuffer();
-
-		m_EditorScene = CreateRef<Scene>();
-		m_ActiveScene = m_EditorScene;
+		PanelManager::Init();
+		PanelManager::RegisterOnSceneOpenCallback(HNB_BIND_EVENT_FN(EditorLayer::OpenScene));
+		PanelManager::RegisterOnScenePlayCallback(HNB_BIND_EVENT_FN(EditorLayer::OnScenePlay));
+		PanelManager::RegisterOnSceneStopCallback(HNB_BIND_EVENT_FN(EditorLayer::OnSceneStop));
 
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
@@ -29,8 +26,6 @@ namespace Hanabi
 			if (!OpenProject())
 				Application::Get().Close();
 		}
-
-		m_EditorCamera = EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f);
 	}
 
 	void EditorLayer::OnDetach()
@@ -38,55 +33,11 @@ namespace Hanabi
 
 	void EditorLayer::OnUpdate(Timestep ts)
 	{
-		#pragma region Resize
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		SceneRenderer::SetViewportSize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-		#pragma endregion
-
-		// Update scene
-		switch (m_SceneState)
-		{
-		case SceneState::Edit:
-		{
-			m_EditorCamera.OnUpdate(ts);
-			m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera, m_SceneHierarchyPanel.GetSelectedEntity(), m_ShowPhysicsColliders);
-			break;
-		}
-		case SceneState::Play:
-		{
-			m_ActiveScene->OnUpdateRuntime(ts, m_SceneHierarchyPanel.GetSelectedEntity(), m_ShowPhysicsColliders);
-			break;
-		}
-		}
-
-		#pragma region Mouse Pick Up
-		ImVec2 mousePos = ImGui::GetMousePos();
-		mousePos.x -= m_ViewportBounds[0].x;
-		mousePos.y -= m_ViewportBounds[0].y;
-		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::OpenGL:
-			mousePos.y = viewportSize.y - mousePos.y;
-			break;
-		}
-
-		int mouseX = (int)mousePos.x;
-		int mouseY = (int)mousePos.y;
-
-		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
-		{
-			int pixelData = m_ViewportFramebuffer->ReadPixel(1, mouseX, mouseY);
-			m_HoveredEntity = pixelData == -1 ? Entity() : Entity((entt::entity)pixelData, m_ActiveScene.get());
-		}
-		#pragma endregion	
+		PanelManager::OnUpdate(ts);
 	}
 
 	void EditorLayer::OnImGuiRender()
 	{
-
 		#pragma region Dockspace Settings
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
@@ -168,7 +119,7 @@ namespace Hanabi
 
 			if (ImGui::BeginMenu("Debug"))
 			{
-				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &m_ImGuiDebugWndDraw);
+				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &SettingManager::ImGuiDebugWndDraw);
 
 				ImGui::EndMenu();
 			}
@@ -177,201 +128,19 @@ namespace Hanabi
 		}
 		#pragma endregion	
 
-		m_SceneHierarchyPanel.OnImGuiRender();
-		m_ContentBrowserPanel->OnImGuiRender();
-		UI_StatisticsPanel();
-		UI_ViewportPanel();
-
-		if (m_ImGuiDebugWndDraw)
-			ImGui::ShowMetricsWindow();
+		PanelManager::OnImGuiRender();
+		SettingManager::OnImGuiRender();
 
 		ImGui::End();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		if (m_SceneState == SceneState::Edit)
-		{
-			m_EditorCamera.OnEvent(e);
-		}
+		PanelManager::OnEvent(e);
+
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
-		dispatcher.Dispatch<MouseButtonPressedEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 		dispatcher.Dispatch<WindowDropEvent>(HNB_BIND_EVENT_FN(EditorLayer::OnWindowDrop));
-	}
-
-	void EditorLayer::UI_StatisticsPanel()
-	{
-		m_EnableVsyn = Application::Get().GetWindow().IsVSync();
-		ImGui::Begin("Settings");
-		auto stats = Renderer2D::GetStats();
-		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
-		ImGui::Text("Quads: %d", stats.QuadCount);
-		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
-		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
-		ImGui::Separator();
-		ImGui::Text("Render Settings:");
-		ImGui::Checkbox("Show physics colliders", &m_ShowPhysicsColliders);
-		if (ImGui::Checkbox("Enable Vsyn", &m_EnableVsyn))
-		{
-			Application::Get().GetWindow().SetVSync(m_EnableVsyn);
-		}
-
-		ImGui::End();
-	}
-
-	void EditorLayer::UI_ViewportPanel()
-	{
-		#pragma region Viewport_Toolbar	
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-		auto& colors = ImGui::GetStyle().Colors;
-		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
-
-		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-		bool toolbarEnabled = (bool)m_ActiveScene;
-
-		ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-		if (!toolbarEnabled)
-			tintColor.w = 0.5f;
-
-		float size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-
-		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? EditorResources::PlayIcon : EditorResources::StopIcon;
-		if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
-		{
-			if (m_SceneState == SceneState::Edit)
-				OnScenePlay();
-			else if (m_SceneState == SceneState::Play)
-				OnSceneStop();
-		}
-
-		if (m_SceneState == SceneState::Play)
-		{
-			ImGui::SameLine();
-			bool isPaused = m_ActiveScene->IsPaused();
-			Ref<Texture2D> icon = isPaused ? EditorResources::PlayIcon : EditorResources::PauseIcon;
-			if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
-			{
-				OnScenePause(!isPaused);
-			}
-
-			if (isPaused)
-			{
-				ImGui::SameLine();
-				{
-					Ref<Texture2D> icon = EditorResources::StepIcon;
-					if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
-					{
-						m_ActiveScene->Step();
-					}
-				}
-			}
-		}
-
-		ImGui::PopStyleVar(2);
-		ImGui::PopStyleColor(3);
-		ImGui::End();
-		#pragma endregion	
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-		ImGui::Begin("Viewport");
-
-		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
-
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::OpenGL:
-			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y }, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-			break;
-			#if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPIType::DX11:
-			ImGui::Image(m_ViewportFramebuffer->GetColorAttachment(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
-			break;
-			#endif
-		}
-
-		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-		auto viewportOffset = ImGui::GetWindowPos();
-		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
-			{
-				AssetHandle tempHandle = *(AssetHandle*)payload->Data;
-				if (AssetManager::GetAssetType(tempHandle) == AssetType::Scene)
-				{
-					OpenScene(tempHandle);
-				}
-				else
-				{
-					//TODO: Show message to user
-					HNB_CORE_ERROR("Wrong asset type!");
-				}
-			}
-			ImGui::EndDragDropTarget();
-		}
-
-		// Gizmos
-		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-		if (selectedEntity && m_GizmoType != -1)
-		{
-			ImGuizmo::SetOrthographic(false);
-			ImGuizmo::SetDrawlist();
-
-			float windowWidth = (float)ImGui::GetWindowWidth();
-			float windowHeight = (float)ImGui::GetWindowHeight();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
-
-			// Editor camera
-			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
-			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
-
-			// Entity transform
-			auto& tc = selectedEntity.GetComponent<TransformComponent>();
-			glm::mat4 transform = tc.GetTransform();
-
-			// Snapping
-			bool snap = Input::IsKeyPressed(Key::LeftControl);
-			float snapValue = 0.5f; // Snap to 0.5m for translation/scale
-			// Snap to 45 degrees for rotation
-			if (m_GizmoType == ImGuizmo::OPERATION::ROTATE)
-				snapValue = 45.0f;
-
-			float snapValues[3] = { snapValue, snapValue, snapValue };
-
-			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
-				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform),
-				nullptr, snap ? snapValues : nullptr);
-
-			if (ImGuizmo::IsUsing())
-			{
-				glm::vec3 translation, rotation, scale;
-				Math::DecomposeTransform(transform, translation, rotation, scale);
-
-				glm::vec3 deltaRotation = rotation - tc.Rotation;
-				tc.Translation = translation;
-				tc.Rotation += deltaRotation;
-				tc.Scale = scale;
-			}
-		}
-
-		ImGui::End();
-		ImGui::PopStyleVar();
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -405,44 +174,8 @@ namespace Hanabi
 				else
 					SaveScene();
 			}
-
 			break;
 		}
-
-		// Scene Commands
-		case Key::D:
-		{
-			if (control)
-				OnDuplicateEntity();
-		}
-		// Gizmos
-		case Key::Q:
-			if (!ImGuizmo::IsUsing())
-				m_GizmoType = -1;
-			break;
-		case Key::W:
-			if (!ImGuizmo::IsUsing())
-				m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-			break;
-		case Key::E:
-			if (!ImGuizmo::IsUsing())
-				m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-			break;
-		case Key::R:
-			if (!ImGuizmo::IsUsing())
-				m_GizmoType = ImGuizmo::OPERATION::SCALE;
-			break;
-		}
-
-		return false;
-	}
-
-	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e)
-	{
-		if (e.GetMouseButton() == Mouse::ButtonLeft)
-		{
-			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
-				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
 		}
 		return false;
 	}
@@ -473,8 +206,8 @@ namespace Hanabi
 			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
 			AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
 			OpenScene(startSceneHandle);
-			m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
 			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());
+			PanelManager::OnOpenProject();
 		}
 	}
 
@@ -486,7 +219,7 @@ namespace Hanabi
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		PanelManager::OnSceneChange(m_ActiveScene);
 	}
 
 	void EditorLayer::OpenScene(AssetHandle handle)
@@ -502,7 +235,7 @@ namespace Hanabi
 		{
 			m_EditorScene = newScene;
 			m_ActiveScene = m_EditorScene;
-			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+			PanelManager::OnSceneChange(m_EditorScene);
 		}
 	}
 
@@ -525,53 +258,23 @@ namespace Hanabi
 		{
 			if (AssetManager::IsAssetHandleValid(m_ActiveScene->Handle))
 				Project::GetEditorAssetManager()->ReloadData(m_ActiveScene->Handle);
-			m_ActiveScene->Handle = m_ContentBrowserPanel->ImportAsset(filepath);
+			m_ActiveScene->Handle = PanelManager::OnAssetImport(filepath);
 			return SaveScene();
 		}
 	}
 
 	void EditorLayer::OnScenePlay()
 	{
-		m_SceneState = SceneState::Play;
-
 		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
 
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+		PanelManager::OnSceneChange(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
-		HNB_CORE_ASSERT(m_SceneState == SceneState::Play);
-
-		if (m_SceneState == SceneState::Play)
-			m_ActiveScene->OnRuntimeStop();
-
-		m_SceneState = SceneState::Edit;
-
 		m_ActiveScene = m_EditorScene;
 
-		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-	}
-
-	void EditorLayer::OnScenePause(bool pause)
-	{
-		if (m_SceneState == SceneState::Edit)
-			return;
-
-		m_ActiveScene->SetPaused(pause);
-	}
-
-	void EditorLayer::OnDuplicateEntity()
-	{
-		if (m_SceneState != SceneState::Edit)
-			return;
-
-		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
-		if (selectedEntity)
-		{
-			Entity newEntity = m_EditorScene->DuplicateEntity(selectedEntity);
-			m_SceneHierarchyPanel.SetSelectedEntity(newEntity);
-		}
+		PanelManager::OnSceneChange(m_ActiveScene);
 	}
 }

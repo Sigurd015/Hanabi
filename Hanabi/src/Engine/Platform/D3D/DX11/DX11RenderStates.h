@@ -4,28 +4,29 @@
 #include "DX11Context.h"
 
 #include <d3d11.h>
-#include <Windows.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
 	class DX11RenderStates
 	{
 	public:
-		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSNoDepthTest = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSLess = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11DepthStencilState> DSSLessEqual = nullptr;
+		inline static ComPtr <ID3D11DepthStencilState> DSSNoDepthTest = nullptr;
+		inline static ComPtr <ID3D11DepthStencilState> DSSLess = nullptr;
+		inline static ComPtr <ID3D11DepthStencilState> DSSLessEqual = nullptr;
 
-		inline static Microsoft::WRL::ComPtr <ID3D11RasterizerState> RSNoCull = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11RasterizerState> RSCullBack = nullptr;
+		inline static ComPtr <ID3D11RasterizerState> RSNoCull = nullptr;
+		inline static ComPtr <ID3D11RasterizerState> RSCullBack = nullptr;
+		inline static ComPtr <ID3D11RasterizerState> RSCullFront = nullptr;
 
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSNoBlend = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSAlpha = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSAdditive = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11BlendState> BSSubtractive = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSNoBlend = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSAlpha = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSAdditive = nullptr;
+		inline static ComPtr <ID3D11BlendState> BSSubtractive = nullptr;
 
-		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSLinearWrap = nullptr;
-		inline static Microsoft::WRL::ComPtr <ID3D11SamplerState> SSLinearClamp = nullptr;
+		inline static ComPtr <ID3D11SamplerState> SSPointClamp = nullptr;
+		inline static ComPtr <ID3D11SamplerState> SSLinearWrap = nullptr;
+		inline static ComPtr <ID3D11SamplerState> SSLinearClamp = nullptr;
+		inline static ComPtr <ID3D11SamplerState> SSAnisotropicWrap = nullptr;
 
 		static void Init()
 		{
@@ -54,11 +55,12 @@ namespace Hanabi
 			}
 
 			// Rasterizer States
+			// FrontCounterClockwise - Use CCW winding order for front faces
 			{
 				D3D11_RASTERIZER_DESC rasterizerDesc = {};
 				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 				rasterizerDesc.CullMode = D3D11_CULL_NONE;
-				rasterizerDesc.FrontCounterClockwise = false;
+				rasterizerDesc.FrontCounterClockwise = true;
 				rasterizerDesc.DepthClipEnable = true;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRasterizerState(&rasterizerDesc, RSNoCull.GetAddressOf()));
 			}
@@ -66,9 +68,17 @@ namespace Hanabi
 				D3D11_RASTERIZER_DESC rasterizerDesc = {};
 				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
 				rasterizerDesc.CullMode = D3D11_CULL_BACK;
-				rasterizerDesc.FrontCounterClockwise = false;
+				rasterizerDesc.FrontCounterClockwise = true;
 				rasterizerDesc.DepthClipEnable = true;
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRasterizerState(&rasterizerDesc, RSCullBack.GetAddressOf()));
+			}
+			{
+				D3D11_RASTERIZER_DESC rasterizerDesc = {};
+				rasterizerDesc.FillMode = D3D11_FILL_SOLID;
+				rasterizerDesc.CullMode = D3D11_CULL_FRONT;
+				rasterizerDesc.FrontCounterClockwise = true;
+				rasterizerDesc.DepthClipEnable = true;
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRasterizerState(&rasterizerDesc, RSCullFront.GetAddressOf()));
 			}
 
 			// Blend States
@@ -130,6 +140,27 @@ namespace Hanabi
 			}
 
 			// Sampler State
+			{
+				// TODO: Make MaxAnisotropy configurable
+				D3D11_SAMPLER_DESC samplerDesc = {};
+				samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
+				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+				samplerDesc.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+				samplerDesc.MipLODBias = 0.0f;
+				samplerDesc.MinLOD = 0.0f;
+				samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSAnisotropicWrap.GetAddressOf()));
+			}
+			{
+				D3D11_SAMPLER_DESC samplerDesc = {};
+				samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSPointClamp.GetAddressOf()));
+			}		
 			{
 				D3D11_SAMPLER_DESC samplerDesc = {};
 				samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;

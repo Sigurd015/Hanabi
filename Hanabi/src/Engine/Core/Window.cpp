@@ -66,18 +66,12 @@ namespace Hanabi
 			glfwSetErrorCallback(GLFWErrorCallback);
 		}
 
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPIType::OpenGL:
-#if defined(HNB_DEBUG)
-			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
-#endif
-			m_Data.Title += "<OpenGL>";
-			break;
-
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 			m_Data.Title += "<DX11>";
 			break;
 #endif
@@ -88,10 +82,6 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-		case RendererAPIType::OpenGL:
-			m_Context = RendererContext::Create(m_Window);
-			break;
-
 #if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			HWND winWnd = glfwGetWin32Window(m_Window);
@@ -126,19 +116,19 @@ namespace Hanabi
 				{
 				case GLFW_PRESS:
 				{
-					KeyPressedEvent event(key, false);
+					KeyPressedEvent event((KeyCode)key, false);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					KeyReleasedEvent event(key);
+					KeyReleasedEvent event((KeyCode)key);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_REPEAT:
 				{
-					KeyPressedEvent event(key, true);
+					KeyPressedEvent event((KeyCode)key, true);
 					data.EventCallback(event);
 					break;
 				}
@@ -149,7 +139,7 @@ namespace Hanabi
 			{
 				WindowProps& data = *(WindowProps*)glfwGetWindowUserPointer(window);
 
-				KeyTypedEvent event(keycode);
+				KeyTypedEvent event((KeyCode)keycode);
 				data.EventCallback(event);
 			});
 
@@ -160,13 +150,13 @@ namespace Hanabi
 				{
 				case GLFW_PRESS:
 				{
-					MouseButtonPressedEvent event(button);
+					MouseButtonPressedEvent event((MouseButton)button);
 					data.EventCallback(event);
 					break;
 				}
 				case GLFW_RELEASE:
 				{
-					MouseButtonReleasedEvent event(button);
+					MouseButtonReleasedEvent event((MouseButton)button);
 					data.EventCallback(event);
 					break;
 				}

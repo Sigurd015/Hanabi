@@ -1,28 +1,31 @@
 #pragma once
+#include "Engine/Renderer/Shader.h"
 
 #include <string>
 
 namespace Hanabi
 {
-	enum class RendererResourceType
-	{
-		Texture2D,
-		TextureCube,
-		ConstantBuffer,
-	};
-
-	class RendererResource : public std::enable_shared_from_this<RendererResource>
+	class RendererResource
 	{
 	public:
 		virtual ~RendererResource() = default;
-
-		template <typename T>
-		Ref<T> GetAs()
-		{
-			static_assert(std::is_base_of<RendererResource, T>::value, "RendererResource::GetAs only works for types derived from RendererResource");
-			return std::dynamic_pointer_cast<T>(shared_from_this());
-		}
-
-		virtual RendererResourceType GetRendererResourceType() const = 0;
+		virtual void Bind(uint32_t slot = 0) const = 0;
 	};
+
+	namespace Utils
+	{
+		template<typename BindFunction>
+		inline void BindResource(const ShaderReflectionData& reflectionData, const std::string& resourceName, BindFunction function)
+		{
+			auto it = reflectionData.find(resourceName);
+			if (it != reflectionData.end())
+			{
+				function(it->second);
+			}
+			else
+			{
+				HNB_CORE_WARN("RendererResource {} not found in shader!", resourceName);
+			}
+		}
+	}
 }

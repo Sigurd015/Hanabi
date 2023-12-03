@@ -2,7 +2,6 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include "DX11ConstantBuffer.h"
-#include "Engine/Platform/D3D/DXCommon.h"
 #include "DX11Context.h"
 
 namespace Hanabi
@@ -24,10 +23,10 @@ namespace Hanabi
 		m_ConstantBuffer.Reset();
 	}
 
-	void DX11ConstantBuffer::Bind(uint32_t binding) const
+	void DX11ConstantBuffer::Bind(uint32_t slot) const
 	{
-		DX11Context::GetDeviceContext()->VSSetConstantBuffers(binding, 1, m_ConstantBuffer.GetAddressOf());
-		DX11Context::GetDeviceContext()->PSSetConstantBuffers(binding, 1, m_ConstantBuffer.GetAddressOf());
+		DX11Context::GetDeviceContext()->VSSetConstantBuffers(slot, 1, m_ConstantBuffer.GetAddressOf());
+		DX11Context::GetDeviceContext()->PSSetConstantBuffers(slot, 1, m_ConstantBuffer.GetAddressOf());
 	}
 
 	void DX11ConstantBuffer::SetData(const void* data, uint32_t offset)

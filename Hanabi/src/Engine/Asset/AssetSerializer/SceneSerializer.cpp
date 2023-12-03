@@ -22,27 +22,6 @@ namespace Hanabi
 		break;                                         \
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec3& v)
-	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
-		return out;
-	}
-
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec4& v)
-	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
-		return out;
-	}
-
-	YAML::Emitter& operator<<(YAML::Emitter& out, const glm::vec2& v)
-	{
-		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
-		return out;
-	}
-
 	static std::string LightTypeToString(LightComponent::LightType lightType)
 	{
 		switch (lightType)
@@ -52,7 +31,7 @@ namespace Hanabi
 		case LightComponent::LightType::Directional: return "Directional";
 		}
 
-		HNB_CORE_ASSERT(false, "Unknown light type");
+		HNB_CORE_ASSERT(false, "Unknown Light Type");
 		return {};
 	}
 
@@ -62,29 +41,31 @@ namespace Hanabi
 		if (lightTypeString == "Spot")   return LightComponent::LightType::Spot;
 		if (lightTypeString == "Directional") return LightComponent::LightType::Directional;
 
-		HNB_CORE_ASSERT(false, "Unknown light type");
+		HNB_CORE_ASSERT(false, "Unknown Light Type");
 		return LightComponent::LightType::None;
 	}
 
-	static std::string ClearMethodTypeToString(CameraComponent::ClearMethod clearMethod)
+	static std::string ShadowTypeToString(LightComponent::ShadowType lightType)
 	{
-		switch (clearMethod)
+		switch (lightType)
 		{
-		case CameraComponent::ClearMethod::Soild_Color:  return "Soild Color";
-		case CameraComponent::ClearMethod::Skybox:   return "Skybox";
+		case LightComponent::ShadowType::None:  return "None";
+		case LightComponent::ShadowType::Hard:   return "Hard";
+		case LightComponent::ShadowType::Soft: return "Soft";
 		}
 
-		HNB_CORE_ASSERT(false, "Unknown Clear Method type");
+		HNB_CORE_ASSERT(false, "Unknown Shadow Type");
 		return {};
 	}
 
-	static CameraComponent::ClearMethod ClearMethodTypeFromString(const std::string& clearMethodString)
+	static LightComponent::ShadowType ShadowTypeFromString(const std::string& lightTypeString)
 	{
-		if (clearMethodString == "Soild Color")    return CameraComponent::ClearMethod::Soild_Color;
-		if (clearMethodString == "Skybox")   return CameraComponent::ClearMethod::Skybox;
+		if (lightTypeString == "None")    return LightComponent::ShadowType::None;
+		if (lightTypeString == "Hard")   return LightComponent::ShadowType::Hard;
+		if (lightTypeString == "Soft") return LightComponent::ShadowType::Soft;
 
-		HNB_CORE_ASSERT(false, "Unknown Clear Method type");
-		return CameraComponent::ClearMethod::None;
+		HNB_CORE_ASSERT(false, "Unknown Shadow Type");
+		return LightComponent::ShadowType::None;
 	}
 
 	static std::string RigidBody2DBodyTypeToString(Rigidbody2DComponent::BodyType bodyType)
@@ -135,6 +116,23 @@ namespace Hanabi
 				out << YAML::Key << "Tag" << YAML::Value << tag;
 			});
 
+		SerializeComponent<RelationshipComponent>("RelationshipComponent", entity, out, [&]()
+			{
+				auto& relationshipComponent = entity.GetComponent<RelationshipComponent>();
+				out << YAML::Key << "Parent" << YAML::Value << relationshipComponent.ParentHandle;
+
+				out << YAML::Key << "Children";
+				out << YAML::Value << YAML::BeginSeq;
+
+				for (auto child : relationshipComponent.Children)
+				{
+					out << YAML::BeginMap;
+					out << YAML::Key << "Handle" << YAML::Value << child;
+					out << YAML::EndMap;
+				}
+				out << YAML::EndSeq;
+			});
+
 		SerializeComponent<TransformComponent>("TransformComponent", entity, out, [&]()
 			{
 				auto& tc = entity.GetComponent<TransformComponent>();
@@ -161,13 +159,6 @@ namespace Hanabi
 
 				out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
 				out << YAML::Key << "FixedAspectRatio" << YAML::Value << cameraComponent.FixedAspectRatio;
-
-				out << YAML::Key << "ClearMethod" << YAML::Value;
-				out << YAML::BeginMap; // Camera
-				out << YAML::Key << "Type" << YAML::Value << ClearMethodTypeToString(cameraComponent.ClearType);
-				out << YAML::Key << "ClearColor" << YAML::Value << cameraComponent.ClearColor;
-				out << YAML::Key << "SkyboxHandle" << YAML::Value << cameraComponent.SkyboxHandle;
-				out << YAML::EndMap; // Camera
 			});
 
 		SerializeComponent<MeshComponent>("MeshComponent", entity, out, [&]()
@@ -193,6 +184,14 @@ namespace Hanabi
 				out << YAML::Key << "Angle" << YAML::Value << lightComponent.Angle;
 				out << YAML::Key << "AngleAttenuation" << YAML::Value << lightComponent.AngleAttenuation;
 				out << YAML::Key << "Falloff" << YAML::Value << lightComponent.Falloff;
+				out << YAML::Key << "ShadowType" << YAML::Value << ShadowTypeToString(lightComponent.Shadow);
+			});
+
+		SerializeComponent<SkyLightComponent>("SkyLightComponent", entity, out, [&]()
+			{
+				auto& skyLightComponent = entity.GetComponent<SkyLightComponent>();
+				out << YAML::Key << "Intensity" << YAML::Value << skyLightComponent.Intensity;
+				out << YAML::Key << "EnvMapHandle" << YAML::Value << skyLightComponent.EnvMapHandle;
 			});
 
 		SerializeComponent<ScriptComponent>("ScriptComponent", entity, out, [&]()
@@ -359,6 +358,23 @@ namespace Hanabi
 
 				Entity deserializedEntity = scene->CreateEntityWithUUID(uuid, name);
 
+				auto relationshipComponent = entity["RelationshipComponent"];
+				if (relationshipComponent)
+				{
+					auto& rsc = deserializedEntity.GetComponent<RelationshipComponent>();
+					rsc.ParentHandle = relationshipComponent["Parent"] ? relationshipComponent["Parent"].as<uint64_t>() : 0;
+
+					auto children = relationshipComponent["Children"];
+					if (children)
+					{
+						for (auto child : children)
+						{
+							uint64_t childHandle = child["Handle"].as<uint64_t>();
+							rsc.Children.push_back(childHandle);
+						}
+					}
+				}
+
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
@@ -387,11 +403,6 @@ namespace Hanabi
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
-
-					auto& clearMethod = cameraComponent["ClearMethod"];
-					cc.ClearType = ClearMethodTypeFromString(clearMethod["Type"].as<std::string>());
-					cc.ClearColor = clearMethod["ClearColor"].as<glm::vec4>();
-					cc.SkyboxHandle = clearMethod["SkyboxHandle"].as<AssetHandle>();
 				}
 
 				auto meshComponent = entity["MeshComponent"];
@@ -422,6 +433,15 @@ namespace Hanabi
 					lc.Angle = lightComponent["Angle"].as<float>();
 					lc.AngleAttenuation = lightComponent["AngleAttenuation"].as<float>();
 					lc.Falloff = lightComponent["Falloff"].as<float>();
+					lc.Shadow = ShadowTypeFromString(lightComponent["ShadowType"].as<std::string>());
+				}
+
+				auto skyLightComponent = entity["SkyLightComponent"];
+				if (skyLightComponent)
+				{
+					auto& slc = deserializedEntity.AddComponent<SkyLightComponent>();
+					slc.Intensity = skyLightComponent["Intensity"].as<float>();
+					slc.EnvMapHandle = skyLightComponent["EnvMapHandle"].as<AssetHandle>();
 				}
 
 				auto scriptComponent = entity["ScriptComponent"];

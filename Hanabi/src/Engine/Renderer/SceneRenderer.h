@@ -2,7 +2,6 @@
 #include "Renderer2D.h"
 #include "ConstantBuffer.h"
 #include "Camera.h"
-#include "EditorCamera.h"
 #include "Engine/Scene/Scene.h"
 
 namespace Hanabi
@@ -17,7 +16,12 @@ namespace Hanabi
 		static void BeginScene(const Ref<Environment> environment);
 		static void EndScene();
 
-		static Ref<RenderPass> GetFinalRenderPass();
+		static Ref<RenderPass> GetFinalPass();
+		//----- GBuffer Debugging -----
+		static Ref<Image2D> GetGBufferAlbedo();
+		static Ref<Image2D> GetGBufferMRE();
+		static Ref<Image2D> GetGBufferNormal();
+		static Ref<Image2D> GetGBufferPosition();
 
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh, const Ref<MaterialAsset>& material);
 		static void SubmitStaticMesh(const glm::mat4& transform, const Ref<Mesh>& mesh);
@@ -25,9 +29,13 @@ namespace Hanabi
 
 	private:
 		static void ExecuteDrawCommands();
-		static void ShadowPass();
-		static void GeometryPass();
-		static void SkyboxPass();
+
+		static void DeferredGeoPass();
+		static void DeferredLightPass();
+
+		static void DirShadowMapPass();
+
 		static void CompositePass();
+		static void SkyboxPass();
 	};
 }

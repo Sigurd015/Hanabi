@@ -3,12 +3,15 @@
 #pragma once
 #include <Windows.h>
 #include <comdef.h>
-#include <d3d11.h>
 #include <d3dcompiler.h>
+#include <wrl.h>
 
 namespace Hanabi
 {
 	void CheckD3DError(HRESULT result);
+
+	template<class T>
+	using ComPtr = Microsoft::WRL::ComPtr<T>;
 }
 
 #ifdef HNB_DEBUG

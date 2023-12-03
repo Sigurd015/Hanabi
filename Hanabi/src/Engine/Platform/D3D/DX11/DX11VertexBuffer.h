@@ -1,9 +1,9 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/VertexBuffer.h"
+#include "Engine/Platform/D3D/DXCommon.h"
 
 #include <d3d11.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -20,7 +20,7 @@ namespace Hanabi
 	private:
 		uint32_t m_Stride = 0;
 		VertexBufferLayout m_Layout;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_VertexBuffer;
+		ComPtr<ID3D11Buffer> m_VertexBuffer;
 	};
 }
 #endif

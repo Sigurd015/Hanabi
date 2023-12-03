@@ -26,7 +26,8 @@ project "Hanabi"
 	{
 		"_CRT_SECURE_NO_WARNINGS",
 		"GLFW_INCLUDE_NONE",
-		"YAML_CPP_STATIC_DEFINE"
+		"YAML_CPP_STATIC_DEFINE",
+		"GLM_FORCE_DEPTH_ZERO_TO_ONE"
 	}
 
 	includedirs
@@ -35,7 +36,6 @@ project "Hanabi"
 		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.GLFW}",
-		"%{IncludeDir.Glad}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.stb_image}",
@@ -53,21 +53,13 @@ project "Hanabi"
 	links 
 	{ 
 		"GLFW",
-		"Glad",
 		"ImGui",
 		"yaml_cpp",
 		"Box2D",
-		"opengl32.lib",
-		"msdf_atlas_gen",
+		"msdf_atlas_gen"
 		"Physix2D"
 	}
 
-	defines
-	{
-		"GLM_FORCE_LEFT_HANDED", 
-		"GLM_FORCE_DEPTH_ZERO_TO_ONE"
-	}
-	
 	filter "files:vendor/stb_image/**.cpp or vendor/ImGuizmo/**.cpp"
 	flags { "NoPCH" }
 	

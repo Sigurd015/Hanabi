@@ -23,7 +23,7 @@ namespace Hanabi
 
 		Buffer(const Buffer&) = default;
 
-		static Buffer Copy(Buffer other)
+		static Buffer Copy(Buffer& other)
 		{
 			Buffer result(other.Size);
 			memcpy(result.Data, other.Data, other.Size);

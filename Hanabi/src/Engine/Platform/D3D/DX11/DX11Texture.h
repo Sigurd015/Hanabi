@@ -1,9 +1,9 @@
 #if defined(HNB_PLATFORM_WINDOWS)
 #pragma once
 #include "Engine/Renderer/Texture.h"
+#include "DX11Image.h"
 
 #include <d3d11.h>
-#include <wrl.h>
 
 namespace Hanabi
 {
@@ -13,43 +13,47 @@ namespace Hanabi
 		DX11Texture2D(const TextureSpecification& specification, Buffer data = Buffer());
 		~DX11Texture2D();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
-		uint32_t GetWidth() const override { return m_Width; }
-		uint32_t GetHeight() const override { return m_Height; }
-		void* GetRendererID() const override { return m_TextureSRV.Get(); }
+		virtual ImageFormat GetFormat() const override { return m_Specification.Format; }
+		uint32_t GetWidth() const override { return m_Specification.Width; }
+		uint32_t GetHeight() const override { return m_Specification.Height; }
+		void* GetRendererID() const override { return m_Image->GetRendererID(); }
 		void Bind(uint32_t slot = 0) const override;
-		void SetData(Buffer data) override;
-		virtual Buffer GetWriteableBuffer() override { return m_Data; }
+		virtual Ref<Image2D> GetImage() const override { return m_Image; }
+		virtual Buffer GetWriteableBuffer() override { return m_Image->GetBuffer(); }
 		bool operator==(const Texture& other) const override;
+
+		// D3D Interop API
+		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_Image->GetTextureSRV(); }
 	private:
+		Ref<DX11Image2D> m_Image;
 		TextureSpecification m_Specification;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
-		Microsoft::WRL::ComPtr <ID3D11SamplerState> m_SamplerState;
-		uint32_t m_Width, m_Height;
-		DXGI_FORMAT m_DataFormat;
-		Buffer m_Data;
 	};
 
 	class DX11TextureCube : public TextureCube
 	{
 	public:
-		DX11TextureCube(const TextureSpecification& specification, const std::array<Buffer, 6>& buffers);
 		DX11TextureCube(const TextureSpecification& specification, Buffer data = Buffer());
 		~DX11TextureCube();
 		const TextureSpecification& GetSpecification() const override { return m_Specification; }
-		uint32_t GetWidth() const override { return m_Width; }
-		uint32_t GetHeight() const override { return m_Height; }
-		void* GetRendererID() const override { return m_TextureSRV.Get(); }
+		virtual ImageFormat GetFormat() const override { return m_Specification.Format; }
+		uint32_t GetWidth() const override { return m_Specification.Width; }
+		uint32_t GetHeight() const override { return m_Specification.Height; }
+		void* GetRendererID() const override { return m_TextureCubeSRV.Get(); }
 		void Bind(uint32_t slot = 0) const override;
-		void SetData(Buffer data) override;
 		bool operator==(const Texture& other) const override;
+
+		// D3D Interop API
+		void CreateUAV(uint32_t mipSlice = 0);
+		void GenerateMips() const;
+		ComPtr<ID3D11Texture2D> GetTextureCube() const { return m_TextureCube; }
+		ComPtr<ID3D11UnorderedAccessView> GetUAV() const { return m_TextureCubeUAV; }
+		ComPtr<ID3D11ShaderResourceView> GetTextureSRV() const { return m_TextureCubeSRV; }
 	private:
+		Buffer m_ImageData;
+		ComPtr<ID3D11Texture2D> m_TextureCube;
+		ComPtr<ID3D11ShaderResourceView> m_TextureCubeSRV;
+		ComPtr<ID3D11UnorderedAccessView> m_TextureCubeUAV;
 		TextureSpecification m_Specification;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_Texture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
-		Microsoft::WRL::ComPtr <ID3D11SamplerState> m_SamplerState;
-		uint32_t m_Width, m_Height;
-		DXGI_FORMAT m_DataFormat;
 	};
 }
 #endif

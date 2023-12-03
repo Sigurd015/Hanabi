@@ -3,6 +3,10 @@ Entities:
   - Entity: 15045535320033348975
     TagComponent:
       Tag: Player
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
     TransformComponent:
       Translation: [1.96902084, 0.840087414, 0.0225147791]
       Rotation: [0, 0, 0]
@@ -15,7 +19,7 @@ Entities:
           Data: 10
     SpriteRendererComponent:
       Color: [1, 1, 1, 1]
-      TextureHandle: 14594112406493172031
+      TextureHandle: 0
       TilingFactor: 1
       UVStart: [0, 0.5]
       UVEnd: [0.100000001, 1]
@@ -33,6 +37,10 @@ Entities:
   - Entity: 4793924497264767156
     TagComponent:
       Tag: Camera
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
     TransformComponent:
       Translation: [1.96902084, -1.47507906, 5]
       Rotation: [0, 0, 0]
@@ -48,10 +56,6 @@ Entities:
         OrthographicFar: 10
       Primary: true
       FixedAspectRatio: false
-      ClearMethod:
-        Type: Soild Color
-        ClearColor: [0, 0, 0, 1]
-        SkyboxHandle: 0
     ScriptComponent:
       ClassName: Sandbox.Camera
       ScriptFields:
@@ -61,6 +65,10 @@ Entities:
   - Entity: 16672940118998907085
     TagComponent:
       Tag: Floor
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
     TransformComponent:
       Translation: [0.878449142, -2.40333867, 0]
       Rotation: [0, 0, 0]
@@ -85,6 +93,10 @@ Entities:
   - Entity: 7385146648431404497
     TagComponent:
       Tag: Circle
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
     TransformComponent:
       Translation: [0, 0.70383358, 0]
       Rotation: [0, 0, 0]
@@ -107,6 +119,10 @@ Entities:
   - Entity: 12183843591437764094
     TagComponent:
       Tag: Msg
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
     TransformComponent:
       Translation: [-3.86357307, -0.71830368, 0]
       Rotation: [0, 0, 0]

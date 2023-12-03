@@ -1,7 +1,6 @@
 #include "hnbpch.h"
 #include "Application.h"
 #include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Utils/PlatformUtils.h"
 #include "Window.h"
 
@@ -20,10 +19,10 @@ namespace Hanabi
 		if (!m_Specification.WorkingDirectory.empty())
 			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
-		RendererAPI::SetAPI(m_Specification.RendererConfig.APIType);
-
+		Renderer::SetConfig(m_Specification.RendererConfig);
+		
 		m_Window = Window::Create(WindowProps(HNB_BIND_EVENT_FN(Application::OnEvent), m_Specification.Name));
-
+		
 		Renderer::Init();
 
 		if (m_Specification.EnableScripting)

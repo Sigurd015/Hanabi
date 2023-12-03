@@ -4,10 +4,13 @@
 #include "Renderer.h"
 #include "MeshFactory.h"
 #include "SceneRenderer.h"
+#include "Engine/Asset/AssetSerializer/AssetSerializer.h"
 
 namespace Hanabi
 {
 	static Scope<RendererAPI> s_RendererAPI = nullptr;
+
+	static RendererConfig s_Config;
 
 	struct RendererData
 	{
@@ -31,17 +34,21 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("Renderer2D_Circle");
 		s_Data->ShaderLibrary->Load("Renderer2D_Line");
 		s_Data->ShaderLibrary->Load("Renderer2D_Text");
-		s_Data->ShaderLibrary->Load("PhongLighting");
-		s_Data->ShaderLibrary->Load("ShadowMap");
+		s_Data->ShaderLibrary->Load("DeferredGeometry");
+		s_Data->ShaderLibrary->Load("DeferredLighting");
+		s_Data->ShaderLibrary->Load("Composite");
+		s_Data->ShaderLibrary->Load("DirShadowMap");
 		s_Data->ShaderLibrary->Load("Skybox");
+		s_Data->ShaderLibrary->Load("EquirectangularToCubemap");
+		s_Data->ShaderLibrary->Load("EnvironmentMipFilter");
+		s_Data->ShaderLibrary->Load("EnvironmentIrradiance");
 
 		//Setup textures
 		TextureSpecification spec;
-		spec.Format = ImageFormat::RGBA8;
+		spec.Format = ImageFormat::RGBA;
 		spec.Width = 1;
 		spec.Height = 1;
-		spec.SamplerWrap = TextureWrap::Repeat;
-		spec.SamplerFilter = TextureFilter::Linear;
+		spec.GenerateMips = false;
 
 		constexpr uint32_t whiteTextureData = 0xffffffff;
 		s_Data->Textures["White"] = Texture2D::Create(spec, Buffer(&whiteTextureData, sizeof(uint32_t)));
@@ -51,10 +58,13 @@ namespace Hanabi
 		constexpr uint32_t blackCubeTextureData[6] = { 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000, 0xff000000 };
 		s_Data->Textures["BlackCube"] = TextureCube::Create(spec, Buffer(blackCubeTextureData, sizeof(blackCubeTextureData)));
 
+		// Notice: format, width and height are automatically set by TextureSerializer::LoadTexture2D, so we can reuse spec
+		s_Data->Textures["BRDFLut"] = TextureSerializer::LoadTexture2D("Resources/Renderer/BRDF_LUT.png", spec);
+
 		//Load default meshes
 		s_Data->Meshes["Box"] = MeshFactory::CreateBox({ 1.0f,1.0f,1.0f });
-		//s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
-		//s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
+		s_Data->Meshes["Capsule"] = MeshFactory::CreateCapsule(1.0f, 1.0f);
+		s_Data->Meshes["Sphere"] = MeshFactory::CreateSphere(1.0f);
 
 		Renderer2D::Init();
 		SceneRenderer::Init();
@@ -64,16 +74,13 @@ namespace Hanabi
 	{
 		Renderer2D::Shutdown();
 		SceneRenderer::Shutdown();
-	}
 
-	void Renderer::SetClearColor(const glm::vec4& color)
-	{
-		s_RendererAPI->SetClearColor(color);
+		delete s_Data;
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
 	{
-		s_RendererAPI->SetViewport(0, 0, width, height);
+		s_RendererAPI->SetViewport(width, height);
 	}
 
 	void Renderer::BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear)
@@ -81,25 +88,57 @@ namespace Hanabi
 		s_RendererAPI->BeginRenderPass(renderPass, clear);
 	}
 
-	void Renderer::EndRenderPass(const Ref<RenderPass>& renderPass)
+	void Renderer::EndRenderPass()
 	{
-		s_RendererAPI->EndRenderPass(renderPass);
+		s_RendererAPI->EndRenderPass();
 	}
 
-	void Renderer::SubmitStaticMesh(const Ref<Mesh>& mesh, const Ref<Material>& material, const Ref<Pipeline>& pipeline)
+	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
 	{
-		s_RendererAPI->SubmitStaticMesh(mesh, material, pipeline);
+		s_RendererAPI->DrawMesh(mesh, material);
+	}
+
+	void Renderer::DrawMesh(const Ref<Mesh>& mesh)
+	{
+		s_RendererAPI->DrawMesh(mesh);
 	}
 
 	void Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,
-		const Ref<Pipeline>& pipeline, uint32_t indexCount)
+		uint32_t indexCount)
 	{
-		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, pipeline, indexCount);
+		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, material, indexCount);
 	}
 
-	void Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, const Ref<Material>& material, const Ref<Pipeline>& pipeline, uint32_t vertexCount)
+	void Renderer::DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, uint32_t indexCount)
 	{
-		s_RendererAPI->DrawLines(vertexBuffer, material, pipeline, vertexCount);
+		s_RendererAPI->DrawIndexed(vertexBuffer, indexBuffer, indexCount);
+	}
+
+	void Renderer::DrawLines(const Ref<VertexBuffer>& vertexBuffer, uint32_t vertexCount)
+	{
+		s_RendererAPI->DrawLines(vertexBuffer, vertexCount);
+	}
+
+	void Renderer::DrawFullScreenQuad()
+	{
+		s_RendererAPI->DrawFullScreenQuad();
+		//Renderer::DrawIndexed(s_Data->FullscreenQuadVertexBuffer, s_Data->FullscreenQuadIndexBuffer);
+	}
+
+	std::pair<Ref<TextureCube>, Ref<TextureCube>> Renderer::CreateEnvironmentMap(const Ref<Texture2D>& equirectangularMap)
+	{
+		return s_RendererAPI->CreateEnvironmentMap(equirectangularMap);
+	}
+
+	RendererConfig& Renderer::GetConfig()
+	{
+		return s_Config;
+	}
+
+	void Renderer::SetConfig(const RendererConfig& config)
+	{
+		s_Config = config;
+		RendererAPI::SetAPI(s_Config.APIType);
 	}
 
 	Ref<Shader> Renderer::GetShader(const std::string& name)
@@ -113,11 +152,6 @@ namespace Hanabi
 			return nullptr;
 
 		return s_Data->Meshes[name];
-	}
-
-	Ref<Shader> Renderer::GetDefaultShader()
-	{
-		return s_Data->ShaderLibrary->Get("PhongLighting");
 	}
 
 	Ref<Texture> Renderer::GetTextureInternal(const std::string& name)

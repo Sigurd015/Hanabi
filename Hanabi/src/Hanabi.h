@@ -11,12 +11,10 @@
 // ---Layer---------------------
 #include "Engine/Layer/Layer.h"
 #include "Engine/Layer/ImGui/ImGuiLayer.h"
-#include "Engine/Layer/ImGui/ScopedStyleColor.h"
 
 // ---Input---------------------
 #include "Engine/Input/Input.h"
 #include "Engine/Input/KeyCodes.h"
-#include "Engine/Input/MouseCodes.h"
 
 // ---Event---------------------	
 #include "Engine/Events/KeyEvent.h"
@@ -32,6 +30,7 @@
 
 // ---Renderer---------------------
 #include "Engine/Renderer/RenderPass.h"
+#include "Engine/Renderer/RendererConfig.h"
 #include "Engine/Renderer/Renderer.h"
 #include "Engine/Renderer/RendererAPI.h"
 #include "Engine/Renderer/Renderer2D.h"
@@ -42,13 +41,15 @@
 #include "Engine/Renderer/VertexBuffer.h"
 #include "Engine/Renderer/PipeLine.h"
 #include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/EditorCamera.h"
 #include "Engine/Renderer/Framebuffer.h"
 #include "Engine/Renderer/ConstantBuffer.h"
 #include "Engine/Renderer/UI/Font.h"
 #include "Engine/Renderer/Mesh.h"
 #include "Engine/Renderer/Material.h"
 #include "Engine/Renderer/MaterialAsset.h"
+
+// ---Editor---------------------
+#include "Engine/Editor/EditorCamera.h"
 
 // ---Scene---------------------
 #include "Engine/Scene/Scene.h"

@@ -6,31 +6,37 @@ namespace Hanabi
 	class MaterialAsset : public Asset
 	{
 	public:
-		// Phong Lighting Model for now
-		enum class TextureType
-		{
-			Diffuse = 0,
-			Specular = 1,
-			Normal = 2,
-		};
-
 		MaterialAsset();
 		MaterialAsset(Ref<Material> material);
 		~MaterialAsset() = default;
 
-		//TODO : For now(Phong lighting model) we only need diffuse and specular textures
-		Ref<Texture2D> GetDiffuse();
-		Ref<Texture2D> GetSpecular();
-		Ref<Texture2D> GetNormal();
+		static Ref<MaterialAsset> Create() { return CreateRef<MaterialAsset>(); }
 
-		void SetDiffuse(AssetHandle handle);
-		void SetSpecular(AssetHandle handle);
-		void SetNormal(AssetHandle handle);
+		Ref<Texture2D> GetAlbedoTex();
+		Ref<Texture2D> GetNormalTex();
+		Ref<Texture2D> GetMetalnessTex();
+		Ref<Texture2D> GetRoughnessTex();
+
+		void SetAlbedoTex(AssetHandle handle);
+		void SetNormalTex(AssetHandle handle);
+		void SetMetalnessTex(AssetHandle handle);
+		void SetRoughnessTex(AssetHandle handle);
+
+		void SetAlbedo(const glm::vec3& albedo) { m_Albedo = albedo; }
+		void SetEmission(float emission) { m_Emission = emission; }
+		void SetMetalness(float metalness) { m_Metalness = metalness; }
+		void SetRoughness(float roughness) { m_Roughness = roughness; }
 		void SetUseNormalMap(bool value) { m_UseNormalMap = value; }
 
-		AssetHandle GetDiffuseHandle() const { return m_DiffuseTexture; }
-		AssetHandle GetSpecularHandle() const { return m_SpecularTexture; }
-		AssetHandle GetNormalHandle() const { return m_NormalTexture; }
+		AssetHandle GetAlbedoTexHandle() const { return m_AlbedoTexture; }
+		AssetHandle GetNormalTexHandle() const { return m_NormalTexture; }
+		AssetHandle GetMetalnessTexHandle() const { return m_MetalnessTexture; }
+		AssetHandle GetRoughnessTexHandle() const { return m_RoughnessTexture; }
+
+		glm::vec3& GetAlbedo() { return m_Albedo; }
+		float& GetEmission() { return m_Emission; }
+		float& GetMetalness() { return m_Metalness; }
+		float& GetRoughness() { return m_Roughness; }
 		bool IsUsingNormalMap() const { return m_UseNormalMap; }
 
 		Ref<Material> GetMaterial() const { return m_Material; }
@@ -39,14 +45,19 @@ namespace Hanabi
 		static AssetType GetStaticType() { return AssetType::Material; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
-		void SetTexture(Ref<Texture2D> texture, uint32_t index);
+		void SetTextureInternal(const std::string& name, AssetHandle handle, const std::string& defaultTexName = "White");
 
 		Ref<Material> m_Material;
 
-		AssetHandle m_DiffuseTexture = 0;
-		AssetHandle m_SpecularTexture = 0;
+		AssetHandle m_AlbedoTexture = 0;
+		AssetHandle m_MetalnessTexture = 0;
+		AssetHandle m_RoughnessTexture = 0;
 		AssetHandle m_NormalTexture = 0;
 
 		bool m_UseNormalMap = false;
+		glm::vec3 m_Albedo = glm::vec3(1.0f);
+		float m_Metalness = 0.0f;
+		float m_Roughness = 0.0f;
+		float m_Emission = 0.0f;
 	};
 }
