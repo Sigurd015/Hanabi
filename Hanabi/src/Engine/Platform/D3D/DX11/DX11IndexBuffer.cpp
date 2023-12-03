@@ -5,13 +5,13 @@
 
 namespace Hanabi
 {
-	DX11IndexBuffer::DX11IndexBuffer(void* indices, uint32_t count) : m_Count(count)
+	DX11IndexBuffer::DX11IndexBuffer(void* indices, uint32_t size) : m_Count(size / sizeof(uint32_t))
 	{
 		D3D11_SUBRESOURCE_DATA resourceData = {};
 		resourceData.pSysMem = indices;
 
 		D3D11_BUFFER_DESC bufferDesc = { 0 };
-		bufferDesc.ByteWidth = count * sizeof(uint32_t);
+		bufferDesc.ByteWidth = size;
 		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bufferDesc.CPUAccessFlags = 0;

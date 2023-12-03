@@ -80,7 +80,6 @@ namespace Hanabi
 	class Mesh :public Asset
 	{
 	public:
-		Mesh() = default;
 		~Mesh() = default;
 		Mesh(Ref<MeshSource> source);
 
