@@ -116,11 +116,17 @@ namespace Hanabi
 	struct MeshComponent
 	{
 		AssetHandle MeshSourceHandle = 0;
+		uint32_t SubmeshIndex = 0;
 		// Storage for runtime memory only asset, not need to serialize
 		AssetHandle MeshHandle = 0;
 
 		MeshComponent() = default;
-		MeshComponent(const MeshComponent&) = default;
+		MeshComponent(const MeshComponent& other)
+			: MeshSourceHandle(other.MeshSourceHandle), SubmeshIndex(other.SubmeshIndex), MeshHandle(other.MeshHandle)
+		{}
+		MeshComponent(AssetHandle meshSourceHandle, uint32_t submeshIndex = 0)
+			: MeshSourceHandle(meshSourceHandle), SubmeshIndex(submeshIndex)
+		{}
 	};
 
 	struct MaterialComponent

@@ -94,6 +94,15 @@ namespace Hanabi
 		std::string name = entity.GetName();
 		Entity newEntity = CreateEntity(name);
 		CopyComponentIfExists(AllComponents{}, newEntity, entity);
+
+		auto parentEntity = entity.GetParentUUID();
+		if (parentEntity)
+		{
+			newEntity.SetParentUUID(parentEntity);
+			auto parent = GetEntityByUUID(parentEntity);
+			parent.GetChildren().push_back(newEntity.GetUUID());
+		}
+
 		return newEntity;
 	}
 
@@ -308,20 +317,20 @@ namespace Hanabi
 				const int32_t velocityIterations = 6;
 				const int32_t positionIterations = 2;
 				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
-
 				// Retrieve transform from Box2D
-				auto view = m_Registry.view<Rigidbody2DComponent>();
+				auto view = m_Registry.view<TransformComponent, Rigidbody2DComponent>();
 				for (auto e : view)
 				{
 					Entity entity = { e, this };
 					auto& transform = GetWorldSpaceTransform(entity);
-					auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
+					auto [tc, rb2d] = view.get<TransformComponent, Rigidbody2DComponent>(entity);
 
 					b2Body* body = (b2Body*)rb2d.RuntimeBody;
 					const auto& position = body->GetPosition();
 					transform.Translation.x = position.x;
 					transform.Translation.y = position.y;
 					transform.Rotation.z = body->GetAngle();
+					tc.SetTransform(transform.GetTransform());
 				}
 			}
 		}
