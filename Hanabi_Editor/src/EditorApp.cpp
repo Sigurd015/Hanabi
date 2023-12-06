@@ -1,6 +1,6 @@
 #include "Hanabi.h"
 #include "EditorLayer.h"
-#include "Engine/EntryPoint.h"
+#include "Hanabi/EntryPoint.h"
 #include "EditorResources.h"
 
 namespace Hanabi

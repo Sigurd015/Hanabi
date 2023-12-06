@@ -2,21 +2,36 @@
 #include "SceneHierarchyPanel.h"
 #include "ContentBrowserPanel.h"
 #include "ViewPortPanel.h"
+#include "RendererSettingPanel.h"
+#include "SelectionManager.h"
 
 #include <unordered_map>
-#include "CommonStates/SelectionManager.h"
-
 #include <memory>
 
 namespace Hanabi
 {
 	static std::unordered_map<std::string, Ref<Panel>> m_Panels;
 
+	template<typename T>
+	static inline Ref<T> GetPanel(const std::string& name)
+	{
+		static_assert(std::is_base_of<Panel, T>::value, "PanelManager::GetPanel only works for types derived from Panel");
+
+		if (m_Panels.find(name) != m_Panels.end())
+			return std::static_pointer_cast<T>(m_Panels[name]);
+		else
+		{
+			HNB_CORE_ASSERT(false, "PanelManager::Panel not found!");
+			return nullptr;
+		}
+	}
+
 	void PanelManager::Init()
 	{
 		m_Panels["SceneHierarchy"] = CreateRef<SceneHierarchyPanel>();
 		m_Panels["ContentBrowser"] = CreateRef<ContentBrowserPanel>();
 		m_Panels["ViewPort"] = CreateRef<ViewPortPanel>();
+		m_Panels["RendererSetting"] = CreateRef<RendererSettingPanel>();
 	}
 
 	void PanelManager::RegisterOnScenePlayCallback(const std::function<void()>& callback)
@@ -32,20 +47,6 @@ namespace Hanabi
 	void PanelManager::RegisterOnSceneOpenCallback(const std::function<void(AssetHandle)>& callback)
 	{
 		GetPanel<ViewPortPanel>("ViewPort")->RegisterOnSceneOpenCallback(callback);
-	}
-
-	template<typename T>
-	inline Ref<T> PanelManager::GetPanel(const std::string& name)
-	{
-		static_assert(std::is_base_of<Panel, T>::value, "PanelManager::GetPanel only works for types derived from Panel");
-
-		if (m_Panels.find(name) != m_Panels.end())
-			return std::static_pointer_cast<T>(m_Panels[name]);
-		else
-		{
-			HNB_CORE_ASSERT(false, "Panel not found!");
-			return nullptr;
-		}
 	}
 
 	void PanelManager::OnImGuiRender()
