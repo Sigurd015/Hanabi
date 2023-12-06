@@ -1,6 +1,5 @@
 ﻿#include "SceneHierarchyPanel.h"
-#include "CommonStates/SelectionManager.h"
-#include "Utils/UICore.h"
+#include "SelectionManager.h"
 
 namespace Hanabi
 {
@@ -322,7 +321,7 @@ namespace Hanabi
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
-				UI::DrawTextureControl("Texture", component.TextureHandle);
+				UI::DrawAssetControl("Texture", component.TextureHandle);
 
 				ImGui::DragFloat("Tiling Factor", &component.TilingFactor, 0.1f, 0.0f, 100.0f);
 				ImGui::DragFloat2("UV Start", glm::value_ptr(component.UVStart), 0.01f, 0.0f, 1.0f);
@@ -331,127 +330,111 @@ namespace Hanabi
 
 		UI::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
-				std::string label = "None";
-				if (AssetManager::IsAssetHandleValid(component.MeshSourceHandle)
-					&& AssetManager::GetAssetType(component.MeshSourceHandle) == AssetType::MeshSource)
-				{
-					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.MeshSourceHandle);
-					label = metadata.FilePath.filename().string();
-				}
-
 				AssetHandle meshSourceHandle = component.MeshSourceHandle;
-
-				UI::DrawDragDropContent(component.MeshSourceHandle, AssetType::MeshSource, [&]()
-					{
-						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
-						{
-							component.MeshSourceHandle = 0;
-						}
-					});
-
+				
+				UI::DrawAssetControl("Mesh", component.MeshSourceHandle, AssetType::MeshSource);
+				
 				if (meshSourceHandle != component.MeshSourceHandle)
 				{
 					component.MeshHandle = 0;
+				}
+
+				if (meshSourceHandle)
+				{
+					auto meshSource = AssetManager::GetAsset<MeshSource>(component.MeshSourceHandle);
+					int submeshIndex = component.SubmeshIndex;
+					int maxSubmeshIndex = (int)meshSource->GetSubmeshes().size() - 1;
+					ImGui::DragInt("Submesh Index", &submeshIndex, 1, 0, maxSubmeshIndex);
+					component.SubmeshIndex = glm::clamp<uint32_t>((uint32_t)submeshIndex, 0, (uint32_t)maxSubmeshIndex);
 				}
 			});
 
 		UI::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
 			{
-				Ref<MaterialAsset> materialAsset = nullptr;
-				std::string label = "None";
-				if (AssetManager::IsAssetHandleValid(component.MaterialAssetHandle)
-					&& AssetManager::GetAssetType(component.MaterialAssetHandle) == AssetType::Material)
-				{
-					materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);
-					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.MaterialAssetHandle);
-					label = metadata.FilePath.filename().string();
-				}
+				UI::DrawAssetControl("Material", component.MaterialAssetHandle, AssetType::Material);
 
-				UI::DrawDragDropContent(component.MaterialAssetHandle, AssetType::Material, [&]()
-					{
-						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
-						{
-							component.MaterialAssetHandle = 0;
-							materialAsset = nullptr;
-						}
-					});
-
-				if (materialAsset != nullptr)
+				if (AssetManager::IsAssetHandleValid(component.MaterialAssetHandle))
 				{
+					Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);
+
 					AssetHandle tempAlbedoHandle = materialAsset->GetAlbedoTexHandle();
 					AssetHandle tempMetalnessHandle = materialAsset->GetMetalnessTexHandle();
 					AssetHandle tempRoughnessHandle = materialAsset->GetRoughnessTexHandle();
 					AssetHandle tempNormalHandle = materialAsset->GetNormalTexHandle();
 
-					UI::DrawTextureControl("Albedo Texture", tempAlbedoHandle, [&]()
-						{
-							float tempEmission = materialAsset->GetEmission();
-							glm::vec3 tempAlbedo = materialAsset->GetAlbedo();
-
-							if (ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo)))
-							{
-								materialAsset->SetAlbedo(tempAlbedo);
-								AssetImporter::Serialize(materialAsset);
-							}
-							if (ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f))
-							{
-								materialAsset->SetEmission(tempEmission);
-								AssetImporter::Serialize(materialAsset);
-							}
-						});
-
-					if (tempAlbedoHandle != materialAsset->GetAlbedoTexHandle())
+					if (ImGui::CollapsingHeader("Albedo Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						materialAsset->SetAlbedoTex(tempAlbedoHandle);
-						AssetImporter::Serialize(materialAsset);
+						UI::DrawAssetControl("Albedo Texture", tempAlbedoHandle);
+						float tempEmission = materialAsset->GetEmission();
+						glm::vec3 tempAlbedo = materialAsset->GetAlbedo();
+
+						if (ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo)))
+						{
+							materialAsset->SetAlbedo(tempAlbedo);
+							AssetImporter::Serialize(materialAsset);
+						}
+						if (ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f))
+						{
+							materialAsset->SetEmission(tempEmission);
+							AssetImporter::Serialize(materialAsset);
+						}
+
+						if (tempAlbedoHandle != materialAsset->GetAlbedoTexHandle())
+						{
+							materialAsset->SetAlbedoTex(tempAlbedoHandle);
+							AssetImporter::Serialize(materialAsset);
+						}
 					}
 
-					UI::DrawTextureControl("Metalness Texture", tempMetalnessHandle, [&]()
-						{
-							float tempMetalness = materialAsset->GetMetalness();
-							if (ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f))
-							{
-								materialAsset->SetMetalness(tempMetalness);
-								AssetImporter::Serialize(materialAsset);
-							}
-						});
-
-					if (tempMetalnessHandle != materialAsset->GetMetalnessTexHandle())
+					if (ImGui::CollapsingHeader("Metalness Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						materialAsset->SetMetalnessTex(tempMetalnessHandle);
-						AssetImporter::Serialize(materialAsset);
+						UI::DrawAssetControl("Metalness Texture", tempMetalnessHandle);
+						float tempMetalness = materialAsset->GetMetalness();
+						if (ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f))
+						{
+							materialAsset->SetMetalness(tempMetalness);
+							AssetImporter::Serialize(materialAsset);
+						}
+
+						if (tempMetalnessHandle != materialAsset->GetMetalnessTexHandle())
+						{
+							materialAsset->SetMetalnessTex(tempMetalnessHandle);
+							AssetImporter::Serialize(materialAsset);
+						}
 					}
 
-					UI::DrawTextureControl("Roughness Texture", tempRoughnessHandle, [&]()
-						{
-							float tempRoughness = materialAsset->GetRoughness();
-							if (ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f))
-							{
-								materialAsset->SetRoughness(tempRoughness);
-								AssetImporter::Serialize(materialAsset);
-							}
-						});
-
-					if (tempRoughnessHandle != materialAsset->GetRoughnessTexHandle())
+					if (ImGui::CollapsingHeader("Roughness Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						materialAsset->SetRoughnessTex(tempRoughnessHandle);
-						AssetImporter::Serialize(materialAsset);
+						UI::DrawAssetControl("Roughness Texture", tempRoughnessHandle);
+						float tempRoughness = materialAsset->GetRoughness();
+						if (ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f))
+						{
+							materialAsset->SetRoughness(tempRoughness);
+							AssetImporter::Serialize(materialAsset);
+						}
+
+						if (tempRoughnessHandle != materialAsset->GetRoughnessTexHandle())
+						{
+							materialAsset->SetRoughnessTex(tempRoughnessHandle);
+							AssetImporter::Serialize(materialAsset);
+						}
 					}
 
-					UI::DrawTextureControl("Normal Texture", tempNormalHandle, [&]()
-						{
-							bool useNormalMap = materialAsset->IsUsingNormalMap();
-							if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
-							{
-								materialAsset->SetUseNormalMap(useNormalMap);
-								AssetImporter::Serialize(materialAsset);
-							}
-						});
-
-					if (tempNormalHandle != materialAsset->GetNormalTexHandle())
+					if (ImGui::CollapsingHeader("Normal Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						materialAsset->SetNormalTex(tempNormalHandle);
-						AssetImporter::Serialize(materialAsset);
+						UI::DrawAssetControl("Normal Texture", tempNormalHandle);
+						bool useNormalMap = materialAsset->IsUsingNormalMap();
+						if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
+						{
+							materialAsset->SetUseNormalMap(useNormalMap);
+							AssetImporter::Serialize(materialAsset);
+						}
+
+						if (tempNormalHandle != materialAsset->GetNormalTexHandle())
+						{
+							materialAsset->SetNormalTex(tempNormalHandle);
+							AssetImporter::Serialize(materialAsset);
+						}
 					}
 				}
 			});
@@ -460,24 +443,7 @@ namespace Hanabi
 			{
 				ImGui::DragFloat("Intensity", &component.Intensity, 0.1f, 0.0f, 5.0f);
 
-				Ref<EnvMapAsset> envMapAsset = nullptr;
-				std::string label = "None";
-				if (AssetManager::IsAssetHandleValid(component.EnvMapHandle)
-					&& AssetManager::GetAssetType(component.EnvMapHandle) == AssetType::EnvMap)
-				{
-					envMapAsset = AssetManager::GetAsset<EnvMapAsset>(component.EnvMapHandle);
-					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(component.EnvMapHandle);
-					label = metadata.FilePath.filename().string();
-				}
-
-				UI::DrawDragDropContent(component.EnvMapHandle, AssetType::EnvMap, [&]()
-					{
-						if (ImGui::Button(label.c_str(), ImVec2(100.0f, 0.0f)))
-						{
-							component.EnvMapHandle = 0;
-							envMapAsset = nullptr;
-						}
-					});
+				UI::DrawAssetControl("EnvMap", component.EnvMapHandle, AssetType::EnvMap);
 			});
 
 		UI::DrawComponent<LightComponent>("Light", entity, [](auto& component)

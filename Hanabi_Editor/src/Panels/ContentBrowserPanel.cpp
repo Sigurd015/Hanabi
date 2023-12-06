@@ -113,7 +113,9 @@ namespace Hanabi
 
 		std::string filenameString = directoryPath.filename().string();
 		std::string label = "##" + filenameString;
-		ImGui::PushID(filenameString.c_str());
+
+		UI::ScopedID id(filenameString.c_str());
+
 		bool nodeOpen = ImGui::TreeNodeEx(label.c_str(), nodeFlags);
 
 		if (ImGui::IsItemClicked())
@@ -136,7 +138,6 @@ namespace Hanabi
 			}
 			ImGui::TreePop();
 		}
-		ImGui::PopID();
 	}
 
 	void ContentBrowserPanel::DrawContents()
@@ -157,68 +158,69 @@ namespace Hanabi
 			const auto& path = directoryEntry.path();
 			std::string filenameString = path.filename().string();
 
-			ImGui::PushID(filenameString.c_str());
-			ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-
-			Ref<Texture> Icon;
-
-			bool isDirectory = directoryEntry.is_directory();
-			bool isAsset = false;
-			auto relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
-
-			if (!isDirectory)
-				isAsset = IsAlreadyImported(relativePath);
-
-			if (isDirectory)
-				Icon = EditorResources::DirectoryIcon;
-			else if (isAsset)
-				Icon = EditorResources::ImportedFileIcon;
-			else
-				Icon = EditorResources::FileIcon;
-
-			ImGui::ImageButton(Icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
-
-			if (!isDirectory && !isAsset)
 			{
-				if (ImGui::BeginPopupContextItem())
+				UI::ScopedID id(filenameString.c_str());
+				bool isDirectory = directoryEntry.is_directory();
 				{
-					if (ImGui::MenuItem("Import"))
-						m_ImportedFiles[relativePath] = Project::GetEditorAssetManager()->ImportAsset(relativePath);
+					UI::ScopedStyleColor button(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 
-					ImGui::EndPopup();
-				}
-			}
+					Ref<Texture> Icon;
 
-			if (isAsset)
-			{
-				if (ImGui::BeginPopupContextItem())
-				{
-					if (ImGui::MenuItem("Remove"))
+					bool isAsset = false;
+					auto relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
+
+					if (!isDirectory)
+						isAsset = IsAlreadyImported(relativePath);
+
+					if (isDirectory)
+						Icon = EditorResources::DirectoryIcon;
+					else if (isAsset)
+						Icon = EditorResources::ImportedFileIcon;
+					else
+						Icon = EditorResources::FileIcon;
+
+					ImGui::ImageButton(Icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+
+					if (!isDirectory && !isAsset)
 					{
-						Project::GetEditorAssetManager()->RemoveAsset(m_ImportedFiles[relativePath]);
-						m_ImportedFiles.erase(relativePath);
+						if (ImGui::BeginPopupContextItem())
+						{
+							if (ImGui::MenuItem("Import"))
+								m_ImportedFiles[relativePath] = Project::GetEditorAssetManager()->ImportAsset(relativePath);
+
+							ImGui::EndPopup();
+						}
 					}
 
-					ImGui::EndPopup();
-				}
+					if (isAsset)
+					{
+						if (ImGui::BeginPopupContextItem())
+						{
+							if (ImGui::MenuItem("Remove"))
+							{
+								Project::GetEditorAssetManager()->RemoveAsset(m_ImportedFiles[relativePath]);
+								m_ImportedFiles.erase(relativePath);
+							}
 
-				if (ImGui::BeginDragDropSource())
+							ImGui::EndPopup();
+						}
+
+						if (ImGui::BeginDragDropSource())
+						{
+							AssetHandle temp = m_ImportedFiles[relativePath];
+							ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", &temp, sizeof(AssetHandle));
+							ImGui::EndDragDropSource();
+						}
+					}
+				}
+				if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
 				{
-					AssetHandle temp = m_ImportedFiles[relativePath];
-					ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", &temp, sizeof(AssetHandle));
-					ImGui::EndDragDropSource();
+					if (isDirectory)
+						m_SelectedDirectory /= path.filename();
 				}
+				ImGui::TextWrapped(filenameString.c_str());
+				ImGui::NextColumn();
 			}
-
-			ImGui::PopStyleColor();
-			if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
-			{
-				if (isDirectory)
-					m_SelectedDirectory /= path.filename();
-			}
-			ImGui::TextWrapped(filenameString.c_str());
-			ImGui::NextColumn();
-			ImGui::PopID();
 		}
 		ImGui::Columns(1);
 		//ImGui::SliderFloat("Thumbnail Size", &thumbnailSize, 16, 512);

@@ -1,63 +1,66 @@
 #pragma once
 
-#include "Engine/Core/Base.h"
-#include "Engine/Core/Assert.h"
-#include "Engine/Core/Application.h"
-#include "Engine/Core/Log.h"
-#include "Engine/Core/Timestep.h"
-#include "Engine/Math/Math.h"
-#include "Engine/Utils/PlatformUtils.h"
+#include "Hanabi/Core/Base.h"
+#include "Hanabi/Core/Assert.h"
+#include "Hanabi/Core/Application.h"
+#include "Hanabi/Core/Log.h"
+#include "Hanabi/Core/Timestep.h"
+#include "Hanabi/Math/Math.h"
+#include "Hanabi/Utils/PlatformUtils.h"
 
 // ---Layer---------------------
-#include "Engine/Layer/Layer.h"
-#include "Engine/Layer/ImGui/ImGuiLayer.h"
+#include "Hanabi/Layer/Layer.h"
+
+// ---ImGui---------------------
+#include "Hanabi/ImGui/ImGui.h"
+#include "Hanabi/ImGui/ImGuiLayer.h"
 
 // ---Input---------------------
-#include "Engine/Input/Input.h"
-#include "Engine/Input/KeyCodes.h"
+#include "Hanabi/Input/Input.h"
+#include "Hanabi/Input/KeyCodes.h"
 
 // ---Event---------------------	
-#include "Engine/Events/KeyEvent.h"
-#include "Engine/Events/MouseEvent.h"
+#include "Hanabi/Events/KeyEvent.h"
+#include "Hanabi/Events/MouseEvent.h"
 
 // ---Asset---------------------
-#include "Engine/Asset/Asset.h"
-#include "Engine/Asset/AssetManager/AssetManagerBase.h"
-#include "Engine/Asset/AssetManager/AssetManager.h"
-#include "Engine/Asset/AssetImporter.h"
-#include "Engine/Asset/AssetMetadata.h"
-#include "Engine/Asset/AssetSerializer/AssetSerializer.h"
+#include "Hanabi/Asset/Asset.h"
+#include "Hanabi/Asset/AssetManager/AssetManagerBase.h"
+#include "Hanabi/Asset/AssetManager/AssetManager.h"
+#include "Hanabi/Asset/AssetImporter.h"
+#include "Hanabi/Asset/AssetMetadata.h"
+#include "Hanabi/Asset/AssetSerializer/AssetSerializer.h"
 
 // ---Renderer---------------------
-#include "Engine/Renderer/RenderPass.h"
-#include "Engine/Renderer/RendererConfig.h"
-#include "Engine/Renderer/Renderer.h"
-#include "Engine/Renderer/RendererAPI.h"
-#include "Engine/Renderer/Renderer2D.h"
-#include "Engine/Renderer/SceneRenderer.h"
-#include "Engine/Renderer/Texture.h"
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/IndexBuffer.h"
-#include "Engine/Renderer/VertexBuffer.h"
-#include "Engine/Renderer/PipeLine.h"
-#include "Engine/Renderer/Camera.h"
-#include "Engine/Renderer/Framebuffer.h"
-#include "Engine/Renderer/ConstantBuffer.h"
-#include "Engine/Renderer/UI/Font.h"
-#include "Engine/Renderer/Mesh.h"
-#include "Engine/Renderer/Material.h"
-#include "Engine/Renderer/MaterialAsset.h"
+#include "Hanabi/Renderer/RenderPass.h"
+#include "Hanabi/Renderer/RendererConfig.h"
+#include "Hanabi/Renderer/Renderer.h"
+#include "Hanabi/Renderer/RendererAPI.h"
+#include "Hanabi/Renderer/Renderer2D.h"
+#include "Hanabi/Renderer/SceneRenderer.h"
+#include "Hanabi/Renderer/Texture.h"
+#include "Hanabi/Renderer/Shader.h"
+#include "Hanabi/Renderer/IndexBuffer.h"
+#include "Hanabi/Renderer/VertexBuffer.h"
+#include "Hanabi/Renderer/PipeLine.h"
+#include "Hanabi/Renderer/Camera.h"
+#include "Hanabi/Renderer/Framebuffer.h"
+#include "Hanabi/Renderer/ConstantBuffer.h"
+#include "Hanabi/Renderer/UI/Font.h"
+#include "Hanabi/Renderer/Mesh.h"
+#include "Hanabi/Renderer/Material.h"
+#include "Hanabi/Renderer/MaterialAsset.h"
 
 // ---Editor---------------------
-#include "Engine/Editor/EditorCamera.h"
+#include "Hanabi/Editor/EditorCamera.h"
 
 // ---Scene---------------------
-#include "Engine/Scene/Scene.h"
-#include "Engine/Scene/Components.h"
-#include "Engine/Scene/Entity.h"
+#include "Hanabi/Scene/Scene.h"
+#include "Hanabi/Scene/Components.h"
+#include "Hanabi/Scene/Entity.h"
 
 // ---Project---------------------
-#include "Engine/Project/Project.h"
+#include "Hanabi/Project/Project.h"
 
 // ---Scripting---------------------	
-#include "Engine/Scripting/ScriptEngine.h"
+#include "Hanabi/Scripting/ScriptEngine.h"

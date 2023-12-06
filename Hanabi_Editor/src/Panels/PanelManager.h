@@ -17,9 +17,6 @@ namespace Hanabi
 	public:
 		static void Init();
 
-		template<typename T>
-		static Ref<T> GetPanel(const std::string& name);
-
 		static void RegisterOnScenePlayCallback(const std::function<void()>& callback);
 		static void RegisterOnSceneStopCallback(const std::function<void()>& callback);
 		static void RegisterOnSceneOpenCallback(const std::function<void(AssetHandle)>& callback);

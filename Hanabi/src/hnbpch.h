@@ -20,10 +20,10 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Engine/Core/Base.h"
-#include "Engine/Core/Log.h"
-#include "Engine/Core/Buffer.h"
-#include "Engine/Core/Assert.h"
+#include "Hanabi/Core/Base.h"
+#include "Hanabi/Core/Log.h"
+#include "Hanabi/Core/Buffer.h"
+#include "Hanabi/Core/Assert.h"
 
 #if defined(HNB_PLATFORM_WINDOWS)
 #include <Windows.h>

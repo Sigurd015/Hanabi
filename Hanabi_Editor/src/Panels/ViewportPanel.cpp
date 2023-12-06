@@ -1,7 +1,7 @@
 #include "ViewportPanel.h"
 #include "EditorResources.h"
-#include "CommonStates/SelectionManager.h"
-#include "CommonStates/SettingManager.h"
+#include "SelectionManager.h"
+#include "RendererSettingPanel.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>
@@ -173,31 +173,31 @@ namespace Hanabi
 		case SceneState::Edit:
 		{
 			m_EditorCamera.OnUpdate(ts);
-			m_Context->OnUpdateEditor(ts, m_EditorCamera, SelectionManager::GetSelectedEntity(), SettingManager::ShowPhysicsColliders);
+			m_Context->OnUpdateEditor(ts, m_EditorCamera, SelectionManager::GetSelectedEntity(), RendererSettingPanel::ShowPhysicsColliders);
 			break;
 		}
 		case SceneState::Play:
 		{
-			m_Context->OnUpdateRuntime(ts, SelectionManager::GetSelectedEntity(), SettingManager::ShowPhysicsColliders);
+			m_Context->OnUpdateRuntime(ts, SelectionManager::GetSelectedEntity(), RendererSettingPanel::ShowPhysicsColliders);
 			break;
 		}
 		}
 
-		switch (SettingManager::DebugDrawMode)
+		switch (RendererSettingPanel::DebugDrawMode)
 		{
-		case SettingManager::ViewportDebugMode::None:
+		case RendererSettingPanel::ViewportDebugMode::None:
 			m_ViewPortImage = SceneRenderer::GetFinalPass()->GetOutput();
 			break;
-		case SettingManager::ViewportDebugMode::GBufferAlbedo:
+		case RendererSettingPanel::ViewportDebugMode::GBufferAlbedo:
 			m_ViewPortImage = SceneRenderer::GetGBufferAlbedo();
 			break;
-		case SettingManager::ViewportDebugMode::GBufferMRE:
+		case RendererSettingPanel::ViewportDebugMode::GBufferMRE:
 			m_ViewPortImage = SceneRenderer::GetGBufferMRE();
 			break;
-		case SettingManager::ViewportDebugMode::GBufferNormal:
+		case RendererSettingPanel::ViewportDebugMode::GBufferNormal:
 			m_ViewPortImage = SceneRenderer::GetGBufferNormal();
 			break;
-		case SettingManager::ViewportDebugMode::GBufferPosition:
+		case RendererSettingPanel::ViewportDebugMode::GBufferPosition:
 			m_ViewPortImage = SceneRenderer::GetGBufferPosition();
 			break;
 		}
@@ -221,116 +221,126 @@ namespace Hanabi
 	void ViewPortPanel::OnImGuiRender()
 	{
 		#pragma region Viewport_Toolbar	
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-		auto& colors = ImGui::GetStyle().Colors;
-		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
-		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
-
-		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
-
-		bool toolbarEnabled = (bool)m_Context;
-
-		ImVec4 tintColor = ImVec4(1, 1, 1, 1);
-		if (!toolbarEnabled)
-			tintColor.w = 0.5f;
-
-		float size = ImGui::GetWindowHeight() - 4.0f;
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-
-		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? EditorResources::PlayIcon : EditorResources::StopIcon;
-		if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 		{
-			if (m_SceneState == SceneState::Edit)
+			UI::ScopedStyle windowPadding(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+			UI::ScopedStyle itemInnerSpacing(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+			UI::ScopedStyleColor button(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+			auto& colors = ImGui::GetStyle().Colors;
+			const auto& buttonHoveredColor = colors[ImGuiCol_ButtonHovered];
+			UI::ScopedStyleColor buttonHovered(ImGuiCol_ButtonHovered, ImVec4(buttonHoveredColor.x, buttonHoveredColor.y, buttonHoveredColor.z, 0.5f));
+			const auto& buttonActiveColor = colors[ImGuiCol_ButtonActive];
+			UI::ScopedStyleColor buttonActive(ImGuiCol_ButtonActive, ImVec4(buttonActiveColor.x, buttonActiveColor.y, buttonActiveColor.z, 0.5f));
+
+			bool isEdit = m_SceneState == SceneState::Edit;
+			bool isPlay = m_SceneState == SceneState::Play;
+			const float buttonSize = 18.0f + 12.0f;
+			const float edgeOffset = 4.0f;
+			const float windowHeight = 32.0f; // annoying limitation of ImGui, window can't be smaller than 32 pixels
+			const float numberOfButtons = 3.0f;
+			const float backgroundWidth = edgeOffset * 4.0f + buttonSize * numberOfButtons;
+
+			float toolbarX = (m_ViewportBounds[0].x + m_ViewportBounds[1].x) / 2.0f;
+			ImGui::SetNextWindowPos(ImVec2(toolbarX - (backgroundWidth / 2.0f), m_ViewportBounds[0].y + edgeOffset));
+			ImGui::SetNextWindowSize(ImVec2(backgroundWidth, windowHeight));
+			ImGui::SetNextWindowBgAlpha(0.0f);
+			ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking);
+
+			bool toolbarEnabled = (bool)m_Context;
+
+			ImVec4 tintColor = ImVec4(1, 1, 1, 1);
+			if (!toolbarEnabled)
+				tintColor.w = 0.5f;
+
+			Ref<Texture2D> icon = isEdit ? EditorResources::PlayIcon : EditorResources::StopIcon;
+			const float height = std::min((float)icon->GetHeight(), buttonSize);
+			const float width = (float)icon->GetWidth() / (float)icon->GetHeight() * height;
+			if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
-				m_SceneState = SceneState::Play;
-				m_OnScenePlayCallback();
-			}
-			else if (m_SceneState == SceneState::Play)
-			{
-				HNB_CORE_ASSERT(m_SceneState == SceneState::Play);
+				if (isEdit)
+				{
+					m_SceneState = SceneState::Play;
+					m_OnScenePlayCallback();
+				}
+				else if (isPlay)
+				{
+					HNB_CORE_ASSERT(isPlay);
 
-				if (m_SceneState == SceneState::Play)
-					m_Context->OnRuntimeStop();
+					if (isPlay)
+						m_Context->OnRuntimeStop();
 
-				m_SceneState = SceneState::Edit;
-				m_OnSceneStopCallback();
-			}
-		}
-
-		if (m_SceneState == SceneState::Play)
-		{
-			ImGui::SameLine();
-			bool isPaused = m_Context->IsPaused();
-			Ref<Texture2D> icon = isPaused ? EditorResources::PlayIcon : EditorResources::PauseIcon;
-			if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
-			{
-				if (m_SceneState == SceneState::Edit)
-					return;
-
-				m_Context->SetPaused(!isPaused);
+					m_SceneState = SceneState::Edit;
+					m_OnSceneStopCallback();
+				}
 			}
 
-			if (isPaused)
+			if (isPlay)
 			{
 				ImGui::SameLine();
+				bool isPaused = m_Context->IsPaused();
+				Ref<Texture2D> icon = isPaused ? EditorResources::PlayIcon : EditorResources::PauseIcon;
+				if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 				{
-					Ref<Texture2D> icon = EditorResources::StepIcon;
-					if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+					if (isEdit)
+						return;
+
+					m_Context->SetPaused(!isPaused);
+				}
+
+				if (isPaused)
+				{
+					ImGui::SameLine();
 					{
-						m_Context->Step();
+						Ref<Texture2D> icon = EditorResources::StepIcon;
+						if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+						{
+							m_Context->Step();
+						}
 					}
 				}
 			}
+			ImGui::End();
 		}
-
-		ImGui::PopStyleVar(2);
-		ImGui::PopStyleColor(3);
-		ImGui::End();
 		#pragma endregion	
 
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-		ImGui::Begin("Viewport");
-
-		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
-
-		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
-
-		ImGui::Image(m_ViewPortImage->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
-
-		auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-		auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-		auto viewportOffset = ImGui::GetWindowPos();
-		m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
-		m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
-
-		if (ImGui::BeginDragDropTarget())
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			UI::ScopedStyle windowPadding(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+			ImGui::Begin("Viewport");
+
+			m_ViewportHovered = ImGui::IsWindowHovered();
+			Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
+
+			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
+
+			ImGui::Image(m_ViewPortImage->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+
+			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+			auto viewportOffset = ImGui::GetWindowPos();
+			m_ViewportBounds[0] = { viewportMinRegion.x + viewportOffset.x, viewportMinRegion.y + viewportOffset.y };
+			m_ViewportBounds[1] = { viewportMaxRegion.x + viewportOffset.x, viewportMaxRegion.y + viewportOffset.y };
+
+			if (ImGui::BeginDragDropTarget())
 			{
-				AssetHandle tempHandle = *(AssetHandle*)payload->Data;
-				if (AssetManager::GetAssetType(tempHandle) == AssetType::Scene)
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
 				{
-					m_OnSceneOpenCallback(tempHandle);
+					AssetHandle tempHandle = *(AssetHandle*)payload->Data;
+					if (AssetManager::GetAssetType(tempHandle) == AssetType::Scene)
+					{
+						m_OnSceneOpenCallback(tempHandle);
+					}
+					else
+					{
+						//TODO: Show message to user
+						HNB_CORE_ERROR("Wrong asset type!");
+					}
 				}
-				else
-				{
-					//TODO: Show message to user
-					HNB_CORE_ERROR("Wrong asset type!");
-				}
+				ImGui::EndDragDropTarget();
 			}
-			ImGui::EndDragDropTarget();
+
+			// Gizmos
+			DrawGizmos();
+			ImGui::End();
 		}
-
-		// Gizmos
-		DrawGizmos();
-
-		ImGui::End();
-		ImGui::PopStyleVar();
 	}
 }

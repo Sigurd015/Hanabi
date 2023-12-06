@@ -1,7 +1,6 @@
 #include "EditorLayer.h"
 #include "EditorResources.h"
-#include "CommonStates/SelectionManager.h"
-#include "CommonStates/SettingManager.h"
+#include "SelectionManager.h"
 
 namespace Hanabi
 {
@@ -68,9 +67,10 @@ namespace Hanabi
 		// all active windows docked into it will lose their parent and become undocked.
 		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
-		ImGui::PopStyleVar();
+		{
+			UI::ScopedStyle windowPadding(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		}	
 
 		if (opt_fullscreen)
 			ImGui::PopStyleVar(2);
@@ -119,7 +119,7 @@ namespace Hanabi
 
 			if (ImGui::BeginMenu("Debug"))
 			{
-				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &SettingManager::ImGuiDebugWndDraw);
+				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &ImGuiDebugWndDraw);
 
 				ImGui::EndMenu();
 			}
@@ -129,7 +129,9 @@ namespace Hanabi
 		#pragma endregion	
 
 		PanelManager::OnImGuiRender();
-		SettingManager::OnImGuiRender();
+
+		if (ImGuiDebugWndDraw)
+			ImGui::ShowMetricsWindow();
 
 		ImGui::End();
 	}
