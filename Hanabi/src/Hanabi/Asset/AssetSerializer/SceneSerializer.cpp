@@ -165,6 +165,7 @@ namespace Hanabi
 			{
 				auto& meshComponent = entity.GetComponent<MeshComponent>();
 				out << YAML::Key << "MeshSourceHandle" << YAML::Value << meshComponent.MeshSourceHandle;
+				out << YAML::Key << "SubmeshIndex" << YAML::Value << meshComponent.SubmeshIndex;
 			});
 
 		SerializeComponent<MaterialComponent>("MaterialComponent", entity, out, [&]()
@@ -411,6 +412,8 @@ namespace Hanabi
 					auto& mc = deserializedEntity.AddComponent<MeshComponent>();
 					if (meshComponent["MeshSourceHandle"])
 						mc.MeshSourceHandle = meshComponent["MeshSourceHandle"].as<AssetHandle>();
+					if (meshComponent["SubmeshIndex"])
+						mc.SubmeshIndex = meshComponent["SubmeshIndex"].as<uint32_t>();
 				}
 
 				auto materialComponent = entity["MaterialComponent"];

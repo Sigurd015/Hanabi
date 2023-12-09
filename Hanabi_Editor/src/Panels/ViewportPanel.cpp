@@ -10,7 +10,7 @@
 
 namespace Hanabi
 {
-	ViewPortPanel::ViewPortPanel() : m_EditorCamera(30.0f, 1920 / 1080, 0.1f, 1000.0f) {}
+	ViewPortPanel::ViewPortPanel() : m_EditorCamera(30.0f, 1920 / 1080, 0.1f, 10000.0f) {}
 
 	void ViewPortPanel::SetContext(const Ref<Scene>& scene)
 	{
@@ -328,6 +328,23 @@ namespace Hanabi
 					if (AssetManager::GetAssetType(tempHandle) == AssetType::Scene)
 					{
 						m_OnSceneOpenCallback(tempHandle);
+					}
+					else if (AssetManager::GetAssetType(tempHandle) == AssetType::MeshSource)
+					{
+						// Import mesh
+						if (m_SceneState == SceneState::Play)
+						{
+							HNB_CORE_ERROR("Cannot import mesh while playing!");
+							return;
+						}
+
+						if (AssetManager::IsAssetHandleValid(tempHandle))
+						{
+							auto meshSource = AssetManager::GetAsset<MeshSource>(tempHandle);
+
+							Entity rootEntity = m_Context->InstantiateMesh(meshSource);
+							SelectionManager::SetSelectedEntity(rootEntity);
+						}
 					}
 					else
 					{

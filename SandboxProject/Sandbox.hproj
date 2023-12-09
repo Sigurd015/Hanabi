@@ -1,6 +1,6 @@
 Project:
   Name: Sandbox
-  StartScene: 5775838104344894305
+  StartScene: 13163428818850691303
   AssetDirectory: "Assets"
   AssetRegistryPath: "AssetRegistry.areg"
   ScriptModulePath: "Scripts/Binaries/Sandbox.dll"

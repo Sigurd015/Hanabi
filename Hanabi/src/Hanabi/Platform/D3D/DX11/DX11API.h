@@ -19,7 +19,6 @@ namespace Hanabi
 		virtual void EndRenderPass() override;
 
 		virtual void DrawMesh(const Ref<Mesh>& mesh, uint32_t submeshIndex, const Ref<Material>& material) override;
-		virtual void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material) override;
 		virtual void DrawMesh(const Ref<Mesh>& mesh) override;
 
 		virtual void DrawIndexed(const Ref<VertexBuffer>& vertexBuffer, const Ref<IndexBuffer>& indexBuffer, const Ref<Material>& material,

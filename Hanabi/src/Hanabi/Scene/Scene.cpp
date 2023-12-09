@@ -166,6 +166,28 @@ namespace Hanabi
 		return {};
 	}
 
+	Entity Scene::InstantiateMesh(Ref<MeshSource> meshSource)
+	{
+		auto& submeshes = meshSource->GetSubmeshes();
+
+		Entity rootEntity = CreateEntity(submeshes[0].MeshName);
+
+		auto& meshComponent = rootEntity.AddComponent<MeshComponent>();
+		meshComponent.MeshSourceHandle = meshSource->Handle;
+		meshComponent.SubmeshIndex = 0;
+
+		for (size_t i = 1; i < submeshes.size(); i++)
+		{
+			Entity entity = CreateEntity(submeshes[i].MeshName);
+			ParentEntity(entity, rootEntity);
+			auto& meshComponent = entity.AddComponent<MeshComponent>();
+			meshComponent.MeshSourceHandle = meshSource->Handle;
+			meshComponent.SubmeshIndex = i;
+		}
+
+		return rootEntity;
+	}
+
 	void Scene::ParentEntity(Entity entity, Entity parent)
 	{
 		if (parent.IsDescendantOf(entity))
@@ -383,7 +405,7 @@ namespace Hanabi
 			}
 
 			{
-				auto view = m_Registry.view<TransformComponent, LightComponent>();
+				auto view = m_Registry.view<LightComponent>();
 				for (auto entity : view)
 				{
 					auto light = view.get<LightComponent>(entity);
@@ -435,29 +457,18 @@ namespace Hanabi
 
 		SceneRenderer::BeginScene(m_Environment);
 
-		// Draw objects with materials
+		// Draw 3D objects
 		{
-			auto view = m_Registry.view<TransformComponent, MeshComponent, MaterialComponent>();
-			for (auto entity : view)
+			auto view = m_Registry.view<MeshComponent>();
+			for (auto e : view)
 			{
-				auto [mesh, material] = view.get<MeshComponent, MaterialComponent>(entity);
-				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+				auto mesh = view.get<MeshComponent>(e);
+				Entity entity = { e, this };
+				auto worldTransform = GetWorldSpaceTransformMatrix(entity);
+				AssetHandle overrideMaterialHandle = entity.HasComponent<MaterialComponent>() ?
+					entity.GetComponent<MaterialComponent>().MaterialAssetHandle : 0;
 
-				if (mesh.SubmeshIndex)
-					SceneRenderer::SubmitStaticMesh(worldTransform, mesh, material.MaterialAssetHandle, mesh.SubmeshIndex);
-				else
-					SceneRenderer::SubmitStaticMesh(worldTransform, mesh, material.MaterialAssetHandle);
-			}
-		}
-
-		// Draw objects with default material
-		{
-			auto view = m_Registry.view<TransformComponent, MeshComponent>();
-			for (auto entity : view)
-			{
-				auto mesh = view.get<MeshComponent>(entity);
-				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
-				SceneRenderer::SubmitStaticMesh(worldTransform, mesh);
+				SceneRenderer::SubmitStaticMesh(worldTransform, mesh, overrideMaterialHandle);
 			}
 		}
 

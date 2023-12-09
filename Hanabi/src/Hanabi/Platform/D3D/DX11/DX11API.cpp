@@ -8,6 +8,7 @@
 #include "Hanabi/Renderer/Renderer.h"
 #include "DX11Texture.h"
 #include "DX11ConstantBuffer.h"
+#include "Hanabi/Asset/AssetManager/AssetManager.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -131,13 +132,8 @@ namespace Hanabi
 		HNB_CORE_ASSERT(submeshIndex <= source->GetSubmeshes().size(), "Submesh index out of range!");
 
 		const Submesh& submesh = mesh->GetMeshSource()->GetSubmeshes()[submeshIndex];
-		m_DeviceContext->DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
-	}
 
-	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
-	{
-		material->Bind();
-		DrawMesh(mesh);
+		m_DeviceContext->DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
 	}
 
 	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh)

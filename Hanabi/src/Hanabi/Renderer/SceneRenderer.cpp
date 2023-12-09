@@ -139,7 +139,7 @@ namespace Hanabi
 		Ref<RenderPass> SkyboxPass;
 		Ref<RenderPass> CompositePass;
 
-		Ref<Material> DefaultMaterial;
+		Ref<MaterialAsset> DefaultMaterialAsset;
 
 		struct GeoDrawCommand
 		{
@@ -338,8 +338,7 @@ namespace Hanabi
 
 		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
-		Ref<MaterialAsset> defaultMaterialAsset = CreateRef<MaterialAsset>();
-		s_Data->DefaultMaterial = defaultMaterialAsset->GetMaterial();
+		s_Data->DefaultMaterialAsset = CreateRef<MaterialAsset>();
 	}
 
 	void SceneRenderer::Shutdown()
@@ -474,7 +473,7 @@ namespace Hanabi
 		return s_Data->DeferredGeoPass->GetOutput(3);
 	}
 
-	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle, uint32_t submeshIndex)
+	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle overrideMaterialHandle)
 	{
 		if (meshComponent.MeshSourceHandle)
 		{
@@ -485,13 +484,25 @@ namespace Hanabi
 			}
 
 			Ref<Mesh> mesh = AssetManager::GetAsset<Mesh>(meshComponent.MeshHandle);
+			Ref<MeshSource> meshSource = AssetManager::GetAsset<MeshSource>(meshComponent.MeshSourceHandle);
+			Ref<MaterialAsset> materialAsset = s_Data->DefaultMaterialAsset;
 
-			if (AssetManager::IsAssetHandleValid(materialAssetHandle))
+			if (AssetManager::IsAssetHandleValid(overrideMaterialHandle))
 			{
-				Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(materialAssetHandle);
-				s_Data->DrawCommands.push_back({
+				materialAsset = AssetManager::GetAsset<MaterialAsset>(overrideMaterialHandle);
+			}
+			else if (meshSource->GetMaterials().size() > 0)
+			{
+				AssetHandle materialHandle = meshSource->GetMaterials()[meshSource->GetSubmeshes()[meshComponent.SubmeshIndex].MaterialIndex];
+				if (AssetManager::IsAssetHandleValid(materialHandle))
+				{
+					materialAsset = AssetManager::GetAsset<MaterialAsset>(materialHandle);
+				}
+			}
+
+			s_Data->DrawCommands.push_back({
 					mesh,
-					submeshIndex,
+					meshComponent.SubmeshIndex,
 					materialAsset->GetMaterial(),
 					{
 						transform,
@@ -501,24 +512,7 @@ namespace Hanabi
 						materialAsset->GetRoughness(),
 						materialAsset->IsUsingNormalMap(),
 					}
-					});
-			}
-			else
-			{
-				s_Data->DrawCommands.push_back({
-					mesh,
-					submeshIndex,
-					s_Data->DefaultMaterial,
-					{
-						transform,
-						glm::vec3(1.0f),
-						0.0f,
-						0.0f,
-						0.0f,
-						false,
-					}
-					});
-			}
+				});
 		}
 	}
 
