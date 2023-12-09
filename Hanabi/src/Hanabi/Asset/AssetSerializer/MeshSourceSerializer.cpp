@@ -16,11 +16,11 @@ namespace Hanabi
 		aiProcess_SortByPType |             // Split meshes by primitive type
 		aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
 		aiProcess_Triangulate;            // Make sure we're triangles
-	    //aiProcess_OptimizeGraph |
-	    //aiProcess_OptimizeMeshes |          // Batch draws where possible
-	    //aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
-	    //aiProcess_ValidateDataStructure   // Validation
-	    //aiProcess_GlobalScale              // e.g. convert cm to m for fbx import (and other formats where cm is native)
+	//aiProcess_OptimizeGraph |
+	//aiProcess_OptimizeMeshes |          // Batch draws where possible
+	//aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
+	//aiProcess_ValidateDataStructure   // Validation
+	//aiProcess_GlobalScale              // e.g. convert cm to m for fbx import (and other formats where cm is native)
 
 	bool MeshSourceSerializer::TryLoadData(const AssetMetadata& metadata, Ref<Asset>& asset) const
 	{
@@ -192,18 +192,28 @@ namespace Hanabi
 					TextureSpecification spec;
 					// TODO: Support SRGB
 					//spec.Format = ImageFormat::SRGB;
+					AssetHandle textureHandle = 0;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
-						material->SetAlbedoTex(textureHandle);
-						material->SetAlbedo(glm::vec3(1.0f));
+						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
 					}
 					else
 					{
-						HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						auto parentPath = path.parent_path();
+						parentPath /= aiTexPath.C_Str();
+						std::string texturePath = parentPath.string();
+						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
+						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
+
+						if (AssetManager::IsAssetHandleValid(texHandle))
+							textureHandle = texHandle;
+						else
+							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
 					}
+					material->SetAlbedoTex(textureHandle);
+					material->SetAlbedo(glm::vec3(1.0f));
 				}
 
 				// Normal
@@ -211,19 +221,29 @@ namespace Hanabi
 				if (hasNormalMap)
 				{
 					TextureSpecification spec;
+					AssetHandle textureHandle = 0;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Format = ImageFormat::RGBA;
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
-						material->SetNormalTex(textureHandle);
-						material->SetUseNormalMap(true);
+						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
 					}
 					else
 					{
-						HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						auto parentPath = path.parent_path();
+						parentPath /= aiTexPath.C_Str();
+						std::string texturePath = parentPath.string();
+						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
+						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
+
+						if (AssetManager::IsAssetHandleValid(texHandle))
+							textureHandle = texHandle;
+						else
+							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
 					}
+					material->SetNormalTex(textureHandle);
+					material->SetUseNormalMap(true);
 				}
 
 				// Roughness
@@ -239,6 +259,7 @@ namespace Hanabi
 				if (hasRoughnessMap)
 				{
 					TextureSpecification spec;
+					AssetHandle textureHandle = 0;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Format = ImageFormat::RGBA;
@@ -260,14 +281,23 @@ namespace Hanabi
 								texel.b = 255 - texel.b;
 							}
 						}
-						AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(texels, 1));
-						material->SetRoughnessTex(textureHandle);
-						material->SetRoughness(1.0f);
+						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(texels, 1));			
 					}
 					else
 					{
-						HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						auto parentPath = path.parent_path();
+						parentPath /= aiTexPath.C_Str();
+						std::string texturePath = parentPath.string();
+						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
+						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
+
+						if (AssetManager::IsAssetHandleValid(texHandle))
+							textureHandle = texHandle;
+						else
+							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
 					}
+					material->SetRoughnessTex(textureHandle);
+					material->SetRoughness(1.0f);
 				}
 
 				// Metalness
@@ -276,19 +306,29 @@ namespace Hanabi
 				if (hasMetalnessMap)
 				{
 					TextureSpecification spec;
+					AssetHandle textureHandle = 0;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Format = ImageFormat::RGBA;
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
-						material->SetMetalnessTex(textureHandle);
-						material->SetMetalness(1.0f);
+						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
 					}
 					else
 					{
-						HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						auto parentPath = path.parent_path();
+						parentPath /= aiTexPath.C_Str();
+						std::string texturePath = parentPath.string();
+						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
+						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
+
+						if (AssetManager::IsAssetHandleValid(texHandle))
+							textureHandle = texHandle;
+						else
+							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
 					}
+					material->SetMetalnessTex(textureHandle);
+					material->SetMetalness(1.0f);
 				}
 			}
 			HNB_CORE_INFO("------------------------");

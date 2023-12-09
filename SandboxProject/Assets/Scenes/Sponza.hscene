@@ -1,5 +1,47 @@
 Scene: Untitled
 Entities:
+  - Entity: 18174999149445251794
+    TagComponent:
+      Tag: Spotlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [122.91481, 0.882739305, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Spot
+      Intensity: 5
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 50
+      Angle: 50
+      AngleAttenuation: 20
+      Falloff: 1
+      ShadowType: None
+  - Entity: 8425643987492941149
+    TagComponent:
+      Tag: Dirlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Directional
+      Intensity: 0.5
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 0
+      ShadowType: Soft
   - Entity: 1314201770760916284
     TagComponent:
       Tag: meshes[0]-102
@@ -2985,3 +3027,66 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 0
+  - Entity: 121084385879951601
+    TagComponent:
+      Tag: Pointlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [-24.847681, 15.0024042, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 0.5
+      Radiance: [1, 1, 1]
+      Radius: 30
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 1
+      ShadowType: None
+  - Entity: 8578963556683790070
+    TagComponent:
+      Tag: Pointlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [-78.8124619, 15.0024042, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 0.5
+      Radiance: [1, 1, 1]
+      Radius: 30
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 1
+      ShadowType: None
+  - Entity: 6586900246761303647
+    TagComponent:
+      Tag: Pointlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [22.9502773, 15.0024042, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 0.5
+      Radiance: [1, 1, 1]
+      Radius: 30
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 1
+      ShadowType: None
