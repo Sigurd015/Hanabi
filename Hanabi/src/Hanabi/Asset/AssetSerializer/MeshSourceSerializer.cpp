@@ -14,10 +14,10 @@ namespace Hanabi
 		aiProcess_GenUVCoords |             // Convert UVs if required 
 		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
 		aiProcess_SortByPType |             // Split meshes by primitive type
+		aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
 		aiProcess_Triangulate;            // Make sure we're triangles
 	    //aiProcess_OptimizeGraph |
 	    //aiProcess_OptimizeMeshes |          // Batch draws where possible
-	    //aiProcess_JoinIdenticalVertices |
 	    //aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
 	    //aiProcess_ValidateDataStructure   // Validation
 	    //aiProcess_GlobalScale              // e.g. convert cm to m for fbx import (and other formats where cm is native)
@@ -58,6 +58,7 @@ namespace Hanabi
 			meshSource->m_BoundingBox.Min = { FLT_MAX, FLT_MAX, FLT_MAX };
 			meshSource->m_BoundingBox.Max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
 
+			// Make sure we have at least one submesh
 			meshSource->m_Submeshes.reserve(scene->mNumMeshes);
 			for (unsigned m = 0; m < scene->mNumMeshes; m++)
 			{

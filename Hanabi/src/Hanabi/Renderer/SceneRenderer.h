@@ -23,7 +23,7 @@ namespace Hanabi
 		static Ref<Image2D> GetGBufferNormal();
 		static Ref<Image2D> GetGBufferPosition();
 
-		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle materialAssetHandle = 0, uint32_t submeshIndex = 0);
+		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle overrideMaterialHandle = 0);
 
 	private:
 		static void ExecuteDrawCommands();

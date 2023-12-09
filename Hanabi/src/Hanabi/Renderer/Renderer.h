@@ -22,7 +22,6 @@ namespace Hanabi
 
 		//3D Objects
 		static void DrawMesh(const Ref<Mesh>& mesh, uint32_t submeshIndex, const Ref<Material>& material);
-		static void DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material);
 		static void DrawMesh(const Ref<Mesh>& mesh);
 
 		//2D Objects

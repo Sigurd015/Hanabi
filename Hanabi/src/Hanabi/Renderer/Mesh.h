@@ -57,6 +57,8 @@ namespace Hanabi
 
 		const AABB& GetBoundingBox() const { return m_BoundingBox; }
 
+		const std::vector<AssetHandle>& GetMaterials() const { return m_Materials; }
+
 		static AssetType GetStaticType() { return AssetType::MeshSource; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:

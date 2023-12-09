@@ -119,7 +119,7 @@ namespace Hanabi
 
 			if (ImGui::BeginMenu("Debug"))
 			{
-				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &ImGuiDebugWndDraw);
+				ImGui::MenuItem("Show ImGui Debug Window", nullptr, &m_ImGuiDebugWndDraw);
 
 				ImGui::EndMenu();
 			}
@@ -130,7 +130,7 @@ namespace Hanabi
 
 		PanelManager::OnImGuiRender();
 
-		if (ImGuiDebugWndDraw)
+		if (m_ImGuiDebugWndDraw)
 			ImGui::ShowMetricsWindow();
 
 		ImGui::End();

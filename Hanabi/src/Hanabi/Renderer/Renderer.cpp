@@ -98,11 +98,6 @@ namespace Hanabi
 		s_RendererAPI->DrawMesh(mesh, submeshIndex, material);
 	}
 
-	void Renderer::DrawMesh(const Ref<Mesh>& mesh, const Ref<Material>& material)
-	{
-		s_RendererAPI->DrawMesh(mesh, material);
-	}
-
 	void Renderer::DrawMesh(const Ref<Mesh>& mesh)
 	{
 		s_RendererAPI->DrawMesh(mesh);

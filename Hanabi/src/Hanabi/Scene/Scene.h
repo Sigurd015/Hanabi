@@ -91,6 +91,8 @@ namespace Hanabi
 		glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
 		Entity GetMainCameraEntity();
 
+		Entity InstantiateMesh(Ref<MeshSource> meshSource);
+
 		void ParentEntity(Entity entity, Entity parent);
 		void UnparentEntity(Entity entity, bool convertToWorldSpace = true);
 		void ConvertToLocalSpace(Entity entity);

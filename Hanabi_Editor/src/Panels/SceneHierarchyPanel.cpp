@@ -331,15 +331,15 @@ namespace Hanabi
 		UI::DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
 				AssetHandle meshSourceHandle = component.MeshSourceHandle;
-				
+
 				UI::DrawAssetControl("Mesh", component.MeshSourceHandle, AssetType::MeshSource);
-				
+
 				if (meshSourceHandle != component.MeshSourceHandle)
 				{
 					component.MeshHandle = 0;
 				}
 
-				if (meshSourceHandle)
+				if (component.MeshSourceHandle)
 				{
 					auto meshSource = AssetManager::GetAsset<MeshSource>(component.MeshSourceHandle);
 					int submeshIndex = component.SubmeshIndex;

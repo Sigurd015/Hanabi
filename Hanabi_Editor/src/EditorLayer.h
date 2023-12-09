@@ -31,6 +31,6 @@ namespace Hanabi
 
 		Ref<Scene> m_EditorScene;
 		Ref<Scene> m_ActiveScene;
-		bool ImGuiDebugWndDraw = false;
+		bool m_ImGuiDebugWndDraw = false;
 	};
 }
