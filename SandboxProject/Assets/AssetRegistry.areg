@@ -1,15 +1,42 @@
 AssetRegistry:
+  - Handle: 192380605463142357
+    FilePath: Models/Sponza/14267839433702832875.jpg
+    Type: AssetType::Texture2D
+  - Handle: 193847352840384354
+    FilePath: Models/Sponza/13196865903111448057.jpg
+    Type: AssetType::Texture2D
+  - Handle: 361824176897904092
+    FilePath: Models/Sponza/14170708867020035030.jpg
+    Type: AssetType::Texture2D
   - Handle: 666927332699581675
     FilePath: Models/Sponza/Sponza.gltf
     Type: AssetType::MeshSource
   - Handle: 841372594545168923
     FilePath: Materials/gray-granite-flecks.hmat
     Type: AssetType::Material
+  - Handle: 978649602932966392
+    FilePath: Models/Sponza/14118779221266351425.jpg
+    Type: AssetType::Texture2D
+  - Handle: 1132154278717260110
+    FilePath: Models/Sponza/11490520546946913238.jpg
+    Type: AssetType::Texture2D
   - Handle: 1991723713832931260
     FilePath: Textures/envmap/brown_photostudio_02_4k.hdr
     Type: AssetType::EnvMap
+  - Handle: 2228980971662411295
+    FilePath: Models/Sponza/8051790464816141987.jpg
+    Type: AssetType::Texture2D
+  - Handle: 2275075777215009262
+    FilePath: Models/Sponza/9288698199695299068.jpg
+    Type: AssetType::Texture2D
   - Handle: 2333949280243433075
     FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_roughness.png
+    Type: AssetType::Texture2D
+  - Handle: 2358905998642501046
+    FilePath: Models/Sponza/332936164838540657.jpg
+    Type: AssetType::Texture2D
+  - Handle: 2463052842703186590
+    FilePath: Models/Sponza/9916269861720640319.jpg
     Type: AssetType::Texture2D
   - Handle: 2537504928911656905
     FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_albedo.png
@@ -17,14 +44,50 @@ AssetRegistry:
   - Handle: 2605795154723237914
     FilePath: Models/Cube.gltf
     Type: AssetType::MeshSource
+  - Handle: 2776047031704835970
+    FilePath: Models/Sponza/2051777328469649772.jpg
+    Type: AssetType::Texture2D
+  - Handle: 3180911329710503346
+    FilePath: Models/Sponza/4477655471536070370.jpg
+    Type: AssetType::Texture2D
   - Handle: 3676138274874464056
     FilePath: Materials/used-stainless.hmat
     Type: AssetType::Material
+  - Handle: 4076971284154023025
+    FilePath: Models/Sponza/8481240838833932244.jpg
+    Type: AssetType::Texture2D
+  - Handle: 4119418559144385774
+    FilePath: Models/Sponza/6593109234861095314.jpg
+    Type: AssetType::Texture2D
+  - Handle: 4165720653940759008
+    FilePath: Models/Sponza/466164707995436622.jpg
+    Type: AssetType::Texture2D
+  - Handle: 4197041980082330576
+    FilePath: Models/Sponza/7441062115984513793.jpg
+    Type: AssetType::Texture2D
+  - Handle: 4232211909556082271
+    FilePath: Models/Sponza/759203620573749278.jpg
+    Type: AssetType::Texture2D
+  - Handle: 4516556486983205455
+    FilePath: Models/Sponza/1219024358953944284.jpg
+    Type: AssetType::Texture2D
   - Handle: 4589171769343660080
     FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-albedo.png
     Type: AssetType::Texture2D
   - Handle: 4704208569905331786
     FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_roughness.png
+    Type: AssetType::Texture2D
+  - Handle: 4760924509351177752
+    FilePath: Models/Sponza/4871783166746854860.jpg
+    Type: AssetType::Texture2D
+  - Handle: 4997132358239163626
+    FilePath: Models/Sponza/8783994986360286082.jpg
+    Type: AssetType::Texture2D
+  - Handle: 5021956361580706744
+    FilePath: Models/Sponza/13824894030729245199.jpg
+    Type: AssetType::Texture2D
+  - Handle: 5335080149075185659
+    FilePath: Models/Sponza/6772804448157695701.jpg
     Type: AssetType::Texture2D
   - Handle: 5715407682404485611
     FilePath: Models/Sphere.gltf
@@ -35,14 +98,38 @@ AssetRegistry:
   - Handle: 5796823861923018421
     FilePath: Textures/envmap/kloppenheim_02_puresky_4k.hdr
     Type: AssetType::EnvMap
+  - Handle: 6196982571575814046
+    FilePath: Models/Sponza/16299174074766089871.jpg
+    Type: AssetType::Texture2D
   - Handle: 6311326570274108486
     FilePath: Textures/envmap/dark_autumn_forest_4k.hdr
     Type: AssetType::EnvMap
+  - Handle: 6532294960542013723
+    FilePath: Models/Sponza/8503262930880235456.jpg
+    Type: AssetType::Texture2D
+  - Handle: 6540213430491133622
+    FilePath: Models/Sponza/2775690330959970771.jpg
+    Type: AssetType::Texture2D
   - Handle: 6548672909131543686
     FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_normal-dx.png
     Type: AssetType::Texture2D
+  - Handle: 6698665615834612350
+    FilePath: Models/Sponza/4601176305987539675.jpg
+    Type: AssetType::Texture2D
   - Handle: 6782582854069637355
     FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_metallic.png
+    Type: AssetType::Texture2D
+  - Handle: 6904234132030976487
+    FilePath: Models/Sponza/15722799267630235092.jpg
+    Type: AssetType::Texture2D
+  - Handle: 7049138644848220114
+    FilePath: Models/Sponza/2969916736137545357.jpg
+    Type: AssetType::Texture2D
+  - Handle: 7390526039102303638
+    FilePath: Models/Sponza/14650633544276105767.jpg
+    Type: AssetType::Texture2D
+  - Handle: 7847674053643423564
+    FilePath: Models/Sponza/7056944414013900257.jpg
     Type: AssetType::Texture2D
   - Handle: 8012010214947151524
     FilePath: Scenes/2DExample.hscene
@@ -50,23 +137,71 @@ AssetRegistry:
   - Handle: 8230805411470845587
     FilePath: Materials/laminate-flooring-brown.hmat
     Type: AssetType::Material
+  - Handle: 8490041139145934759
+    FilePath: Models/Sponza/7815564343179553343.jpg
+    Type: AssetType::Texture2D
+  - Handle: 8625462657800010186
+    FilePath: Models/Sponza/4910669866631290573.jpg
+    Type: AssetType::Texture2D
+  - Handle: 8649223737632059282
+    FilePath: Models/Sponza/16275776544635328252.png
+    Type: AssetType::Texture2D
   - Handle: 8903819486709350489
     FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Normal-dx.png
+    Type: AssetType::Texture2D
+  - Handle: 9029641300834168460
+    FilePath: Models/Sponza/2299742237651021498.jpg
+    Type: AssetType::Texture2D
+  - Handle: 9106694041600244853
+    FilePath: Models/Sponza/5792855332885324923.jpg
+    Type: AssetType::Texture2D
+  - Handle: 9231063215162813302
+    FilePath: Models/Sponza/5823059166183034438.jpg
+    Type: AssetType::Texture2D
+  - Handle: 9270924959366123394
+    FilePath: Models/Sponza/11474523244911310074.jpg
     Type: AssetType::Texture2D
   - Handle: 9496776747364153426
     FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Metallic.png
     Type: AssetType::Texture2D
+  - Handle: 9510930675717834610
+    FilePath: Models/Sponza/755318871556304029.jpg
+    Type: AssetType::Texture2D
   - Handle: 9798693481466945810
     FilePath: Textures/TestNormal.png
+    Type: AssetType::Texture2D
+  - Handle: 9841752754189557464
+    FilePath: Models/Sponza/11872827283454512094.jpg
     Type: AssetType::Texture2D
   - Handle: 10066814809449201864
     FilePath: Textures/envmap/hilly_terrain_01_4k.hdr
     Type: AssetType::EnvMap
+  - Handle: 10200988520218647482
+    FilePath: Models/Sponza/6667038893015345571.jpg
+    Type: AssetType::Texture2D
+  - Handle: 10411063269783377681
+    FilePath: Models/Sponza/12501374198249454378.jpg
+    Type: AssetType::Texture2D
+  - Handle: 10529217213763168728
+    FilePath: Models/Sponza/17556969131407844942.jpg
+    Type: AssetType::Texture2D
+  - Handle: 10539158386702576285
+    FilePath: Models/Sponza/715093869573992647.jpg
+    Type: AssetType::Texture2D
+  - Handle: 10686327677415973022
+    FilePath: Models/Sponza/4675343432951571524.jpg
+    Type: AssetType::Texture2D
+  - Handle: 10749618308503164540
+    FilePath: Models/Sponza/5061699253647017043.png
+    Type: AssetType::Texture2D
   - Handle: 10801380211512351879
     FilePath: Materials/white.hmat
     Type: AssetType::Material
   - Handle: 10864898568509953569
     FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_normal-dx.png
+    Type: AssetType::Texture2D
+  - Handle: 11545724005930506840
+    FilePath: Models/Sponza/8006627369776289000.png
     Type: AssetType::Texture2D
   - Handle: 11712703148928652040
     FilePath: Textures/envmap/lago_disola_4k.hdr
@@ -77,20 +212,41 @@ AssetRegistry:
   - Handle: 12049005096031057341
     FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_normal.png
     Type: AssetType::Texture2D
+  - Handle: 12184413599650592249
+    FilePath: Models/Sponza/3628158980083700836.jpg
+    Type: AssetType::Texture2D
+  - Handle: 12199325505070560264
+    FilePath: Models/Sponza/3827035219084910048.jpg
+    Type: AssetType::Texture2D
   - Handle: 12490738633885367934
     FilePath: Textures/envmap/rustig_koppie_puresky_4k.hdr
     Type: AssetType::EnvMap
+  - Handle: 12979073036252153584
+    FilePath: Models/Sponza/6151467286084645207.jpg
+    Type: AssetType::Texture2D
   - Handle: 13163428818850691303
     FilePath: Scenes/Sponza.hscene
     Type: AssetType::Scene
   - Handle: 13566442178785289733
     FilePath: Textures/used-stainless-steel2-ue/used-stainless-steel2_albedo.png
     Type: AssetType::Texture2D
+  - Handle: 13609953376540553617
+    FilePath: Models/Sponza/white.png
+    Type: AssetType::Texture2D
+  - Handle: 13624275467349760626
+    FilePath: Models/Sponza/11968150294050148237.jpg
+    Type: AssetType::Texture2D
   - Handle: 13744182516866292656
     FilePath: Textures/gray-granite-flecks-ue/gray-granite-flecks-Roughness.png
     Type: AssetType::Texture2D
+  - Handle: 13933490168461735379
+    FilePath: Models/Sponza/8750083169368950601.jpg
+    Type: AssetType::Texture2D
   - Handle: 14057650850447361125
     FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_metallic.png
+    Type: AssetType::Texture2D
+  - Handle: 14460590257071955779
+    FilePath: Models/Sponza/15295713303328085182.jpg
     Type: AssetType::Texture2D
   - Handle: 14548778339704962245
     FilePath: Textures/laminate-flooring-brown-ue/laminate-flooring-brown_metallic.png
@@ -98,9 +254,60 @@ AssetRegistry:
   - Handle: 14594112406493172031
     FilePath: Textures/SpriteAnimation.png
     Type: AssetType::Texture2D
+  - Handle: 14680651091230822016
+    FilePath: Models/Sponza/7268504077753552595.jpg
+    Type: AssetType::Texture2D
+  - Handle: 14950370380738617622
+    FilePath: Models/Sponza/10381718147657362067.jpg
+    Type: AssetType::Texture2D
+  - Handle: 14974189875610420240
+    FilePath: Models/Sponza/3455394979645218238.jpg
+    Type: AssetType::Texture2D
   - Handle: 15063411845910190571
     FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_basecolor.png
     Type: AssetType::Texture2D
+  - Handle: 15304994922414843737
+    FilePath: Models/Sponza/6047387724914829168.jpg
+    Type: AssetType::Texture2D
+  - Handle: 15417841575883814453
+    FilePath: Models/Sponza/16885566240357350108.jpg
+    Type: AssetType::Texture2D
+  - Handle: 15507645221123207169
+    FilePath: Models/Sponza/2374361008830720677.jpg
+    Type: AssetType::Texture2D
+  - Handle: 15710693969674553300
+    FilePath: Models/Sponza/3371964815757888145.jpg
+    Type: AssetType::Texture2D
+  - Handle: 16161486829373302423
+    FilePath: Models/Sponza/2185409758123873465.jpg
+    Type: AssetType::Texture2D
+  - Handle: 16264759086437234399
+    FilePath: Models/Sponza/10388182081421875623.jpg
+    Type: AssetType::Texture2D
+  - Handle: 16372574396960687853
+    FilePath: Models/Sponza/4975155472559461469.jpg
+    Type: AssetType::Texture2D
+  - Handle: 16636443563185204597
+    FilePath: Models/Sponza/8773302468495022225.jpg
+    Type: AssetType::Texture2D
+  - Handle: 16704080573682880949
+    FilePath: Models/Sponza/2411100444841994089.jpg
+    Type: AssetType::Texture2D
   - Handle: 17032317040619436040
     FilePath: Textures/rustediron1-alt2-Unreal-Engine/rustediron2_roughness.png
+    Type: AssetType::Texture2D
+  - Handle: 17255927636068979336
+    FilePath: Models/Sponza/8114461559286000061.jpg
+    Type: AssetType::Texture2D
+  - Handle: 17413349269619435779
+    FilePath: Models/Sponza/17876391417123941155.jpg
+    Type: AssetType::Texture2D
+  - Handle: 18282315162349423791
+    FilePath: Models/Sponza/13982482287905699490.jpg
+    Type: AssetType::Texture2D
+  - Handle: 18295068335602728184
+    FilePath: Models/Sponza/7645212358685992005.jpg
+    Type: AssetType::Texture2D
+  - Handle: 18361405716400925049
+    FilePath: Models/Sponza/8747919177698443163.jpg
     Type: AssetType::Texture2D
