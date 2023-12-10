@@ -232,8 +232,15 @@ namespace Hanabi
 					ImGui::Image(texture->GetRendererID(), ImVec2(100.0f, 100.0f), ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 					ImGui::SameLine();
 				}
-				const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(handle);
-				label = metadata.FilePath.filename().string();
+				if (AssetManager::IsMemoryAsset(handle))
+				{
+					label = "Memory Asset";
+				}
+				else
+				{
+					const AssetMetadata& metadata = Project::GetEditorAssetManager()->GetMetadata(handle);
+					label = metadata.FilePath.filename().string();
+				}
 			}
 			else if (isTexture)
 			{

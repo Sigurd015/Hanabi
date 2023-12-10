@@ -140,7 +140,8 @@ namespace Hanabi
 			for (uint32_t i = 0; i < scene->mNumMaterials; i++)
 			{
 				auto aiMaterial = scene->mMaterials[i];
-				// TODO: Support Material Names
+				// TODO: May generate the AssetHandle by hashing the material name
+				// So that we can make the AssetHandle consistent across different imports
 				auto aiMaterialName = aiMaterial->GetName();
 				meshSource->m_Materials[i] = AssetManager::CreateMemoryOnlyAsset<MaterialAsset>();
 

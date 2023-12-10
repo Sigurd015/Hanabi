@@ -349,13 +349,38 @@ namespace Hanabi
 				}
 			});
 
-		UI::DrawComponent<MaterialComponent>("Material", entity, [](auto& component)
+		UI::DrawComponent<MaterialComponent>("Material", entity, [&](auto& component)
 			{
 				UI::DrawAssetControl("Material", component.MaterialAssetHandle, AssetType::Material);
 
+				Ref<MaterialAsset> materialAsset = nullptr;
 				if (AssetManager::IsAssetHandleValid(component.MaterialAssetHandle))
 				{
-					Ref<MaterialAsset> materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);
+					materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);
+				}
+				// TODO: Temporary for memory assets
+				else
+				{
+					if (entity.HasComponent<MeshComponent>())
+					{
+						auto& meshComponent = entity.GetComponent<MeshComponent>();
+						if (AssetManager::IsAssetHandleValid(meshComponent.MeshSourceHandle))
+						{
+							Ref<MeshSource> meshSource = AssetManager::GetAsset<MeshSource>(meshComponent.MeshSourceHandle);
+							auto& submesh = meshSource->GetSubmeshes()[meshComponent.SubmeshIndex];
+							auto& materials = meshSource->GetMaterials();
+							if (!materials.empty())
+							{
+								component.MaterialAssetHandle = materials[submesh.MaterialIndex];
+								materialAsset = AssetManager::GetAsset<MaterialAsset>(component.MaterialAssetHandle);
+							}
+						}
+					}
+				}
+
+				if (materialAsset)
+				{
+					bool isMemoryAsset = AssetManager::IsMemoryAsset(component.MaterialAssetHandle);
 
 					AssetHandle tempAlbedoHandle = materialAsset->GetAlbedoTexHandle();
 					AssetHandle tempMetalnessHandle = materialAsset->GetMetalnessTexHandle();
@@ -371,18 +396,21 @@ namespace Hanabi
 						if (ImGui::ColorEdit3("Albedo Color", glm::value_ptr(tempAlbedo)))
 						{
 							materialAsset->SetAlbedo(tempAlbedo);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 						if (ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f))
 						{
 							materialAsset->SetEmission(tempEmission);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 
 						if (tempAlbedoHandle != materialAsset->GetAlbedoTexHandle())
 						{
 							materialAsset->SetAlbedoTex(tempAlbedoHandle);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 					}
 
@@ -393,13 +421,15 @@ namespace Hanabi
 						if (ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f))
 						{
 							materialAsset->SetMetalness(tempMetalness);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 
 						if (tempMetalnessHandle != materialAsset->GetMetalnessTexHandle())
 						{
 							materialAsset->SetMetalnessTex(tempMetalnessHandle);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 					}
 
@@ -410,13 +440,15 @@ namespace Hanabi
 						if (ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f))
 						{
 							materialAsset->SetRoughness(tempRoughness);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 
 						if (tempRoughnessHandle != materialAsset->GetRoughnessTexHandle())
 						{
 							materialAsset->SetRoughnessTex(tempRoughnessHandle);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 					}
 
@@ -427,13 +459,15 @@ namespace Hanabi
 						if (ImGui::Checkbox("Use Normal Map", &useNormalMap))
 						{
 							materialAsset->SetUseNormalMap(useNormalMap);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 
 						if (tempNormalHandle != materialAsset->GetNormalTexHandle())
 						{
 							materialAsset->SetNormalTex(tempNormalHandle);
-							AssetImporter::Serialize(materialAsset);
+							if (!isMemoryAsset)
+								AssetImporter::Serialize(materialAsset);
 						}
 					}
 				}
