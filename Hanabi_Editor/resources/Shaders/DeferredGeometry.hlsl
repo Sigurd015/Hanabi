@@ -65,8 +65,10 @@ PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
     float4 albedo = u_AlbedoTex.Sample(u_SSAnisotropicWrap, Input.TexCoord);
-    float metalness = u_MetalnessTex.Sample(u_SSLinearWrap, Input.TexCoord).r * u_Material.Metalness;
-    float roughness = u_RoughnessTex.Sample(u_SSLinearWrap, Input.TexCoord).r * u_Material.Roughness;
+    // Notice: Metalness and Roughness could be in the same texture
+    //         Use GLTF spec, Metalness is in B channel, Roughness is in G channel
+    float metalness = u_MetalnessTex.Sample(u_SSLinearWrap, Input.TexCoord).b * u_Material.Metalness;
+    float roughness = u_RoughnessTex.Sample(u_SSLinearWrap, Input.TexCoord).g * u_Material.Roughness;
 
     float3 normal = normalize(Input.Normal);
     if (u_Material.UseNormalMap)
