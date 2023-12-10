@@ -177,6 +177,9 @@ namespace Hanabi
 				else
 					metalness = 1.0f;
 
+				material->SetRoughness(roughness);
+				material->SetMetalness(metalness);
+
 				HNB_CORE_INFO("    COLOR = {0}, {1}, {2}", aiColor.r, aiColor.g, aiColor.b);
 				HNB_CORE_INFO("    ROUGHNESS = {0}", roughness);
 				HNB_CORE_INFO("    METALNESS = {0}", metalness);
@@ -193,28 +196,22 @@ namespace Hanabi
 					TextureSpecification spec;
 					// TODO: Support SRGB
 					//spec.Format = ImageFormat::SRGB;
-					AssetHandle textureHandle = 0;
+					Buffer buffer;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
+						buffer = Buffer(aiTexEmbedded->pcData, 1);
 					}
 					else
 					{
 						auto parentPath = path.parent_path();
 						parentPath /= aiTexPath.C_Str();
-						std::string texturePath = parentPath.string();
-						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
-						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
-
-						if (AssetManager::IsAssetHandleValid(texHandle))
-							textureHandle = texHandle;
-						else
-							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						HNB_CORE_INFO("    Albedo map path = {0}", parentPath.string());
+						buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
 					}
+					AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
 					material->SetAlbedoTex(textureHandle);
-					material->SetAlbedo(glm::vec3(1.0f));
 				}
 
 				// Normal
@@ -222,83 +219,49 @@ namespace Hanabi
 				if (hasNormalMap)
 				{
 					TextureSpecification spec;
-					AssetHandle textureHandle = 0;
+					Buffer buffer;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Format = ImageFormat::RGBA;
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
+						buffer = Buffer(aiTexEmbedded->pcData, 1);
 					}
 					else
 					{
 						auto parentPath = path.parent_path();
 						parentPath /= aiTexPath.C_Str();
-						std::string texturePath = parentPath.string();
-						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
-						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
-
-						if (AssetManager::IsAssetHandleValid(texHandle))
-							textureHandle = texHandle;
-						else
-							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						HNB_CORE_INFO("    Normal map path = {0}", parentPath.string());
+						buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
 					}
+					AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
 					material->SetNormalTex(textureHandle);
 					material->SetUseNormalMap(true);
 				}
 
 				// Roughness
 				bool hasRoughnessMap = aiMaterial->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE, &aiTexPath) == AI_SUCCESS;
-				bool invertRoughness = false;
-				if (!hasRoughnessMap)
-				{
-					// no PBR roughness. Try old-school shininess.  (note: this also picks up the gloss texture from PBR specular/gloss workflow).
-					// Either way, Roughness = (1 - shininess)
-					hasRoughnessMap = aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS;
-					invertRoughness = true;
-				}
 				if (hasRoughnessMap)
 				{
 					TextureSpecification spec;
-					AssetHandle textureHandle = 0;
+					Buffer buffer;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Format = ImageFormat::RGBA;
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
 						aiTexel* texels = aiTexEmbedded->pcData;
-						if (invertRoughness)
-						{
-							if (spec.Height == 0)
-							{
-								auto buffer = TextureSerializer::ToBufferFromMemory(Buffer(aiTexEmbedded->pcData, spec.Width), spec);
-								texels = (aiTexel*)buffer.Data;
-							}
-							for (uint32_t i = 0; i < spec.Width * spec.Height; ++i)
-							{
-								auto& texel = texels[i];
-								texel.r = 255 - texel.r;
-								texel.g = 255 - texel.g;
-								texel.b = 255 - texel.b;
-							}
-						}
-						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(texels, 1));			
+						buffer = Buffer(texels, 1);
 					}
 					else
 					{
 						auto parentPath = path.parent_path();
 						parentPath /= aiTexPath.C_Str();
-						std::string texturePath = parentPath.string();
-						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
-						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
-
-						if (AssetManager::IsAssetHandleValid(texHandle))
-							textureHandle = texHandle;
-						else
-							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						HNB_CORE_INFO("    Roughness map path = {0}", parentPath.string());
+						buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
 					}
+					AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
 					material->SetRoughnessTex(textureHandle);
-					material->SetRoughness(1.0f);
 				}
 
 				// Metalness
@@ -307,29 +270,23 @@ namespace Hanabi
 				if (hasMetalnessMap)
 				{
 					TextureSpecification spec;
-					AssetHandle textureHandle = 0;
+					Buffer buffer;
 					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
 					{
 						spec.Format = ImageFormat::RGBA;
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, Buffer(aiTexEmbedded->pcData, 1));
+						buffer = Buffer(aiTexEmbedded->pcData, 1);
 					}
 					else
 					{
 						auto parentPath = path.parent_path();
 						parentPath /= aiTexPath.C_Str();
-						std::string texturePath = parentPath.string();
-						HNB_CORE_INFO("    Albedo map path = {0}", texturePath);
-						AssetHandle texHandle = Project::GetEditorAssetManager()->ImportAsset(texturePath);
-
-						if (AssetManager::IsAssetHandleValid(texHandle))
-							textureHandle = texHandle;
-						else
-							HNB_CORE_ERROR("Mesh: Could not load texture: {0}", aiTexPath.C_Str());
+						HNB_CORE_INFO("    Metalness map path = {0}", parentPath.string());
+						buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
 					}
+					AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
 					material->SetMetalnessTex(textureHandle);
-					material->SetMetalness(1.0f);
 				}
 			}
 			HNB_CORE_INFO("------------------------");

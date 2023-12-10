@@ -1743,12 +1743,12 @@ Entities:
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
+      Scale: [0.100000001, 0.100000001, 0.100000001]
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 0
     MaterialComponent:
-      MaterialAssetHandle: 10145199231822772834
+      MaterialAssetHandle: 17689672196659053553
   - Entity: 6586900246761303647
     TagComponent:
       Tag: Pointlight
@@ -1763,7 +1763,7 @@ Entities:
     LightComponent:
       LightType: Point
       Intensity: 0.5
-      Radiance: [1, 1, 1]
+      Radiance: [0, 0.0849423409, 1]
       Radius: 30
       Range: 0
       Angle: 0
@@ -1784,7 +1784,7 @@ Entities:
     LightComponent:
       LightType: Point
       Intensity: 0.5
-      Radiance: [1, 1, 1]
+      Radiance: [0, 1, 0.084941864]
       Radius: 30
       Range: 0
       Angle: 0
@@ -1805,7 +1805,7 @@ Entities:
     LightComponent:
       LightType: Point
       Intensity: 0.5
-      Radiance: [1, 1, 1]
+      Radiance: [1, 0, 0]
       Radius: 30
       Range: 0
       Angle: 0
@@ -1835,7 +1835,7 @@ Entities:
         []
     TransformComponent:
       Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
+      Rotation: [-0.497418821, -2.76111078, -1.47480321]
       Scale: [1, 1, 1]
     LightComponent:
       LightType: Directional
@@ -1861,7 +1861,7 @@ Entities:
     LightComponent:
       LightType: Spot
       Intensity: 5
-      Radiance: [1, 1, 1]
+      Radiance: [1, 0, 0.486486912]
       Radius: 0
       Range: 50
       Angle: 50

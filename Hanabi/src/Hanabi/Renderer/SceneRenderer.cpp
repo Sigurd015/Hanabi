@@ -551,9 +551,9 @@ namespace Hanabi
 			s_Data->DirShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->DirLight.ShadowType);
 			if (s_Data->SceneEnvironment->DirLight.ShadowType != LightComponent::ShadowType::None)
 			{
-				glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 20.0f);
+				glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 200.0f);
 				glm::mat4 lightViewMatrix = glm::lookAt(lightPosition, glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-				glm::mat4 lightOrthoMatrix = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
+				glm::mat4 lightOrthoMatrix = glm::ortho(-350.0f, 350.0f, -350.0f, 350.0f, 0.1f, 750.0f);
 				s_Data->DirShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
 
 				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);

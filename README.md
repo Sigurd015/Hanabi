@@ -34,7 +34,8 @@ A simple game engine made for learning rendering APIs, game engine architecture,
     - [x] 2D Batch Renderer
     - [ ] 3D Renderer
       - [x] Deferred Rendering 
-      - [x] PBR + IBL
+      - [x] PBR Metallic Workflow
+      - [x] IBL
       - [ ] .....
 
 - [ ] Editor  
