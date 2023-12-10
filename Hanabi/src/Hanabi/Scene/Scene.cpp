@@ -169,12 +169,19 @@ namespace Hanabi
 	Entity Scene::InstantiateMesh(Ref<MeshSource> meshSource)
 	{
 		auto& submeshes = meshSource->GetSubmeshes();
+		auto& materials = meshSource->GetMaterials();
 
 		Entity rootEntity = CreateEntity(submeshes[0].MeshName);
 
 		auto& meshComponent = rootEntity.AddComponent<MeshComponent>();
 		meshComponent.MeshSourceHandle = meshSource->Handle;
 		meshComponent.SubmeshIndex = 0;
+
+		auto& materialComponent = rootEntity.AddComponent<MaterialComponent>();
+		if (!materials.empty())
+		{
+			materialComponent.MaterialAssetHandle = materials[submeshes[0].MaterialIndex];
+		}
 
 		for (size_t i = 1; i < submeshes.size(); i++)
 		{
@@ -183,6 +190,12 @@ namespace Hanabi
 			auto& meshComponent = entity.AddComponent<MeshComponent>();
 			meshComponent.MeshSourceHandle = meshSource->Handle;
 			meshComponent.SubmeshIndex = i;
+
+			auto& materialComponent = entity.AddComponent<MaterialComponent>();
+			if (!materials.empty())
+			{
+				materialComponent.MaterialAssetHandle = materials[submeshes[i].MaterialIndex];
+			}
 		}
 
 		return rootEntity;

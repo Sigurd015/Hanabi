@@ -30,6 +30,11 @@ namespace Hanabi
 			return Project::GetAssetManager()->IsAssetLoaded(handle);
 		}
 
+		static bool IsMemoryAsset(AssetHandle handle)
+		{
+			return Project::GetAssetManager()->IsMemoryAsset(handle);
+		}
+
 		static AssetType GetAssetType(AssetHandle handle)
 		{
 			return Project::GetAssetManager()->GetAssetType(handle);

@@ -1,52 +1,10 @@
 Scene: Untitled
 Entities:
-  - Entity: 18174999149445251794
-    TagComponent:
-      Tag: Spotlight
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    TransformComponent:
-      Translation: [122.91481, 0.882739305, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      LightType: Spot
-      Intensity: 5
-      Radiance: [1, 1, 1]
-      Radius: 0
-      Range: 50
-      Angle: 50
-      AngleAttenuation: 20
-      Falloff: 1
-      ShadowType: None
-  - Entity: 8425643987492941149
-    TagComponent:
-      Tag: Dirlight
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    LightComponent:
-      LightType: Directional
-      Intensity: 0.5
-      Radiance: [1, 1, 1]
-      Radius: 0
-      Range: 0
-      Angle: 0
-      AngleAttenuation: 0
-      Falloff: 0
-      ShadowType: Soft
-  - Entity: 1314201770760916284
+  - Entity: 68773106929715567
     TagComponent:
       Tag: meshes[0]-102
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -56,11 +14,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 102
-  - Entity: 1636381912318471977
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 2014262237480688746
     TagComponent:
       Tag: meshes[0]-101
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -70,11 +30,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 101
-  - Entity: 17850787882634963105
+    MaterialComponent:
+      MaterialAssetHandle: 8278223127698157324
+  - Entity: 10677288483029729030
     TagComponent:
       Tag: meshes[0]-100
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -84,11 +46,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 100
-  - Entity: 1655060317731620294
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 3792847178229495625
     TagComponent:
       Tag: meshes[0]-99
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -98,11 +62,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 99
-  - Entity: 14075271591232930553
+    MaterialComponent:
+      MaterialAssetHandle: 17831964469440476419
+  - Entity: 2071457031909525510
     TagComponent:
       Tag: meshes[0]-98
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -112,11 +78,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 98
-  - Entity: 8571116895685155402
+    MaterialComponent:
+      MaterialAssetHandle: 14642036371864120044
+  - Entity: 3529015925888677223
     TagComponent:
       Tag: meshes[0]-97
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -126,11 +94,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 97
-  - Entity: 1418360023066721057
+    MaterialComponent:
+      MaterialAssetHandle: 17831964469440476419
+  - Entity: 17674902090346152342
     TagComponent:
       Tag: meshes[0]-96
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -140,11 +110,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 96
-  - Entity: 5845290966638183467
+    MaterialComponent:
+      MaterialAssetHandle: 14642036371864120044
+  - Entity: 12274385634523111195
     TagComponent:
       Tag: meshes[0]-95
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -154,11 +126,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 95
-  - Entity: 374124908131073636
+    MaterialComponent:
+      MaterialAssetHandle: 5391161249939161511
+  - Entity: 1112174333699263422
     TagComponent:
       Tag: meshes[0]-94
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -168,11 +142,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 94
-  - Entity: 12088877790788551438
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 16948095092952574302
     TagComponent:
       Tag: meshes[0]-93
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -182,11 +158,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 93
-  - Entity: 10610085778554572297
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 656251062182647387
     TagComponent:
       Tag: meshes[0]-92
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -196,11 +174,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 92
-  - Entity: 2186665901191504010
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 5173725192774081962
     TagComponent:
       Tag: meshes[0]-91
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -210,11 +190,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 91
-  - Entity: 10242207388868110923
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 4314510198520100628
     TagComponent:
       Tag: meshes[0]-90
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -224,11 +206,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 90
-  - Entity: 3362644786697578485
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 10345229275207969608
     TagComponent:
       Tag: meshes[0]-89
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -238,11 +222,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 89
-  - Entity: 3030755449001323403
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 3709208834256891651
     TagComponent:
       Tag: meshes[0]-88
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -252,11 +238,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 88
-  - Entity: 12556373602845737383
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 17110239749899191469
     TagComponent:
       Tag: meshes[0]-87
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -266,11 +254,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 87
-  - Entity: 6465862862462108590
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 16075525575600355043
     TagComponent:
       Tag: meshes[0]-86
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -280,11 +270,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 86
-  - Entity: 12072153470750289628
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 8827864180391928588
     TagComponent:
       Tag: meshes[0]-85
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -294,11 +286,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 85
-  - Entity: 449357661071762695
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 11210768454812829419
     TagComponent:
       Tag: meshes[0]-84
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -308,11 +302,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 84
-  - Entity: 12336685966352858358
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 14163428201833288817
     TagComponent:
       Tag: meshes[0]-83
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -322,11 +318,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 83
-  - Entity: 680610696326888361
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 14077785073908915143
     TagComponent:
       Tag: meshes[0]-82
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -336,11 +334,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 82
-  - Entity: 234769410207185118
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 8563913323485947423
     TagComponent:
       Tag: meshes[0]-81
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -350,11 +350,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 81
-  - Entity: 7357198632525528308
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 14934928842329421919
     TagComponent:
       Tag: meshes[0]-80
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -364,11 +366,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 80
-  - Entity: 2159107518785097291
+    MaterialComponent:
+      MaterialAssetHandle: 315054582957642575
+  - Entity: 3581966943826529017
     TagComponent:
       Tag: meshes[0]-79
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -378,11 +382,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 79
-  - Entity: 8151558575655445269
+    MaterialComponent:
+      MaterialAssetHandle: 5419891569971748178
+  - Entity: 17195224127557013309
     TagComponent:
       Tag: meshes[0]-78
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -392,11 +398,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 78
-  - Entity: 12955924970288028503
+    MaterialComponent:
+      MaterialAssetHandle: 315054582957642575
+  - Entity: 573037533287823060
     TagComponent:
       Tag: meshes[0]-77
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -406,11 +414,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 77
-  - Entity: 8375711800055498351
+    MaterialComponent:
+      MaterialAssetHandle: 5419891569971748178
+  - Entity: 7580782724195112853
     TagComponent:
       Tag: meshes[0]-76
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -420,11 +430,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 76
-  - Entity: 14524249857945587416
+    MaterialComponent:
+      MaterialAssetHandle: 315054582957642575
+  - Entity: 6176218893393256460
     TagComponent:
       Tag: meshes[0]-75
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -434,11 +446,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 75
-  - Entity: 6499059234586138177
+    MaterialComponent:
+      MaterialAssetHandle: 5419891569971748178
+  - Entity: 4160366540115363152
     TagComponent:
       Tag: meshes[0]-74
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -448,11 +462,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 74
-  - Entity: 4605732134469429491
+    MaterialComponent:
+      MaterialAssetHandle: 315054582957642575
+  - Entity: 8927360007378353509
     TagComponent:
       Tag: meshes[0]-73
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -462,11 +478,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 73
-  - Entity: 9815847972153157773
+    MaterialComponent:
+      MaterialAssetHandle: 5419891569971748178
+  - Entity: 7048785008601352993
     TagComponent:
       Tag: meshes[0]-72
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -476,11 +494,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 72
-  - Entity: 12889335825336068929
+    MaterialComponent:
+      MaterialAssetHandle: 6076043488535479756
+  - Entity: 12976665306711117534
     TagComponent:
       Tag: meshes[0]-71
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -490,11 +510,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 71
-  - Entity: 5409570459010324587
+    MaterialComponent:
+      MaterialAssetHandle: 4800535683391291506
+  - Entity: 3652237454443037135
     TagComponent:
       Tag: meshes[0]-70
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -504,11 +526,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 70
-  - Entity: 11683388924090138835
+    MaterialComponent:
+      MaterialAssetHandle: 9983490225208037327
+  - Entity: 8914740197591541233
     TagComponent:
       Tag: meshes[0]-69
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -518,11 +542,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 69
-  - Entity: 16955842559031233561
+    MaterialComponent:
+      MaterialAssetHandle: 6076043488535479756
+  - Entity: 8957846679828443138
     TagComponent:
       Tag: meshes[0]-68
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -532,11 +558,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 68
-  - Entity: 9428938661066437568
+    MaterialComponent:
+      MaterialAssetHandle: 4800535683391291506
+  - Entity: 10563215611554311804
     TagComponent:
       Tag: meshes[0]-67
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -546,11 +574,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 67
-  - Entity: 13023561937549604724
+    MaterialComponent:
+      MaterialAssetHandle: 9983490225208037327
+  - Entity: 8823317024615762372
     TagComponent:
       Tag: meshes[0]-66
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -560,11 +590,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 66
-  - Entity: 4325619154949290100
+    MaterialComponent:
+      MaterialAssetHandle: 4800535683391291506
+  - Entity: 906837824892335853
     TagComponent:
       Tag: meshes[0]-65
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -574,11 +606,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 65
-  - Entity: 4199768498322225268
+    MaterialComponent:
+      MaterialAssetHandle: 9983490225208037327
+  - Entity: 482983650605171706
     TagComponent:
       Tag: meshes[0]-64
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -588,11 +622,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 64
-  - Entity: 9100961582755117593
+    MaterialComponent:
+      MaterialAssetHandle: 4800535683391291506
+  - Entity: 16778916651760182982
     TagComponent:
       Tag: meshes[0]-63
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -602,11 +638,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 63
-  - Entity: 3290155727691842819
+    MaterialComponent:
+      MaterialAssetHandle: 6076043488535479756
+  - Entity: 16268505105592580291
     TagComponent:
       Tag: meshes[0]-62
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -616,11 +654,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 62
-  - Entity: 2948543654822533309
+    MaterialComponent:
+      MaterialAssetHandle: 3875482867786681257
+  - Entity: 14498469221680660738
     TagComponent:
       Tag: meshes[0]-61
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -630,11 +670,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 61
-  - Entity: 12408138746377775413
+    MaterialComponent:
+      MaterialAssetHandle: 9218664547528576685
+  - Entity: 2007434189678259051
     TagComponent:
       Tag: meshes[0]-60
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -644,11 +686,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 60
-  - Entity: 17061272743788999699
+    MaterialComponent:
+      MaterialAssetHandle: 6349720636887098372
+  - Entity: 2590793062092808865
     TagComponent:
       Tag: meshes[0]-59
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -658,11 +702,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 59
-  - Entity: 2166265883469357468
+    MaterialComponent:
+      MaterialAssetHandle: 17321947364324989809
+  - Entity: 12259218614867203617
     TagComponent:
       Tag: meshes[0]-58
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -672,11 +718,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 58
-  - Entity: 10907632466273574458
+    MaterialComponent:
+      MaterialAssetHandle: 9218664547528576685
+  - Entity: 5854713815946653083
     TagComponent:
       Tag: meshes[0]-57
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -686,11 +734,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 57
-  - Entity: 9724405696351965503
+    MaterialComponent:
+      MaterialAssetHandle: 17321947364324989809
+  - Entity: 9454412868165894444
     TagComponent:
       Tag: meshes[0]-56
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -700,11 +750,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 56
-  - Entity: 1616235264721860104
+    MaterialComponent:
+      MaterialAssetHandle: 6349720636887098372
+  - Entity: 11457843718543281805
     TagComponent:
       Tag: meshes[0]-55
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -714,11 +766,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 55
-  - Entity: 6033360715596300349
+    MaterialComponent:
+      MaterialAssetHandle: 9218664547528576685
+  - Entity: 14121001663763712916
     TagComponent:
       Tag: meshes[0]-54
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -728,11 +782,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 54
-  - Entity: 1801736524486790300
+    MaterialComponent:
+      MaterialAssetHandle: 17321947364324989809
+  - Entity: 17609457816015113849
     TagComponent:
       Tag: meshes[0]-53
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -742,11 +798,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 53
-  - Entity: 1812743467529483181
+    MaterialComponent:
+      MaterialAssetHandle: 10145199231822772834
+  - Entity: 369341053133964872
     TagComponent:
       Tag: meshes[0]-52
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -756,11 +814,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 52
-  - Entity: 17614978014138910442
+    MaterialComponent:
+      MaterialAssetHandle: 3875482867786681257
+  - Entity: 4283696612192874211
     TagComponent:
       Tag: meshes[0]-51
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -770,11 +830,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 51
-  - Entity: 339487209109217313
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 789282760313106364
     TagComponent:
       Tag: meshes[0]-50
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -784,11 +846,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 50
-  - Entity: 17211099835809986089
+    MaterialComponent:
+      MaterialAssetHandle: 18105407233451865500
+  - Entity: 1579898941644738786
     TagComponent:
       Tag: meshes[0]-49
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -798,11 +862,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 49
-  - Entity: 16433023260453914394
+    MaterialComponent:
+      MaterialAssetHandle: 17819237159177165291
+  - Entity: 13310617351176651348
     TagComponent:
       Tag: meshes[0]-48
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -812,11 +878,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 48
-  - Entity: 5133791021845317058
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 18302588332199747247
     TagComponent:
       Tag: meshes[0]-47
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -826,11 +894,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 47
-  - Entity: 10644969536140299295
+    MaterialComponent:
+      MaterialAssetHandle: 8806939820104651199
+  - Entity: 17866733450311172255
     TagComponent:
       Tag: meshes[0]-46
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -840,11 +910,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 46
-  - Entity: 4145497881552445067
+    MaterialComponent:
+      MaterialAssetHandle: 12852930458356537731
+  - Entity: 8394804946757017492
     TagComponent:
       Tag: meshes[0]-45
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -854,11 +926,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 45
-  - Entity: 5702762689972015310
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 9987639612654134539
     TagComponent:
       Tag: meshes[0]-44
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -868,11 +942,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 44
-  - Entity: 10484384733993709323
+    MaterialComponent:
+      MaterialAssetHandle: 11050714543861955359
+  - Entity: 14192067068365301411
     TagComponent:
       Tag: meshes[0]-43
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -882,11 +958,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 43
-  - Entity: 16652614801261049329
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 13485023014609902972
     TagComponent:
       Tag: meshes[0]-42
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -896,11 +974,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 42
-  - Entity: 18231486846302431595
+    MaterialComponent:
+      MaterialAssetHandle: 16425414488360459326
+  - Entity: 13459305963256195798
     TagComponent:
       Tag: meshes[0]-41
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -910,11 +990,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 41
-  - Entity: 15116717258183741643
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 14166762872883485848
     TagComponent:
       Tag: meshes[0]-40
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -924,11 +1006,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 40
-  - Entity: 1898228505852216584
+    MaterialComponent:
+      MaterialAssetHandle: 16425414488360459326
+  - Entity: 14444573617347972175
     TagComponent:
       Tag: meshes[0]-39
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -938,11 +1022,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 39
-  - Entity: 9761612941910088679
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 4402317576300181045
     TagComponent:
       Tag: meshes[0]-38
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -952,11 +1038,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 38
-  - Entity: 12898403526148663265
+    MaterialComponent:
+      MaterialAssetHandle: 16425414488360459326
+  - Entity: 11908199953228953186
     TagComponent:
       Tag: meshes[0]-37
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -966,11 +1054,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 37
-  - Entity: 3962671009748627650
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 7783672951406708434
     TagComponent:
       Tag: meshes[0]-36
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -980,11 +1070,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 36
-  - Entity: 17264012407174205027
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 7247017677009725021
     TagComponent:
       Tag: meshes[0]-35
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -994,11 +1086,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 35
-  - Entity: 13587026153301255028
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 1131751770497923646
     TagComponent:
       Tag: meshes[0]-34
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1008,11 +1102,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 34
-  - Entity: 15757410177300829557
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 2132221894363609054
     TagComponent:
       Tag: meshes[0]-33
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1022,11 +1118,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 33
-  - Entity: 2292873482948306998
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 17652651640857993928
     TagComponent:
       Tag: meshes[0]-32
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1036,11 +1134,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 32
-  - Entity: 13666922256473589620
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 7899228126368396119
     TagComponent:
       Tag: meshes[0]-31
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1050,11 +1150,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 31
-  - Entity: 7916849248232095244
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 17070102365748109874
     TagComponent:
       Tag: meshes[0]-30
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1064,11 +1166,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 30
-  - Entity: 9630552871498056311
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 2121159027820535627
     TagComponent:
       Tag: meshes[0]-29
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1078,11 +1182,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 29
-  - Entity: 1979145181031937936
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 3910337078685163601
     TagComponent:
       Tag: meshes[0]-28
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1092,11 +1198,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 28
-  - Entity: 2238410802079077572
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 8610616454527242295
     TagComponent:
       Tag: meshes[0]-27
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1106,11 +1214,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 27
-  - Entity: 13566152015428970817
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 7339167149752572315
     TagComponent:
       Tag: meshes[0]-26
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1120,11 +1230,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 26
-  - Entity: 6437435811378669033
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 10756282365714680631
     TagComponent:
       Tag: meshes[0]-25
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1134,11 +1246,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 25
-  - Entity: 9411329382502920632
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 16550312068027438493
     TagComponent:
       Tag: meshes[0]-24
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1148,11 +1262,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 24
-  - Entity: 14683127527785969241
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 407221386852337555
     TagComponent:
       Tag: meshes[0]-23
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1162,11 +1278,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 23
-  - Entity: 10024802608176513884
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 10078183060311292415
     TagComponent:
       Tag: meshes[0]-22
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1176,11 +1294,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 22
-  - Entity: 6765940141844105759
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 15292761290590819440
     TagComponent:
       Tag: meshes[0]-21
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1190,11 +1310,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 21
-  - Entity: 11663713548045468472
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 5794370193645735742
     TagComponent:
       Tag: meshes[0]-20
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1204,11 +1326,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 20
-  - Entity: 12972936020338212858
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 2745468265451010324
     TagComponent:
       Tag: meshes[0]-19
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1218,11 +1342,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 19
-  - Entity: 10957710348765094613
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 14170484874144672794
     TagComponent:
       Tag: meshes[0]-18
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1232,11 +1358,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 18
-  - Entity: 819405049973987462
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 6529658672090606578
     TagComponent:
       Tag: meshes[0]-17
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1246,11 +1374,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 17
-  - Entity: 13048253508324795469
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 6430315212088884366
     TagComponent:
       Tag: meshes[0]-16
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1260,11 +1390,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 16
-  - Entity: 9962036313519182570
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 1460589131153089814
     TagComponent:
       Tag: meshes[0]-15
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1274,11 +1406,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 15
-  - Entity: 11053093778439232244
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 4147910853375789401
     TagComponent:
       Tag: meshes[0]-14
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1288,11 +1422,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 14
-  - Entity: 11749710309132513719
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 56216642139052419
     TagComponent:
       Tag: meshes[0]-13
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1302,11 +1438,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 13
-  - Entity: 5357547888816813559
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 4259305452218281937
     TagComponent:
       Tag: meshes[0]-12
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1316,11 +1454,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 12
-  - Entity: 11035850182385955856
+    MaterialComponent:
+      MaterialAssetHandle: 11050714543861955359
+  - Entity: 9175537330789979285
     TagComponent:
       Tag: meshes[0]-11
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1330,11 +1470,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 11
-  - Entity: 8788646282483301449
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 13581707807188384084
     TagComponent:
       Tag: meshes[0]-10
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1344,11 +1486,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 10
-  - Entity: 5197227205421395391
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 2963096098078002668
     TagComponent:
       Tag: meshes[0]-9
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1358,11 +1502,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 9
-  - Entity: 14510552314604124428
+    MaterialComponent:
+      MaterialAssetHandle: 12852930458356537731
+  - Entity: 3696290667540379346
     TagComponent:
       Tag: meshes[0]-8
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1372,11 +1518,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 8
-  - Entity: 2999724119976044224
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 18253023502689998466
     TagComponent:
       Tag: meshes[0]-7
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1386,11 +1534,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 7
-  - Entity: 3915141507164512135
+    MaterialComponent:
+      MaterialAssetHandle: 8806939820104651199
+  - Entity: 15095715217553772904
     TagComponent:
       Tag: meshes[0]-6
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1400,11 +1550,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 6
-  - Entity: 17110498912658439349
+    MaterialComponent:
+      MaterialAssetHandle: 17129831314228467046
+  - Entity: 14945286325659503648
     TagComponent:
       Tag: meshes[0]-5
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1414,11 +1566,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 5
-  - Entity: 2999855593670008573
+    MaterialComponent:
+      MaterialAssetHandle: 384142477851218161
+  - Entity: 14453562238341184044
     TagComponent:
       Tag: meshes[0]-4
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1428,11 +1582,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 4
-  - Entity: 2808714857313388494
+    MaterialComponent:
+      MaterialAssetHandle: 14231379175454349031
+  - Entity: 12010452883368417149
     TagComponent:
       Tag: meshes[0]-3
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1442,11 +1598,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 3
-  - Entity: 5898028762336247204
+    MaterialComponent:
+      MaterialAssetHandle: 17831964469440476419
+  - Entity: 5333672242958541784
     TagComponent:
       Tag: meshes[0]-2
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1456,11 +1614,13 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 2
-  - Entity: 15074263237098621882
+    MaterialComponent:
+      MaterialAssetHandle: 3112889418963515402
+  - Entity: 10398394004685068987
     TagComponent:
       Tag: meshes[0]-1
     RelationshipComponent:
-      Parent: 2961150424659581487
+      Parent: 3598590178451846697
       Children:
         []
     TransformComponent:
@@ -1470,1564 +1630,126 @@ Entities:
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 1
-  - Entity: 9431967094388230866
-    TagComponent:
-      Tag: Skylight
-    RelationshipComponent:
-      Parent: 0
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SkyLightComponent:
-      Intensity: 1
-      EnvMapHandle: 5796823861923018421
-  - Entity: 2961150424659581487
+    MaterialComponent:
+      MaterialAssetHandle: 8869615096401155199
+  - Entity: 3598590178451846697
     TagComponent:
       Tag: meshes[0]-0
     RelationshipComponent:
       Parent: 0
       Children:
-        - Handle: 15074263237098621882
-        - Handle: 5898028762336247204
-        - Handle: 2808714857313388494
-        - Handle: 2999855593670008573
-        - Handle: 17110498912658439349
-        - Handle: 3915141507164512135
-        - Handle: 2999724119976044224
-        - Handle: 14510552314604124428
-        - Handle: 5197227205421395391
-        - Handle: 8788646282483301449
-        - Handle: 11035850182385955856
-        - Handle: 5357547888816813559
-        - Handle: 11749710309132513719
-        - Handle: 11053093778439232244
-        - Handle: 9962036313519182570
-        - Handle: 13048253508324795469
-        - Handle: 819405049973987462
-        - Handle: 10957710348765094613
-        - Handle: 12972936020338212858
-        - Handle: 11663713548045468472
-        - Handle: 6765940141844105759
-        - Handle: 10024802608176513884
-        - Handle: 14683127527785969241
-        - Handle: 9411329382502920632
-        - Handle: 6437435811378669033
-        - Handle: 13566152015428970817
-        - Handle: 2238410802079077572
-        - Handle: 1979145181031937936
-        - Handle: 9630552871498056311
-        - Handle: 7916849248232095244
-        - Handle: 13666922256473589620
-        - Handle: 2292873482948306998
-        - Handle: 15757410177300829557
-        - Handle: 13587026153301255028
-        - Handle: 17264012407174205027
-        - Handle: 3962671009748627650
-        - Handle: 12898403526148663265
-        - Handle: 9761612941910088679
-        - Handle: 1898228505852216584
-        - Handle: 15116717258183741643
-        - Handle: 18231486846302431595
-        - Handle: 16652614801261049329
-        - Handle: 10484384733993709323
-        - Handle: 5702762689972015310
-        - Handle: 4145497881552445067
-        - Handle: 10644969536140299295
-        - Handle: 5133791021845317058
-        - Handle: 16433023260453914394
-        - Handle: 17211099835809986089
-        - Handle: 339487209109217313
-        - Handle: 17614978014138910442
-        - Handle: 1812743467529483181
-        - Handle: 1801736524486790300
-        - Handle: 6033360715596300349
-        - Handle: 1616235264721860104
-        - Handle: 9724405696351965503
-        - Handle: 10907632466273574458
-        - Handle: 2166265883469357468
-        - Handle: 17061272743788999699
-        - Handle: 12408138746377775413
-        - Handle: 2948543654822533309
-        - Handle: 3290155727691842819
-        - Handle: 9100961582755117593
-        - Handle: 4199768498322225268
-        - Handle: 4325619154949290100
-        - Handle: 13023561937549604724
-        - Handle: 9428938661066437568
-        - Handle: 16955842559031233561
-        - Handle: 11683388924090138835
-        - Handle: 5409570459010324587
-        - Handle: 12889335825336068929
-        - Handle: 9815847972153157773
-        - Handle: 4605732134469429491
-        - Handle: 6499059234586138177
-        - Handle: 14524249857945587416
-        - Handle: 8375711800055498351
-        - Handle: 12955924970288028503
-        - Handle: 8151558575655445269
-        - Handle: 2159107518785097291
-        - Handle: 7357198632525528308
-        - Handle: 234769410207185118
-        - Handle: 680610696326888361
-        - Handle: 12336685966352858358
-        - Handle: 449357661071762695
-        - Handle: 12072153470750289628
-        - Handle: 6465862862462108590
-        - Handle: 12556373602845737383
-        - Handle: 3030755449001323403
-        - Handle: 3362644786697578485
-        - Handle: 10242207388868110923
-        - Handle: 2186665901191504010
-        - Handle: 10610085778554572297
-        - Handle: 12088877790788551438
-        - Handle: 374124908131073636
-        - Handle: 5845290966638183467
-        - Handle: 1418360023066721057
-        - Handle: 8571116895685155402
-        - Handle: 14075271591232930553
-        - Handle: 1655060317731620294
-        - Handle: 17850787882634963105
-        - Handle: 1636381912318471977
-        - Handle: 1314201770760916284
+        - Handle: 10398394004685068987
+        - Handle: 5333672242958541784
+        - Handle: 12010452883368417149
+        - Handle: 14453562238341184044
+        - Handle: 14945286325659503648
+        - Handle: 15095715217553772904
+        - Handle: 18253023502689998466
+        - Handle: 3696290667540379346
+        - Handle: 2963096098078002668
+        - Handle: 13581707807188384084
+        - Handle: 9175537330789979285
+        - Handle: 4259305452218281937
+        - Handle: 56216642139052419
+        - Handle: 4147910853375789401
+        - Handle: 1460589131153089814
+        - Handle: 6430315212088884366
+        - Handle: 6529658672090606578
+        - Handle: 14170484874144672794
+        - Handle: 2745468265451010324
+        - Handle: 5794370193645735742
+        - Handle: 15292761290590819440
+        - Handle: 10078183060311292415
+        - Handle: 407221386852337555
+        - Handle: 16550312068027438493
+        - Handle: 10756282365714680631
+        - Handle: 7339167149752572315
+        - Handle: 8610616454527242295
+        - Handle: 3910337078685163601
+        - Handle: 2121159027820535627
+        - Handle: 17070102365748109874
+        - Handle: 7899228126368396119
+        - Handle: 17652651640857993928
+        - Handle: 2132221894363609054
+        - Handle: 1131751770497923646
+        - Handle: 7247017677009725021
+        - Handle: 7783672951406708434
+        - Handle: 11908199953228953186
+        - Handle: 4402317576300181045
+        - Handle: 14444573617347972175
+        - Handle: 14166762872883485848
+        - Handle: 13459305963256195798
+        - Handle: 13485023014609902972
+        - Handle: 14192067068365301411
+        - Handle: 9987639612654134539
+        - Handle: 8394804946757017492
+        - Handle: 17866733450311172255
+        - Handle: 18302588332199747247
+        - Handle: 13310617351176651348
+        - Handle: 1579898941644738786
+        - Handle: 789282760313106364
+        - Handle: 4283696612192874211
+        - Handle: 369341053133964872
+        - Handle: 17609457816015113849
+        - Handle: 14121001663763712916
+        - Handle: 11457843718543281805
+        - Handle: 9454412868165894444
+        - Handle: 5854713815946653083
+        - Handle: 12259218614867203617
+        - Handle: 2590793062092808865
+        - Handle: 2007434189678259051
+        - Handle: 14498469221680660738
+        - Handle: 16268505105592580291
+        - Handle: 16778916651760182982
+        - Handle: 482983650605171706
+        - Handle: 906837824892335853
+        - Handle: 8823317024615762372
+        - Handle: 10563215611554311804
+        - Handle: 8957846679828443138
+        - Handle: 8914740197591541233
+        - Handle: 3652237454443037135
+        - Handle: 12976665306711117534
+        - Handle: 7048785008601352993
+        - Handle: 8927360007378353509
+        - Handle: 4160366540115363152
+        - Handle: 6176218893393256460
+        - Handle: 7580782724195112853
+        - Handle: 573037533287823060
+        - Handle: 17195224127557013309
+        - Handle: 3581966943826529017
+        - Handle: 14934928842329421919
+        - Handle: 8563913323485947423
+        - Handle: 14077785073908915143
+        - Handle: 14163428201833288817
+        - Handle: 11210768454812829419
+        - Handle: 8827864180391928588
+        - Handle: 16075525575600355043
+        - Handle: 17110239749899191469
+        - Handle: 3709208834256891651
+        - Handle: 10345229275207969608
+        - Handle: 4314510198520100628
+        - Handle: 5173725192774081962
+        - Handle: 656251062182647387
+        - Handle: 16948095092952574302
+        - Handle: 1112174333699263422
+        - Handle: 12274385634523111195
+        - Handle: 17674902090346152342
+        - Handle: 3529015925888677223
+        - Handle: 2071457031909525510
+        - Handle: 3792847178229495625
+        - Handle: 10677288483029729030
+        - Handle: 2014262237480688746
+        - Handle: 68773106929715567
     TransformComponent:
       Translation: [0, 0, 0]
       Rotation: [0, 0, 0]
-      Scale: [0.100000001, 0.100000001, 0.100000001]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 13450678788710819440
-    TagComponent:
-      Tag: meshes[0]-1
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14707919907417054733
-    TagComponent:
-      Tag: meshes[0]-2
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14607600526678388607
-    TagComponent:
-      Tag: meshes[0]-3
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 3832548770247002236
-    TagComponent:
-      Tag: meshes[0]-4
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 17451667103398801118
-    TagComponent:
-      Tag: meshes[0]-5
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 13817372229712190250
-    TagComponent:
-      Tag: meshes[0]-6
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1298635475914319308
-    TagComponent:
-      Tag: meshes[0]-7
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 11353427281214802913
-    TagComponent:
-      Tag: meshes[0]-8
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 7691893976422553382
-    TagComponent:
-      Tag: meshes[0]-9
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 10567586940496398056
-    TagComponent:
-      Tag: meshes[0]-10
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 16394689128620579164
-    TagComponent:
-      Tag: meshes[0]-11
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 709785429557746874
-    TagComponent:
-      Tag: meshes[0]-12
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 18194695352615455528
-    TagComponent:
-      Tag: meshes[0]-13
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 11338369027414784071
-    TagComponent:
-      Tag: meshes[0]-14
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 948176845236216108
-    TagComponent:
-      Tag: meshes[0]-15
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 9444499486151175217
-    TagComponent:
-      Tag: meshes[0]-16
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 2600336786255566713
-    TagComponent:
-      Tag: meshes[0]-17
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 8607718608600265426
-    TagComponent:
-      Tag: meshes[0]-18
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 7733917745234594088
-    TagComponent:
-      Tag: meshes[0]-19
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 6905935394485672878
-    TagComponent:
-      Tag: meshes[0]-20
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 4794613652211491645
-    TagComponent:
-      Tag: meshes[0]-21
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 7287026023367598383
-    TagComponent:
-      Tag: meshes[0]-22
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 10493703582168189772
-    TagComponent:
-      Tag: meshes[0]-23
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 13981496079231322133
-    TagComponent:
-      Tag: meshes[0]-24
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 4345931291696437542
-    TagComponent:
-      Tag: meshes[0]-25
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15959808573268355378
-    TagComponent:
-      Tag: meshes[0]-26
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 16669372069048400158
-    TagComponent:
-      Tag: meshes[0]-27
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 5875709015725110100
-    TagComponent:
-      Tag: meshes[0]-28
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14828018142200421239
-    TagComponent:
-      Tag: meshes[0]-29
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 17245110940478327791
-    TagComponent:
-      Tag: meshes[0]-30
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 12657142167856652080
-    TagComponent:
-      Tag: meshes[0]-31
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 17463145518263523780
-    TagComponent:
-      Tag: meshes[0]-32
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15952472649168955898
-    TagComponent:
-      Tag: meshes[0]-33
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15239950563314759003
-    TagComponent:
-      Tag: meshes[0]-34
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14421331786166158474
-    TagComponent:
-      Tag: meshes[0]-35
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 6221989211643909452
-    TagComponent:
-      Tag: meshes[0]-36
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 18298780812800613849
-    TagComponent:
-      Tag: meshes[0]-37
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 4466054184798944232
-    TagComponent:
-      Tag: meshes[0]-38
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 9814763053488032714
-    TagComponent:
-      Tag: meshes[0]-39
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14672040320149485240
-    TagComponent:
-      Tag: meshes[0]-40
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 16858556611904934180
-    TagComponent:
-      Tag: meshes[0]-41
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 7890696578256897244
-    TagComponent:
-      Tag: meshes[0]-42
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14104317847800731344
-    TagComponent:
-      Tag: meshes[0]-43
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 5762215764566788180
-    TagComponent:
-      Tag: meshes[0]-44
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 3412883509821103814
-    TagComponent:
-      Tag: meshes[0]-45
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 2884314988863996891
-    TagComponent:
-      Tag: meshes[0]-46
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 13407027907002222081
-    TagComponent:
-      Tag: meshes[0]-47
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 11716998849389665230
-    TagComponent:
-      Tag: meshes[0]-48
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 5614894726985247782
-    TagComponent:
-      Tag: meshes[0]-49
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1955177461164678792
-    TagComponent:
-      Tag: meshes[0]-50
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 6927174329911997654
-    TagComponent:
-      Tag: meshes[0]-51
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14127732204836861850
-    TagComponent:
-      Tag: meshes[0]-52
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 6596528360779207702
-    TagComponent:
-      Tag: meshes[0]-53
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 187141545397806382
-    TagComponent:
-      Tag: meshes[0]-54
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 3543118237585531513
-    TagComponent:
-      Tag: meshes[0]-55
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1165558165652243615
-    TagComponent:
-      Tag: meshes[0]-56
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 2074507328587742413
-    TagComponent:
-      Tag: meshes[0]-57
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 17915036520217540995
-    TagComponent:
-      Tag: meshes[0]-58
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 9764696057302320878
-    TagComponent:
-      Tag: meshes[0]-59
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 3310086505373697312
-    TagComponent:
-      Tag: meshes[0]-60
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 2549699679355283780
-    TagComponent:
-      Tag: meshes[0]-61
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 8752928605704629192
-    TagComponent:
-      Tag: meshes[0]-62
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14805700179197938105
-    TagComponent:
-      Tag: meshes[0]-63
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 7069979732686513972
-    TagComponent:
-      Tag: meshes[0]-64
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 8823011815634065127
-    TagComponent:
-      Tag: meshes[0]-65
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 6520210522936091434
-    TagComponent:
-      Tag: meshes[0]-66
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 8530421055914158842
-    TagComponent:
-      Tag: meshes[0]-67
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 3972099459571963670
-    TagComponent:
-      Tag: meshes[0]-68
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15451920456949229753
-    TagComponent:
-      Tag: meshes[0]-69
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 18266811252539011874
-    TagComponent:
-      Tag: meshes[0]-70
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 4734598148323861965
-    TagComponent:
-      Tag: meshes[0]-71
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 4564098959852276206
-    TagComponent:
-      Tag: meshes[0]-72
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15138035402304287884
-    TagComponent:
-      Tag: meshes[0]-73
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 17897938910040969603
-    TagComponent:
-      Tag: meshes[0]-74
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15680275288697333577
-    TagComponent:
-      Tag: meshes[0]-75
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 12765880147371646238
-    TagComponent:
-      Tag: meshes[0]-76
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14451050406052521393
-    TagComponent:
-      Tag: meshes[0]-77
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1257602256914631332
-    TagComponent:
-      Tag: meshes[0]-78
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 12238449767826936049
-    TagComponent:
-      Tag: meshes[0]-79
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 2672658301260807384
-    TagComponent:
-      Tag: meshes[0]-80
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 16522502962163265602
-    TagComponent:
-      Tag: meshes[0]-81
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 11748877512780904653
-    TagComponent:
-      Tag: meshes[0]-82
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 16145295821829659460
-    TagComponent:
-      Tag: meshes[0]-83
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 359515015773288497
-    TagComponent:
-      Tag: meshes[0]-84
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 12005902768657246332
-    TagComponent:
-      Tag: meshes[0]-85
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 11140525218829628317
-    TagComponent:
-      Tag: meshes[0]-86
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1130721489266076942
-    TagComponent:
-      Tag: meshes[0]-87
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 16622238095353397018
-    TagComponent:
-      Tag: meshes[0]-88
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 5275324930858136327
-    TagComponent:
-      Tag: meshes[0]-89
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1638917422745567723
-    TagComponent:
-      Tag: meshes[0]-90
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 15734130749677872314
-    TagComponent:
-      Tag: meshes[0]-91
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 208903296772349781
-    TagComponent:
-      Tag: meshes[0]-92
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 2213356806934267066
-    TagComponent:
-      Tag: meshes[0]-93
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 10731805052166348350
-    TagComponent:
-      Tag: meshes[0]-94
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 1177499673949937190
-    TagComponent:
-      Tag: meshes[0]-95
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14851282928506430378
-    TagComponent:
-      Tag: meshes[0]-96
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 13163737085858709505
-    TagComponent:
-      Tag: meshes[0]-97
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 13756344743336175501
-    TagComponent:
-      Tag: meshes[0]-98
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 894083137632040013
-    TagComponent:
-      Tag: meshes[0]-99
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 14136216947261014915
-    TagComponent:
-      Tag: meshes[0]-100
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 5052241932672788615
-    TagComponent:
-      Tag: meshes[0]-101
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      MeshSourceHandle: 666927332699581675
-      SubmeshIndex: 0
-  - Entity: 7507662883936003362
-    TagComponent:
-      Tag: meshes[0]-102
-    RelationshipComponent:
-      Parent: 7557022440664537824
-      Children:
-        []
-    TransformComponent:
-      Translation: [0, 0, 0]
-      Rotation: [0, -0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
       MeshSourceHandle: 666927332699581675
       SubmeshIndex: 0
-  - Entity: 121084385879951601
+    MaterialComponent:
+      MaterialAssetHandle: 10145199231822772834
+  - Entity: 6586900246761303647
     TagComponent:
       Tag: Pointlight
     RelationshipComponent:
@@ -3035,7 +1757,7 @@ Entities:
       Children:
         []
     TransformComponent:
-      Translation: [-24.847681, 15.0024042, 0]
+      Translation: [22.9502773, 15.0024042, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     LightComponent:
@@ -3069,7 +1791,7 @@ Entities:
       AngleAttenuation: 0
       Falloff: 1
       ShadowType: None
-  - Entity: 6586900246761303647
+  - Entity: 121084385879951601
     TagComponent:
       Tag: Pointlight
     RelationshipComponent:
@@ -3077,7 +1799,7 @@ Entities:
       Children:
         []
     TransformComponent:
-      Translation: [22.9502773, 15.0024042, 0]
+      Translation: [-24.847681, 15.0024042, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     LightComponent:
@@ -3088,5 +1810,61 @@ Entities:
       Range: 0
       Angle: 0
       AngleAttenuation: 0
+      Falloff: 1
+      ShadowType: None
+  - Entity: 9431967094388230866
+    TagComponent:
+      Tag: Skylight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SkyLightComponent:
+      Intensity: 1
+      EnvMapHandle: 5796823861923018421
+  - Entity: 8425643987492941149
+    TagComponent:
+      Tag: Dirlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Directional
+      Intensity: 0.5
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 0
+      ShadowType: Soft
+  - Entity: 18174999149445251794
+    TagComponent:
+      Tag: Spotlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [122.91481, 0.882739305, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Spot
+      Intensity: 5
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 50
+      Angle: 50
+      AngleAttenuation: 20
       Falloff: 1
       ShadowType: None
