@@ -351,8 +351,6 @@ namespace Hanabi
 
 		UI::DrawComponent<MaterialComponent>("Material", entity, [&](auto& component)
 			{
-				UI::DrawAssetControl("Material", component.MaterialAssetHandle, AssetType::Material);
-
 				Ref<MaterialAsset> materialAsset = nullptr;
 				if (AssetManager::IsAssetHandleValid(component.MaterialAssetHandle))
 				{
@@ -378,13 +376,14 @@ namespace Hanabi
 					}
 				}
 
+				UI::DrawAssetControl("Material", component.MaterialAssetHandle, AssetType::Material);		
+
 				if (materialAsset)
 				{
 					bool isMemoryAsset = AssetManager::IsMemoryAsset(component.MaterialAssetHandle);
 
 					AssetHandle tempAlbedoHandle = materialAsset->GetAlbedoTexHandle();
-					AssetHandle tempMetalnessHandle = materialAsset->GetMetalnessTexHandle();
-					AssetHandle tempRoughnessHandle = materialAsset->GetRoughnessTexHandle();
+					AssetHandle metallicRoughnessHandle = materialAsset->GetMetallicRoughnessTexHandle(); 
 					AssetHandle tempNormalHandle = materialAsset->GetNormalTexHandle();
 
 					if (ImGui::CollapsingHeader("Albedo Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
@@ -414,29 +413,17 @@ namespace Hanabi
 						}
 					}
 
-					if (ImGui::CollapsingHeader("Metalness Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+					if (ImGui::CollapsingHeader("Metalness and Roughness Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						UI::DrawAssetControl("Metalness Texture", tempMetalnessHandle);
+						UI::DrawAssetControl("Metalness and Roughness Texture", metallicRoughnessHandle);
 						float tempMetalness = materialAsset->GetMetalness();
+						float tempRoughness = materialAsset->GetRoughness();
 						if (ImGui::DragFloat("Metalness", &tempMetalness, 0.01f, 0.0f, 1.0f))
 						{
 							materialAsset->SetMetalness(tempMetalness);
 							if (!isMemoryAsset)
 								AssetImporter::Serialize(materialAsset);
 						}
-
-						if (tempMetalnessHandle != materialAsset->GetMetalnessTexHandle())
-						{
-							materialAsset->SetMetalnessTex(tempMetalnessHandle);
-							if (!isMemoryAsset)
-								AssetImporter::Serialize(materialAsset);
-						}
-					}
-
-					if (ImGui::CollapsingHeader("Roughness Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-					{
-						UI::DrawAssetControl("Roughness Texture", tempRoughnessHandle);
-						float tempRoughness = materialAsset->GetRoughness();
 						if (ImGui::DragFloat("Roughness", &tempRoughness, 0.01f, 0.0f, 1.0f))
 						{
 							materialAsset->SetRoughness(tempRoughness);
@@ -444,9 +431,9 @@ namespace Hanabi
 								AssetImporter::Serialize(materialAsset);
 						}
 
-						if (tempRoughnessHandle != materialAsset->GetRoughnessTexHandle())
+						if (metallicRoughnessHandle != materialAsset->GetMetallicRoughnessTexHandle())
 						{
-							materialAsset->SetRoughnessTex(tempRoughnessHandle);
+							materialAsset->SetMetallicRoughnessTex(metallicRoughnessHandle);
 							if (!isMemoryAsset)
 								AssetImporter::Serialize(materialAsset);
 						}

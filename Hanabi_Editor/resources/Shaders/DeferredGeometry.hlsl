@@ -30,6 +30,8 @@ VertexOutput main(VertexInput Input)
     Output.WorldPosition = worldPosition.xyz;  
     Output.TexCoord = Input.a_TexCoord;
     Output.Normal = mul((float3x3)u_Transform, Input.a_Normal);
+    // Notice: float3x3 constructor may pack the matrix in row-major order, so we need to transpose it
+    // It seems like GLSL mat3 constructor packs the matrix in column-major order
     Output.TBN = mul((float3x3)u_Transform, transpose(float3x3(Input.a_Tangent, Input.a_Bitangent, Input.a_Normal)));
     Output.Position = mul(u_ViewProjection, worldPosition);
     return Output;
@@ -57,18 +59,17 @@ struct PixelOutput
 };
 
 Texture2D u_AlbedoTex : register(t0);
-Texture2D u_MetalnessTex : register(t1);
-Texture2D u_RoughnessTex : register(t2);
-Texture2D u_NormalTex : register(t3);
+Texture2D u_MetallicRoughnessTex : register(t1);
+Texture2D u_NormalTex : register(t2);
 
 PixelOutput main(PixelInput Input)
 {
     PixelOutput Output;
     float4 albedo = u_AlbedoTex.Sample(u_SSAnisotropicWrap, Input.TexCoord);
-    // Notice: Metalness and Roughness could be in the same texture
-    //         Use GLTF spec, Metalness is in B channel, Roughness is in G channel
-    float metalness = u_MetalnessTex.Sample(u_SSLinearWrap, Input.TexCoord).b * u_Material.Metalness;
-    float roughness = u_RoughnessTex.Sample(u_SSLinearWrap, Input.TexCoord).g * u_Material.Roughness;
+    // Notice: Use GLTF spec, Metalness is in B channel, Roughness is in G channel
+    float4 metallicRoughness = u_MetallicRoughnessTex.Sample(u_SSLinearWrap, Input.TexCoord);
+    float metalness = metallicRoughness.b * u_Material.Metalness;
+    float roughness = metallicRoughness.g * u_Material.Roughness;
 
     float3 normal = normalize(Input.Normal);
     if (u_Material.UseNormalMap)
@@ -77,7 +78,7 @@ PixelOutput main(PixelInput Input)
         normal = normalize(mul(Input.TBN, normal));
     }
 
-    // Texture is created in UNORM format, so we need to convert it to linear space
+    // Convert albedo from sRGB to linear space
     albedo.rgb = SRGBToLinear(albedo.rgb, 2.2f);
     Output.Albedo = float4(albedo.rgb * u_Material.Albedo, albedo.a);
     // Minimum roughness of 0.05 to keep specular highlight

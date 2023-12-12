@@ -35,6 +35,9 @@ namespace Hanabi
 		const glm::mat4& GetViewMatrix() const { return m_ViewMatrix; }
 		glm::mat4 GetViewProjection() const { return GetProjection() * m_ViewMatrix; }
 
+		float GetNearClip() const { return m_NearClip; }
+		float GetFarClip() const { return m_FarClip; }
+
 		glm::vec3 GetUpDirection() const;
 		glm::vec3 GetRightDirection() const;
 		glm::vec3 GetForwardDirection() const;

@@ -26,7 +26,6 @@ namespace Hanabi
 		void OnDuplicateEntity();
 
 		Ref<Scene> m_Context;
-		Ref<Image2D> m_ViewPortImage;
 		bool m_ViewportHovered = false;
 		Entity m_HoveredEntity;
 		EditorCamera m_EditorCamera;

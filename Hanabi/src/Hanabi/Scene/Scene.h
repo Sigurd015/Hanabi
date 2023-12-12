@@ -47,6 +47,10 @@ namespace Hanabi
 	struct Environment
 	{
 		glm::vec3 CameraPosition;
+		float CameraNearClip;
+		float CameraFarClip;
+		glm::mat4 View;
+		glm::mat4 Projection;
 		glm::mat4 ViewProjection;
 
 		AssetHandle EnvMapHandle = 0;

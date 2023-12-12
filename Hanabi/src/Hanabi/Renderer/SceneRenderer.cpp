@@ -6,6 +6,9 @@
 #include "EnvMapAsset.h"
 #include "Hanabi/Asset/AssetManager/AssetManager.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/compatibility.hpp>
+
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
@@ -150,6 +153,7 @@ namespace Hanabi
 			CBModel ModelData;
 		};
 		std::vector<GeoDrawCommand> DrawCommands;
+		SceneRenderer::Statistics RendererStats;
 	};
 	static SceneRendererData* s_Data;
 
@@ -186,7 +190,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::RGBA,
+				spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::RGBA16F,
 					ImageFormat::RGBA16F,ImageFormat::RGBA16F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
@@ -352,14 +356,31 @@ namespace Hanabi
 		if (fbsc.Width != width || fbsc.Height != height)
 		{
 			// TODO: Resize color attachment and depth attachment
-			//s_Data->DeferredGeoPass->GetTargetFramebuffer()->Resize(width, height);
-			//s_Data->DeferredLightingPass->GetTargetFramebuffer()->Resize(width, height);
-			//s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
+			/*	s_Data->DeferredGeoPass->GetTargetFramebuffer()->Resize(width, height);
+				s_Data->DeferredLightingPass->GetTargetFramebuffer()->Resize(width, height);
+				s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
+
+				{
+					Ref<Framebuffer> framebuffer;
+					{
+						FramebufferSpecification spec;
+						spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::Depth };
+						spec.Width = width;
+						spec.Height = height;
+						spec.SwapChainTarget = false;
+						spec.ExistingImages[0] = s_Data->CompositePass->GetOutput(0);
+						spec.ExistingImages[1] = s_Data->DeferredGeoPass->GetDepthOutput();
+						framebuffer = Framebuffer::Create(spec);
+					}
+					s_Data->SkyboxPass->GetPipeline()->GetSpecification().TargetFramebuffer = framebuffer;
+				}*/
 		}
 	}
 
 	void SceneRenderer::BeginScene(const Ref<Environment> environment)
 	{
+		ResetStats();
+
 		s_Data->CameraData.ViewProj = environment->ViewProjection;
 		s_Data->CameraData.CameraPosition = environment->CameraPosition;
 		s_Data->CameraDataBuffer->SetData(&s_Data->CameraData);
@@ -473,6 +494,11 @@ namespace Hanabi
 		return s_Data->DeferredGeoPass->GetOutput(3);
 	}
 
+	Ref<Image2D> SceneRenderer::GetDirShadowMap()
+	{
+		return s_Data->DirShadowMapPass->GetDepthOutput();
+	}
+
 	void SceneRenderer::SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle overrideMaterialHandle)
 	{
 		if (meshComponent.MeshSourceHandle)
@@ -516,6 +542,16 @@ namespace Hanabi
 		}
 	}
 
+	void SceneRenderer::ResetStats()
+	{
+		s_Data->RendererStats = {};
+	}
+
+	SceneRenderer::Statistics SceneRenderer::GetStats()
+	{
+		return s_Data->RendererStats;
+	}
+
 	void SceneRenderer::ExecuteDrawCommands()
 	{
 		for (auto& command : s_Data->DrawCommands)
@@ -524,6 +560,8 @@ namespace Hanabi
 			s_Data->ModelData.Material = command.ModelData.Material;
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
+
+			s_Data->RendererStats.DrawCalls++;
 
 			Renderer::DrawMesh(command.Mesh, command.SubmeshIndex, command.Material);
 		}
@@ -583,5 +621,128 @@ namespace Hanabi
 		Ref<Mesh> mesh = Renderer::GetMesh("Box");
 		Renderer::DrawMesh(mesh);
 		Renderer::EndRenderPass();
+	}
+
+	void SceneRenderer::CalculateCascades(CascadeData* cascades)
+	{
+		float scaleToOrigin = 0.0f;
+		float CascadeSplitLambda = 0.92f;
+		float CascadeFarPlaneOffset = 50.0f, CascadeNearPlaneOffset = -50.0f;
+
+		glm::mat4 viewMatrix = s_Data->SceneEnvironment->View;
+		constexpr glm::vec4 origin = glm::vec4(glm::vec3(0.0f), 1.0f);
+		viewMatrix[3] = glm::lerp(viewMatrix[3], origin, scaleToOrigin);
+
+		auto viewProjection = s_Data->SceneEnvironment->Projection * viewMatrix;
+
+		const int SHADOW_MAP_CASCADE_COUNT = 4;
+		float cascadeSplits[SHADOW_MAP_CASCADE_COUNT];
+
+		float nearClip = s_Data->SceneEnvironment->CameraNearClip;
+		float farClip = s_Data->SceneEnvironment->CameraFarClip;
+		float clipRange = farClip - nearClip;
+
+		float minZ = nearClip;
+		float maxZ = nearClip + clipRange;
+
+		float range = maxZ - minZ;
+		float ratio = maxZ / minZ;
+
+		// Calculate split depths based on view camera frustum
+		// Based on method presented in https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch10.html
+		for (uint32_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
+		{
+			float p = (i + 1) / static_cast<float>(SHADOW_MAP_CASCADE_COUNT);
+			float log = minZ * std::pow(ratio, p);
+			float uniform = minZ + range * p;
+			float d = CascadeSplitLambda * (log - uniform) + uniform;
+			cascadeSplits[i] = (d - nearClip) / clipRange;
+		}
+
+		cascadeSplits[3] = 0.3f;
+
+		// Manually set cascades here
+		// cascadeSplits[0] = 0.05f;
+		// cascadeSplits[1] = 0.15f;
+		// cascadeSplits[2] = 0.3f;
+		// cascadeSplits[3] = 1.0f;
+
+		// Calculate orthographic projection matrix for each cascade
+		float lastSplitDist = 0.0;
+		for (uint32_t i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
+		{
+			float splitDist = cascadeSplits[i];
+
+			glm::vec3 frustumCorners[8] =
+			{
+				glm::vec3(-1.0f,  1.0f, -1.0f),
+				glm::vec3(1.0f,  1.0f, -1.0f),
+				glm::vec3(1.0f, -1.0f, -1.0f),
+				glm::vec3(-1.0f, -1.0f, -1.0f),
+				glm::vec3(-1.0f,  1.0f,  1.0f),
+				glm::vec3(1.0f,  1.0f,  1.0f),
+				glm::vec3(1.0f, -1.0f,  1.0f),
+				glm::vec3(-1.0f, -1.0f,  1.0f),
+			};
+
+			// Project frustum corners into world space
+			glm::mat4 invCam = glm::inverse(viewProjection);
+			for (uint32_t i = 0; i < 8; i++)
+			{
+				glm::vec4 invCorner = invCam * glm::vec4(frustumCorners[i], 1.0f);
+				frustumCorners[i] = invCorner / invCorner.w;
+			}
+
+			for (uint32_t i = 0; i < 4; i++)
+			{
+				glm::vec3 dist = frustumCorners[i + 4] - frustumCorners[i];
+				frustumCorners[i + 4] = frustumCorners[i] + (dist * splitDist);
+				frustumCorners[i] = frustumCorners[i] + (dist * lastSplitDist);
+			}
+
+			// Get frustum center
+			glm::vec3 frustumCenter = glm::vec3(0.0f);
+			for (uint32_t i = 0; i < 8; i++)
+				frustumCenter += frustumCorners[i];
+
+			frustumCenter /= 8.0f;
+
+			//frustumCenter *= 0.01f;
+
+			float radius = 0.0f;
+			for (uint32_t i = 0; i < 8; i++)
+			{
+				float distance = glm::length(frustumCorners[i] - frustumCenter);
+				radius = glm::max(radius, distance);
+			}
+			radius = std::ceil(radius * 16.0f) / 16.0f;
+
+			glm::vec3 maxExtents = glm::vec3(radius);
+			glm::vec3 minExtents = -maxExtents;
+
+			glm::vec3 lightDir = -s_Data->SceneEnvironment->DirLight.Direction;
+			glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter, glm::vec3(0.0f, 0.0f, 1.0f));
+			glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, 0.0f + CascadeNearPlaneOffset, maxExtents.z - minExtents.z + CascadeFarPlaneOffset);
+
+			// Offset to texel space to avoid shimmering (from https://stackoverflow.com/questions/33499053/cascaded-shadow-map-shimmering)
+			glm::mat4 shadowMatrix = lightOrthoMatrix * lightViewMatrix;
+			float ShadowMapResolution = (float)s_Data->DirShadowMapPass->GetTargetFramebuffer()->GetWidth();
+
+			glm::vec4 shadowOrigin = (shadowMatrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)) * ShadowMapResolution / 2.0f;
+			glm::vec4 roundedOrigin = glm::round(shadowOrigin);
+			glm::vec4 roundOffset = roundedOrigin - shadowOrigin;
+			roundOffset = roundOffset * 2.0f / ShadowMapResolution;
+			roundOffset.z = 0.0f;
+			roundOffset.w = 0.0f;
+
+			lightOrthoMatrix[3] += roundOffset;
+
+			// Store split distance and matrix in cascade
+			cascades[i].SplitDepth = (nearClip + splitDist * clipRange) * -1.0f;
+			cascades[i].ViewProj = lightOrthoMatrix * lightViewMatrix;
+			cascades[i].View = lightViewMatrix;
+
+			lastSplitDist = cascadeSplits[i];
+		}
 	}
 }

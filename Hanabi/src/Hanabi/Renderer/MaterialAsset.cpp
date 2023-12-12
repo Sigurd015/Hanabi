@@ -5,16 +5,14 @@
 
 namespace Hanabi
 {
-	static const std::string s_AlbedoMap= "u_AlbedoTex";
+	static const std::string s_AlbedoMap = "u_AlbedoTex";
 	static const std::string s_NormalMap = "u_NormalTex";
-	static const std::string s_MetalnessMap = "u_MetalnessTex";
-	static const std::string s_RoughnessMap = "u_RoughnessTex";
+	static const std::string s_MetallicRoughnessMap = "u_MetallicRoughnessTex";
 
 	MaterialAsset::MaterialAsset() :m_Material(CreateRef<Material>(Renderer::GetShader("DeferredGeometry")))
 	{
 		m_Material->SetTexture<Texture2D>(s_AlbedoMap, Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>(s_MetalnessMap, Renderer::GetTexture<Texture2D>("White"));
-		m_Material->SetTexture<Texture2D>(s_RoughnessMap, Renderer::GetTexture<Texture2D>("White"));
+		m_Material->SetTexture<Texture2D>(s_MetallicRoughnessMap, Renderer::GetTexture<Texture2D>("White"));
 		m_Material->SetTexture<Texture2D>(s_NormalMap, Renderer::GetTexture<Texture2D>("White"));
 	}
 
@@ -31,38 +29,22 @@ namespace Hanabi
 		return m_Material->GetTexture<Texture2D>(s_NormalMap);
 	}
 
-	Ref<Texture2D> MaterialAsset::GetMetalnessTex()
-	{
-		return m_Material->GetTexture<Texture2D>(s_MetalnessMap);
-	}
-
-	Ref<Texture2D> MaterialAsset::GetRoughnessTex()
-	{
-		return m_Material->GetTexture<Texture2D>(s_RoughnessMap);
-	}
-
 	void MaterialAsset::SetAlbedoTex(AssetHandle handle)
 	{
 		m_AlbedoTexture = handle;
 		SetTextureInternal(s_AlbedoMap, m_AlbedoTexture);
 	}
 
-	void MaterialAsset::SetMetalnessTex(AssetHandle handle)
-	{
-		m_MetalnessTexture = handle;
-		SetTextureInternal(s_MetalnessMap, m_MetalnessTexture);
-	}
-
-	void MaterialAsset::SetRoughnessTex(AssetHandle handle)
-	{
-		m_RoughnessTexture = handle;
-		SetTextureInternal(s_RoughnessMap, m_RoughnessTexture);
-	}
-
 	void MaterialAsset::SetNormalTex(AssetHandle handle)
 	{
 		m_NormalTexture = handle;
 		SetTextureInternal(s_NormalMap, m_NormalTexture);
+	}
+
+	void MaterialAsset::SetMetallicRoughnessTex(AssetHandle handle)
+	{
+		m_MetallicRoughnessTexture = handle;
+		SetTextureInternal(s_MetallicRoughnessMap, m_MetallicRoughnessTexture);
 	}
 
 	void MaterialAsset::SetTextureInternal(const std::string& name, AssetHandle handle, const std::string& defaultTexName)
