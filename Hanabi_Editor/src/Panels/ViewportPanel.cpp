@@ -223,7 +223,7 @@ namespace Hanabi
 			ImGui::SetNextWindowPos(ImVec2(toolbarX - (backgroundWidth / 2.0f), m_ViewportBounds[0].y + edgeOffset));
 			ImGui::SetNextWindowSize(ImVec2(backgroundWidth, windowHeight));
 			ImGui::SetNextWindowBgAlpha(0.0f);
-			ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking);
+			ImGui::Begin("Toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoDocking);
 
 			bool toolbarEnabled = (bool)m_Context;
 
