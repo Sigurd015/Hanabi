@@ -143,6 +143,7 @@ namespace Hanabi
 				// TODO: May generate the AssetHandle by hashing the material name
 				// So that we can make the AssetHandle consistent across different imports
 				auto aiMaterialName = aiMaterial->GetName();
+				HNB_CORE_INFO("--- Name Hash --- {0}", Hash::GenerateFNVHash(aiMaterialName.data));
 				meshSource->m_Materials[i] = AssetManager::CreateMemoryOnlyAsset<MaterialAsset>();
 
 				Ref<MaterialAsset> material = AssetManager::GetAsset<MaterialAsset>(meshSource->m_Materials[i]);
@@ -188,7 +189,7 @@ namespace Hanabi
 				bool hasAlbedoMap = aiMaterial->GetTexture(AI_MATKEY_BASE_COLOR_TEXTURE, &aiTexPath) == AI_SUCCESS;
 				if (!hasAlbedoMap)
 				{
-					// no PBR base color. Try old-school diffuse  (note: should probably combine with specular in this case)
+					// no PBR base color. Try old-school diffuse
 					hasAlbedoMap = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
 				}
 				if (hasAlbedoMap)
@@ -201,7 +202,7 @@ namespace Hanabi
 					{
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						buffer = Buffer(aiTexEmbedded->pcData, 1);
+						buffer = Buffer(aiTexEmbedded->pcData, spec.Width * spec.Height);
 					}
 					else
 					{
@@ -225,7 +226,7 @@ namespace Hanabi
 						spec.Format = ImageFormat::RGBA;
 						spec.Width = aiTexEmbedded->mWidth;
 						spec.Height = aiTexEmbedded->mHeight;
-						buffer = Buffer(aiTexEmbedded->pcData, 1);
+						buffer = Buffer(aiTexEmbedded->pcData, spec.Width * spec.Height);
 					}
 					else
 					{
@@ -239,54 +240,40 @@ namespace Hanabi
 					material->SetUseNormalMap(true);
 				}
 
-				// Roughness
-				bool hasRoughnessMap = aiMaterial->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE, &aiTexPath) == AI_SUCCESS;
-				if (hasRoughnessMap)
+				// Roughness and Metalness
 				{
-					TextureSpecification spec;
-					Buffer buffer;
-					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
+					aiString aiRoughnessTexPath;
+					aiString aiMetalnessTexPath;
+					bool hasRoughnessMap = aiMaterial->GetTexture(AI_MATKEY_ROUGHNESS_TEXTURE, &aiRoughnessTexPath) == AI_SUCCESS;
+					bool hasMetalnessMap = aiMaterial->GetTexture(AI_MATKEY_METALLIC_TEXTURE, &aiMetalnessTexPath) == AI_SUCCESS;
+					if (aiRoughnessTexPath != aiMetalnessTexPath)
 					{
-						spec.Format = ImageFormat::RGBA;
-						spec.Width = aiTexEmbedded->mWidth;
-						spec.Height = aiTexEmbedded->mHeight;
-						aiTexel* texels = aiTexEmbedded->pcData;
-						buffer = Buffer(texels, 1);
+						HNB_CORE_ERROR("    Roughness and Metalness map must be the same");
 					}
 					else
 					{
-						auto parentPath = path.parent_path();
-						parentPath /= aiTexPath.C_Str();
-						HNB_CORE_INFO("    Roughness map path = {0}", parentPath.string());
-						buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
+						if (hasRoughnessMap)
+						{
+							TextureSpecification spec;
+							Buffer buffer;
+							if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiRoughnessTexPath.C_Str()))
+							{
+								spec.Format = ImageFormat::RGBA;
+								spec.Width = aiTexEmbedded->mWidth;
+								spec.Height = aiTexEmbedded->mHeight;
+								buffer = Buffer(aiTexEmbedded->pcData, spec.Width * spec.Height);
+							}
+							else
+							{
+								auto parentPath = path.parent_path();
+								parentPath /= aiRoughnessTexPath.C_Str();
+								HNB_CORE_INFO("    Roughness map path = {0}", parentPath.string());
+								buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
+							}
+							AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
+							material->SetMetallicRoughnessTex(textureHandle);
+						}
 					}
-					AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
-					material->SetRoughnessTex(textureHandle);
-				}
-
-				// Metalness
-				bool hasMetalnessMap = aiMaterial->GetTexture(AI_MATKEY_METALLIC_TEXTURE, &aiTexPath) == AI_SUCCESS;
-				AssetHandle metalnessTextureHandle = 0;
-				if (hasMetalnessMap)
-				{
-					TextureSpecification spec;
-					Buffer buffer;
-					if (auto aiTexEmbedded = scene->GetEmbeddedTexture(aiTexPath.C_Str()))
-					{
-						spec.Format = ImageFormat::RGBA;
-						spec.Width = aiTexEmbedded->mWidth;
-						spec.Height = aiTexEmbedded->mHeight;
-						buffer = Buffer(aiTexEmbedded->pcData, 1);
-					}
-					else
-					{
-						auto parentPath = path.parent_path();
-						parentPath /= aiTexPath.C_Str();
-						HNB_CORE_INFO("    Metalness map path = {0}", parentPath.string());
-						buffer = TextureSerializer::ToBufferFromFile(parentPath, spec);
-					}
-					AssetHandle textureHandle = AssetManager::CreateMemoryOnlyAsset<Texture2D>(spec, buffer);
-					material->SetMetalnessTex(textureHandle);
 				}
 			}
 			HNB_CORE_INFO("------------------------");

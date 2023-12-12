@@ -1,6 +1,7 @@
 #pragma once
 #include "AssetManagerBase.h"
 #include "Hanabi/Asset/AssetMetadata.h"
+#include "Hanabi/Utils/Hash.h"
 
 #include <map>
 
@@ -29,6 +30,27 @@ namespace Hanabi
 		void RemoveAsset(AssetHandle handle);
 
 		virtual void AddMemoryOnlyAsset(Ref<Asset> asset) override;
+
+		template<typename TAsset, typename... TArgs>
+		AssetHandle CreateNamedMemoryOnlyAsset(const std::string& name, TArgs&&... args)
+		{
+			static_assert(std::is_base_of<Asset, TAsset>::value, "CreateMemoryOnlyAsset only works for types derived from Asset");
+
+			Ref<TAsset> asset = TAsset::Create(std::forward<TArgs>(args)...);
+			asset->Handle = Hash::GenerateFNVHash(name);
+
+			AssetMetadata metadata;
+			metadata.Handle = asset->Handle;
+			metadata.FilePath = name;
+			metadata.IsDataLoaded = true;
+			metadata.Type = TAsset::GetStaticType();
+			metadata.IsMemoryAsset = true;
+
+			m_AssetRegistry[metadata.Handle] = metadata;
+
+			m_MemoryAssets[asset->Handle] = asset;
+			return asset->Handle;
+		}
 
 		const AssetMetadata& GetMetadata(AssetHandle handle) const;
 		const AssetMetadata& GetMetadata(const std::filesystem::path& filepath);

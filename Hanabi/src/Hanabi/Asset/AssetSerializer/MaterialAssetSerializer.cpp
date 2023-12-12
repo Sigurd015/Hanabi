@@ -11,8 +11,7 @@ namespace Hanabi
 {
 	static std::string s_DefaultMaterialYAML = R"(Material:
   AlbedoTexHandle: 0
-  MetalnessTexHandle: 0
-  RoughnessTexHandle: 0
+  MetallicRoughnessTexHandle: 0
   NormalTexHandle: 0
   AlbedoColor: [0, 0, 0]
   Emission: 0.0
@@ -62,8 +61,7 @@ namespace Hanabi
 			{
 				out << YAML::BeginMap;// Material
 				out << YAML::Key << "AlbedoTexHandle" << YAML::Value << materialAsset->GetAlbedoTexHandle();
-				out << YAML::Key << "MetalnessTexHandle" << YAML::Value << materialAsset->GetMetalnessTexHandle();
-				out << YAML::Key << "RoughnessTexHandle" << YAML::Value << materialAsset->GetRoughnessTexHandle();
+				out << YAML::Key << "MetallicRoughnessTexHandle" << YAML::Value << materialAsset->GetMetallicRoughnessTexHandle();
 				out << YAML::Key << "NormalTexHandle" << YAML::Value << materialAsset->GetNormalTexHandle();
 				out << YAML::Key << "AlbedoColor" << YAML::Value << materialAsset->GetAlbedo();
 				out << YAML::Key << "Emission" << YAML::Value << materialAsset->GetEmission();
@@ -85,10 +83,8 @@ namespace Hanabi
 
 		AssetHandle albedoTexHandle = materialNode["AlbedoTexHandle"].as<uint64_t>();
 		targetMaterialAsset->SetAlbedoTex(albedoTexHandle);
-		AssetHandle metalnessTexHandle = materialNode["MetalnessTexHandle"].as<uint64_t>();
-		targetMaterialAsset->SetMetalnessTex(metalnessTexHandle);
-		AssetHandle roughnessTexHandle = materialNode["RoughnessTexHandle"].as<uint64_t>();
-		targetMaterialAsset->SetRoughnessTex(roughnessTexHandle);
+		AssetHandle metallicRoughnessTexHandle = materialNode["MetallicRoughnessTexHandle"].as<uint64_t>();
+		targetMaterialAsset->SetMetallicRoughnessTex(metallicRoughnessTexHandle);
 		AssetHandle normalHandle = materialNode["NormalTexHandle"].as<uint64_t>();
 		targetMaterialAsset->SetNormalTex(normalHandle);
 

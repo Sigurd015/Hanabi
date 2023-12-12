@@ -19,8 +19,7 @@ namespace Hanabi
 
 		void SetAlbedoTex(AssetHandle handle);
 		void SetNormalTex(AssetHandle handle);
-		void SetMetalnessTex(AssetHandle handle);
-		void SetRoughnessTex(AssetHandle handle);
+		void SetMetallicRoughnessTex(AssetHandle handle);
 
 		void SetAlbedo(const glm::vec3& albedo) { m_Albedo = albedo; }
 		void SetEmission(float emission) { m_Emission = emission; }
@@ -30,8 +29,7 @@ namespace Hanabi
 
 		AssetHandle GetAlbedoTexHandle() const { return m_AlbedoTexture; }
 		AssetHandle GetNormalTexHandle() const { return m_NormalTexture; }
-		AssetHandle GetMetalnessTexHandle() const { return m_MetalnessTexture; }
-		AssetHandle GetRoughnessTexHandle() const { return m_RoughnessTexture; }
+		AssetHandle GetMetallicRoughnessTexHandle() const { return m_MetallicRoughnessTexture; }
 
 		glm::vec3& GetAlbedo() { return m_Albedo; }
 		float& GetEmission() { return m_Emission; }
@@ -50,8 +48,7 @@ namespace Hanabi
 		Ref<Material> m_Material;
 
 		AssetHandle m_AlbedoTexture = 0;
-		AssetHandle m_MetalnessTexture = 0;
-		AssetHandle m_RoughnessTexture = 0;
+		AssetHandle m_MetallicRoughnessTexture = 0;
 		AssetHandle m_NormalTexture = 0;
 
 		bool m_UseNormalMap = false;

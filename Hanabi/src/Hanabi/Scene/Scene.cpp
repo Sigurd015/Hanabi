@@ -375,14 +375,18 @@ namespace Hanabi
 
 		if (mainCameraEntity)
 		{
-			glm::mat4 cameraTransform = glm::inverse(GetWorldSpaceTransformMatrix(mainCameraEntity));
+			glm::mat4 view = glm::inverse(GetWorldSpaceTransformMatrix(mainCameraEntity));
 			m_Environment->PointLights.clear();
 			m_Environment->SpotLights.clear();
 			auto worldTransform = GetWorldSpaceTransform({ mainCameraEntity, this });
 			m_Environment->CameraPosition = worldTransform.Translation;
 
-			glm::mat4 viewProjection = mainCameraEntity.GetComponent<CameraComponent>().Camera.GetProjection() * cameraTransform;
-			m_Environment->ViewProjection = viewProjection;
+			SceneCamera& camera = mainCameraEntity.GetComponent<CameraComponent>().Camera;
+			m_Environment->View = view;
+			m_Environment->Projection = camera.GetProjection();
+			m_Environment->ViewProjection = m_Environment->Projection * view;
+			m_Environment->CameraNearClip = camera.GetNearClip();
+			m_Environment->CameraFarClip = camera.GetFarClip();
 			RenderScene(selectedEntity, enableOverlayRender);
 		}
 	}
@@ -392,7 +396,11 @@ namespace Hanabi
 		m_Environment->PointLights.clear();
 		m_Environment->SpotLights.clear();
 		m_Environment->CameraPosition = camera.GetPosition();
-		m_Environment->ViewProjection = camera.GetViewProjection();
+		m_Environment->View = camera.GetViewMatrix();
+		m_Environment->Projection = camera.GetProjection();
+		m_Environment->ViewProjection = m_Environment->Projection * m_Environment->View;
+		m_Environment->CameraNearClip = camera.GetNearClip();
+		m_Environment->CameraFarClip = camera.GetFarClip();
 		RenderScene(selectedEntity, enableOverlayRender);
 	}
 

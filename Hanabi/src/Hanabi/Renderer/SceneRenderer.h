@@ -22,9 +22,17 @@ namespace Hanabi
 		static Ref<Image2D> GetGBufferMRE();
 		static Ref<Image2D> GetGBufferNormal();
 		static Ref<Image2D> GetGBufferPosition();
+		static Ref<Image2D> GetDirShadowMap();
 
 		static void SubmitStaticMesh(const glm::mat4& transform, MeshComponent& meshComponent, AssetHandle overrideMaterialHandle = 0);
+		
+		struct Statistics
+		{
+			uint32_t DrawCalls = 0;
+		};
 
+		static void ResetStats();
+		static SceneRenderer::Statistics GetStats();
 	private:
 		static void ExecuteDrawCommands();
 
@@ -35,5 +43,14 @@ namespace Hanabi
 
 		static void CompositePass();
 		static void SkyboxPass();
+
+	
+		struct CascadeData
+		{
+			glm::mat4 ViewProj;
+			glm::mat4 View;
+			float SplitDepth;
+		};
+		static void CalculateCascades(CascadeData* cascades);
 	};
 }

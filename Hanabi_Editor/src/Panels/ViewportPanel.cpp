@@ -15,7 +15,6 @@ namespace Hanabi
 	void ViewPortPanel::SetContext(const Ref<Scene>& scene)
 	{
 		m_Context = scene;
-		m_ViewPortImage = SceneRenderer::GetFinalPass()->GetOutput();
 	}
 
 	void ViewPortPanel::OnEvent(Event& e)
@@ -183,25 +182,6 @@ namespace Hanabi
 		}
 		}
 
-		switch (RendererSettingPanel::DebugDrawMode)
-		{
-		case RendererSettingPanel::ViewportDebugMode::None:
-			m_ViewPortImage = SceneRenderer::GetFinalPass()->GetOutput();
-			break;
-		case RendererSettingPanel::ViewportDebugMode::GBufferAlbedo:
-			m_ViewPortImage = SceneRenderer::GetGBufferAlbedo();
-			break;
-		case RendererSettingPanel::ViewportDebugMode::GBufferMRE:
-			m_ViewPortImage = SceneRenderer::GetGBufferMRE();
-			break;
-		case RendererSettingPanel::ViewportDebugMode::GBufferNormal:
-			m_ViewPortImage = SceneRenderer::GetGBufferNormal();
-			break;
-		case RendererSettingPanel::ViewportDebugMode::GBufferPosition:
-			m_ViewPortImage = SceneRenderer::GetGBufferPosition();
-			break;
-		}
-
 		#pragma region Mouse Pick Up
 		ImVec2 mousePos = ImGui::GetMousePos();
 		mousePos.x -= m_ViewportBounds[0].x;
@@ -312,7 +292,7 @@ namespace Hanabi
 			ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 			m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-			ImGui::Image(m_ViewPortImage->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
+			ImGui::Image(RendererSettingPanel::ViewPortImage->GetRendererID(), ImVec2{ m_ViewportSize.x, m_ViewportSize.y });
 
 			auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
 			auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
