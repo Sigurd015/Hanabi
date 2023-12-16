@@ -12,7 +12,7 @@ namespace Hanabi
 	public:
 		DX11ConstantBuffer(uint32_t size);
 		~DX11ConstantBuffer();
-		void Bind(uint32_t slot) const override;
+		void Bind(const ShaderResourceDeclaration& declaration) const override;
 		void SetData(const void* data, uint32_t offset = 0) override;
 
 		// D3D Interop API

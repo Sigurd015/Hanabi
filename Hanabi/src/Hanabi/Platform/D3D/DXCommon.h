@@ -8,14 +8,14 @@
 
 namespace Hanabi
 {
-	void CheckD3DError(HRESULT result);
+	bool CheckD3DError(HRESULT result);
 
 	template<class T>
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 }
 
 #ifdef HNB_DEBUG
-#define DX_CHECK_RESULT(x) { HRESULT __hr = x;CheckD3DError(__hr);}
+#define DX_CHECK_RESULT(x) { HRESULT __hr = x; HNB_CORE_ASSERT(CheckD3DError(__hr), "D3D Error"); }
 #else
 #define DX_CHECK_RESULT(x) x
 #endif

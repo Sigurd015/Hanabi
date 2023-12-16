@@ -1,5 +1,3 @@
-#ifndef BUFFER_HEADER
-#define BUFFER_HEADER
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
@@ -75,4 +73,3 @@ cbuffer CBDirShadow : register(b5)
     float4x4 u_DirLightViewProjection;
     uint u_DirShadowType;
 };
-#endif

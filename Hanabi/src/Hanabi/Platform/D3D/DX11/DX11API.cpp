@@ -9,6 +9,8 @@
 #include "DX11Texture.h"
 #include "DX11ConstantBuffer.h"
 #include "Hanabi/Asset/AssetManager/AssetManager.h"
+#include "Hanabi/Renderer/ComputePass.h"
+#include "Hanabi/Renderer/ComputePipeline.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -121,6 +123,19 @@ namespace Hanabi
 		m_DeviceContext->OMSetRenderTargets(1, m_RenderTargetView.GetAddressOf(), nullptr);
 	}
 
+	void DX11RendererAPI::BeginComputePass(const Ref<ComputePass>& computePass)
+	{
+		Ref<ComputePipeline>& pipeline = computePass->GetPipeline();
+		pipeline->Bind();
+
+		computePass->BindInputs();
+	}
+
+	void DX11RendererAPI::EndComputePass(const Ref<ComputePass>& computePass)
+	{
+		computePass->UnbindInputs();
+	}
+
 	void DX11RendererAPI::DrawMesh(const Ref<Mesh>& mesh, uint32_t submeshIndex, const Ref<Material>& material)
 	{
 		material->Bind();
@@ -185,7 +200,6 @@ namespace Hanabi
 
 		const uint32_t cubemapSize = Renderer::GetConfig().EnvironmentMapResolution;
 		static const uint32_t irradianceMapSize = 32;
-		static ID3D11UnorderedAccessView* nullUAV[] = { nullptr };
 
 		Ref<DX11Texture2D> envMap = std::static_pointer_cast<DX11Texture2D>(equirectangularMap);
 
@@ -198,30 +212,24 @@ namespace Hanabi
 
 		// Radiance map (Equirectangular to cubemap) 
 		{
-			Ref<Shader> equirectangularToCubemapShader = Renderer::GetShader("EquirectangularToCubemap");
+			static Ref<ComputePass> s_EquirectangularToCubemapPass = nullptr;
+			if (!s_EquirectangularToCubemapPass)
+			{
+				ComputePassSpecification spec = {};
+				ComputePipelineSpecification pipelineSpec = {};
+				pipelineSpec.Shader = Renderer::GetShader("EquirectangularToCubemap");
+				spec.Pipeline = ComputePipeline::Create(pipelineSpec);
+				s_EquirectangularToCubemapPass = ComputePass::Create(spec);
+			}
 
-			const ShaderReflectionData& reflectionData = equirectangularToCubemapShader->GetReflectionData();
-			uint32_t uavSlot = 0;
 			envUnfiltered->CreateUAV();
-			Utils::BindResource(reflectionData, "o_OutputTex", [&](auto& slot)
-				{
-					uavSlot = slot;
-					m_DeviceContext->CSSetUnorderedAccessViews(slot, 1, envUnfiltered->GetUAV().GetAddressOf(), 0);
-				});
-			Utils::BindResource(reflectionData, "u_EquirectangularMap", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetShaderResources(slot, 1, envMap->GetTextureSRV().GetAddressOf());
-				});
-			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-				});
 
-			equirectangularToCubemapShader->Bind();
-			m_DeviceContext->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
+			s_EquirectangularToCubemapPass->SetInput("u_EquirectangularMap", envMap);
+			s_EquirectangularToCubemapPass->SetInput("o_OutputTex", envUnfiltered);
 
-			// Unbind uav
-			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+			BeginComputePass(s_EquirectangularToCubemapPass);
+			s_EquirectangularToCubemapPass->Dispatch(cubemapSize / 32, cubemapSize / 32, 6);
+			EndComputePass(s_EquirectangularToCubemapPass);
 
 			envUnfiltered->GenerateMips();
 		}
@@ -232,22 +240,7 @@ namespace Hanabi
 			// Copy Unfiltered envmap to Filtered envmap (Keep the first mip level)
 			m_DeviceContext->CopyResource(envFiltered->GetTextureCube().Get(), envUnfiltered->GetTextureCube().Get());
 
-			Ref<Shader> environmentMipFilterShader = Renderer::GetShader("EnvironmentMipFilter");
 			uint32_t mipCount = Utils::CalculateMipCount(cubemapSize, cubemapSize);
-			const ShaderReflectionData& reflectionData = environmentMipFilterShader->GetReflectionData();
-			Utils::BindResource(reflectionData, "u_InputTex", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetShaderResources(slot, 1, envUnfiltered->GetTextureSRV().GetAddressOf());
-				});
-			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-				});
-			uint32_t uavSlot = 0;
-			Utils::BindResource(reflectionData, "o_OutputTex", [&](auto& slot)
-				{
-					uavSlot = slot;
-				});
 
 			struct CBFilterParam
 			{
@@ -255,18 +248,24 @@ namespace Hanabi
 
 				char padding[12];
 			};
-
-			static Ref<DX11ConstantBuffer> s_FilterParam;
+			static Ref<ConstantBuffer> s_FilterParam;
 
 			if (!s_FilterParam)
-				s_FilterParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBFilterParam)));
+				s_FilterParam = ConstantBuffer::Create(sizeof(CBFilterParam));
 
-			Utils::BindResource(reflectionData, "CBFilterParam", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetConstantBuffers(slot, 1, s_FilterParam->GetBuffer().GetAddressOf());
-				});
+			static Ref<ComputePass> s_EnvironmentMipFilterPass = nullptr;
+			if (!s_EnvironmentMipFilterPass)
+			{
+				ComputePassSpecification spec = {};
+				ComputePipelineSpecification pipelineSpec = {};
+				pipelineSpec.Shader = Renderer::GetShader("EnvironmentMipFilter");
+				spec.Pipeline = ComputePipeline::Create(pipelineSpec);
+				s_EnvironmentMipFilterPass = ComputePass::Create(spec);
+			}
 
-			environmentMipFilterShader->Bind();
+			s_EnvironmentMipFilterPass->SetInput("u_InputTex", envUnfiltered);
+			s_EnvironmentMipFilterPass->SetInput("CBFilterParam", s_FilterParam);
+
 			const float deltaRoughness = 1.0f / glm::max((float)mipCount - 1.0f, 1.0f);
 			for (uint32_t i = 1, size = cubemapSize; i < mipCount; i++, size /= 2)
 			{
@@ -274,12 +273,12 @@ namespace Hanabi
 				CBFilterParam filterParam = { i * deltaRoughness };
 				s_FilterParam->SetData(&filterParam, sizeof(CBFilterParam));
 				envFiltered->CreateUAV(i);
-				m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, envFiltered->GetUAV().GetAddressOf(), 0);
-				m_DeviceContext->Dispatch(numGroups, numGroups, 6);
-			}
+				s_EnvironmentMipFilterPass->SetInput("o_OutputTex", envFiltered);
 
-			// Unbind uav
-			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+				BeginComputePass(s_EnvironmentMipFilterPass);
+				s_EnvironmentMipFilterPass->Dispatch(numGroups, numGroups, 6);
+				EndComputePass(s_EnvironmentMipFilterPass);
+			}
 		}
 
 		// Irradiance map
@@ -287,50 +286,39 @@ namespace Hanabi
 		cubemapSpec.Height = irradianceMapSize;
 		Ref<DX11TextureCube> irradianceMap = std::static_pointer_cast<DX11TextureCube>(TextureCube::Create(cubemapSpec));
 		{
-			Ref<Shader> environmentIrradianceShader = Renderer::GetShader("EnvironmentIrradiance");
-
-			const ShaderReflectionData& reflectionData = environmentIrradianceShader->GetReflectionData();
-			Utils::BindResource(reflectionData, "u_RadianceMap", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetShaderResources(slot, 1, envFiltered->GetTextureSRV().GetAddressOf());
-				});
-			uint32_t uavSlot = 0;
-			irradianceMap->CreateUAV();
-			Utils::BindResource(reflectionData, "o_IrradianceMap", [&](auto& slot)
-				{
-					uavSlot = slot;
-					m_DeviceContext->CSSetUnorderedAccessViews(slot, 1, irradianceMap->GetUAV().GetAddressOf(), 0);
-				});
-			Utils::BindResource(reflectionData, "u_SSLinearWrap", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetSamplers(slot, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-				});
-
 			struct CBSamplesParams
 			{
 				uint32_t Samples;
 
 				char padding[12];
 			};
-
-			static Ref<DX11ConstantBuffer> s_SamplesParam;
+			static Ref<ConstantBuffer> s_SamplesParam;
 
 			if (!s_SamplesParam)
-				s_SamplesParam = std::static_pointer_cast<DX11ConstantBuffer>(ConstantBuffer::Create(sizeof(CBSamplesParams)));
+				s_SamplesParam = ConstantBuffer::Create(sizeof(CBSamplesParams));
 
-			Utils::BindResource(reflectionData, "CBSamplesParams", [&](auto& slot)
-				{
-					m_DeviceContext->CSSetConstantBuffers(slot, 1, s_SamplesParam->GetBuffer().GetAddressOf());
-				});
+			static Ref<ComputePass> s_EnvironmentIrradiancePass = nullptr;
+			if (!s_EnvironmentIrradiancePass)
+			{
+				ComputePassSpecification spec = {};
+				ComputePipelineSpecification pipelineSpec = {};
+				pipelineSpec.Shader = Renderer::GetShader("EnvironmentIrradiance");
+				spec.Pipeline = ComputePipeline::Create(pipelineSpec);
+				s_EnvironmentIrradiancePass = ComputePass::Create(spec);
+			}
+
+			irradianceMap->CreateUAV();
+
+			s_EnvironmentIrradiancePass->SetInput("u_RadianceMap", envFiltered);
+			s_EnvironmentIrradiancePass->SetInput("o_IrradianceMap", irradianceMap);
+			s_EnvironmentIrradiancePass->SetInput("CBSamplesParams", s_SamplesParam);
 
 			CBSamplesParams samplesParams = { Renderer::GetConfig().IrradianceMapComputeSamples };
 			s_SamplesParam->SetData(&samplesParams, sizeof(CBSamplesParams));
 
-			environmentIrradianceShader->Bind();
-			m_DeviceContext->Dispatch(irradianceMapSize / 32, irradianceMapSize / 32, 6);
-
-			// Unbind uav
-			m_DeviceContext->CSSetUnorderedAccessViews(uavSlot, 1, nullUAV, nullptr);
+			BeginComputePass(s_EnvironmentIrradiancePass);
+			s_EnvironmentIrradiancePass->Dispatch(irradianceMapSize / 32, irradianceMapSize / 32, 6);
+			EndComputePass(s_EnvironmentIrradiancePass);
 
 			irradianceMap->GenerateMips();
 		}

@@ -81,7 +81,7 @@ namespace Hanabi
 		virtual void Resize(const uint32_t width, const uint32_t height) override;
 		virtual void Invalidate() override;
 		virtual void Release() override;
-		virtual void Bind(uint32_t slot) const override;
+		virtual void Bind(const ShaderResourceDeclaration& declaration) const override;
 		virtual void* GetRendererID() const override { return m_TextureSRV.Get(); }
 
 		virtual uint32_t GetWidth() const override { return m_Specification.Width; }

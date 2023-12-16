@@ -23,10 +23,23 @@ namespace Hanabi
 		m_ConstantBuffer.Reset();
 	}
 
-	void DX11ConstantBuffer::Bind(uint32_t slot) const
+	void DX11ConstantBuffer::Bind(const ShaderResourceDeclaration& declaration) const
 	{
-		DX11Context::GetDeviceContext()->VSSetConstantBuffers(slot, 1, m_ConstantBuffer.GetAddressOf());
-		DX11Context::GetDeviceContext()->PSSetConstantBuffers(slot, 1, m_ConstantBuffer.GetAddressOf());
+		switch (declaration.Stage)
+		{
+		case VertexShader:
+			DX11Context::GetDeviceContext()->VSSetConstantBuffers(declaration.Slot, 1, m_ConstantBuffer.GetAddressOf());
+			break;
+		case GeometryShader:
+			DX11Context::GetDeviceContext()->GSSetConstantBuffers(declaration.Slot, 1, m_ConstantBuffer.GetAddressOf());
+			break;
+		case PixelShader:
+			DX11Context::GetDeviceContext()->PSSetConstantBuffers(declaration.Slot, 1, m_ConstantBuffer.GetAddressOf());
+			break;
+		case ComputeShader:
+			DX11Context::GetDeviceContext()->CSSetConstantBuffers(declaration.Slot, 1, m_ConstantBuffer.GetAddressOf());
+			break;
+		}
 	}
 
 	void DX11ConstantBuffer::SetData(const void* data, uint32_t offset)

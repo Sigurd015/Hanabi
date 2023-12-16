@@ -44,15 +44,15 @@ namespace Hanabi
 
 	void Material::BindTextures() const
 	{
-		const ShaderReflectionData& reflectionData = m_Shader->GetReflectionData();
+		const auto& declarations = m_Shader->GetReflectionData();
 
-		for (auto& texture : m_Textures)
+		for (auto& reflection : declarations)
 		{
-			Utils::BindResource(reflectionData, texture.first, [&](auto& slot)
-				{
-					if (texture.second)
-						texture.second->Bind(slot);
-				});
+			auto& it = m_Textures.find(reflection.Name);
+			if (it != m_Textures.end())
+			{
+				it->second->Bind(reflection);
+			}
 		}
 	}
 }

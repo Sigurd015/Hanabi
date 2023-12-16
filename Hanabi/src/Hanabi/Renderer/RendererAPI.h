@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include "Hanabi/Renderer/RenderPass.h"
+#include "Hanabi/Renderer/ComputePass.h"
 
 #include <glm/glm.hpp>
 
@@ -19,6 +20,8 @@ namespace Hanabi
 
 		virtual void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear) = 0;
 		virtual void EndRenderPass() = 0;
+		virtual void BeginComputePass(const Ref<ComputePass>& computePass) = 0;
+		virtual void EndComputePass(const Ref<ComputePass>& computePass) = 0;
 
 		virtual void DrawMesh(const Ref<Mesh>& mesh, uint32_t submeshIndex, const Ref<Material>& material) = 0;
 		virtual void DrawMesh(const Ref<Mesh>& mesh) = 0;

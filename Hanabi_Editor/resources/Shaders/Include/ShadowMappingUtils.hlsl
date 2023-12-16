@@ -1,5 +1,3 @@
-#ifndef SHADOW_HEADER
-#define SHADOW_HEADER
 #include "Buffers.hlsl"
 #include "Common.hlsl"
 #include "Lighting.hlsl"
@@ -224,4 +222,3 @@ float DirHardShadow(float4 position)
     float depthFromLight = u_ShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy, 0).r;
     return step(shadowPosition.z, depthFromLight + bias);
 }
-#endif

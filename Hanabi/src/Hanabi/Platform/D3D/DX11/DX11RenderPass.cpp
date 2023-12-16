@@ -3,6 +3,7 @@
 #include "DX11RenderPass.h"
 #include "DX11Context.h"
 #include "DX11RenderStates.h"
+#include "DX11Shader.h"
 
 namespace Hanabi
 {
@@ -16,46 +17,21 @@ namespace Hanabi
 
 	void DX11RenderPass::BindInputs()
 	{
-		const ShaderReflectionData& reflectionData = m_Specification.Pipeline->GetSpecification().Shader->GetReflectionData();
+		const auto& declarations = m_Specification.Pipeline->GetSpecification().Shader->GetReflectionData();
 
-		for (auto& input : m_Inputs)
+		for (auto& reflection : declarations)
 		{
-			const std::string& name = input.first;
-			Ref<RendererResource> bindable = input.second;
-
-			Utils::BindResource(reflectionData, name, [&](auto& slot)
+			if (reflection.ResourceType == RendererResourceType::Sampler)
+			{
+				DX11Context::GetDeviceContext()->PSSetSamplers(reflection.Slot, 1, DX11RenderStates::SamplerStates[reflection.Name].GetAddressOf());
+			}
+			else
+			{
+				auto& it = m_Inputs.find(reflection.Name);
+				if (it != m_Inputs.end())
 				{
-					bindable->Bind(slot);
-				});
-		}
-
-		// Bind Common States
-		{
-			auto it = reflectionData.find("u_SSPointClamp");
-			if (it != reflectionData.end())
-			{
-				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSPointClamp.GetAddressOf());
-			}
-		}
-		{
-			auto it = reflectionData.find("u_SSLinearWrap");
-			if (it != reflectionData.end())
-			{
-				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearWrap.GetAddressOf());
-			}
-		}
-		{
-			auto it = reflectionData.find("u_SSLinearClamp");
-			if (it != reflectionData.end())
-			{
-				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSLinearClamp.GetAddressOf());
-			}
-		}
-		{
-			auto it = reflectionData.find("u_SSAnisotropicWrap");
-			if (it != reflectionData.end())
-			{
-				DX11Context::GetDeviceContext()->PSSetSamplers(it->second, 1, DX11RenderStates::SSAnisotropicWrap.GetAddressOf());
+					it->second->Bind(reflection);
+				}
 			}
 		}
 	}

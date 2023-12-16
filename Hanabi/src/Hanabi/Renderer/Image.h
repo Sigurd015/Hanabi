@@ -49,7 +49,7 @@ namespace Hanabi
 		virtual void Resize(const uint32_t width, const uint32_t height) = 0;
 		virtual void Invalidate() = 0;
 		virtual void Release() = 0;
-		virtual void Bind(uint32_t slot) const = 0;
+		virtual void Bind(const ShaderResourceDeclaration& declaration) const = 0;
 		virtual void* GetRendererID() const = 0;
 
 		virtual uint32_t GetWidth() const = 0;
