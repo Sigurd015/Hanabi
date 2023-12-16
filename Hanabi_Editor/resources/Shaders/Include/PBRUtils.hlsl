@@ -1,5 +1,3 @@
-#ifndef PBR_HEADER
-#define PBR_HEADER
 #include "Common.hlsl"
 
 // GGX/Towbridge-Reitz normal distribution function.
@@ -58,4 +56,3 @@ float3 FresnelSchlickRoughness(float3 F0, float cosTheta, float roughness)
 {
     return F0 + (max(1.0 - roughness, F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
-#endif

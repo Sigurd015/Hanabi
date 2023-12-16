@@ -1,4 +1,5 @@
 #pragma once
+#include "ShaderCompiler/ShaderCompiler.h"
 
 #include <unordered_map>
 #include <string>
@@ -6,32 +7,21 @@
 
 namespace Hanabi
 {
-	using ShaderReflectionData = std::unordered_map<std::string, uint32_t>;
-
 	class Shader
 	{
 	public:
 		virtual ~Shader() = default;
 		virtual void Bind() const = 0;
-		virtual const std::string& GetName() const = 0;
-		virtual const ShaderReflectionData& GetReflectionData() const = 0;
-
-		static Ref<Shader> Create(const std::string& fileName);
-
-		static constexpr const char* GetShaderDirectoryPath()
-		{
-			return "Resources/Shaders/";
-		}
+		virtual const std::vector<ShaderResourceDeclaration>& GetReflectionData() const = 0;
 	};
 
 	//TODO:This should be handled by the Asset Manager
 	class ShaderLibrary
 	{
 	public:
+		ShaderLibrary();
 		void Add(const std::string& name, const Ref<Shader>& shader);
-		void Add(const Ref<Shader>& shader);
 		Ref<Shader> Load(const std::string& fileName);
-		Ref<Shader> Load(const std::string& name, const std::string& fileName);
 		Ref<Shader> Get(const std::string& name);
 		bool Exists(const std::string& name) const;
 	private:

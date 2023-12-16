@@ -1,5 +1,3 @@
-#ifndef LIGHTING_HEADER
-#define LIGHTING_HEADER
 #include "Buffers.hlsl"
 #include "PBRUtils.hlsl"
 
@@ -130,4 +128,3 @@ float3 CalculateSpotLights(float3 F0)
     }
     return result;
 }
-#endif

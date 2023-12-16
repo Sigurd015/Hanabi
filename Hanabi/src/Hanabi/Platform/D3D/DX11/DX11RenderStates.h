@@ -23,10 +23,7 @@ namespace Hanabi
 		inline static ComPtr <ID3D11BlendState> BSAdditive = nullptr;
 		inline static ComPtr <ID3D11BlendState> BSSubtractive = nullptr;
 
-		inline static ComPtr <ID3D11SamplerState> SSPointClamp = nullptr;
-		inline static ComPtr <ID3D11SamplerState> SSLinearWrap = nullptr;
-		inline static ComPtr <ID3D11SamplerState> SSLinearClamp = nullptr;
-		inline static ComPtr <ID3D11SamplerState> SSAnisotropicWrap = nullptr;
+		inline static std::unordered_map<std::string, ComPtr <ID3D11SamplerState>> SamplerStates;
 
 		static void Init()
 		{
@@ -151,7 +148,7 @@ namespace Hanabi
 				samplerDesc.MipLODBias = 0.0f;
 				samplerDesc.MinLOD = 0.0f;
 				samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSAnisotropicWrap.GetAddressOf()));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SamplerStates["u_SSAnisotropicWrap"].GetAddressOf()));
 			}
 			{
 				D3D11_SAMPLER_DESC samplerDesc = {};
@@ -159,7 +156,7 @@ namespace Hanabi
 				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSPointClamp.GetAddressOf()));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SamplerStates["u_SSPointClamp"].GetAddressOf()));
 			}		
 			{
 				D3D11_SAMPLER_DESC samplerDesc = {};
@@ -167,7 +164,7 @@ namespace Hanabi
 				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSLinearWrap.GetAddressOf()));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SamplerStates["u_SSLinearWrap"].GetAddressOf()));
 			}
 			{
 				D3D11_SAMPLER_DESC samplerDesc = {};
@@ -175,7 +172,7 @@ namespace Hanabi
 				samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 				samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 				samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SSLinearClamp.GetAddressOf()));
+				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateSamplerState(&samplerDesc, SamplerStates["u_SSLinearClamp"].GetAddressOf()));
 			}
 		}
 	};

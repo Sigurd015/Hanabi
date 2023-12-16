@@ -1,5 +1,3 @@
-#ifndef ENVMAPPING_HEADER
-#define ENVMAPPING_HEADER
 #include "Common.hlsl"
 
 float3 GetCubeMapTexCoord(uint3 ThreadID, float2 imageSize)
@@ -81,5 +79,3 @@ float3 SampleHemisphere(float u1, float u2)
 	const float u1p = sqrt(max(0.0, 1.0 - u1*u1));
 	return float3(cos(TwoPI*u2) * u1p, sin(TwoPI*u2) * u1p, u1);
 }
-
-#endif

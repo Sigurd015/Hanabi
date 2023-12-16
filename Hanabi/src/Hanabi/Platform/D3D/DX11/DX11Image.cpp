@@ -126,9 +126,26 @@ namespace Hanabi
 		m_TextureSRV.Reset();
 	}
 
-	void DX11Image2D::Bind(uint32_t slot) const
+	void DX11Image2D::Bind(const ShaderResourceDeclaration& declaration) const
 	{
-		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureSRV.GetAddressOf());
+		switch (declaration.Stage)
+		{
+		case VertexShader:
+			DX11Context::GetDeviceContext()->VSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
+			break;
+		case GeometryShader:
+			DX11Context::GetDeviceContext()->GSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
+			break;
+		case PixelShader:
+			DX11Context::GetDeviceContext()->PSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
+			break;
+		case ComputeShader:
+			DX11Context::GetDeviceContext()->CSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
+			break;
+		default:
+			HNB_CORE_ASSERT(false, "Unknown shader stage!");
+			break;
+		}
 	}
 }
 #endif

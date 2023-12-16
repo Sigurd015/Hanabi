@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "MaterialAsset.h"
 #include "RendererConfig.h"
+#include "ComputePass.h"
 
 namespace Hanabi
 {
@@ -19,6 +20,8 @@ namespace Hanabi
 
 		static void BeginRenderPass(const Ref<RenderPass>& renderPass, bool clear = true);
 		static void EndRenderPass();
+		static void BeginComputePass(const Ref<ComputePass>& computePass);
+		static void EndComputePass(const Ref<ComputePass>& computePass);
 
 		//3D Objects
 		static void DrawMesh(const Ref<Mesh>& mesh, uint32_t submeshIndex, const Ref<Material>& material);

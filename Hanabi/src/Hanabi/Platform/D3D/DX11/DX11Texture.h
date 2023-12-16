@@ -17,7 +17,7 @@ namespace Hanabi
 		uint32_t GetWidth() const override { return m_Specification.Width; }
 		uint32_t GetHeight() const override { return m_Specification.Height; }
 		void* GetRendererID() const override { return m_Image->GetRendererID(); }
-		void Bind(uint32_t slot = 0) const override;
+		void Bind(const ShaderResourceDeclaration& declaration) const override;
 		virtual Ref<Image2D> GetImage() const override { return m_Image; }
 		virtual Buffer GetWriteableBuffer() override { return m_Image->GetBuffer(); }
 		bool operator==(const Texture& other) const override;
@@ -39,7 +39,7 @@ namespace Hanabi
 		uint32_t GetWidth() const override { return m_Specification.Width; }
 		uint32_t GetHeight() const override { return m_Specification.Height; }
 		void* GetRendererID() const override { return m_TextureCubeSRV.Get(); }
-		void Bind(uint32_t slot = 0) const override;
+		void Bind(const ShaderResourceDeclaration& declaration) const override;
 		bool operator==(const Texture& other) const override;
 
 		// D3D Interop API

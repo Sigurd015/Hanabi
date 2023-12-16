@@ -6,6 +6,7 @@
 #include "Hanabi/Core/UUID.h"
 #include "Hanabi/Platform/D3D/DXCommon.h"
 #include "DX11RenderStates.h"
+#include "Hanabi/Renderer/Shader.h"
 
 #include <stb_image.h>
 
@@ -55,9 +56,9 @@ namespace Hanabi
 		return Utils::CompareTexture(*this, other);
 	}
 
-	void DX11Texture2D::Bind(uint32_t slot) const
+	void DX11Texture2D::Bind(const ShaderResourceDeclaration& declaration) const
 	{
-		m_Image->Bind(slot);
+		m_Image->Bind(declaration);
 	}
 
 	DX11TextureCube::DX11TextureCube(const TextureSpecification& specification, Buffer data) :m_Specification(specification)
@@ -128,9 +129,36 @@ namespace Hanabi
 		m_TextureCubeUAV.Reset();
 	}
 
-	void DX11TextureCube::Bind(uint32_t slot) const
+	void DX11TextureCube::Bind(const ShaderResourceDeclaration& declaration) const
 	{
-		DX11Context::GetDeviceContext()->PSSetShaderResources(slot, 1, m_TextureCubeSRV.GetAddressOf());
+		switch (declaration.Stage)
+		{
+		case VertexShader:
+			DX11Context::GetDeviceContext()->VSSetShaderResources(declaration.Slot, 1, m_TextureCubeSRV.GetAddressOf());
+			break;
+		case GeometryShader:
+			DX11Context::GetDeviceContext()->GSSetShaderResources(declaration.Slot, 1, m_TextureCubeSRV.GetAddressOf());
+			break;
+		case PixelShader:
+			DX11Context::GetDeviceContext()->PSSetShaderResources(declaration.Slot, 1, m_TextureCubeSRV.GetAddressOf());
+			break;
+		case ComputeShader:
+		{
+			switch (declaration.ResourceType)
+			{
+			case RendererResourceType::Resource:
+				DX11Context::GetDeviceContext()->CSSetShaderResources(declaration.Slot, 1, m_TextureCubeSRV.GetAddressOf());
+				break;
+			case RendererResourceType::UnorderedAccess:
+				DX11Context::GetDeviceContext()->CSSetUnorderedAccessViews(declaration.Slot, 1, m_TextureCubeUAV.GetAddressOf(), 0);
+				break;
+			}
+			break;
+		}
+		default:
+			HNB_CORE_ASSERT(false, "Unknown shader stage!");
+			break;
+		}
 	}
 
 	bool DX11TextureCube::operator==(const Texture& other) const

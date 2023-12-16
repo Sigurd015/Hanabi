@@ -2,6 +2,7 @@
 
 #if defined(HNB_PLATFORM_WINDOWS)
 //----------DX11----------------------------------------
+#include "Hanabi/Platform/D3D/DXShaderCompiler.h"
 #include "Hanabi/Platform/D3D/DX11/DX11VertexBuffer.h"
 #include "Hanabi/Platform/D3D/DX11/DX11IndexBuffer.h"
 #include "Hanabi/Platform/D3D/DX11/DX11API.h"
@@ -13,6 +14,8 @@
 #include "Hanabi/Platform/D3D/DX11/DX11ConstantBuffer.h"
 #include "Hanabi/Platform/D3D/DX11/DX11RenderPass.h"
 #include "Hanabi/Platform/D3D/DX11/DX11Image.h"
+#include "Hanabi/Platform/D3D/DX11/DX11ComputePass.h"
+#include "Hanabi/Platform/D3D/DX11/DX11ComputePipeline.h"
 #endif
 
 namespace Hanabi
@@ -31,6 +34,51 @@ namespace Hanabi
 		case RendererAPIType::DX11:
 			return CreateScope<DX11RendererAPI>();
 			#endif
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Scope<ShaderCompiler> ShaderCompiler::Create()
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+			#if defined(HNB_PLATFORM_WINDOWS)
+		case RendererAPIType::DX11:
+			return CreateScope<DXShaderCompiler>();
+			#endif
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<ComputePass> ComputePass::Create(const ComputePassSpecification& spec)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+		case RendererAPIType::DX11:
+			return CreateRef<DX11ComputePass>(spec);
+		}
+
+		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<ComputePipeline> ComputePipeline::Create(const ComputePipelineSpecification& spec)
+	{
+		switch (RendererAPI::GetAPI())
+		{
+		case RendererAPIType::None:
+			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+		case RendererAPIType::DX11:
+			return CreateRef<DX11ComputePipeline>(spec);
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -84,23 +132,6 @@ namespace Hanabi
 			#if defined(HNB_PLATFORM_WINDOWS)
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Pipeline>(spec);
-			#endif
-		}
-		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
-		return nullptr;
-	}
-
-	Ref<Shader> Shader::Create(const std::string& fileName)
-	{
-		switch (RendererAPI::GetAPI())
-		{
-		case RendererAPIType::None:
-			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
-			return nullptr;
-
-			#if defined(HNB_PLATFORM_WINDOWS)
-		case RendererAPIType::DX11:
-			return CreateRef<DX11Shader>(fileName);
 			#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

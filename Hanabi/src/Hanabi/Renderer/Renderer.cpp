@@ -93,6 +93,16 @@ namespace Hanabi
 		s_RendererAPI->EndRenderPass();
 	}
 
+	void Renderer::BeginComputePass(const Ref<ComputePass>& computePass)
+	{
+		s_RendererAPI->BeginComputePass(computePass);
+	}
+
+	void Renderer::EndComputePass(const Ref<ComputePass>& computePass)
+	{
+		s_RendererAPI->EndComputePass(computePass);
+	}
+
 	void Renderer::DrawMesh(const Ref<Mesh>& mesh, uint32_t submeshIndex, const Ref<Material>& material)
 	{
 		s_RendererAPI->DrawMesh(mesh, submeshIndex, material);

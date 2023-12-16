@@ -1,31 +1,26 @@
 #include "hnbpch.h"
 #include "Hanabi/Renderer/Shader.h"
+#include "ShaderCompiler/ShaderCompiler.h"
 
 namespace Hanabi
 {
+	Scope<ShaderCompiler> s_ShaderCompiler = nullptr;
+
+	ShaderLibrary::ShaderLibrary()
+	{
+		s_ShaderCompiler = ShaderCompiler::Create();
+	}
+
 	void ShaderLibrary::Add(const std::string& name, const Ref<Shader>& shader)
 	{
 		HNB_CORE_ASSERT(!Exists(name), "Shader already exists!");
 		m_Shaders[name] = shader;
 	}
 
-	void ShaderLibrary::Add(const Ref<Shader>& shader)
-	{
-		auto& name = shader->GetName();
-		Add(name, shader);
-	}
-
 	Ref<Shader> ShaderLibrary::Load(const std::string& fileName)
 	{
-		auto shader = Shader::Create(fileName);
-		Add(shader);
-		return shader;
-	}
-
-	Ref<Shader> ShaderLibrary::Load(const std::string& name, const std::string& fileName)
-	{
-		auto shader = Shader::Create(fileName);
-		Add(name, shader);
+		auto shader = s_ShaderCompiler->Compile(fileName);
+		Add(fileName, shader);
 		return shader;
 	}
 
