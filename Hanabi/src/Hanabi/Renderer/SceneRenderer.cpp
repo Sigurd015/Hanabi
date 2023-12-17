@@ -12,6 +12,8 @@
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
+#define POINT_SHADOW_RESOLUTION 2048
+
 namespace Hanabi
 {
 	struct SceneRendererData
@@ -120,6 +122,17 @@ namespace Hanabi
 			char padding[12];
 		};
 
+		struct CBPointShadow
+		{
+			glm::mat4 LightViewProj[6];
+			glm::vec3 LightPosition;
+			float FarPlane = 0.0f;
+			uint32_t ShadowType = 0;
+
+			// Padding
+			char padding[12];
+		};
+
 		Ref<Environment> SceneEnvironment;
 
 		CBModel ModelData;
@@ -128,6 +141,7 @@ namespace Hanabi
 		CBPointLight PointLightData;
 		CBSpotLight SpotLightData;
 		CBDirShadow DirShadowData;
+		CBPointShadow PointShadowData;
 
 		Ref<ConstantBuffer> ModelDataBuffer;
 		Ref<ConstantBuffer> CameraDataBuffer;
@@ -135,8 +149,10 @@ namespace Hanabi
 		Ref<ConstantBuffer> PointLightDataBuffer;
 		Ref<ConstantBuffer> SpotLightDataBuffer;
 		Ref<ConstantBuffer> DirShadowDataBuffer;
+		Ref<ConstantBuffer> PointShadowDataBuffer;
 
 		Ref<RenderPass> DirShadowMapPass;
+		Ref<RenderPass> PointShadowMapPass;
 		Ref<RenderPass> DeferredGeoPass;
 		Ref<RenderPass> DeferredLightingPass;
 		Ref<RenderPass> SkyboxPass;
@@ -167,6 +183,7 @@ namespace Hanabi
 		s_Data->PointLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointLight));
 		s_Data->SpotLightDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBSpotLight));
 		s_Data->DirShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBDirShadow));
+		s_Data->PointShadowDataBuffer = ConstantBuffer::Create(sizeof(SceneRendererData::CBPointShadow));
 
 		VertexBufferLayout GeoLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
@@ -190,7 +207,7 @@ namespace Hanabi
 			Ref<Framebuffer> framebuffer;
 			{
 				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::RGBA16F,
+				spec.Attachments = { ImageFormat::RGBA32F, ImageFormat::RGBA16F,
 					ImageFormat::RGBA16F,ImageFormat::RGBA16F,ImageFormat::Depth };
 				spec.Width = 1920;
 				spec.Height = 1080;
@@ -212,7 +229,7 @@ namespace Hanabi
 				s_Data->DeferredGeoPass = RenderPass::Create(renderPassSpec);
 			}
 		}
-		// Shadow Map Pass
+		// Dir Shadow Map Pass
 		{
 			Ref<Framebuffer> framebuffer;
 			{
@@ -239,6 +256,35 @@ namespace Hanabi
 				RenderPassSpecification renderPassSpec;
 				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
 				s_Data->DirShadowMapPass = RenderPass::Create(renderPassSpec);
+			}
+		}
+		// Point Shadow Map Pass
+		{
+			Ref<Framebuffer> framebuffer;
+			{
+				FramebufferSpecification spec;
+				spec.Attachments = { { ImageFormat::ShadowMap,6 } };
+				spec.Width = POINT_SHADOW_RESOLUTION;
+				spec.Height = POINT_SHADOW_RESOLUTION;
+				spec.SwapChainTarget = false;
+				spec.DepthClearValue = 1.0f;
+				framebuffer = Framebuffer::Create(spec);
+			}
+			{
+				PipelineSpecification pipelineSpec;
+				// Notice: Use the same layout as DeferredGeoPass, 
+				// because transparent objects need check alpha value from Albedo Texture
+				pipelineSpec.Layout = GeoLayout;
+				pipelineSpec.Shader = Renderer::GetShader("PointShadowMap");
+				pipelineSpec.TargetFramebuffer = framebuffer;
+				pipelineSpec.BackfaceCulling = true;
+				pipelineSpec.DepthTest = true;
+				pipelineSpec.Topology = PrimitiveTopology::Triangles;
+				pipelineSpec.DepthOperator = DepthCompareOperator::Less;
+
+				RenderPassSpecification renderPassSpec;
+				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
+				s_Data->PointShadowMapPass = RenderPass::Create(renderPassSpec);
 			}
 		}
 		// Deferred Lighting Pass
@@ -325,6 +371,8 @@ namespace Hanabi
 
 		s_Data->DirShadowMapPass->SetInput("CBModel", s_Data->ModelDataBuffer);
 		s_Data->DirShadowMapPass->SetInput("CBDirShadow", s_Data->DirShadowDataBuffer);
+		s_Data->PointShadowMapPass->SetInput("CBModel", s_Data->ModelDataBuffer);
+		s_Data->PointShadowMapPass->SetInput("CBPointShadow", s_Data->PointShadowDataBuffer);
 
 		s_Data->DeferredLightingPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBScene", s_Data->SceneDataBuffer);
@@ -335,7 +383,8 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("u_MREBuffer", s_Data->DeferredGeoPass->GetOutput(1));
 		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
 		s_Data->DeferredLightingPass->SetInput("u_PositionBuffer", s_Data->DeferredGeoPass->GetOutput(3));
-		s_Data->DeferredLightingPass->SetInput("u_ShadowMap", s_Data->DirShadowMapPass->GetDepthOutput());
+		s_Data->DeferredLightingPass->SetInput("u_DirShadowMap", s_Data->DirShadowMapPass->GetDepthOutput());
+		s_Data->DeferredLightingPass->SetInput("u_PointShadowMap", s_Data->PointShadowMapPass->GetDepthOutput());
 		s_Data->DeferredLightingPass->SetInput("u_BRDFLUTTex", Renderer::GetTexture<Texture2D>("BRDFLut"));
 
 		s_Data->CompositePass->SetInput("u_Color", s_Data->DeferredLightingPass->GetOutput());
@@ -595,6 +644,51 @@ namespace Hanabi
 				s_Data->DirShadowData.LightViewProj = lightOrthoMatrix * lightViewMatrix;
 
 				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
+
+				ExecuteDrawCommands();
+			}
+			else
+			{
+				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
+			}
+			Renderer::EndRenderPass();
+		}
+
+		// Point Light Shadow
+		{
+			Renderer::BeginRenderPass(s_Data->PointShadowMapPass);
+			// TODO: Only support one point light now
+			s_Data->PointShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->PointLights[0].ShadowType);
+			if (s_Data->SceneEnvironment->PointLights[0].ShadowType != LightComponent::ShadowType::None)
+			{
+				s_Data->PointShadowData.LightPosition = s_Data->SceneEnvironment->PointLights[0].Position;
+				s_Data->PointShadowData.FarPlane = s_Data->SceneEnvironment->PointLights[0].Radius;
+
+				static float s_PointShadowAspect = (float)POINT_SHADOW_RESOLUTION / (float)POINT_SHADOW_RESOLUTION;
+				const static float s_PointShadowNearPlane = 1.0f;
+				glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), s_PointShadowAspect,
+					s_PointShadowNearPlane, s_Data->PointShadowData.FarPlane);
+
+				s_Data->PointShadowData.LightViewProj[0] = shadowProj *
+					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(1.0, 0.0, 0.0),
+						glm::vec3(0.0, -1.0, 0.0));
+				s_Data->PointShadowData.LightViewProj[1] = shadowProj *
+					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(-1.0, 0.0, 0.0),
+						glm::vec3(0.0, -1.0, 0.0));
+				s_Data->PointShadowData.LightViewProj[2] = shadowProj *
+					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 1.0, 0.0),
+						glm::vec3(0.0, 0.0, 1.0));
+				s_Data->PointShadowData.LightViewProj[3] = shadowProj *
+					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, -1.0, 0.0),
+						glm::vec3(0.0, 0.0, -1.0));
+				s_Data->PointShadowData.LightViewProj[4] = shadowProj *
+					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, 1.0),
+						glm::vec3(0.0, -1.0, 0.0));
+				s_Data->PointShadowData.LightViewProj[5] = shadowProj *
+					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, -1.0),
+						glm::vec3(0.0, -1.0, 0.0));
+
+				s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
 
 				ExecuteDrawCommands();
 			}

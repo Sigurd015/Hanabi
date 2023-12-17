@@ -2,7 +2,8 @@
 #include "Common.hlsl"
 #include "Lighting.hlsl"
 
-Texture2D u_ShadowMap : register(t8);
+Texture2D u_DirShadowMap : register(t8);
+TextureCube u_PointShadowMap : register(t9);
 
 float GetDirShadowBias()
 {
@@ -111,7 +112,7 @@ float2 SamplePoisson(int index)
 	return PoissonDistribution[index % 64];
 }
 
-// Directional Shadows
+// -------------------------- Directional Light Shadows --------------------------
 float FindBlockerDistance_DirectionalLight(uint cascade, float3 shadowCoords, float uvLightSize)
 {
 	float bias = GetDirShadowBias();
@@ -123,7 +124,7 @@ float FindBlockerDistance_DirectionalLight(uint cascade, float3 shadowCoords, fl
 	float searchWidth = SearchRegionRadiusUV(shadowCoords.z);
 	for (int i = 0; i < numBlockerSearchSamples; i++)
 	{
-		float z = u_ShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + SamplePoisson(i) * searchWidth, cascade), 0).r;
+		float z = u_DirShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + SamplePoisson(i) * searchWidth, cascade), 0).r;
 		if (z < (shadowCoords.z - bias))
 		{
 			blockers++;
@@ -146,7 +147,7 @@ float PCF_DirectionalLight(uint cascade, float3 shadowCoords, float uvRadius)
 	for (int i = 0; i < numPCFSamples; i++)
 	{
 		float2 offset = SamplePoisson(i) * uvRadius;
-		float z = u_ShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + offset, cascade), 0).r;
+		float z = u_DirShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + offset, cascade), 0).r;
 		sum += step(shadowCoords.z - bias, z);
 	}
 	return sum / numPCFSamples;
@@ -191,7 +192,7 @@ float DirSoftShadow(float4 position)
     {
         for (int j = -SampleSize; j <= SampleSize; j++)
         {
-            float pcfDepth = u_ShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy + float2(i, j) * texelSize, 0).r;
+            float pcfDepth = u_DirShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy + float2(i, j) * texelSize, 0).r;
             shadow += step(shadowPosition.z - bias , pcfDepth);
         }
     }
@@ -219,6 +220,18 @@ float DirHardShadow(float4 position)
 
     float shadow = 1.0f;
     float bias = GetDirShadowBias();
-    float depthFromLight = u_ShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy, 0).r;
+    float depthFromLight = u_DirShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy, 0).r;
     return step(shadowPosition.z, depthFromLight + bias);
 }
+// -------------------------- Directional Light Shadows --------------------------
+
+// -------------------------- Point Light Shadows --------------------------
+float PointHardShadow(float3 position)
+{
+	const float bias = 0.001f;
+	float3 pixelToLight = position - u_PointLightPosition;
+	float depthFromLight = u_PointShadowMap.SampleLevel(u_SSLinearClamp, pixelToLight, 0).r;
+	depthFromLight *= u_PointFarPlane;
+	return step(length(pixelToLight), depthFromLight + bias);
+}
+// -------------------------- Point Light Shadows --------------------------

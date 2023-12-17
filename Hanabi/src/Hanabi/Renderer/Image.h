@@ -38,6 +38,7 @@ namespace Hanabi
 		uint32_t Width = 1;
 		uint32_t Height = 1;
 		uint32_t Mips = 1;
+		uint32_t Layers = 1;
 	};
 
 	class Image : public RendererResource

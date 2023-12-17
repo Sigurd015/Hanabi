@@ -60,6 +60,7 @@ namespace Hanabi
 					imageSpec.Width = m_Specification.Width;
 					imageSpec.Height = m_Specification.Height;
 					imageSpec.Format = spec.TextureFormat;
+					imageSpec.Layers = spec.Layers;
 					imageSpec.Usage = ImageUsage::Attachment;
 					image = CreateRef<DX11Image2D>(imageSpec);
 					image->Invalidate();
@@ -68,8 +69,18 @@ namespace Hanabi
 				ComPtr<ID3D11RenderTargetView> targetView;
 				D3D11_RENDER_TARGET_VIEW_DESC targetViewDesc = {};
 				targetViewDesc.Format = image->GetDXGIFormat();
-				targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-				targetViewDesc.Texture2D.MipSlice = 0;
+				if (spec.Layers > 1)
+				{
+					targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+					targetViewDesc.Texture2DArray.ArraySize = spec.Layers;
+					targetViewDesc.Texture2DArray.MipSlice = 0;
+				}
+				else
+				{
+					targetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+					targetViewDesc.Texture2D.MipSlice = 0;
+				}
+
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateRenderTargetView(image->GetTexture().Get(), &targetViewDesc, &targetView));
 
 				m_ColorAttachments.emplace_back(std::move(image));
@@ -88,6 +99,7 @@ namespace Hanabi
 					depthImageSpec.Width = m_Specification.Width;
 					depthImageSpec.Height = m_Specification.Height;
 					depthImageSpec.Format = spec.TextureFormat;
+					depthImageSpec.Layers = spec.Layers;
 					depthImageSpec.Usage = ImageUsage::Attachment;
 					image = CreateRef<DX11Image2D>(depthImageSpec);
 					image->Invalidate();
@@ -96,8 +108,18 @@ namespace Hanabi
 				D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc = {};
 				depthStencilViewDesc.Format = Utils::ImageFormatToDXDepthDSVFormat(spec.TextureFormat);
 				depthStencilViewDesc.Flags = 0;
-				depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-				depthStencilViewDesc.Texture2D.MipSlice = 0;
+				if (spec.Layers > 1)
+				{
+					depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+					depthStencilViewDesc.Texture2DArray.ArraySize = spec.Layers;
+					depthStencilViewDesc.Texture2DArray.MipSlice = 0;
+				}
+				else
+				{
+					depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+					depthStencilViewDesc.Texture2D.MipSlice = 0;
+				}
+
 				DX_CHECK_RESULT(DX11Context::GetDevice()->CreateDepthStencilView(image->GetTexture().Get(), &depthStencilViewDesc,
 					m_DSAttachmentDSV.GetAddressOf()));
 

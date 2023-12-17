@@ -9,9 +9,10 @@ namespace Hanabi
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
-		FramebufferTextureSpecification(ImageFormat format) :TextureFormat(format) {}
+		FramebufferTextureSpecification(ImageFormat format, uint32_t layers = 1) :TextureFormat(format), Layers(layers) {}
 
 		ImageFormat TextureFormat;
+		uint32_t Layers = 0;
 		// TODO: filtering/wrap
 	};
 

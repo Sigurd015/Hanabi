@@ -73,3 +73,11 @@ cbuffer CBDirShadow : register(b5)
     float4x4 u_DirLightViewProjection;
     uint u_DirShadowType;
 };
+
+cbuffer CBPointShadow : register(b6)
+{
+    float4x4 u_PointLightViewProj[6];
+    float3 u_PointLightPosition;
+    float u_PointFarPlane;
+    uint u_PointShadowType;
+};
