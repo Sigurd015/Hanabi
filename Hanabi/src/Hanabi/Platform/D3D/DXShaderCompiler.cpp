@@ -40,6 +40,7 @@ namespace Hanabi
 		if (disableOptimization)
 			flags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 
+		shader->m_ReflectionData.clear();
 		for (auto& data : shaderSource)
 		{
 			switch (data.Type)

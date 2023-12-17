@@ -42,6 +42,7 @@ namespace Hanabi
 		s_Data->ShaderLibrary->Load("EquirectangularToCubemap");
 		s_Data->ShaderLibrary->Load("EnvironmentMipFilter");
 		s_Data->ShaderLibrary->Load("EnvironmentIrradiance");
+		s_Data->ShaderLibrary->Load("PointShadowMap");
 
 		//Setup textures
 		TextureSpecification spec;

@@ -32,7 +32,7 @@ namespace Hanabi
 			textureDesc.Width = m_Specification.Width;
 			textureDesc.Height = m_Specification.Height;
 			textureDesc.MipLevels = 1;
-			textureDesc.ArraySize = 1;
+			textureDesc.ArraySize = m_Specification.Layers;
 			textureDesc.Format = m_DataFormat;
 			// TODO: Implement multisampling
 			textureDesc.SampleDesc.Count = 1;
@@ -41,8 +41,26 @@ namespace Hanabi
 			textureDesc.CPUAccessFlags = 0;
 
 			D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceDesc = {};
-			shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			shaderResourceDesc.Texture2D.MipLevels = 1;
+
+			if (textureDesc.ArraySize > 1)
+			{
+				if (textureDesc.ArraySize == 6)
+				{
+					textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+					shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+					shaderResourceDesc.TextureCube.MipLevels = 1;
+				}
+				else
+				{
+					shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+					shaderResourceDesc.Texture2DArray.MipLevels = 1;
+				}
+			}
+			else
+			{
+				shaderResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				shaderResourceDesc.Texture2D.MipLevels = 1;
+			}
 
 			if (Utils::IsDepthFormat(m_Specification.Format))
 			{
@@ -104,7 +122,7 @@ namespace Hanabi
 				subresourceData.pSysMem = m_ImageData.Data;
 
 				// Notice: RGBA32F format used for HDR image
-				if(m_Specification.Format == ImageFormat::RGBA32F)
+				if (m_Specification.Format == ImageFormat::RGBA32F)
 					subresourceData.SysMemPitch = m_Specification.Width * defalutDataSize * sizeof(float);  // size of one row in bytes
 				else
 					subresourceData.SysMemPitch = m_Specification.Width * defalutDataSize;  // size of one row in bytes

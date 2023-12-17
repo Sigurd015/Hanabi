@@ -32,26 +32,26 @@ namespace Hanabi
 	std::string FileSystem::ReadFileText(const std::filesystem::path& filepath)
 	{
 		std::string result;
-		std::ifstream in(filepath.string(), std::ios::in | std::ios::binary);
-		if (in)
+		std::ifstream stream(filepath, std::ios::in | std::ios::binary);
+		if (stream)
 		{
-			in.seekg(0, std::ios::end);
-			size_t size = in.tellg();
+			stream.seekg(0, std::ios::end);
+			size_t size = stream.tellg();
 			if (size != -1)
 			{
 				result.resize(size);
-				in.seekg(0, std::ios::beg);
-				in.read(&result[0], size);
-				in.close();
+				stream.seekg(0, std::ios::beg);
+				stream.read(&result[0], size);
+				stream.close();
 			}
 			else
 			{
-				HNB_CORE_ERROR("Could not read from file '{0}'", filepath.string());
+				HNB_CORE_ERROR("Could not read from file '{0}'", filepath);
 			}
 		}
 		else
 		{
-			HNB_CORE_ERROR("Could not open file '{0}'", filepath.string());
+			HNB_CORE_ERROR("Could not open file '{0}'", filepath);
 		}
 		return result;
 	}

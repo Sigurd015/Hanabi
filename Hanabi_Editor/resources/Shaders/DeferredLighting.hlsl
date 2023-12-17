@@ -15,9 +15,9 @@ Texture2D u_MREBuffer : register(t4);
 Texture2D u_NormalBuffer : register(t5);
 Texture2D u_PositionBuffer : register(t6);
 
-Texture2D u_BRDFLUTTex : register(t9);
-TextureCube u_EnvRadianceTex : register(t10);
-TextureCube u_EnvIrradianceTex : register(t11);
+Texture2D u_BRDFLUTTex : register(t11);
+TextureCube u_EnvRadianceTex : register(t12);
+TextureCube u_EnvIrradianceTex : register(t13);
 
 float3 IBL(float3 F0, float3 Lr)
 {
@@ -73,9 +73,22 @@ float4 main(float4 Position : SV_Position) : SV_Target
             break;
     }
 
+    // TODO: Calculate all point light shadow factors in a single pass, 
+    // and then sample them in the lighting pass
+    float pointShadowFactor = 1.0f;
+    switch (u_PointShadowType)
+    {
+        case 1:
+            pointShadowFactor = PointHardShadow(m_Params.WorldPosition);
+            break;
+        case 2:
+            pointShadowFactor = PointHardShadow(m_Params.WorldPosition);
+            break;
+    }
+
     // Direct lighting
 	float3 lightContribution = CalculateDirLights(F0) * dirShadowFactor;
-	lightContribution += CalculatePointLights(F0);
+	lightContribution += CalculatePointLights(F0) * pointShadowFactor;
 	lightContribution += CalculateSpotLights(F0);
 	lightContribution += m_Params.Albedo * MRE.z; // MRE.z -> Emission
 
