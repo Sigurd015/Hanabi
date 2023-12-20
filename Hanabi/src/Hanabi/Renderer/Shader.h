@@ -21,8 +21,10 @@ namespace Hanabi
 	public:
 		ShaderLibrary();
 		void Add(const std::string& name, const Ref<Shader>& shader);
-		Ref<Shader> Load(const std::string& fileName);
+		Ref<Shader> Load(const std::string& name);
+		void Reload(const std::string& name);
 		Ref<Shader> Get(const std::string& name);
+		std::vector<std::string> GetShaderNames() const;
 		bool Exists(const std::string& name) const;
 	private:
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;

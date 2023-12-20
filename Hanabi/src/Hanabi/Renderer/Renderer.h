@@ -41,6 +41,8 @@ namespace Hanabi
 		static void SetConfig(const RendererConfig& config);
 
 		static Ref<Shader> GetShader(const std::string& name);
+		static void ReloadShader(const std::string& name);
+		static std::vector<std::string> GetShaderNames();
 		static Ref<Mesh> GetMesh(const std::string& name);
 
 		template<typename T>

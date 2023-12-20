@@ -157,6 +157,16 @@ namespace Hanabi
 		return s_Data->ShaderLibrary->Get(name);
 	}
 
+	void Renderer::ReloadShader(const std::string& name)
+	{
+		s_Data->ShaderLibrary->Reload(name);
+	}
+
+	std::vector<std::string> Renderer::GetShaderNames()
+	{
+		return s_Data->ShaderLibrary->GetShaderNames();
+	}
+
 	Ref<Mesh> Renderer::GetMesh(const std::string& name)
 	{
 		if (s_Data->Meshes.find(name) == s_Data->Meshes.end())

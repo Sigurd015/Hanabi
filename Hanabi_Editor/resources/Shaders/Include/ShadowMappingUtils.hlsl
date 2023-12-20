@@ -221,7 +221,7 @@ float DirHardShadow(float4 position)
     float shadow = 1.0f;
     float bias = GetDirShadowBias();
     float depthFromLight = u_DirShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy, 0).r;
-    return step(shadowPosition.z, depthFromLight + bias);
+    return step(shadowPosition.z - bias, depthFromLight);
 }
 // -------------------------- Directional Light Shadows --------------------------
 
@@ -232,6 +232,6 @@ float PointHardShadow(float3 position)
 	float3 pixelToLight = position - u_PointLightPosition;
 	float depthFromLight = u_PointShadowMap.SampleLevel(u_SSLinearClamp, pixelToLight, 0).r;
 	depthFromLight *= u_PointFarPlane;
-	return step(length(pixelToLight), depthFromLight + bias);
+	return step(length(pixelToLight) - bias, depthFromLight);
 }
 // -------------------------- Point Light Shadows --------------------------

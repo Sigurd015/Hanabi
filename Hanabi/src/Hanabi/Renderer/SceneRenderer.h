@@ -30,7 +30,6 @@ namespace Hanabi
 		{
 			uint32_t DrawCalls = 0;
 		};
-
 		static void ResetStats();
 		static SceneRenderer::Statistics GetStats();
 	private:
@@ -44,7 +43,6 @@ namespace Hanabi
 		static void CompositePass();
 		static void SkyboxPass();
 
-	
 		struct CascadeData
 		{
 			glm::mat4 ViewProj;
