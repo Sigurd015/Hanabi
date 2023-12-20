@@ -31,18 +31,23 @@ VertexOutput main(VertexInput Input)
 #type:geometry
 #include "Buffers.hlsl"
 
+struct GSInput
+{
+    float4 Vertex : SV_Position;
+    float2 TexCoord : TexCoord;
+};
+
 struct GSOutput
 {
-    float4 Vertex : SV_POSITION;
-    //float2 TexCoord : TexCoord;
+    float4 Vertex : SV_Position;
+    float2 TexCoord : TexCoord;
     float3 WorldPosition : WorldPosition;
     uint RTIndex : SV_RenderTargetArrayIndex;
 };
 
 [maxvertexcount(18)] //6 * 3 = 18
 void main(
-	triangle float4 Input[3] : SV_POSITION, //Takes the output from vertex shader * 3
-    //float2 TexCoord : TexCoord, 
+	triangle GSInput Input[3], //Takes the output from vertex shader * 3
 	inout TriangleStream<GSOutput> OutputStream //Sends to pixel shader
 )
 {
@@ -54,9 +59,9 @@ void main(
         //Triangle = 3 vertices
         for (int VertexIndex = 0; VertexIndex < 3; VertexIndex++)
         {
-            output.WorldPosition = Input[VertexIndex].xyz;
-            //output.TexCoord = TexCoord;
-            output.Vertex = mul(Input[VertexIndex], u_PointLightViewProj[CubeFaceIndex]);
+            output.WorldPosition = Input[VertexIndex].Vertex.xyz;
+            output.TexCoord = Input[VertexIndex].TexCoord;
+            output.Vertex = mul(u_PointLightViewProj[CubeFaceIndex], float4(Input[VertexIndex].Vertex.xyz, 1.0f));
             OutputStream.Append(output);
         }
         OutputStream.RestartStrip();
@@ -70,17 +75,17 @@ void main(
 struct PixelInput
 {
     float4 Position : SV_Position;
+    float2 TexCoord : TexCoord;
     float3 WorldPosition : WorldPosition;
-    //float2 TexCoord : TexCoord;
 };
 
 Texture2D u_AlbedoTex : register(t0);
 
 float main(PixelInput Input) : SV_Depth
 {
-    //float4 albedo = u_AlbedoTex.Sample(u_SSAnisotropicWrap, Input.TexCoord);
+    float4 albedo = u_AlbedoTex.Sample(u_SSAnisotropicWrap, Input.TexCoord);
     // Discard transparent pixels
-    //clip(albedo.a - 0.01f);
+    clip(albedo.a - 0.01f);
 
     // get distance between pixel and light source
     float lightDistance = length(Input.WorldPosition - u_PointLightPosition);

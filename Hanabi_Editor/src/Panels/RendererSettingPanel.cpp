@@ -72,6 +72,24 @@ namespace Hanabi
 				ImGui::Text("Dir Light Shadow Map");
 				ImGui::Image(SceneRenderer::GetDirShadowMap()->GetRendererID(), ImVec2(300.0f, 300.0f));
 			}
+
+			const std::vector<std::string>& shaderNames = Renderer::GetShaderNames();
+			if (ImGui::CollapsingHeader("Shader Settings", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				for (const std::string& name : shaderNames)
+				{
+					Ref<Shader> shader = Renderer::GetShader(name);
+					if (ImGui::TreeNode(name.c_str()))
+					{
+						ImGui::Text("Name: %s", name.c_str());
+						if (ImGui::Button("Reload"))
+						{
+							Renderer::ReloadShader(name);
+						}
+						ImGui::TreePop();
+					}
+				}
+			}
 		}
 		ImGui::End();
 	}

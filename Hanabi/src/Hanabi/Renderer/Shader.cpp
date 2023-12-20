@@ -17,17 +17,33 @@ namespace Hanabi
 		m_Shaders[name] = shader;
 	}
 
-	Ref<Shader> ShaderLibrary::Load(const std::string& fileName)
+	Ref<Shader> ShaderLibrary::Load(const std::string& name)
 	{
-		auto shader = s_ShaderCompiler->Compile(fileName);
-		Add(fileName, shader);
+		auto shader = s_ShaderCompiler->Compile(name);
+		Add(name, shader);
 		return shader;
+	}
+
+	void ShaderLibrary::Reload(const std::string& name)
+	{
+		Ref<Shader> shader = Get(name);
+		s_ShaderCompiler->TryReCompile(shader, name);
 	}
 
 	Ref<Shader> ShaderLibrary::Get(const std::string& name)
 	{
 		HNB_CORE_ASSERT(Exists(name), "Shader not found!");
 		return m_Shaders[name];
+	}
+
+	std::vector<std::string> ShaderLibrary::GetShaderNames() const
+	{
+		std::vector<std::string> names;
+		names.reserve(m_Shaders.size());
+		for (auto& pair : m_Shaders)
+			names.push_back(pair.first);
+
+		return names;
 	}
 
 	bool ShaderLibrary::Exists(const std::string& name) const

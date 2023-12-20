@@ -671,22 +671,22 @@ namespace Hanabi
 
 				s_Data->PointShadowData.LightViewProj[0] = shadowProj *
 					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(1.0, 0.0, 0.0),
-						glm::vec3(0.0, -1.0, 0.0));
+						glm::vec3(0.0, 1.0, 0.0));
 				s_Data->PointShadowData.LightViewProj[1] = shadowProj *
 					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(-1.0, 0.0, 0.0),
-						glm::vec3(0.0, -1.0, 0.0));
+						glm::vec3(0.0, 1.0, 0.0));
 				s_Data->PointShadowData.LightViewProj[2] = shadowProj *
 					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 1.0, 0.0),
-						glm::vec3(0.0, 0.0, 1.0));
+						glm::vec3(0.0, 0.0, -1.0));
 				s_Data->PointShadowData.LightViewProj[3] = shadowProj *
 					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, -1.0, 0.0),
-						glm::vec3(0.0, 0.0, -1.0));
+						glm::vec3(0.0, 0.0, 1.0));
 				s_Data->PointShadowData.LightViewProj[4] = shadowProj *
 					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, 1.0),
-						glm::vec3(0.0, -1.0, 0.0));
+						glm::vec3(0.0, 1.0, 0.0));
 				s_Data->PointShadowData.LightViewProj[5] = shadowProj *
 					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, -1.0),
-						glm::vec3(0.0, -1.0, 0.0));
+						glm::vec3(0.0, 1.0, 0.0));
 
 				s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
 
@@ -699,7 +699,7 @@ namespace Hanabi
 			Renderer::EndRenderPass();
 		}
 
-		// TODO: Implement Point Light Shadow and Spot Light Shadow
+		// TODO: Implement Spot Light Shadow
 	}
 
 	void SceneRenderer::CompositePass()
