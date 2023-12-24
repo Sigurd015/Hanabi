@@ -2,25 +2,6 @@
 #include "Common.hlsl"
 #include "Lighting.hlsl"
 
-Texture2D u_DirShadowMap : register(t8);
-TextureCube u_PointShadowMap : register(t9);
-
-float GetDirShadowBias()
-{
-	const float MINIMUM_SHADOW_BIAS = 0.002f;
-	float bias = max(MINIMUM_SHADOW_BIAS * (1.0 - dot(m_Params.Normal, u_DirLight.Direction)), MINIMUM_SHADOW_BIAS);
-	return bias;
-}
-
-float SearchRegionRadiusUV(float zWorld)
-{
-	const float light_zNear = 0.0; // 0.01 gives artifacts? maybe because of ortho proj?
-	const float lightRadiusUV = 0.05;
-	return lightRadiusUV * (zWorld - light_zNear) / zWorld;
-}
-
-static float ShadowFade = 1.0; //TODO(Karim): A better placement of this?
-
 static const float2 PoissonDistribution[64] = {
 	float2(-0.94201624, -0.39906216),
 	float2(0.94558609, -0.76890725),
@@ -113,6 +94,24 @@ float2 SamplePoisson(int index)
 }
 
 // -------------------------- Directional Light Shadows --------------------------
+Texture2D u_DirShadowMap : register(t8);
+
+static float ShadowFade = 1.0; //TODO: A better placement of this?
+
+float GetDirShadowBias()
+{
+	const float MINIMUM_SHADOW_BIAS = 0.002f;
+	float bias = max(MINIMUM_SHADOW_BIAS * (1.0 - dot(m_Params.Normal, u_DirLight.Direction)), MINIMUM_SHADOW_BIAS);
+	return bias;
+}
+
+float SearchRegionRadiusUV(float zWorld)
+{
+	const float light_zNear = 0.0; // 0.01 gives artifacts? maybe because of ortho proj?
+	const float lightRadiusUV = 0.05;
+	return lightRadiusUV * (zWorld - light_zNear) / zWorld;
+}
+
 float FindBlockerDistance_DirectionalLight(uint cascade, float3 shadowCoords, float uvLightSize)
 {
 	float bias = GetDirShadowBias();
@@ -226,12 +225,14 @@ float DirHardShadow(float4 position)
 // -------------------------- Directional Light Shadows --------------------------
 
 // -------------------------- Point Light Shadows --------------------------
+TextureCube u_PointShadowMap : register(t9);
+
 float PointHardShadow(float3 position)
 {
-	const float bias = 0.001f;
-	float3 pixelToLight = position - u_PointLightPosition;
-	float depthFromLight = u_PointShadowMap.SampleLevel(u_SSLinearClamp, pixelToLight, 0).r;
+	const float bias = 0.02f;
+	float3 lightToPixel = position - u_PointLightPosition;
+	float depthFromLight = u_PointShadowMap.SampleLevel(u_SSLinearClamp, lightToPixel, 0).r;
 	depthFromLight *= u_PointFarPlane;
-	return step(length(pixelToLight) - bias, depthFromLight);
+	return step(length(lightToPixel) - bias, depthFromLight);
 }
 // -------------------------- Point Light Shadows --------------------------

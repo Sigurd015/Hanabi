@@ -12,8 +12,6 @@
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
-#define POINT_SHADOW_RESOLUTION 2048
-
 namespace Hanabi
 {
 	struct SceneRendererData
@@ -264,8 +262,8 @@ namespace Hanabi
 			{
 				FramebufferSpecification spec;
 				spec.Attachments = { { ImageFormat::ShadowMap,6 } };
-				spec.Width = POINT_SHADOW_RESOLUTION;
-				spec.Height = POINT_SHADOW_RESOLUTION;
+				spec.Width = 2048;
+				spec.Height = 2048;
 				spec.SwapChainTarget = false;
 				spec.DepthClearValue = 1.0f;
 				framebuffer = Framebuffer::Create(spec);
@@ -510,7 +508,7 @@ namespace Hanabi
 	{
 		DeferredGeoPass();
 
-		DirShadowMapPass();
+		ShadowMapPass();
 
 		DeferredLightPass();
 
@@ -630,7 +628,7 @@ namespace Hanabi
 		Renderer::EndRenderPass();
 	}
 
-	void SceneRenderer::DirShadowMapPass()
+	void SceneRenderer::ShadowMapPass()
 	{
 		// Directional Light
 		{
@@ -664,7 +662,7 @@ namespace Hanabi
 				s_Data->PointShadowData.LightPosition = s_Data->SceneEnvironment->PointLights[0].Position;
 				s_Data->PointShadowData.FarPlane = s_Data->SceneEnvironment->PointLights[0].Radius;
 
-				static float s_PointShadowAspect = (float)POINT_SHADOW_RESOLUTION / (float)POINT_SHADOW_RESOLUTION;
+				const static float s_PointShadowAspect = 1.0f;
 				const static float s_PointShadowNearPlane = 1.0f;
 				glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), s_PointShadowAspect,
 					s_PointShadowNearPlane, s_Data->PointShadowData.FarPlane);
@@ -694,7 +692,7 @@ namespace Hanabi
 			}
 			else
 			{
-				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
+				s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
 			}
 			Renderer::EndRenderPass();
 		}
