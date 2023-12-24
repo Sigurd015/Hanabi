@@ -122,7 +122,7 @@ namespace Hanabi
 			// D3D_SIT_CBUFFER --> Constant Buffer
 			// D3D_SIT_TEXTURE --> Texture
 			// D3D_SIT_SAMPLER --> Sampler
-			// D3D_SIT_TBUFFER --> Structured Buffer
+			// D3D_SIT_STRUCTURED --> Structured Buffer
 			// D3D_SIT_UAV_RWTYPED --> RWTexture2D/Texture2DArray
 			if (bindDesc.Type == D3D_SIT_CBUFFER)
 			{
@@ -139,7 +139,7 @@ namespace Hanabi
 				shader->m_ReflectionData.push_back(
 					{ bindDesc.Name,RendererResourceType::Sampler,bindDesc.BindPoint,shaderType });
 			}
-			else if (bindDesc.Type == D3D_SIT_TBUFFER)
+			else if (bindDesc.Type == D3D_SIT_STRUCTURED)
 			{
 				shader->m_ReflectionData.push_back(
 					{ bindDesc.Name,RendererResourceType::StructuredBuffer,bindDesc.BindPoint,shaderType });

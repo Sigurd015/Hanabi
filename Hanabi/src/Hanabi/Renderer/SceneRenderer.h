@@ -38,7 +38,7 @@ namespace Hanabi
 		static void DeferredGeoPass();
 		static void DeferredLightPass();
 
-		static void DirShadowMapPass();
+		static void ShadowMapPass();
 
 		static void CompositePass();
 		static void SkyboxPass();
