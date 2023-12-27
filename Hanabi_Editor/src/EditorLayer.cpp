@@ -193,7 +193,7 @@ namespace Hanabi
 
 	bool EditorLayer::OpenProject()
 	{
-		std::string filepath = FileDialogs::OpenFile("Hanabi Project (*.hproj)\0*.hproj\0");
+		std::string filepath = Utils::FileDialogs::OpenFile("Hanabi Project (*.hproj)\0*.hproj\0");
 		if (filepath.empty())
 			return false;
 
@@ -255,7 +255,7 @@ namespace Hanabi
 
 	void EditorLayer::SaveSceneAs()
 	{
-		std::string filepath = FileDialogs::SaveFile("Scenes (*.hscene)\0*.hscene\0");
+		std::string filepath = Utils::FileDialogs::SaveFile("Scenes (*.hscene)\0*.hscene\0");
 		if (!filepath.empty())
 		{
 			if (AssetManager::IsAssetHandleValid(m_ActiveScene->Handle))

@@ -2,11 +2,11 @@
 // Composite Shader
 // --------------------------
 
-#type:vertex
-#include "FullScreenQuadVertex.hlsl"
+#pragma stage : vertex
+#include "Include/FullScreenQuadVertex.hlsl"
 
-#type:pixel
-#include "Common.hlsl"
+#pragma stage : pixel
+#include "Include/Common.hlsl"
 
 Texture2D u_Color : register(t0);
 

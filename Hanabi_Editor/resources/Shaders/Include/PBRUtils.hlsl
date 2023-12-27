@@ -1,3 +1,4 @@
+#pragma once
 #include "Common.hlsl"
 
 // GGX/Towbridge-Reitz normal distribution function.

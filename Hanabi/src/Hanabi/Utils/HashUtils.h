@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 
-namespace Hanabi
+namespace Hanabi::Utils
 {
 	class Hash
 	{

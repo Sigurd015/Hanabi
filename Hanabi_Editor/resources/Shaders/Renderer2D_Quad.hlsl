@@ -2,7 +2,7 @@
 // Renderer2D Quad Shader
 // --------------------------
 
-#type:vertex
+#pragma stage : vertex
 struct VertexInput
 {
     float3 a_Position : a_Position;
@@ -37,8 +37,8 @@ VertexOutput main(VertexInput Input)
     return Output;
 }
 
-#type:pixel
-#include "Common.hlsl"
+#pragma stage : pixel
+#include "Include/Common.hlsl"
 #define MAX_TEXTURE 32
 
 struct PixelInput

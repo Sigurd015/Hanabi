@@ -143,7 +143,7 @@ namespace Hanabi
 				// TODO: May generate the AssetHandle by hashing the material name
 				// So that we can make the AssetHandle consistent across different imports
 				auto aiMaterialName = aiMaterial->GetName();
-				HNB_CORE_INFO("--- Name Hash --- {0}", Hash::GenerateFNVHash(aiMaterialName.data));
+				HNB_CORE_INFO("--- Name Hash --- {0}", Utils::Hash::GenerateFNVHash(aiMaterialName.data));
 				meshSource->m_Materials[i] = AssetManager::CreateMemoryOnlyAsset<MaterialAsset>();
 
 				Ref<MaterialAsset> material = AssetManager::GetAsset<MaterialAsset>(meshSource->m_Materials[i]);

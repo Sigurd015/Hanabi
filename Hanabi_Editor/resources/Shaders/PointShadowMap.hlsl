@@ -2,8 +2,8 @@
 // PointShadow Map Shader
 // --------------------------
 
-#type:vertex
-#include "Buffers.hlsl"
+#pragma stage : vertex
+#include "Include/Buffers.hlsl"
 
 struct VertexInput
 {
@@ -28,8 +28,8 @@ VertexOutput main(VertexInput Input)
     return Output;
 }
 
-#type:geometry
-#include "Buffers.hlsl"
+#pragma stage : geometry
+#include "Include/Buffers.hlsl"
 
 struct GSInput
 {
@@ -68,9 +68,9 @@ void main(
     }
 }
 
-#type:pixel
-#include "Common.hlsl"
-#include "Buffers.hlsl"
+#pragma stage : pixel
+#include "Include/Common.hlsl"
+#include "Include/Buffers.hlsl"
 
 struct PixelInput
 {

@@ -1,13 +1,8 @@
 workspace "Sandbox"
-	architecture "x86_64"
+	architecture "x64"
 	startproject "Sandbox"
 
-	configurations
-	{
-		"Debug",
-		"Release",
-		"Dist"
-	}
+	configurations { "Debug", "Release", "Dist" }
 
 	flags
 	{

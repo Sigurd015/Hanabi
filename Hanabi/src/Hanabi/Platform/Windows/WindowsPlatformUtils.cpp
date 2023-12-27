@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-namespace Hanabi
+namespace Hanabi::Utils
 {
 	std::string FileDialogs::OpenFile(const char* filter)
 	{

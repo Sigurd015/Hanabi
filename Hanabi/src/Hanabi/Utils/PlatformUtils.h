@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace Hanabi
+namespace Hanabi::Utils
 {
 	class FileDialogs
 	{

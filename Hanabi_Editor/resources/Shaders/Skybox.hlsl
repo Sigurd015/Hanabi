@@ -2,8 +2,8 @@
 // Skybox Shader
 // --------------------------
 
-#type:vertex
-#include "Buffers.hlsl"
+#pragma stage : vertex
+#include "Include/Buffers.hlsl"
 
 struct VertexInput
 {
@@ -25,7 +25,7 @@ VertexOutput main(VertexInput Input)
     return Output;
 }
 
-#type:pixel
+#pragma stage : pixel
 struct PixelInput
 {
     float4 Pos : SV_Position;

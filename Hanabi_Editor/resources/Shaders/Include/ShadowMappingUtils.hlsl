@@ -1,9 +1,11 @@
+#pragma once
 #include "Buffers.hlsl"
 #include "Common.hlsl"
 #include "Lighting.hlsl"
 
-static const float2 PoissonDistribution[64] = {
-	float2(-0.94201624, -0.39906216),
+static const float2 PoissonDistribution[64] =
+{
+    float2(-0.94201624, -0.39906216),
 	float2(0.94558609, -0.76890725),
 	float2(-0.094184101, -0.92938870),
 	float2(0.34495938, 0.29387760),
@@ -69,8 +71,9 @@ static const float2 PoissonDistribution[64] = {
 	float2(-0.018516, 0.435703)
 };
 
-static const float2 poissonDisk[16] = {
-	float2(-0.94201624, -0.39906216),
+static const float2 poissonDisk[16] =
+{
+    float2(-0.94201624, -0.39906216),
 	float2(0.94558609, -0.76890725),
 	float2(-0.094184101, -0.92938870),
 	float2(0.34495938, 0.29387760),
@@ -90,7 +93,7 @@ static const float2 poissonDisk[16] = {
 
 float2 SamplePoisson(int index)
 {
-	return PoissonDistribution[index % 64];
+    return PoissonDistribution[index % 64];
 }
 
 // -------------------------- Directional Light Shadows --------------------------
@@ -100,71 +103,71 @@ static float ShadowFade = 1.0; //TODO: A better placement of this?
 
 float GetDirShadowBias()
 {
-	const float MINIMUM_SHADOW_BIAS = 0.002f;
-	float bias = max(MINIMUM_SHADOW_BIAS * (1.0 - dot(m_Params.Normal, u_DirLight.Direction)), MINIMUM_SHADOW_BIAS);
-	return bias;
+    const float MINIMUM_SHADOW_BIAS = 0.002f;
+    float bias = max(MINIMUM_SHADOW_BIAS * (1.0 - dot(m_Params.Normal, u_DirLight.Direction)), MINIMUM_SHADOW_BIAS);
+    return bias;
 }
 
 float SearchRegionRadiusUV(float zWorld)
 {
-	const float light_zNear = 0.0; // 0.01 gives artifacts? maybe because of ortho proj?
-	const float lightRadiusUV = 0.05;
-	return lightRadiusUV * (zWorld - light_zNear) / zWorld;
+    const float light_zNear = 0.0; // 0.01 gives artifacts? maybe because of ortho proj?
+    const float lightRadiusUV = 0.05;
+    return lightRadiusUV * (zWorld - light_zNear) / zWorld;
 }
 
 float FindBlockerDistance_DirectionalLight(uint cascade, float3 shadowCoords, float uvLightSize)
 {
-	float bias = GetDirShadowBias();
+    float bias = GetDirShadowBias();
 
-	int numBlockerSearchSamples = 64;
-	int blockers = 0;
-	float avgBlockerDistance = 0;
+    int numBlockerSearchSamples = 64;
+    int blockers = 0;
+    float avgBlockerDistance = 0;
 
-	float searchWidth = SearchRegionRadiusUV(shadowCoords.z);
-	for (int i = 0; i < numBlockerSearchSamples; i++)
-	{
-		float z = u_DirShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + SamplePoisson(i) * searchWidth, cascade), 0).r;
-		if (z < (shadowCoords.z - bias))
-		{
-			blockers++;
-			avgBlockerDistance += z;
-		}
-	}
+    float searchWidth = SearchRegionRadiusUV(shadowCoords.z);
+    for (int i = 0; i < numBlockerSearchSamples; i++)
+    {
+        float z = u_DirShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + SamplePoisson(i) * searchWidth, cascade), 0).r;
+        if (z < (shadowCoords.z - bias))
+        {
+            blockers++;
+            avgBlockerDistance += z;
+        }
+    }
 
-	if (blockers > 0)
-		return avgBlockerDistance / float(blockers);
+    if (blockers > 0)
+        return avgBlockerDistance / float(blockers);
 
-	return -1;
+    return -1;
 }
 
 float PCF_DirectionalLight(uint cascade, float3 shadowCoords, float uvRadius)
 {
-	float bias = GetDirShadowBias();
-	int numPCFSamples = 64;
+    float bias = GetDirShadowBias();
+    int numPCFSamples = 64;
 
-	float sum = 0;
-	for (int i = 0; i < numPCFSamples; i++)
-	{
-		float2 offset = SamplePoisson(i) * uvRadius;
-		float z = u_DirShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + offset, cascade), 0).r;
-		sum += step(shadowCoords.z - bias, z);
-	}
-	return sum / numPCFSamples;
+    float sum = 0;
+    for (int i = 0; i < numPCFSamples; i++)
+    {
+        float2 offset = SamplePoisson(i) * uvRadius;
+        float z = u_DirShadowMap.SampleLevel(u_SSLinearClamp, float3(shadowCoords.xy + offset, cascade), 0).r;
+        sum += step(shadowCoords.z - bias, z);
+    }
+    return sum / numPCFSamples;
 }
 
 float PCSS_DirectionalLight(uint cascade, float3 shadowCoords, float uvLightSize)
 {
-	float blockerDistance = FindBlockerDistance_DirectionalLight(cascade, shadowCoords, uvLightSize);
-	if (blockerDistance == -1) // No occlusion
-		return 1.0f;
+    float blockerDistance = FindBlockerDistance_DirectionalLight(cascade, shadowCoords, uvLightSize);
+    if (blockerDistance == -1) // No occlusion
+        return 1.0f;
 
-	float penumbraWidth = (shadowCoords.z - blockerDistance) / blockerDistance;
+    float penumbraWidth = (shadowCoords.z - blockerDistance) / blockerDistance;
 
-	float NEAR = 0.01; // Should this value be tweakable?
-	float uvRadius = penumbraWidth * uvLightSize * NEAR / shadowCoords.z; // Do we need to divide by shadowCoords.z?
-	uvRadius = min(uvRadius, 0.002f);
-	return PCF_DirectionalLight(cascade, shadowCoords, uvRadius) * ShadowFade;
-} 
+    float NEAR = 0.01; // Should this value be tweakable?
+    float uvRadius = penumbraWidth * uvLightSize * NEAR / shadowCoords.z; // Do we need to divide by shadowCoords.z?
+    uvRadius = min(uvRadius, 0.002f);
+    return PCF_DirectionalLight(cascade, shadowCoords, uvRadius) * ShadowFade;
+}
 
 float DirSoftShadow(float4 position)
 {
@@ -181,10 +184,10 @@ float DirSoftShadow(float4 position)
     shadowPosition.x = 0.5f * shadowPosition.x + 0.5f;
     shadowPosition.y = -0.5f * shadowPosition.y + 0.5f;
 
-	float bias = GetDirShadowBias();
+    float bias = GetDirShadowBias();
     // PCF Sample with 8x8 kernel
     static const int SampleSize = 4;
-    static float texelSize =0.00008f;
+    static float texelSize = 0.00008f;
 
     float shadow = 0.0f;
     for (int i = -SampleSize; i <= SampleSize; i++)
@@ -192,7 +195,7 @@ float DirSoftShadow(float4 position)
         for (int j = -SampleSize; j <= SampleSize; j++)
         {
             float pcfDepth = u_DirShadowMap.SampleLevel(u_SSLinearClamp, shadowPosition.xy + float2(i, j) * texelSize, 0).r;
-            shadow += step(shadowPosition.z - bias , pcfDepth);
+            shadow += step(shadowPosition.z - bias, pcfDepth);
         }
     }
 
@@ -229,10 +232,10 @@ TextureCube u_PointShadowMap : register(t9);
 
 float PointHardShadow(float3 position)
 {
-	const float bias = 0.02f;
-	float3 lightToPixel = position - u_PointLightPosition;
-	float depthFromLight = u_PointShadowMap.SampleLevel(u_SSLinearClamp, lightToPixel, 0).r;
-	depthFromLight *= u_PointFarPlane;
-	return step(length(lightToPixel) - bias, depthFromLight);
+    const float bias = 0.02f;
+    float3 lightToPixel = position - u_PointLightPosition;
+    float depthFromLight = u_PointShadowMap.SampleLevel(u_SSLinearClamp, lightToPixel, 0).r;
+    depthFromLight *= u_PointFarPlane;
+    return step(length(lightToPixel) - bias, depthFromLight);
 }
 // -------------------------- Point Light Shadows --------------------------
