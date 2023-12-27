@@ -1,3 +1,4 @@
+#pragma once
 #define MAX_POINT_LIGHT 32
 #define MAX_SPOT_LIGHT 32
 
@@ -34,7 +35,7 @@ struct Material
     float3 Albedo;
     float Emission;
     float Metalness;
-	float Roughness;
+    float Roughness;
     bool UseNormalMap;
 };
 

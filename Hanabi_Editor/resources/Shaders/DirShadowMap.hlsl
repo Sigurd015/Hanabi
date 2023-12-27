@@ -2,8 +2,8 @@
 // DirShadow Map Shader
 // --------------------------
 
-#type:vertex
-#include "Buffers.hlsl"
+#pragma stage : vertex
+#include "Include/Buffers.hlsl"
 
 struct VertexInput
 {
@@ -29,8 +29,8 @@ VertexOutput main(VertexInput Input)
     return Output;
 }
 
-#type:pixel
-#include "Common.hlsl"
+#pragma stage : pixel
+#include "Include/Common.hlsl"
 
 struct PixelInput
 {

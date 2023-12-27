@@ -2,7 +2,7 @@
 // Renderer2D Circle Shader
 // --------------------------
 
-#type:vertex
+#pragma stage : vertex
 struct VertexInput
 {
     float3 a_WorldPosition : a_WorldPosition;
@@ -37,7 +37,7 @@ VertexOutput main(VertexInput Input)
     return Output;
 }
 
-#type:pixel
+#pragma stage : pixel
 struct PixelInput
 {
     float4 Pos : SV_Position;

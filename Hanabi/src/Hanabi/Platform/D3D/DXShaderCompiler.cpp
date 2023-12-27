@@ -62,7 +62,7 @@ namespace Hanabi
 			{
 				ComPtr<ID3DBlob> blob;
 				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "gs_5_0", flags, 0, blob.ReleaseAndGetAddressOf(), nullptr)))
+					"main", "gs_5_0", flags, 0, blob.GetAddressOf(), nullptr)))
 				{
 					return false;
 				}
@@ -76,7 +76,7 @@ namespace Hanabi
 			{
 				ComPtr<ID3DBlob> blob;
 				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "ps_5_0", flags, 0, blob.ReleaseAndGetAddressOf(), nullptr)))
+					"main", "ps_5_0", flags, 0, blob.GetAddressOf(), nullptr)))
 				{
 					return false;
 				}
@@ -90,7 +90,7 @@ namespace Hanabi
 			{
 				ComPtr<ID3DBlob> blob;
 				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "cs_5_0", flags, 0, blob.ReleaseAndGetAddressOf(), nullptr)))
+					"main", "cs_5_0", flags, 0, blob.GetAddressOf(), nullptr)))
 				{
 					return false;
 				}

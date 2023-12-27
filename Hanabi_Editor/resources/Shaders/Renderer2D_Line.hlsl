@@ -2,7 +2,7 @@
 // Renderer2D Line Shader
 // --------------------------
 
-#type:vertex
+#pragma stage : vertex
 struct VertexInput
 {
     float3 a_Position : a_Position;
@@ -24,11 +24,11 @@ VertexOutput main(VertexInput Input)
 {
     VertexOutput Output;
     Output.Color = Input.a_Color;
-    Output.Pos = mul(u_ViewProjection,float4(Input.a_Position, 1.0f));
+    Output.Pos = mul(u_ViewProjection, float4(Input.a_Position, 1.0f));
     return Output;
 }
 
-#type:pixel
+#pragma stage : pixel
 struct PixelInput
 {
     float4 Pos : SV_Position;

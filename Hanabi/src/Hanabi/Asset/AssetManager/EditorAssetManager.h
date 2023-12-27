@@ -1,7 +1,7 @@
 #pragma once
 #include "AssetManagerBase.h"
 #include "Hanabi/Asset/AssetMetadata.h"
-#include "Hanabi/Utils/Hash.h"
+#include "Hanabi/Utils/HashUtils.h"
 
 #include <map>
 
@@ -37,7 +37,7 @@ namespace Hanabi
 			static_assert(std::is_base_of<Asset, TAsset>::value, "CreateMemoryOnlyAsset only works for types derived from Asset");
 
 			Ref<TAsset> asset = TAsset::Create(std::forward<TArgs>(args)...);
-			asset->Handle = Hash::GenerateFNVHash(name);
+			asset->Handle = Utils::Hash::GenerateFNVHash(name);
 
 			AssetMetadata metadata;
 			metadata.Handle = asset->Handle;

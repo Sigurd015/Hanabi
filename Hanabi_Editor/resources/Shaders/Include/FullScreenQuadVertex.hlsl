@@ -1,3 +1,4 @@
+#pragma once
 // --------------------------
 // Full Screen Quad Vertex Shader
 // --------------------------

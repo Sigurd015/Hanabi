@@ -2,8 +2,8 @@
 // Deferred Geometry Shader
 // --------------------------
 
-#type:vertex
-#include "Buffers.hlsl"
+#pragma stage : vertex
+#include "Include/Buffers.hlsl"
 
 struct VertexInput
 {
@@ -27,19 +27,19 @@ VertexOutput main(VertexInput Input)
 {
     VertexOutput Output;
     float4 worldPosition = mul(u_Transform, float4(Input.a_Position, 1.0f));
-    Output.WorldPosition = worldPosition.xyz;  
+    Output.WorldPosition = worldPosition.xyz;
     Output.TexCoord = Input.a_TexCoord;
-    Output.Normal = mul((float3x3)u_Transform, Input.a_Normal);
+    Output.Normal = mul((float3x3) u_Transform, Input.a_Normal);
     // Notice: float3x3 constructor may pack the matrix in row-major order, so we need to transpose it
     // It seems like GLSL mat3 constructor packs the matrix in column-major order
-    Output.TBN = mul((float3x3)u_Transform, transpose(float3x3(Input.a_Tangent, Input.a_Bitangent, Input.a_Normal)));
+    Output.TBN = mul((float3x3) u_Transform, transpose(float3x3(Input.a_Tangent, Input.a_Bitangent, Input.a_Normal)));
     Output.Position = mul(u_ViewProjection, worldPosition);
     return Output;
 }
 
-#type:pixel
-#include "Buffers.hlsl"
-#include "Common.hlsl"
+#pragma stage : pixel
+#include "Include/Buffers.hlsl"
+#include "Include/Common.hlsl"
 
 struct PixelInput
 {
@@ -53,7 +53,7 @@ struct PixelInput
 struct PixelOutput
 {
     float4 Albedo : SV_Target0;
-    float4 MRE : SV_Target1;  // Metalness, Roughness, Emission
+    float4 MRE : SV_Target1; // Metalness, Roughness, Emission
     float4 Normal : SV_Target2;
     float4 Position : SV_Target3;
 };

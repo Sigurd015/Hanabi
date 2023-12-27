@@ -79,14 +79,11 @@ namespace Hanabi
 				for (const std::string& name : shaderNames)
 				{
 					Ref<Shader> shader = Renderer::GetShader(name);
-					if (ImGui::TreeNode(name.c_str()))
+					ImGui::Text("Name: %s", name.c_str());
+					ImGui::SameLine();
+					if (ImGui::Button("Reload"))
 					{
-						ImGui::Text("Name: %s", name.c_str());
-						if (ImGui::Button("Reload"))
-						{
-							Renderer::ReloadShader(name);
-						}
-						ImGui::TreePop();
+						Renderer::ReloadShader(name);
 					}
 				}
 			}
