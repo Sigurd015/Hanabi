@@ -266,7 +266,7 @@ namespace Hanabi
 	{
 		s_Data->SceneBuffer.ViewProjection = viewProjection;
 
-		s_Data->CameraConstantBuffer->SetData(&s_Data->SceneBuffer, sizeof(Renderer2DData::CameraData));
+		s_Data->CameraConstantBuffer->SetData(&s_Data->SceneBuffer);
 
 		StartBatch();
 	}
