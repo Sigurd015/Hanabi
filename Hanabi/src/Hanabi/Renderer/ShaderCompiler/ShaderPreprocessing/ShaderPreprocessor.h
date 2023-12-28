@@ -10,8 +10,6 @@ namespace Hanabi
 	{
 		std::filesystem::path IncludedFilePath;
 		std::string IncludedFileSource;
-		uint32_t IncludeOffset = 0;
-		uint32_t IncludeLength = 0;
 
 		inline bool operator==(const IncludeData& other) const noexcept
 		{

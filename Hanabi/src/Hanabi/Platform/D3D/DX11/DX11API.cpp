@@ -271,7 +271,7 @@ namespace Hanabi
 			{
 				uint32_t numGroups = glm::max(1u, size / 32);
 				CBFilterParam filterParam = { i * deltaRoughness };
-				s_FilterParam->SetData(&filterParam, sizeof(CBFilterParam));
+				s_FilterParam->SetData(&filterParam);
 				envFiltered->CreateUAV(i);
 				s_EnvironmentMipFilterPass->SetInput("o_OutputTex", envFiltered);
 
@@ -314,7 +314,7 @@ namespace Hanabi
 			s_EnvironmentIrradiancePass->SetInput("CBSamplesParams", s_SamplesParam);
 
 			CBSamplesParams samplesParams = { Renderer::GetConfig().IrradianceMapComputeSamples };
-			s_SamplesParam->SetData(&samplesParams, sizeof(CBSamplesParams));
+			s_SamplesParam->SetData(&samplesParams);
 
 			BeginComputePass(s_EnvironmentIrradiancePass);
 			s_EnvironmentIrradiancePass->Dispatch(irradianceMapSize / 32, irradianceMapSize / 32, 6);

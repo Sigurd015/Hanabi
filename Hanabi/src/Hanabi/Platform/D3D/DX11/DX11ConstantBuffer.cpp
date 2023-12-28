@@ -42,7 +42,7 @@ namespace Hanabi
 		}
 	}
 
-	void DX11ConstantBuffer::SetData(const void* data, uint32_t offset)
+	void DX11ConstantBuffer::SetData(const void* data)
 	{
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		ZeroMemory(&mappedResource, sizeof(D3D11_MAPPED_SUBRESOURCE));
