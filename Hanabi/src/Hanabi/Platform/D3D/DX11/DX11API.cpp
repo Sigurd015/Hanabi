@@ -261,10 +261,10 @@ namespace Hanabi
 				pipelineSpec.Shader = Renderer::GetShader("EnvironmentMipFilter");
 				spec.Pipeline = ComputePipeline::Create(pipelineSpec);
 				s_EnvironmentMipFilterPass = ComputePass::Create(spec);
+				s_EnvironmentMipFilterPass->SetInput("CBFilterParam", s_FilterParam);
 			}
 
-			s_EnvironmentMipFilterPass->SetInput("u_InputTex", envUnfiltered);
-			s_EnvironmentMipFilterPass->SetInput("CBFilterParam", s_FilterParam);
+			s_EnvironmentMipFilterPass->SetInput("u_InputTex", envUnfiltered);			
 
 			const float deltaRoughness = 1.0f / glm::max((float)mipCount - 1.0f, 1.0f);
 			for (uint32_t i = 1, size = cubemapSize; i < mipCount; i++, size /= 2)
@@ -305,13 +305,13 @@ namespace Hanabi
 				pipelineSpec.Shader = Renderer::GetShader("EnvironmentIrradiance");
 				spec.Pipeline = ComputePipeline::Create(pipelineSpec);
 				s_EnvironmentIrradiancePass = ComputePass::Create(spec);
+				s_EnvironmentIrradiancePass->SetInput("CBSamplesParams", s_SamplesParam);
 			}
 
 			irradianceMap->CreateUAV();
 
 			s_EnvironmentIrradiancePass->SetInput("u_RadianceMap", envFiltered);
-			s_EnvironmentIrradiancePass->SetInput("o_IrradianceMap", irradianceMap);
-			s_EnvironmentIrradiancePass->SetInput("CBSamplesParams", s_SamplesParam);
+			s_EnvironmentIrradiancePass->SetInput("o_IrradianceMap", irradianceMap);		
 
 			CBSamplesParams samplesParams = { Renderer::GetConfig().IrradianceMapComputeSamples };
 			s_SamplesParam->SetData(&samplesParams);

@@ -19,6 +19,11 @@ namespace Hanabi
 
 	DX11Framebuffer::~DX11Framebuffer()
 	{
+		Release();
+	}
+
+	void DX11Framebuffer::Release()
+	{
 		if (!m_ColorAttachmentRTV.empty())
 		{
 			for (size_t i = 0; i < m_ColorAttachmentRTV.size(); i++)
@@ -33,16 +38,7 @@ namespace Hanabi
 
 	void DX11Framebuffer::Invalidate()
 	{
-		if (!m_ColorAttachmentRTV.empty())
-		{
-			for (size_t i = 0; i < m_ColorAttachmentRTV.size(); i++)
-			{
-				m_ColorAttachmentRTV[i].Reset();
-			}
-			m_ColorAttachments.clear();
-			m_ColorAttachmentRTV.clear();
-		}
-		m_DSAttachmentDSV.Reset();
+		Release();
 
 		uint32_t attachmentIndex = 0;
 		for (auto spec : m_Specification.Attachments.Attachments)

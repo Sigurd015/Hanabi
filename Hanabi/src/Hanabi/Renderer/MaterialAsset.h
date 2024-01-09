@@ -14,8 +14,7 @@ namespace Hanabi
 
 		Ref<Texture2D> GetAlbedoTex();
 		Ref<Texture2D> GetNormalTex();
-		Ref<Texture2D> GetMetalnessTex();
-		Ref<Texture2D> GetRoughnessTex();
+		Ref<Texture2D> GetMetallicRoughnessTex();
 
 		void SetAlbedoTex(AssetHandle handle);
 		void SetNormalTex(AssetHandle handle);

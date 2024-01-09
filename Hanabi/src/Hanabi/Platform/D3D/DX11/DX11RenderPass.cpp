@@ -23,7 +23,18 @@ namespace Hanabi
 		{
 			if (reflection.ResourceType == RendererResourceType::Sampler)
 			{
-				DX11Context::GetDeviceContext()->PSSetSamplers(reflection.Slot, 1, DX11RenderStates::SamplerStates[reflection.Name].GetAddressOf());
+				switch (reflection.Stage)
+				{
+				case ShaderType::VertexShader:
+					DX11Context::GetDeviceContext()->VSSetSamplers(reflection.Slot, 1, DX11RenderStates::SamplerStates[reflection.Name].GetAddressOf());
+					break;
+				case ShaderType::PixelShader:
+					DX11Context::GetDeviceContext()->PSSetSamplers(reflection.Slot, 1, DX11RenderStates::SamplerStates[reflection.Name].GetAddressOf());
+					break;
+				case ShaderType::GeometryShader:
+					DX11Context::GetDeviceContext()->GSSetSamplers(reflection.Slot, 1, DX11RenderStates::SamplerStates[reflection.Name].GetAddressOf());
+					break;
+				}
 			}
 			else
 			{

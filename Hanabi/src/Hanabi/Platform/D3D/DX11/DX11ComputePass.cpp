@@ -19,6 +19,9 @@ namespace Hanabi
 
 		for (auto& reflection : declarations)
 		{
+			if (reflection.Stage != ShaderType::ComputeShader)
+				continue;
+
 			if (reflection.ResourceType == RendererResourceType::Sampler)
 			{
 				DX11Context::GetDeviceContext()->CSSetSamplers(reflection.Slot, 1, DX11RenderStates::SamplerStates[reflection.Name].GetAddressOf());

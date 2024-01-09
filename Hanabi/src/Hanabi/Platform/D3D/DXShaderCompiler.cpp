@@ -11,8 +11,6 @@ namespace Hanabi
 {
 	Ref<Shader> DXShaderCompiler::Compile(const std::string& shaderName, bool disableOptimization)
 	{
-		std::vector<ShaderSource> shaderSource = ShaderPreprocessor::Preprocess(shaderName);
-
 		Ref<DX11Shader> shader = CreateRef<DX11Shader>();
 
 		bool success = CompileShader(shader, shaderName, disableOptimization);
@@ -25,8 +23,6 @@ namespace Hanabi
 
 	bool DXShaderCompiler::TryReCompile(Ref<Shader> shader, const std::string& shaderName, bool disableOptimization)
 	{
-		std::vector<ShaderSource> shaderSource = ShaderPreprocessor::Preprocess(shaderName);
-
 		Ref<DX11Shader> dxShader = std::static_pointer_cast<DX11Shader>(shader);
 
 		return CompileShader(dxShader, shaderName, disableOptimization);

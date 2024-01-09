@@ -29,6 +29,11 @@ namespace Hanabi
 		return m_Material->GetTexture<Texture2D>(s_NormalMap);
 	}
 
+	Ref<Texture2D> MaterialAsset::GetMetallicRoughnessTex()
+	{
+		return m_Material->GetTexture<Texture2D>(s_MetallicRoughnessMap);
+	}
+
 	void MaterialAsset::SetAlbedoTex(AssetHandle handle)
 	{
 		m_AlbedoTexture = handle;

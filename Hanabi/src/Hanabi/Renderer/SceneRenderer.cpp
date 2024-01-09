@@ -603,8 +603,7 @@ namespace Hanabi
 	{
 		for (auto& command : s_Data->DrawCommands)
 		{
-			s_Data->ModelData.Transform = command.ModelData.Transform;
-			s_Data->ModelData.Material = command.ModelData.Material;
+			s_Data->ModelData = command.ModelData;
 
 			s_Data->ModelDataBuffer->SetData(&s_Data->ModelData);
 
@@ -655,40 +654,44 @@ namespace Hanabi
 		// Point Light Shadow
 		{
 			Renderer::BeginRenderPass(s_Data->PointShadowMapPass);
-			// TODO: Only support one point light now
-			s_Data->PointShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->PointLights[0].ShadowType);
-			if (s_Data->SceneEnvironment->PointLights[0].ShadowType != LightComponent::ShadowType::None)
+			s_Data->PointShadowData.ShadowType = static_cast<uint32_t>(LightComponent::ShadowType::None);
+			if (s_Data->SceneEnvironment->PointLights.size() > 0)
 			{
-				s_Data->PointShadowData.LightPosition = s_Data->SceneEnvironment->PointLights[0].Position;
-				s_Data->PointShadowData.FarPlane = s_Data->SceneEnvironment->PointLights[0].Radius;
+				// TODO: Only support one point light now
+				s_Data->PointShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->PointLights[0].ShadowType);
+				if (s_Data->SceneEnvironment->PointLights[0].ShadowType != LightComponent::ShadowType::None)
+				{
+					s_Data->PointShadowData.LightPosition = s_Data->SceneEnvironment->PointLights[0].Position;
+					s_Data->PointShadowData.FarPlane = s_Data->SceneEnvironment->PointLights[0].Radius;
 
-				const static float s_PointShadowAspect = 1.0f;
-				const static float s_PointShadowNearPlane = 1.0f;
-				glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), s_PointShadowAspect,
-					s_PointShadowNearPlane, s_Data->PointShadowData.FarPlane);
+					const static float s_PointShadowAspect = 1.0f;
+					const static float s_PointShadowNearPlane = 1.0f;
+					glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), s_PointShadowAspect,
+						s_PointShadowNearPlane, s_Data->PointShadowData.FarPlane);
 
-				s_Data->PointShadowData.LightViewProj[0] = shadowProj *
-					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(1.0, 0.0, 0.0),
-						glm::vec3(0.0, 1.0, 0.0));
-				s_Data->PointShadowData.LightViewProj[1] = shadowProj *
-					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(-1.0, 0.0, 0.0),
-						glm::vec3(0.0, 1.0, 0.0));
-				s_Data->PointShadowData.LightViewProj[2] = shadowProj *
-					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 1.0, 0.0),
-						glm::vec3(0.0, 0.0, -1.0));
-				s_Data->PointShadowData.LightViewProj[3] = shadowProj *
-					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, -1.0, 0.0),
-						glm::vec3(0.0, 0.0, 1.0));
-				s_Data->PointShadowData.LightViewProj[4] = shadowProj *
-					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, 1.0),
-						glm::vec3(0.0, 1.0, 0.0));
-				s_Data->PointShadowData.LightViewProj[5] = shadowProj *
-					glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, -1.0),
-						glm::vec3(0.0, 1.0, 0.0));
+					s_Data->PointShadowData.LightViewProj[0] = shadowProj *
+						glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(1.0, 0.0, 0.0),
+							glm::vec3(0.0, 1.0, 0.0));
+					s_Data->PointShadowData.LightViewProj[1] = shadowProj *
+						glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(-1.0, 0.0, 0.0),
+							glm::vec3(0.0, 1.0, 0.0));
+					s_Data->PointShadowData.LightViewProj[2] = shadowProj *
+						glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 1.0, 0.0),
+							glm::vec3(0.0, 0.0, -1.0));
+					s_Data->PointShadowData.LightViewProj[3] = shadowProj *
+						glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, -1.0, 0.0),
+							glm::vec3(0.0, 0.0, 1.0));
+					s_Data->PointShadowData.LightViewProj[4] = shadowProj *
+						glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, 1.0),
+							glm::vec3(0.0, 1.0, 0.0));
+					s_Data->PointShadowData.LightViewProj[5] = shadowProj *
+						glm::lookAt(s_Data->PointShadowData.LightPosition, s_Data->PointShadowData.LightPosition + glm::vec3(0.0, 0.0, -1.0),
+							glm::vec3(0.0, 1.0, 0.0));
 
-				s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
+					s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
 
-				ExecuteDrawCommands();
+					ExecuteDrawCommands();
+				}
 			}
 			else
 			{

@@ -47,7 +47,6 @@ namespace Hanabi
 			imageBuffer.Data = stbi_load(pathString.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 			imageBuffer.Size = width * height * 4;
 			spec.Format = ImageFormat::RGBA;
-			spec.GenerateMips = true;
 		}
 
 		if (!imageBuffer)
@@ -77,7 +76,6 @@ namespace Hanabi
 			imageBuffer.Data = stbi_load_from_memory((const stbi_uc*)buffer.Data, (int)buffer.Size, &width, &height, &channels, STBI_rgb_alpha);
 			imageBuffer.Size = width * height * 4;
 			spec.Format = ImageFormat::RGBA;
-			spec.GenerateMips = true;
 		}
 
 		if (!imageBuffer)
