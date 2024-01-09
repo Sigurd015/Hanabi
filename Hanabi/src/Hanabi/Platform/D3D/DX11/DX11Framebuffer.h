@@ -25,13 +25,13 @@ namespace Hanabi
 
 		virtual Ref<Image2D> GetImage(uint32_t attachmentIndex = 0) const override
 		{
-			HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
+			HNB_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size(), "DX11Framebuffer::GetImage - Invalid attachment index!");
 			return m_ColorAttachments[attachmentIndex];
 		}
 
 		virtual Ref<Image2D> GetDepthImage() const override
 		{
-			HNB_CORE_ASSERT(m_DSAttachment != nullptr);
+			HNB_CORE_ASSERT(m_DSAttachment != nullptr, "DX11Framebuffer::GetDepthImage - No depth attachment!");
 			return m_DSAttachment;
 		}
 
@@ -39,6 +39,7 @@ namespace Hanabi
 
 		const FramebufferSpecification& GetSpecification() const override { return m_Specification; }
 	private:
+		void Release();
 		void Invalidate();
 
 		FramebufferSpecification m_Specification;

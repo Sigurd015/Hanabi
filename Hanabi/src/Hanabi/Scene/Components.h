@@ -71,6 +71,22 @@ namespace Hanabi
 			return glm::quat(Rotation);
 		}
 
+		// Right hand coordinate system, -z forward, y up, x right
+		glm::vec3 GetForward() const
+		{
+			return glm::rotate(GetRotation(), glm::vec3(0.0f, 0.0f, -1.0f));
+		}
+
+		glm::vec3 GetUp() const
+		{
+			return glm::rotate(GetRotation(), glm::vec3(0.0f, 1.0f, 0.0f));
+		}
+
+		glm::vec3 GetRight() const
+		{
+			return glm::rotate(GetRotation(), glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+
 		void SetTransform(const glm::mat4& transform)
 		{
 			Math::DecomposeTransform(transform, Translation, Rotation, Scale);
