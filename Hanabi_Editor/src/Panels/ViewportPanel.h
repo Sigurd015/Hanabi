@@ -24,10 +24,11 @@ namespace Hanabi
 		bool OnKeyPressed(KeyPressedEvent& e);
 		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 		void OnDuplicateEntity();
+		std::pair<float, float> GetMouseViewportSpace();
+		std::pair<glm::vec3, glm::vec3> CastRay(const EditorCamera& camera, float mx, float my);
 
 		Ref<Scene> m_Context;
 		bool m_ViewportHovered = false;
-		Entity m_HoveredEntity;
 		EditorCamera m_EditorCamera;
 		int m_GizmoType = -1;
 		glm::vec2 m_ViewportSize = { 0.0f, 0.0f };

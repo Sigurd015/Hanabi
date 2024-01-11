@@ -139,11 +139,55 @@ namespace Hanabi
 
 	bool ViewPortPanel::OnMouseButtonPressed(MouseButtonPressedEvent& e)
 	{
+		if (m_SceneState == SceneState::Play)
+			return false;
+
+		// Mouse picking
 		if (e.GetMouseButton() == MouseButton::Left)
 		{
 			if (m_ViewportHovered && !ImGuizmo::IsOver() && !Input::IsKeyPressed(Key::LeftAlt))
-				SelectionManager::SetSelectedEntity(m_HoveredEntity);
+			{
+				auto [mouseX, mouseY] = GetMouseViewportSpace();
+				if (mouseX > -1.0f && mouseX < 1.0f && mouseY > -1.0f && mouseY < 1.0f)
+				{
+					const auto& camera = m_EditorCamera;
+					auto [origin, direction] = CastRay(camera, mouseX, mouseY);
+
+					auto meshEntities = m_Context->GetAllEntitiesWith<MeshComponent>();
+					for (auto e : meshEntities)
+					{
+						Entity entity = { e, m_Context.get() };
+						auto& mc = entity.GetComponent<MeshComponent>();
+
+						auto meshSource = AssetManager::GetAsset<MeshSource>(mc.MeshSourceHandle);
+
+						auto& submeshes = meshSource->GetSubmeshes();
+						auto& submesh = submeshes[mc.SubmeshIndex];
+						glm::mat4 transform = m_Context->GetWorldSpaceTransformMatrix(entity);
+						Ray ray = {
+							glm::inverse(transform) * glm::vec4(origin, 1.0f),
+							glm::inverse(glm::mat3(transform)) * direction
+						};
+
+						float t;
+						bool intersects = ray.IntersectsAABB(submesh.BoundingBox, t);
+						if (intersects)
+						{
+							const auto& triangleCache = meshSource->GetTriangleCache(mc.SubmeshIndex);
+							for (const auto& triangle : triangleCache)
+							{
+								if (ray.IntersectsTriangle(triangle.V0.Position, triangle.V1.Position, triangle.V2.Position, t))
+								{
+									SelectionManager::SetSelectedEntity(entity);
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
+
 		return false;
 	}
 
@@ -158,6 +202,32 @@ namespace Hanabi
 			Entity newEntity = m_Context->DuplicateEntity(selectedEntity);
 			SelectionManager::SetSelectedEntity(newEntity);
 		}
+	}
+
+	std::pair<float, float> ViewPortPanel::GetMouseViewportSpace()
+	{
+		auto [mx, my] = ImGui::GetMousePos();
+		const auto& viewportBounds = m_ViewportBounds;
+		mx -= viewportBounds[0].x;
+		my -= viewportBounds[0].y;
+		auto viewportWidth = viewportBounds[1].x - viewportBounds[0].x;
+		auto viewportHeight = viewportBounds[1].y - viewportBounds[0].y;
+
+		return { (mx / viewportWidth) * 2.0f - 1.0f, ((my / viewportHeight) * 2.0f - 1.0f) * -1.0f };
+	}
+
+	std::pair<glm::vec3, glm::vec3> ViewPortPanel::CastRay(const EditorCamera& camera, float mx, float my)
+	{
+		glm::vec4 mouseClipPos = { mx, my, -1.0f, 1.0f };
+
+		auto inverseProj = glm::inverse(camera.GetProjection());
+		auto inverseView = glm::inverse(glm::mat3(camera.GetViewMatrix()));
+
+		glm::vec4 ray = inverseProj * mouseClipPos;
+		glm::vec3 rayPos = camera.GetPosition();
+		glm::vec3 rayDir = inverseView * glm::vec3(ray);
+
+		return { rayPos, rayDir };
 	}
 
 	void ViewPortPanel::OnUpdate(Timestep ts)
@@ -181,26 +251,11 @@ namespace Hanabi
 			break;
 		}
 		}
-
-		#pragma region Mouse Pick Up
-		ImVec2 mousePos = ImGui::GetMousePos();
-		mousePos.x -= m_ViewportBounds[0].x;
-		mousePos.y -= m_ViewportBounds[0].y;
-		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
-
-		int mouseX = (int)mousePos.x;
-		int mouseY = (int)mousePos.y;
-
-		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y)
-		{
-			// TODO: Mouse Picking
-		}
-		#pragma endregion	
 	}
 
 	void ViewPortPanel::OnImGuiRender()
 	{
-		#pragma region Viewport_Toolbar	
+#pragma region Viewport_Toolbar	
 		{
 			UI::ScopedStyle windowPadding(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 			UI::ScopedStyle itemInnerSpacing(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
@@ -280,7 +335,7 @@ namespace Hanabi
 			}
 			ImGui::End();
 		}
-		#pragma endregion	
+#pragma endregion	
 
 		{
 			UI::ScopedStyle windowPadding(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));

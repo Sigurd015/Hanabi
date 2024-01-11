@@ -6,6 +6,7 @@
 #include "Hanabi/Scripting/ScriptEngine.h"
 #include "Hanabi/Physics/Physics2D.h"
 #include "Hanabi/Renderer/SceneRenderer.h"
+#include "Hanabi/Asset/AssetManager/AssetManager.h"
 
 // Box2D
 #include <box2d/b2_world.h>
@@ -16,6 +17,8 @@
 
 namespace Hanabi
 {
+	static glm::vec4 s_SelectionColor = { 1.0f, 0.5f, 0.0f, 1.0f };
+
 	template<typename... Component>
 	static void CopyComponent(entt::registry& dst, entt::registry& src,
 		const std::unordered_map<UUID, entt::entity>& enttMap)
@@ -539,6 +542,7 @@ namespace Hanabi
 	//TODO: Make a better way to render overlays
 	void Scene::OnOverlayRender(bool enable, Entity selectedEntity)
 	{
+		// 2D Physics Debug Rendering
 		if (enable)
 		{
 			// Box Colliders
@@ -579,11 +583,31 @@ namespace Hanabi
 		}
 
 		// Draw selected entity outline 
-		// TODO: Make this work for 3D Objects
 		if (selectedEntity)
 		{
 			auto worldTransform = GetWorldSpaceTransformMatrix({ selectedEntity, this });
-			Renderer2D::DrawRect(worldTransform, glm::vec4(1.0f, 0.5f, 0.0f, 1.0f));
+
+			if (selectedEntity.HasComponent<MeshComponent>())
+			{
+				auto& meshComponent = selectedEntity.GetComponent<MeshComponent>();
+				if (AssetManager::IsAssetHandleValid(meshComponent.MeshSourceHandle))
+				{
+					Ref<MeshSource> meshSource = AssetManager::GetAsset<MeshSource>(meshComponent.MeshSourceHandle);
+					if (meshComponent.SubmeshIndex)
+					{
+						Submesh& submesh = meshSource->GetSubmeshes()[meshComponent.SubmeshIndex];
+						Renderer2D::DrawAABB(submesh.BoundingBox, worldTransform, s_SelectionColor);
+					}
+					else
+					{
+						Renderer2D::DrawAABB(meshSource->GetBoundingBox(), worldTransform, s_SelectionColor);
+					}
+				}
+			}
+			else
+			{
+				Renderer2D::DrawRect(worldTransform, s_SelectionColor);
+			}
 		}
 	}
 
