@@ -81,7 +81,8 @@ namespace Hanabi
 					Ref<Shader> shader = Renderer::GetShader(name);
 					ImGui::Text("Name: %s", name.c_str());
 					ImGui::SameLine();
-					if (ImGui::Button("Reload"))
+					std::string buttonName = "Reload##" + std::string(name.c_str());
+					if (ImGui::Button(buttonName.c_str()))
 					{
 						Renderer::ReloadShader(name);
 					}
