@@ -31,6 +31,10 @@
 #include "Hanabi/Asset/AssetMetadata.h"
 #include "Hanabi/Asset/AssetSerializer/AssetSerializer.h"
 
+// ---Math---------------------
+#include "Hanabi/Math/AABB.h"
+#include "Hanabi/Math/Ray.h"
+
 // ---Renderer---------------------
 #include "Hanabi/Renderer/RenderPass.h"
 #include "Hanabi/Renderer/RendererConfig.h"

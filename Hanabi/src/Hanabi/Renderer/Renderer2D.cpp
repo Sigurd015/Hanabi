@@ -413,6 +413,34 @@ namespace Hanabi
 		DrawLine(lineVertices[3], lineVertices[0], color);
 	}
 
+	void Renderer2D::DrawAABB(const AABB& aabb, const glm::mat4& transform, const glm::vec4& color)
+	{
+		glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
+		glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
+
+		glm::vec4 corners[8] =
+		{
+			transform * glm::vec4 { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
+			transform * glm::vec4 { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
+			transform * glm::vec4 { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
+			transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
+
+			transform * glm::vec4 { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
+			transform * glm::vec4 { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
+			transform * glm::vec4 { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
+			transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
+		};
+
+		for (uint32_t i = 0; i < 4; i++)
+			DrawLine(glm::vec3(corners[i]), glm::vec3(corners[(i + 1) % 4]), color);
+
+		for (uint32_t i = 0; i < 4; i++)
+			DrawLine(glm::vec3(corners[i + 4]), glm::vec3(corners[((i + 1) % 4) + 4]), color);
+
+		for (uint32_t i = 0; i < 4; i++)
+			DrawLine(glm::vec3(corners[i]), glm::vec3(corners[i + 4]), color);
+	}
+
 	void Renderer2D::DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams)
 	{
 		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;

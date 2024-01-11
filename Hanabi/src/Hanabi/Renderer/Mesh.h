@@ -19,6 +19,14 @@ namespace Hanabi
 		glm::vec2 TexCoord;
 	};
 
+	struct Triangle
+	{
+		Vertex V0, V1, V2;
+
+		Triangle(const Vertex& v0, const Vertex& v1, const Vertex& v2)
+			: V0(v0), V1(v1), V2(v2) {}
+	};
+
 	struct Index
 	{
 		uint32_t V1, V2, V3;
@@ -60,6 +68,8 @@ namespace Hanabi
 		std::vector<AssetHandle>& GetMaterials() { return m_Materials; }
 		const std::vector<AssetHandle>& GetMaterials() const { return m_Materials; }
 
+		const std::vector<Triangle> GetTriangleCache(uint32_t index) const { return m_TriangleCache.at(index); }
+
 		static AssetType GetStaticType() { return AssetType::MeshSource; }
 		virtual AssetType GetAssetType() const override { return GetStaticType(); }
 	private:
@@ -70,6 +80,8 @@ namespace Hanabi
 		std::vector<AssetHandle> m_Materials;
 
 		AABB m_BoundingBox;
+
+		std::unordered_map<uint32_t, std::vector<Triangle>> m_TriangleCache;
 
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
