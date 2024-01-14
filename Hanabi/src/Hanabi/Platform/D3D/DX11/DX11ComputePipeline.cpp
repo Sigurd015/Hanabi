@@ -1,4 +1,6 @@
 #include "hnbpch.h"
+
+#ifdef HNB_ENABLE_D3D
 #include "DX11ComputePipeline.h"
 
 namespace Hanabi
@@ -11,3 +13,4 @@ namespace Hanabi
 		m_Specification.Shader->Bind();
 	}
 }
+#endif

@@ -1,3 +1,4 @@
+#ifdef HNB_ENABLE_D3D
 #pragma once
 #include "Hanabi/Renderer/ComputePass.h"
 
@@ -22,3 +23,4 @@ namespace Hanabi
 		std::unordered_map<std::string, Ref<RendererResource>> m_Inputs;
 	};
 }
+#endif

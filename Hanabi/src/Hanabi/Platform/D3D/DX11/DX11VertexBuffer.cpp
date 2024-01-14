@@ -1,6 +1,6 @@
 ﻿#include "hnbpch.h"
 
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 #include "DX11VertexBuffer.h"
 #include "DX11Context.h"
 

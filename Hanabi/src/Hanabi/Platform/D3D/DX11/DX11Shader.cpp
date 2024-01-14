@@ -1,10 +1,8 @@
 ﻿#include "hnbpch.h"
 
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 #include "DX11Shader.h"
 #include "DX11Context.h"
-
-#include <fstream>
 
 namespace Hanabi
 {

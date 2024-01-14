@@ -1,4 +1,4 @@
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 #pragma once
 #include "Hanabi/Renderer/Texture.h"
 #include "DX11Image.h"

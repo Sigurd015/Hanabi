@@ -1,7 +1,5 @@
 ﻿#include "Hanabi.h"
-#include "Engine/EntryPoint.h"
-
-#include <imgui.h>
+#include "Hanabi/EntryPoint.h"
 
 class Sandbox :public Hanabi::Application
 {
@@ -24,7 +22,7 @@ Hanabi::Application* Hanabi::CreateApplication(Hanabi::ApplicationCommandLineArg
 	spec.CommandLineArgs = args;
 	spec.EnableImGui = true;
 	spec.EnableScripting = false;
-	spec.RendererConfig.APIType = RendererAPIType::DX11;
+	spec.RendererConfig.APIType = RendererAPIType::Vulkan;
 
 	return new Sandbox(spec);
 }

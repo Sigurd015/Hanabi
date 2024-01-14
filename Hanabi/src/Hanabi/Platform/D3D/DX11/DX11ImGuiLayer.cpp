@@ -1,6 +1,6 @@
 #include "hnbpch.h"
 
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 #include "Hanabi/ImGui/ImGuiLayer.h"
 #include "Hanabi/Core/Application.h"
 #include "Hanabi/Platform/D3D/DX11/DX11Context.h"

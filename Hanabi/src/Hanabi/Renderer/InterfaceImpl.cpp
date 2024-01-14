@@ -1,6 +1,12 @@
 #include "hnbpch.h"
 
-#if defined(HNB_PLATFORM_WINDOWS)
+//----------Vulkan----------------------------------------
+#ifdef HNB_ENABLE_VULKAN
+#include "Hanabi/Platform/Vulkan/VulkanContext.h"
+#endif
+
+//----------DirectX----------------------------------------
+#ifdef HNB_ENABLE_D3D
 //----------DX11----------------------------------------
 #include "Hanabi/Platform/D3D/DXShaderCompiler.h"
 #include "Hanabi/Platform/D3D/DX11/DX11VertexBuffer.h"
@@ -30,10 +36,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateScope<DX11RendererAPI>();
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -47,10 +53,10 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateScope<DXShaderCompiler>();
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -93,10 +99,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11RenderPass>(spec);
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -111,10 +117,14 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_VULKAN
+		case RendererAPIType::Vulkan:
+			return CreateScope<VulkanContext>(static_cast<GLFWwindow*>(window));
+#endif
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateScope<DX11Context>(static_cast<HWND*>(window));
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -129,10 +139,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Pipeline>(spec);
-			#endif
+#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -146,10 +156,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11VertexBuffer>(size);
-			#endif
+#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -163,10 +173,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11VertexBuffer>(vertices, size);
-			#endif
+#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -180,10 +190,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11IndexBuffer>(indices, count);
-			#endif
+#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -197,10 +207,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Image2D>(specification, buffer);
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -215,10 +225,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Texture2D>(specification, data);
-			#endif
+#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -232,10 +242,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11TextureCube>(specification, data);
-			#endif
+#endif
 		}
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
 		return nullptr;
@@ -249,10 +259,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11Framebuffer>(spec);
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -267,10 +277,10 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-			#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11ConstantBuffer>(size);
-			#endif
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -46,7 +46,8 @@ project "Hanabi"
 		"%{IncludeDir.mono}",
 		"%{IncludeDir.msdfgen}",
 		"%{IncludeDir.msdf_atlas_gen}",
-		"%{IncludeDir.assimp}"
+		"%{IncludeDir.assimp}",
+		"%{IncludeDir.Vulkan}"
 	}
 
 	links 
@@ -55,7 +56,7 @@ project "Hanabi"
 		"ImGui",
 		"yaml_cpp",
 		"Box2D",
-		"msdf_atlas_gen"
+		"msdf_atlas_gen",
 	}
 
 	filter "files:vendor/stb_image/**.cpp or vendor/ImGuizmo/**.cpp"
@@ -72,12 +73,15 @@ project "Hanabi"
 			"%{Library.WinSock}",
 			"%{Library.WinMM}",
 			"%{Library.WinVersion}",
-			"%{Library.BCrypt}"
+			"%{Library.BCrypt}",
+			"%{Library.Vulkan}"
 		}
 		
 		defines
 		{
 			"HNB_PLATFORM_WINDOWS",
+			"HNB_ENABLE_D3D",
+			"HNB_ENABLE_VULKAN",
 			"GLFW_EXPOSE_NATIVE_WIN32",
 			"GLFW_NATIVE_INCLUDE_NONE"
 		}
