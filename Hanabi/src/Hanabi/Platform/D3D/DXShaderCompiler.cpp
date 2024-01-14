@@ -43,8 +43,9 @@ namespace Hanabi
 			{
 			case VertexShader:
 			{
-				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "vs_5_0", flags, 0, shader->m_VertexShaderBlob.GetAddressOf(), nullptr)))
+				HRESULT result = D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
+					"main", "vs_5_0", flags, 0, shader->m_VertexShaderBlob.GetAddressOf(), nullptr);
+				if (result != S_OK)
 				{
 					return false;
 				}
@@ -57,8 +58,9 @@ namespace Hanabi
 			case GeometryShader:
 			{
 				ComPtr<ID3DBlob> blob;
-				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "gs_5_0", flags, 0, blob.GetAddressOf(), nullptr)))
+				HRESULT result = D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
+					"main", "gs_5_0", flags, 0, blob.GetAddressOf(), nullptr);
+				if (result != S_OK)
 				{
 					return false;
 				}
@@ -71,8 +73,9 @@ namespace Hanabi
 			case PixelShader:
 			{
 				ComPtr<ID3DBlob> blob;
-				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "ps_5_0", flags, 0, blob.GetAddressOf(), nullptr)))
+				HRESULT result = D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
+					"main", "ps_5_0", flags, 0, blob.GetAddressOf(), nullptr);
+				if (result != S_OK)
 				{
 					return false;
 				}
@@ -85,8 +88,9 @@ namespace Hanabi
 			case ComputeShader:
 			{
 				ComPtr<ID3DBlob> blob;
-				if (!CheckD3DError(D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
-					"main", "cs_5_0", flags, 0, blob.GetAddressOf(), nullptr)))
+				HRESULT result = D3DCompile(data.Source.c_str(), data.Source.length(), nullptr, nullptr, nullptr,
+					"main", "cs_5_0", flags, 0, blob.GetAddressOf(), nullptr);
+				if (result != S_OK)
 				{
 					return false;
 				}

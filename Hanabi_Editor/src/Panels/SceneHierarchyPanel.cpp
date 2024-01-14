@@ -376,14 +376,14 @@ namespace Hanabi
 					}
 				}
 
-				UI::DrawAssetControl("Material", component.MaterialAssetHandle, AssetType::Material);		
+				UI::DrawAssetControl("Material", component.MaterialAssetHandle, AssetType::Material);
 
 				if (materialAsset)
 				{
 					bool isMemoryAsset = AssetManager::IsMemoryAsset(component.MaterialAssetHandle);
 
 					AssetHandle tempAlbedoHandle = materialAsset->GetAlbedoTexHandle();
-					AssetHandle metallicRoughnessHandle = materialAsset->GetMetallicRoughnessTexHandle(); 
+					AssetHandle metallicRoughnessHandle = materialAsset->GetMetallicRoughnessTexHandle();
 					AssetHandle tempNormalHandle = materialAsset->GetNormalTexHandle();
 
 					if (ImGui::CollapsingHeader("Albedo Texture", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
@@ -398,7 +398,7 @@ namespace Hanabi
 							if (!isMemoryAsset)
 								AssetImporter::Serialize(materialAsset);
 						}
-						if (ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f, 1.0f))
+						if (ImGui::DragFloat("Emission", &tempEmission, 0.01f, 0.0f))
 						{
 							materialAsset->SetEmission(tempEmission);
 							if (!isMemoryAsset)

@@ -633,6 +633,7 @@ namespace Hanabi
 		{
 			Renderer::BeginRenderPass(s_Data->DirShadowMapPass);
 			s_Data->DirShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->DirLight.ShadowType);
+			s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
 			if (s_Data->SceneEnvironment->DirLight.ShadowType != LightComponent::ShadowType::None)
 			{
 				glm::vec3 lightPosition = glm::vec3(0.0f) - (s_Data->SceneEnvironment->DirLight.Direction * 200.0f);
@@ -643,10 +644,6 @@ namespace Hanabi
 				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
 
 				ExecuteDrawCommands();
-			}
-			else
-			{
-				s_Data->DirShadowDataBuffer->SetData(&s_Data->DirShadowData);
 			}
 			Renderer::EndRenderPass();
 		}
@@ -659,6 +656,7 @@ namespace Hanabi
 			{
 				// TODO: Only support one point light now
 				s_Data->PointShadowData.ShadowType = static_cast<uint32_t>(s_Data->SceneEnvironment->PointLights[0].ShadowType);
+				s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
 				if (s_Data->SceneEnvironment->PointLights[0].ShadowType != LightComponent::ShadowType::None)
 				{
 					s_Data->PointShadowData.LightPosition = s_Data->SceneEnvironment->PointLights[0].Position;
@@ -692,10 +690,6 @@ namespace Hanabi
 
 					ExecuteDrawCommands();
 				}
-			}
-			else
-			{
-				s_Data->PointShadowDataBuffer->SetData(&s_Data->PointShadowData);
 			}
 			Renderer::EndRenderPass();
 		}

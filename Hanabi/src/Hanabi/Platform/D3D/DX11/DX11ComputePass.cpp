@@ -1,4 +1,6 @@
 #include "hnbpch.h"
+
+#ifdef HNB_ENABLE_D3D
 #include "DX11ComputePass.h"
 #include "DX11Context.h"
 #include "DX11RenderStates.h"
@@ -60,3 +62,4 @@ namespace Hanabi
 		DX11Context::GetDeviceContext()->Dispatch(x, y, z);
 	}
 }
+#endif

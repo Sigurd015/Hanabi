@@ -14,7 +14,7 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return new DX11ImGuiLayer();
 #endif

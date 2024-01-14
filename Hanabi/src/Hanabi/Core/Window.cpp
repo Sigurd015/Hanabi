@@ -70,7 +70,12 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_VULKAN
+		case RendererAPIType::Vulkan:
+			m_Data.Title += "<Vulkan>";
+			break;
+#endif
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			m_Data.Title += "<DX11>";
 			break;
@@ -82,7 +87,12 @@ namespace Hanabi
 
 		switch (RendererAPI::GetAPI())
 		{
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_VULKAN
+		case RendererAPIType::Vulkan:
+			m_Context = RendererContext::Create(m_Window);
+			break;
+#endif
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			HWND winWnd = glfwGetWin32Window(m_Window);
 			m_Context = RendererContext::Create(&winWnd);

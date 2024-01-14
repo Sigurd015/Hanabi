@@ -12,8 +12,6 @@
 
 #ifdef HNB_DEBUG
 #define HNB_ENABLE_ASSERTS
-#else
-#define HNB_DEBUGBREAK()
 #endif
 
 #ifndef HNB_DIST

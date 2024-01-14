@@ -84,6 +84,10 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 
 ## Getting Started
 
+### Windows
+
+Require [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) 1.2(or higher)
+
 Visual Studio 2022 is recommended
 
 <ins>**1. Downloading the repository:**</ins>

@@ -1,3 +1,4 @@
+#ifdef HNB_ENABLE_D3D
 #pragma once
 #include "Hanabi/Renderer/ComputePipeline.h"
 
@@ -17,3 +18,4 @@ namespace Hanabi
 		ComputePipelineSpecification m_Specification;
 	};
 }
+#endif

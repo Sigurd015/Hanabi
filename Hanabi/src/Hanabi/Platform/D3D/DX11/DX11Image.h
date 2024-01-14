@@ -1,4 +1,4 @@
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 #pragma once
 #include "Hanabi/Renderer/Image.h"
 #include "Hanabi/Platform/D3D/DXCommon.h"

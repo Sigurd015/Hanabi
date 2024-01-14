@@ -22,7 +22,7 @@ namespace Hanabi
 
 		bool m_BlockEvents = true;
 	};
-#if defined(HNB_PLATFORM_WINDOWS)
+#ifdef HNB_ENABLE_D3D
 	class DX11ImGuiLayer : public ImGuiLayer
 	{
 	public:
