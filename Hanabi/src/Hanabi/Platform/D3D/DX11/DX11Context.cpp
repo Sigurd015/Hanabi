@@ -5,24 +5,16 @@
 
 namespace Hanabi
 {
-	DX11Context* DX11Context::s_Instance = nullptr;
-
-	DX11Context::DX11Context(HWND* windowHandle) :m_WindowHandle(windowHandle)
+	DX11Context::DX11Context(HWND* windowHandle, uint32_t width, uint32_t height, bool vsync)
 	{
 		HNB_CORE_ASSERT(windowHandle, "Window handle is null!");
-
-		Init();
-	}
-
-	void DX11Context::Init()
-	{
-		HNB_CORE_ASSERT(!s_Instance, "DX11Context already exists!");
-
-		s_Instance = this;
+		HNB_CORE_ASSERT(!m_SwapChain, "DX11Context already exists!");
+		HNB_CORE_ASSERT(!m_Device, "DX11Context already exists!");
+		HNB_CORE_ASSERT(!m_DeviceContext, "DX11Context already exists!");
 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-		swapChainDesc.BufferDesc.Width = 0;
-		swapChainDesc.BufferDesc.Height = 0;
+		swapChainDesc.BufferDesc.Width = width;
+		swapChainDesc.BufferDesc.Height = height;
 		swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 		swapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
@@ -32,7 +24,7 @@ namespace Hanabi
 		swapChainDesc.SampleDesc.Quality = 0;
 		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		swapChainDesc.BufferCount = 1;
-		swapChainDesc.OutputWindow = *m_WindowHandle;
+		swapChainDesc.OutputWindow = *windowHandle;
 		swapChainDesc.Windowed = true;
 		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		swapChainDesc.Flags = 0;
