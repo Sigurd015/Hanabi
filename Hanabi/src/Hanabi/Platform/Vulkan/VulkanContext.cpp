@@ -1,5 +1,6 @@
 #include "hnbpch.h"
 #include "VulkanContext.h"
+#include "Hanabi/Core/Application.h"
 
 #ifdef HNB_PLATFORM_WINDOWS
 #define VK_KHR_PLATFORM_SURFACE_EXTENSION_NAME "VK_KHR_win32_surface"
@@ -70,10 +71,10 @@ namespace Hanabi
 		return VK_FALSE;
 	}
 
-	VulkanContext::VulkanContext(GLFWwindow* windowHandle)
+	VulkanContext::VulkanContext(GLFWwindow* windowHandle, uint32_t width, uint32_t height, bool vsync)
 	{
 		HNB_CORE_ASSERT(glfwVulkanSupported(), "GLFW must support Vulkan!");
-		HNB_CORE_ASSERT(!s_VulkanInstance, "DX11DeviceContext already exists!");
+		HNB_CORE_ASSERT(!s_VulkanInstance, "VulkanContext already exists!");
 
 		VkApplicationInfo appInfo = {};
 		appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -154,6 +155,12 @@ namespace Hanabi
 		enabledFeatures.independentBlend = true;
 		enabledFeatures.pipelineStatisticsQuery = true;
 		m_Device = CreateRef<VulkanDevice>(m_PhysicalDevice, enabledFeatures);
+
+		// Swap chain
+		m_SwapChain = CreateRef<VulkanSwapChain>();
+		m_SwapChain->Init(GetInstance(), GetDevice());
+		m_SwapChain->InitSurface(windowHandle);
+		m_SwapChain->Create(width, height, vsync);
 	}
 
 	VulkanContext::~VulkanContext()

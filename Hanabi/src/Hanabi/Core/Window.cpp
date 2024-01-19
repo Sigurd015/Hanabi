@@ -89,13 +89,13 @@ namespace Hanabi
 		{
 #ifdef HNB_ENABLE_VULKAN
 		case RendererAPIType::Vulkan:
-			m_Context = RendererContext::Create(m_Window);
+			m_Context = RendererContext::Create(m_Window, m_Data.Width, m_Data.Height, m_Data.VSync);
 			break;
 #endif
 #ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			HWND winWnd = glfwGetWin32Window(m_Window);
-			m_Context = RendererContext::Create(&winWnd);
+			m_Context = RendererContext::Create(&winWnd, m_Data.Width, m_Data.Height, m_Data.VSync);
 			break;
 #endif
 		}

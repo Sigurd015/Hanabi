@@ -53,6 +53,7 @@ namespace Hanabi
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
+
 #ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateScope<DXShaderCompiler>();
@@ -69,8 +70,12 @@ namespace Hanabi
 		{
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11ComputePass>(spec);
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -83,8 +88,12 @@ namespace Hanabi
 		{
 		case RendererAPIType::None:
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+			return nullptr;
+
+#ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateRef<DX11ComputePipeline>(spec);
+#endif
 		}
 
 		HNB_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -109,7 +118,7 @@ namespace Hanabi
 		return nullptr;
 	}
 
-	Scope<RendererContext> RendererContext::Create(void* window)
+	Scope<RendererContext> RendererContext::Create(void* window, uint32_t width, uint32_t height, bool vsync)
 	{
 		switch (RendererAPI::GetAPI())
 		{
@@ -119,11 +128,11 @@ namespace Hanabi
 
 #ifdef HNB_ENABLE_VULKAN
 		case RendererAPIType::Vulkan:
-			return CreateScope<VulkanContext>(static_cast<GLFWwindow*>(window));
+			return CreateScope<VulkanContext>(static_cast<GLFWwindow*>(window), width, height, vsync);
 #endif
 #ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
-			return CreateScope<DX11Context>(static_cast<HWND*>(window));
+			return CreateScope<DX11Context>(static_cast<HWND*>(window), width, height, vsync);
 #endif
 		}
 
