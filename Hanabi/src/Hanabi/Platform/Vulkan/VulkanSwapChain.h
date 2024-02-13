@@ -14,6 +14,7 @@ namespace Hanabi
 		void Init(VkInstance instance, const Ref<VulkanDevice>& device);
 		void InitSurface(GLFWwindow* windowHandle);
 		void Create(uint32_t width, uint32_t height, bool vsync);
+		void Destroy();
 	private:
 		void FindImageFormatAndColorSpace();
 
