@@ -427,6 +427,38 @@ namespace Hanabi
 		}
 	}
 
+	void VulkanSwapChain::Destroy()
+	{
+		auto device = m_Device->GetVulkanDevice();
+		vkDeviceWaitIdle(device);
+
+		if (m_SwapChain)
+			fpDestroySwapchainKHR(device, m_SwapChain, nullptr);
+
+		for (auto& image : m_Images)
+			vkDestroyImageView(device, image.ImageView, nullptr);
+
+		for (auto& commandBuffer : m_CommandBuffers)
+			vkDestroyCommandPool(device, commandBuffer.CommandPool, nullptr);
+
+		if (m_RenderPass)
+			vkDestroyRenderPass(device, m_RenderPass, nullptr);
+
+		for (auto framebuffer : m_Framebuffers)
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+
+		if (m_Semaphores.RenderComplete)
+			vkDestroySemaphore(device, m_Semaphores.RenderComplete, nullptr);
+
+		if (m_Semaphores.PresentComplete)
+			vkDestroySemaphore(device, m_Semaphores.PresentComplete, nullptr);
+
+		for (auto& fence : m_WaitFences)
+			vkDestroyFence(device, fence, nullptr);
+
+		vkDeviceWaitIdle(device);
+	}
+
 	void VulkanSwapChain::FindImageFormatAndColorSpace()
 	{
 		VkPhysicalDevice physicalDevice = m_Device->GetPhysicalDevice()->GetVulkanPhysicalDevice();

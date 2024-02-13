@@ -14,7 +14,7 @@ namespace Hanabi
 		uint32_t gpuCount = 0;
 		// Get number of available physical devices
 		vkEnumeratePhysicalDevices(vkInstance, &gpuCount, nullptr);
-		HNB_CORE_ASSERT(gpuCount > 0, "");
+		HNB_CORE_ASSERT(gpuCount > 0, "No device with Vulkan support found");
 		// Enumerate devices
 		std::vector<VkPhysicalDevice> physicalDevices(gpuCount);
 		VK_CHECK_RESULT(vkEnumeratePhysicalDevices(vkInstance, &gpuCount, physicalDevices.data()));
