@@ -136,7 +136,7 @@ namespace Hanabi
 #ifndef HNB_DIST
 		{
 			auto vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(s_VulkanInstance, "vkCreateDebugUtilsMessengerEXT");
-			HNB_CORE_ASSERT(vkCreateDebugUtilsMessengerEXT != NULL, "");
+			HNB_CORE_ASSERT(vkCreateDebugUtilsMessengerEXT != NULL, "Failed to load vkCreateDebugUtilsMessengerEXT!");
 			VkDebugUtilsMessengerCreateInfoEXT debugUtilsCreateInfo{};
 			debugUtilsCreateInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
 			debugUtilsCreateInfo.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
