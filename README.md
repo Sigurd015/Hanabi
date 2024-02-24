@@ -5,7 +5,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
 
-![](https://github.com/Sigurd015/Hanabi/blob/main/images/preview.png)
+<img src="images/preview.png">
 
 ## Goals
 - Support multiple rendering APIs (such as DX12, Vulkan, Metal, etc.)
@@ -97,9 +97,7 @@ git clone https://github.com/Sigurd015/Hanabi
 git submodule update --init --recursive
 ```
 
-<ins>**2. Run the [Setup-Windows.bat](https://github.com/Sigurd015/Hanabi/blob/main/Scripts/Setup-Windows.bat)**</ins>
-
-You can change the .bat file to generate a different version project file, but that is not tested.
+<ins>**2. Run the [Setup-Windows.bat](Scripts/Setup-Windows.bat)**</ins>
 
 <ins>**3. Open .sln file with Visual Studio**</ins>
 

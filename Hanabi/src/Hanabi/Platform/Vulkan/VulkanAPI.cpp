@@ -1,3 +1,4 @@
+#include "hnbpch.h"
 #include "VulkanAPI.h"
 
 namespace Hanabi

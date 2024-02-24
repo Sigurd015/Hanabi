@@ -8,7 +8,7 @@
 // Computes diffuse irradiance cubemap convolution for image-based lighting.
 // Uses quasi Monte Carlo sampling with Hammersley sequence.
 
-Texture2D u_RadianceMap : register(t0);
+TextureCube u_RadianceMap : register(t0);
 
 RWTexture2DArray<float4> o_IrradianceMap : register(u0);
 
