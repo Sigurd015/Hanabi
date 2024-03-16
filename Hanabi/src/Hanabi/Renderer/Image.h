@@ -29,6 +29,7 @@ namespace Hanabi
 		None = 0,
 		Texture2D,
 		Attachment,
+		Writable, // TODO: Now, for d3d unorderd access view
 	};
 
 	struct ImageSpecification

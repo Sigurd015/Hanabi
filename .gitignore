@@ -10,3 +10,4 @@ Sandbox/imgui.ini
 *.json
 *.csproj
 SandboxProject/Assets/Scripts/Binaries
+Hanabi_Editor/resources/Shaders/test.hlsl

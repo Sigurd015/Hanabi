@@ -8,21 +8,26 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 <img src="images/preview.png">
 
 ## Goals
+
 - Support multiple rendering APIs (such as DX12, Vulkan, Metal, etc.)
 - Support full workflow, you can use this to make a game.
 
 ## Features
+
 - [ ] Supported platforms
+
   - [x] Windows
   - [ ] Mac
 
 - [ ] Rendering APIs
+
   - [ ] Vulkan
   - [x] DirectX 11
   - [ ] DirectX 12
   - [ ] Metal
 
 - [x] Core
+
   - [x] Entry point
   - [x] Logging System
   - [x] Event system
@@ -30,20 +35,20 @@ A simple game engine made for learning rendering APIs, game engine architecture,
     - [x] C# Script Engine
   - [x] Serialize & Deserialize System (YAML)
   - [x] ECS System (entt)
-  - [ ] Renderer 
+  - [ ] Renderer
     - [x] 2D Batch Renderer
     - [ ] 3D Renderer
-      - [x] Deferred Rendering 
+      - [x] Deferred Rendering
       - [x] PBR Metallic Workflow
       - [x] IBL
       - [ ] .....
 
-- [ ] Editor  
+- [ ] Editor
   - [x] Play in editor
   - [ ] .....
 
-
 ## Dependencies
+
 - [glfw](https://github.com/glfw/glfw)
 - [ImGuizmo](https://github.com/CedricGuillemet/ImGuizmo)
 - [box2d](https://github.com/erincatto/box2d)
@@ -58,17 +63,19 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [spdlog](https://github.com/gabime/spdlog)
 - [stb_image](https://github.com/nothings/stb/blob/master/stb_image.h)
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
+- [assimp](https://github.com/assimp/assimp)
 
 ## Roadmap
-- [X] DX11 Support
-- [X] C# Script Engine
+
+- [x] DX11 Support
+- [x] C# Script Engine
 - [ ] SPIR-V Shader System
 - [ ] UI Renderer
-- [X] Asset Manager
+- [x] Asset Manager
 - [ ] 3D Renderer
-  - [X] Mesh System
-  - [X] Material System
-  - [X] Lighting
+  - [x] Mesh System
+  - [x] Material System
+  - [x] Lighting
   - [ ] Shadow mapping
     - [ ] Cascaded Shadow Maps
     - [ ] Omnidirectional Shadow Maps

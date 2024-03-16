@@ -37,7 +37,8 @@ namespace Hanabi
 				}
 				else
 				{
-					HNB_CORE_WARN("ComputePass: Missing input: {0}", reflection.Name);
+					// TODO: What is $Globals?
+					//HNB_CORE_WARN("ComputePass: Missing input: {0}", reflection.Name);
 				}
 			}
 		}

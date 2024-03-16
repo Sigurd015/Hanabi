@@ -1,4 +1,7 @@
 AssetRegistry:
+  - Handle: 111976336359139137
+    FilePath: Scenes/ShadowTest.hscene
+    Type: AssetType::Scene
   - Handle: 666927332699581675
     FilePath: Models/Sponza/Sponza.gltf
     Type: AssetType::MeshSource

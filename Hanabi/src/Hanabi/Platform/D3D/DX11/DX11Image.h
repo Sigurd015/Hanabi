@@ -106,6 +106,7 @@ namespace Hanabi
 		DXGI_FORMAT m_DataFormat;
 		ComPtr<ID3D11Texture2D> m_Texture;
 		ComPtr<ID3D11ShaderResourceView> m_TextureSRV;
+		ComPtr<ID3D11UnorderedAccessView> m_TextureUAV;
 	};
 }
 #endif

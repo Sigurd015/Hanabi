@@ -152,9 +152,12 @@ namespace Hanabi
 		Ref<RenderPass> DirShadowMapPass;
 		Ref<RenderPass> PointShadowMapPass;
 		Ref<RenderPass> DeferredGeoPass;
-		Ref<RenderPass> DeferredLightingPass;
 		Ref<RenderPass> SkyboxPass;
-		Ref<RenderPass> CompositePass;
+
+		Ref<ComputePass> DeferredLightingPass;
+		Ref<Image2D> DeferredLightingPassOutput;
+		Ref<ComputePass> CompositePass;
+		Ref<Image2D> CompositePassOutput;
 
 		Ref<MaterialAsset> DefaultMaterialAsset;
 
@@ -287,53 +290,41 @@ namespace Hanabi
 		}
 		// Deferred Lighting Pass
 		{
-			Ref<Framebuffer> framebuffer;
-			{
-				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA32F };
-				spec.Width = 1920;
-				spec.Height = 1080;
-				spec.SwapChainTarget = false;
-				framebuffer = Framebuffer::Create(spec);
-			}
-			{
-				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = FullScreenQuadLayout;
-				pipelineSpec.Shader = Renderer::GetShader("DeferredLighting");
-				pipelineSpec.TargetFramebuffer = framebuffer;
-				pipelineSpec.BackfaceCulling = false;
-				pipelineSpec.DepthTest = false;
-				pipelineSpec.Topology = PrimitiveTopology::Triangles;
+			ComputePipelineSpecification pipelineSpec;
+			pipelineSpec.Shader = Renderer::GetShader("DeferredLighting");
 
-				RenderPassSpecification renderPassSpec;
-				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->DeferredLightingPass = RenderPass::Create(renderPassSpec);
-			}
+			ComputePassSpecification computePassSpec;
+			computePassSpec.Pipeline = ComputePipeline::Create(pipelineSpec);
+			s_Data->DeferredLightingPass = ComputePass::Create(computePassSpec);
+
+			ImageSpecification spec = {};
+			spec.Width = 1920;
+			spec.Height = 1080;
+			spec.Format = ImageFormat::RGBA32F;
+			spec.Usage = ImageUsage::Writable;
+			spec.Layers = 1;
+			spec.Mips = 1;
+			s_Data->DeferredLightingPassOutput = Image2D::Create(spec);
+			s_Data->DeferredLightingPassOutput->Invalidate();
 		}
 		// Composite Pass
 		{
-			Ref<Framebuffer> framebuffer;
-			{
-				FramebufferSpecification spec;
-				spec.Attachments = { ImageFormat::RGBA32F };
-				spec.Width = 1920;
-				spec.Height = 1080;
-				spec.SwapChainTarget = false;
-				framebuffer = Framebuffer::Create(spec);
-			}
-			{
-				PipelineSpecification pipelineSpec;
-				pipelineSpec.Layout = FullScreenQuadLayout;
-				pipelineSpec.Shader = Renderer::GetShader("Composite");
-				pipelineSpec.TargetFramebuffer = framebuffer;
-				pipelineSpec.BackfaceCulling = false;
-				pipelineSpec.DepthTest = false;
-				pipelineSpec.Topology = PrimitiveTopology::Triangles;
+			ComputePipelineSpecification pipelineSpec;
+			pipelineSpec.Shader = Renderer::GetShader("Composite");
 
-				RenderPassSpecification renderPassSpec;
-				renderPassSpec.Pipeline = Pipeline::Create(pipelineSpec);
-				s_Data->CompositePass = RenderPass::Create(renderPassSpec);
-			}
+			ComputePassSpecification computePassSpec;
+			computePassSpec.Pipeline = ComputePipeline::Create(pipelineSpec);
+			s_Data->CompositePass = ComputePass::Create(computePassSpec);
+
+			ImageSpecification spec = {};
+			spec.Width = 1920;
+			spec.Height = 1080;
+			spec.Format = ImageFormat::RGBA32F;
+			spec.Usage = ImageUsage::Writable;
+			spec.Layers = 1;
+			spec.Mips = 1;
+			s_Data->CompositePassOutput = Image2D::Create(spec);
+			s_Data->CompositePassOutput->Invalidate();
 		}
 		// Skybox Pass
 		{
@@ -344,7 +335,7 @@ namespace Hanabi
 				spec.Width = 1920;
 				spec.Height = 1080;
 				spec.SwapChainTarget = false;
-				spec.ExistingImages[0] = s_Data->CompositePass->GetOutput(0);
+				spec.ExistingImages[0] = s_Data->CompositePassOutput;
 				spec.ExistingImages[1] = s_Data->DeferredGeoPass->GetDepthOutput();
 				framebuffer = Framebuffer::Create(spec);
 			}
@@ -377,6 +368,7 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("CBPointLight", s_Data->PointLightDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBSpotLight", s_Data->SpotLightDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("CBDirShadow", s_Data->DirShadowDataBuffer);
+		s_Data->DeferredLightingPass->SetInput("CBPointShadow", s_Data->PointShadowDataBuffer);
 		s_Data->DeferredLightingPass->SetInput("u_AlbedoBuffer", s_Data->DeferredGeoPass->GetOutput(0));
 		s_Data->DeferredLightingPass->SetInput("u_MREBuffer", s_Data->DeferredGeoPass->GetOutput(1));
 		s_Data->DeferredLightingPass->SetInput("u_NormalBuffer", s_Data->DeferredGeoPass->GetOutput(2));
@@ -384,8 +376,10 @@ namespace Hanabi
 		s_Data->DeferredLightingPass->SetInput("u_DirShadowMap", s_Data->DirShadowMapPass->GetDepthOutput());
 		s_Data->DeferredLightingPass->SetInput("u_PointShadowMap", s_Data->PointShadowMapPass->GetDepthOutput());
 		s_Data->DeferredLightingPass->SetInput("u_BRDFLUTTex", Renderer::GetTexture<Texture2D>("BRDFLut"));
+		s_Data->DeferredLightingPass->SetInput("u_OutputBuffer", s_Data->DeferredLightingPassOutput);
 
-		s_Data->CompositePass->SetInput("u_Color", s_Data->DeferredLightingPass->GetOutput());
+		s_Data->CompositePass->SetInput("u_InputBuffer", s_Data->DeferredLightingPassOutput);
+		s_Data->CompositePass->SetInput("u_OutputBuffer", s_Data->CompositePassOutput);
 
 		s_Data->SkyboxPass->SetInput("CBCamera", s_Data->CameraDataBuffer);
 
@@ -399,29 +393,7 @@ namespace Hanabi
 
 	void SceneRenderer::SetViewportSize(uint32_t width, uint32_t height)
 	{
-		const FramebufferSpecification& fbsc = s_Data->CompositePass->GetTargetFramebuffer()->GetSpecification();
-		if (fbsc.Width != width || fbsc.Height != height)
-		{
-			// TODO: Resize color attachment and depth attachment
-			/*	s_Data->DeferredGeoPass->GetTargetFramebuffer()->Resize(width, height);
-				s_Data->DeferredLightingPass->GetTargetFramebuffer()->Resize(width, height);
-				s_Data->CompositePass->GetTargetFramebuffer()->Resize(width, height);
-
-				{
-					Ref<Framebuffer> framebuffer;
-					{
-						FramebufferSpecification spec;
-						spec.Attachments = { ImageFormat::RGBA32F,ImageFormat::Depth };
-						spec.Width = width;
-						spec.Height = height;
-						spec.SwapChainTarget = false;
-						spec.ExistingImages[0] = s_Data->CompositePass->GetOutput(0);
-						spec.ExistingImages[1] = s_Data->DeferredGeoPass->GetDepthOutput();
-						framebuffer = Framebuffer::Create(spec);
-					}
-					s_Data->SkyboxPass->GetPipeline()->GetSpecification().TargetFramebuffer = framebuffer;
-				}*/
-		}
+		//TODO: Resize color attachment and depth attachment
 	}
 
 	void SceneRenderer::BeginScene(const Ref<Environment> environment)
@@ -444,11 +416,6 @@ namespace Hanabi
 				s_Data->SkyboxPass->SetInput("u_RadianceMap", asset->RadianceMap);
 				s_Data->DeferredLightingPass->SetInput("u_EnvRadianceTex", asset->RadianceMap);
 				s_Data->DeferredLightingPass->SetInput("u_EnvIrradianceTex", asset->IrradianceMap);
-
-				// Debug
-				//Ref<Texture2D> equirectangularMap = AssetManager::GetAsset<Texture2D>(environment->EnvMapHandle);
-				//auto [radiance, irradiance] = Renderer::CreateEnvironmentMap(equirectangularMap);
-				//s_Data->SkyboxPass->SetInput("u_RadianceMap", radiance);
 			}
 			else
 			{
@@ -622,9 +589,12 @@ namespace Hanabi
 
 	void SceneRenderer::DeferredLightPass()
 	{
-		Renderer::BeginRenderPass(s_Data->DeferredLightingPass);
-		Renderer::DrawFullScreenQuad();
-		Renderer::EndRenderPass();
+		uint32_t width = s_Data->DeferredLightingPassOutput->GetSpecification().Width;
+		uint32_t height = s_Data->DeferredLightingPassOutput->GetSpecification().Height;
+
+		Renderer::BeginComputePass(s_Data->DeferredLightingPass);
+		s_Data->DeferredLightingPass->Dispatch(width / 32, height / 32, 1);
+		Renderer::EndComputePass(s_Data->DeferredLightingPass);
 	}
 
 	void SceneRenderer::ShadowMapPass()
@@ -699,9 +669,12 @@ namespace Hanabi
 
 	void SceneRenderer::CompositePass()
 	{
-		Renderer::BeginRenderPass(s_Data->CompositePass);
-		Renderer::DrawFullScreenQuad();
-		Renderer::EndRenderPass();
+		uint32_t width = s_Data->CompositePassOutput->GetSpecification().Width;
+		uint32_t height = s_Data->CompositePassOutput->GetSpecification().Height;
+
+		Renderer::BeginComputePass(s_Data->CompositePass);
+		s_Data->CompositePass->Dispatch(width / 32, height / 32, 1);
+		Renderer::EndComputePass(s_Data->CompositePass);
 	}
 
 	void SceneRenderer::SkyboxPass()
