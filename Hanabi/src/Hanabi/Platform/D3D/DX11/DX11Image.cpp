@@ -135,6 +135,60 @@ namespace Hanabi
 			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &resourceView, m_TextureSRV.GetAddressOf()));
 			break;
 		}
+		case ImageUsage::Writable:
+		{
+			D3D11_TEXTURE2D_DESC textureDesc = {};
+			textureDesc.Width = m_Specification.Width;
+			textureDesc.Height = m_Specification.Height;
+			textureDesc.MipLevels = m_Specification.Mips;
+			textureDesc.ArraySize = m_Specification.Layers;
+			textureDesc.Format = m_DataFormat;
+			textureDesc.SampleDesc.Count = 1;
+			textureDesc.SampleDesc.Quality = 0;
+			textureDesc.Usage = D3D11_USAGE_DEFAULT;
+			textureDesc.CPUAccessFlags = 0;
+			// Notice: This image may be used in framebuffer, so it should be able to be used as render target
+			textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC resourceView = {};
+			resourceView.Format = m_DataFormat;
+			resourceView.Texture2D.MostDetailedMip = 0;
+			resourceView.TextureCube.MipLevels = m_Specification.Mips;
+
+			if (textureDesc.ArraySize > 1)
+			{
+				if (textureDesc.ArraySize == 6)
+				{
+					textureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+					resourceView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+					resourceView.TextureCube.MipLevels = m_Specification.Mips;
+				}
+				else
+				{
+					resourceView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+					resourceView.Texture2DArray.MipLevels = m_Specification.Mips;
+				}
+			}
+			else
+			{
+				resourceView.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				resourceView.Texture2D.MipLevels = 1;
+			}
+
+			textureDesc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateTexture2D(&textureDesc, nullptr, m_Texture.GetAddressOf()));
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateShaderResourceView(m_Texture.Get(), &resourceView, m_TextureSRV.GetAddressOf()));
+
+			D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc = {};
+			uavDesc.Format = m_DataFormat;
+			uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+			uavDesc.Texture2DArray.MipSlice = 0;
+			uavDesc.Texture2DArray.FirstArraySlice = 0;
+			uavDesc.Texture2DArray.ArraySize = m_Specification.Layers;
+
+			DX_CHECK_RESULT(DX11Context::GetDevice()->CreateUnorderedAccessView(m_Texture.Get(), &uavDesc, m_TextureUAV.GetAddressOf()));
+			break;
+		}
 		}
 	}
 
@@ -142,6 +196,7 @@ namespace Hanabi
 	{
 		m_Texture.Reset();
 		m_TextureSRV.Reset();
+		m_TextureUAV.Reset();
 	}
 
 	void DX11Image2D::Bind(const ShaderResourceDeclaration& declaration) const
@@ -158,7 +213,15 @@ namespace Hanabi
 			DX11Context::GetDeviceContext()->PSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
 			break;
 		case ComputeShader:
-			DX11Context::GetDeviceContext()->CSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
+			switch (declaration.ResourceType)
+			{
+			case RendererResourceType::Resource:
+				DX11Context::GetDeviceContext()->CSSetShaderResources(declaration.Slot, 1, m_TextureSRV.GetAddressOf());
+				break;
+			case RendererResourceType::UnorderedAccess:
+				DX11Context::GetDeviceContext()->CSSetUnorderedAccessViews(declaration.Slot, 1, m_TextureUAV.GetAddressOf(), 0);
+				break;
+			}
 			break;
 		default:
 			HNB_CORE_ASSERT(false, "Unknown shader stage!");

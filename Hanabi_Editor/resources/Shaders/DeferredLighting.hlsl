@@ -2,10 +2,7 @@
 // Deferred Lighting Shader
 // --------------------------
 
-#pragma stage : vertex
-#include "Include/FullScreenQuadVertex.hlsl"
-
-#pragma stage : pixel
+#pragma stage : compute
 #include "Include/Buffers.hlsl"
 #include "Include/Lighting.hlsl"
 #include "Include/ShadowMappingUtils.hlsl"
@@ -19,9 +16,11 @@ Texture2D u_BRDFLUTTex : register(t11);
 TextureCube u_EnvRadianceTex : register(t12);
 TextureCube u_EnvIrradianceTex : register(t13);
 
+RWTexture2D<float4> u_OutputBuffer : register(u0);
+
 float3 IBL(float3 F0, float3 Lr)
 {
-    float3 irradiance = u_EnvIrradianceTex.Sample(u_SSLinearWrap, m_Params.Normal).rgb;
+    float3 irradiance = u_EnvIrradianceTex.SampleLevel(u_SSLinearWrap, m_Params.Normal, 0).rgb;
     float3 F = FresnelSchlickRoughness(F0, m_Params.NdotV, m_Params.Roughness);
     float3 kd = (1.0 - F) * (1.0 - m_Params.Metalness);
     float3 diffuseIBL = kd * m_Params.Albedo * irradiance;
@@ -31,25 +30,26 @@ float3 IBL(float3 F0, float3 Lr)
 	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), m_Params.Roughness * envRadianceTexLevels).rgb;
     float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, m_Params.Roughness * envRadianceTexLevels).rgb;
 
-    float2 specularBRDF = u_BRDFLUTTex.Sample(u_SSPointClamp, float2(m_Params.NdotV, 1.0 - m_Params.Roughness)).rg;
+    float2 specularBRDF = u_BRDFLUTTex.SampleLevel(u_SSPointClamp, float2(m_Params.NdotV, 1.0 - m_Params.Roughness), 0).rg;
     float3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
 
     return diffuseIBL + specularIBL;
 }
 
 // Constant normal incidence Fresnel factor for all dielectrics.
-const float3 Fdielectric = float3(0.04f, 0.04f, 0.04f);
+const float3 Fdielectric = 0.04f;
 
-float4 main(float4 Position : SV_Position) : SV_Target
+[numthreads(32, 32, 1)]
+void main(uint3 ThreadID : SV_DispatchThreadID)
 {
-    float4 albedoTexColor = u_AlbedoBuffer.Load(uint3(Position.xy, 0));
+    float4 albedoTexColor = u_AlbedoBuffer.Load(uint3(ThreadID.xy, 0));
     m_Params.Albedo = albedoTexColor.rgb;
     float alpha = albedoTexColor.a;
-    float4 MRE = u_MREBuffer.Load(uint3(Position.xy, 0));
+    float4 MRE = u_MREBuffer.Load(uint3(ThreadID.xy, 0));
     m_Params.Metalness = MRE.x;
     m_Params.Roughness = MRE.y;
-    m_Params.Normal = u_NormalBuffer.Load(uint3(Position.xy, 0)).xyz;
-    m_Params.WorldPosition = u_PositionBuffer.Load(uint3(Position.xy, 0)).xyz;
+    m_Params.Normal = u_NormalBuffer.Load(uint3(ThreadID.xy, 0)).xyz;
+    m_Params.WorldPosition = u_PositionBuffer.Load(uint3(ThreadID.xy, 0)).xyz;
     float4 lightTransformedPosition = mul(u_DirLightViewProjection, float4(m_Params.WorldPosition, 1.0));
     
     m_Params.View = normalize(u_CameraPosition - m_Params.WorldPosition);
@@ -96,5 +96,5 @@ float4 main(float4 Position : SV_Position) : SV_Target
     float3 iblContribution = IBL(F0, Lr) * u_EnvironmentMapIntensity;
 
 	// Final color
-    return float4(iblContribution + lightContribution, 1.0f);
+    u_OutputBuffer[ThreadID.xy] = float4(iblContribution + lightContribution, 1.0f);
 }

@@ -1,0 +1,352 @@
+Scene: Untitled
+Entities:
+  - Entity: 10011489124705530156
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [-21.4257927, 10.9974966, -100.011612]
+      Rotation: [-1.57079637, 0, 0]
+      Scale: [10, 9.99992657, 0.999996185]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 3301941280396562761
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [-7.22796392, 6.09581757, -99.1887207]
+      Rotation: [0, 0, 0]
+      Scale: [1, 10, 10]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 12245650109766773653
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [6.79275799, 6.09581757, -99.1887207]
+      Rotation: [0, 0, 0]
+      Scale: [1, 10, 10]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 13793735894920877080
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -91.3842545]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 4911917162863925040
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -106.911499]
+      Rotation: [0, 0, 0]
+      Scale: [10, 10, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 3593450339971526023
+    TagComponent:
+      Tag: pointlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [-0.154527187, 6.21701479, -99.2697296]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Point
+      Intensity: 3.20000005
+      Radiance: [1, 1, 1]
+      Radius: 30
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 0.144999996
+      ShadowType: Hard
+  - Entity: 672919279616593371
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [4.12052774, 6.09581757, -99.1887207]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 7253026373793659117
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0.252736926, 6.09581757, -95.4436951]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 6047198221957505725
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [-4.14161396, 6.09581757, -99.3037872]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 3619540958969615821
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -102.575249]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 2880507292675359383
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -74.4491882]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 11353414081179837382
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -62.6241074]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 10781218386144644527
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -48.398941]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 16753751127472561184
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -36.870327]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 12963936637663821996
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, 34.0685768]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 9737980880972910864
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, 20.8506565]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 8921263292212782806
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, 7.8740859]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 15757020153666424713
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -3.09331393]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 11199218623031035273
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -12.7417927]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 4414505013540964023
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -18.8872604]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 16985479686266401944
+    TagComponent:
+      Tag: box
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 6.09581757, -25.5401173]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 15525477349561828525
+    TagComponent:
+      Tag: dirlight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0.0872664601]
+      Scale: [1, 1, 1]
+    LightComponent:
+      LightType: Directional
+      Intensity: 0.5
+      Radiance: [1, 1, 1]
+      Radius: 0
+      Range: 0
+      Angle: 0
+      AngleAttenuation: 0
+      Falloff: 0
+      ShadowType: Soft
+  - Entity: 15225250417249054405
+    TagComponent:
+      Tag: floor
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [20, 1, 300]
+    MeshComponent:
+      MeshSourceHandle: 2605795154723237914
+      SubmeshIndex: 0
+  - Entity: 2791633825552438851
+    TagComponent:
+      Tag: skylight
+    RelationshipComponent:
+      Parent: 0
+      Children:
+        []
+    TransformComponent:
+      Translation: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SkyLightComponent:
+      Intensity: 1
+      EnvMapHandle: 10066814809449201864

@@ -2,16 +2,15 @@
 // Composite Shader
 // --------------------------
 
-#pragma stage : vertex
-#include "Include/FullScreenQuadVertex.hlsl"
-
-#pragma stage : pixel
+#pragma stage : compute
 #include "Include/Common.hlsl"
 
-Texture2D u_Color : register(t0);
+Texture2D u_InputBuffer : register(t0);
+RWTexture2D<float4> u_OutputBuffer : register(u0);
 
-float4 main(float4 Position : SV_Position) : SV_Target
+[numthreads(32, 32, 1)]
+void main(uint3 ThreadID : SV_DispatchThreadID)
 {
-    float3 color = u_Color.Load(uint3(Position.xy, 0)).rgb;
-    return float4(ACESTonemap(GammaCorrect(color, 2.2f)), 1.0f);
+    float4 color = u_InputBuffer.Load(uint3(ThreadID.xy, 0));
+    u_OutputBuffer[ThreadID.xy] = float4(ACESTonemap(GammaCorrect(color.xyz, 2.2f)), 1.0f);
 }
