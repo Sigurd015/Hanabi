@@ -9,43 +9,29 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 
 ## Goals
 
-- Support multiple rendering APIs (such as DX12, Vulkan, Metal, etc.)
-- Support full workflow, you can use this to make a game.
+- Cross-platform, multiple graphics API compatible.
+- Useable for game development.
+
+## Supported platforms and APIs
+
+|                | DirectX 11               | Vulkan                        | 
+| -------------- | ------------------------ | ----------------------------- |
+| Windows        | :heavy_check_mark:       | :heavy_multiplication_x:      |
+| macOS/iOS/tvOS | :heavy_multiplication_x: | :heavy_multiplication_x:      |
+| Linux          | :heavy_multiplication_x: | :heavy_multiplication_x:      |
 
 ## Features
 
-- [ ] Supported platforms
-
-  - [x] Windows
-  - [ ] Mac
-
-- [ ] Rendering APIs
-
-  - [ ] Vulkan
-  - [x] DirectX 11
-  - [ ] DirectX 12
-  - [ ] Metal
-
-- [x] Core
-
-  - [x] Entry point
-  - [x] Logging System
-  - [x] Event system
-  - [x] Scripting System
-    - [x] C# Script Engine
-  - [x] Serialize & Deserialize System (YAML)
-  - [x] ECS System (entt)
-  - [ ] Renderer
-    - [x] 2D Batch Renderer
-    - [ ] 3D Renderer
-      - [x] Deferred Rendering
-      - [x] PBR Metallic Workflow
-      - [x] IBL
-      - [ ] .....
-
+- [x] Basic engine architecture
+- [x] Custom format asset system
+- [x] ECS system
+- [x] Scripting system
+  - [x] C# script engine
+- [ ] Rendering system
+  - [x] 2D batch renderer
+  - [x] PBR pipeline
 - [ ] Editor
-  - [x] Play in editor
-  - [ ] .....
+  - [x] Basic editor
 
 ## Dependencies
 
@@ -67,27 +53,37 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 
 ## Roadmap
 
-- [x] DX11 Support
-- [x] C# Script Engine
-- [ ] SPIR-V Shader System
-- [ ] UI Renderer
-- [x] Asset Manager
-- [ ] 3D Renderer
-  - [x] Mesh System
-  - [x] Material System
+- [x] DX11 support
+- [x] C# script engine
+- [x] Custom format asset system
+- [ ] Rendering
+  - [x] Mesh system
+  - [x] Material system
   - [x] Lighting
+  - [x] Deferred rendering
+    - [ ] Tile-based light culling
   - [ ] Shadow mapping
-    - [ ] Cascaded Shadow Maps
-    - [ ] Omnidirectional Shadow Maps
-  - [x] Skyboxes
-  - [x] Physically based rendering (PBR)
+    - [ ] Cascaded shadow maps
+    - [ ] Omnidirectional shadow maps
+  - [x] Skyboxes Rendering
+  - [x] Physically based rendering pipeline
+  - [x] Image-based lighting
   - [ ] Screen space ambient occulsion
   - [ ] Screen space reflection
-- [ ] Ray/Path tracing
-  - [ ] Vulkan & DX12
-- [ ] Metal support
+  - [ ] Screen space global illumination
+  - [ ] Light baking system
+  - [ ] Non-photorealistic rendering pipeline
+  - [ ] LOD(Level of detail) system
+  - [ ] UI Rendering
+  - [ ] Ray/Path tracing
+    - [ ] Vulkan & DX12
+  - [ ] Metal support
+- [ ] Animation system
+- [ ] New C# script engine(Custom C++/C# wrapper)
 - [ ] Runtime
   - [ ] Asset Package Serialize & Deserialize
+- [ ] Editor
+  - [ ] Animation state machine graph editor
 
 ## Getting Started
 
@@ -108,6 +104,6 @@ git submodule update --init --recursive
 
 <ins>**3. Open .sln file with Visual Studio**</ins>
 
-## Credits
+## Reference
 
 - [TheCherno](https://www.youtube.com/@TheCherno) [Hazel](https://github.com/TheCherno/Hazel)
