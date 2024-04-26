@@ -65,7 +65,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] Shadow mapping
     - [ ] Cascaded shadow maps
     - [ ] Omnidirectional shadow maps
-  - [x] Skyboxes Rendering
+  - [x] Skyboxes rendering
   - [x] Physically based rendering pipeline
   - [x] Image-based lighting
   - [ ] Screen space ambient occulsion
@@ -74,14 +74,15 @@ A simple game engine made for learning rendering APIs, game engine architecture,
   - [ ] Light baking system
   - [ ] Non-photorealistic rendering pipeline
   - [ ] LOD(Level of detail) system
-  - [ ] UI Rendering
+  - [ ] UI rendering
   - [ ] Ray/Path tracing
     - [ ] Vulkan & DX12
   - [ ] Metal support
+- [ ] 3D physics([JoltPhysics](https://github.com/jrouwe/JoltPhysics) or [PhysX](https://github.com/NVIDIA-Omniverse/PhysX))
 - [ ] Animation system
 - [ ] New C# script engine(Custom C++/C# wrapper)
 - [ ] Runtime
-  - [ ] Asset Package Serialize & Deserialize
+  - [ ] Asset package serialize & deserialize
 - [ ] Editor
   - [ ] Animation state machine graph editor
 
