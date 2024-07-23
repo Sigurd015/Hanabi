@@ -17,7 +17,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 |                | DirectX 11               | Vulkan                        | 
 | -------------- | ------------------------ | ----------------------------- |
 | Windows        | :heavy_check_mark:       | :heavy_multiplication_x:      |
-| macOS/iOS/tvOS | :heavy_multiplication_x: | :heavy_multiplication_x:      |
+| macOS          | :heavy_multiplication_x: | :heavy_multiplication_x:      |
 | Linux          | :heavy_multiplication_x: | :heavy_multiplication_x:      |
 
 ## Features
@@ -51,40 +51,7 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 - [yaml-cpp](https://github.com/jbeder/yaml-cpp)
 - [assimp](https://github.com/assimp/assimp)
 
-## Roadmap
-
-- [x] DX11 support
-- [x] C# script engine
-- [x] Custom format asset system
-- [ ] Rendering
-  - [x] Mesh system
-  - [x] Material system
-  - [x] Lighting
-  - [x] Deferred rendering
-    - [ ] Tile-based light culling
-  - [ ] Shadow mapping
-    - [ ] Cascaded shadow maps
-    - [ ] Omnidirectional shadow maps
-  - [x] Skyboxes rendering
-  - [x] Physically based rendering pipeline
-  - [x] Image-based lighting
-  - [ ] Screen space ambient occulsion
-  - [ ] Screen space reflection
-  - [ ] Screen space global illumination
-  - [ ] Light baking system
-  - [ ] Non-photorealistic rendering pipeline
-  - [ ] LOD(Level of detail) system
-  - [ ] UI rendering
-  - [ ] Ray/Path tracing
-    - [ ] Vulkan & DX12
-  - [ ] Metal support
-- [ ] 3D physics([JoltPhysics](https://github.com/jrouwe/JoltPhysics) or [PhysX](https://github.com/NVIDIA-Omniverse/PhysX))
-- [ ] Animation system
-- [ ] New C# script engine(Custom C++/C# wrapper)
-- [ ] Runtime
-  - [ ] Asset package serialize & deserialize
-- [ ] Editor
-  - [ ] Animation state machine graph editor
+## [Roadmap](https://trello.com/invite/b/669fa865d55b09e9a3402606/ATTI8bab0a10662b1d2682023d0ef4df1111004102D7/my-trello-board)
 
 ## Getting Started
 

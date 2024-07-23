@@ -11,3 +11,4 @@ Sandbox/imgui.ini
 *.csproj
 SandboxProject/Assets/Scripts/Binaries
 Hanabi_Editor/resources/Shaders/test.hlsl
+.DS_Store
