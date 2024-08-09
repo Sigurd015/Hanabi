@@ -27,9 +27,10 @@ float3 IBL(float3 F0, float3 Lr)
 
     uint width, height, envRadianceTexLevels;
     u_EnvRadianceTex.GetDimensions(0, width, height, envRadianceTexLevels);
-	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(u_MaterialUniforms.EnvMapRotation, Lr), m_Params.Roughness * envRadianceTexLevels).rgb;
+	//float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, RotateVectorAboutY(90.0f, Lr), m_Params.Roughness * envRadianceTexLevels).rgb;
     float3 specularIrradiance = u_EnvRadianceTex.SampleLevel(u_SSLinearWrap, Lr, m_Params.Roughness * envRadianceTexLevels).rgb;
 
+    // 1.0 - m_Params.Roughness because the BRDF_LUT is loaded by stb_image which flips the image vertically
     float2 specularBRDF = u_BRDFLUTTex.SampleLevel(u_SSPointClamp, float2(m_Params.NdotV, 1.0 - m_Params.Roughness), 0).rg;
     float3 specularIBL = specularIrradiance * (F0 * specularBRDF.x + specularBRDF.y);
 
@@ -57,7 +58,7 @@ void main(uint3 ThreadID : SV_DispatchThreadID)
 
     // Specular reflection vector
     float3 Lr = 2.0 * m_Params.NdotV * m_Params.Normal - m_Params.View;
-
+    
 	// Fresnel reflectance, metals use albedo
     float3 F0 = lerp(Fdielectric, m_Params.Albedo, m_Params.Metalness);
 
