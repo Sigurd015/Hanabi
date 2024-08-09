@@ -1,3 +1,4 @@
+-- premake5.lua
 include "Dependencies.lua"
 
 workspace "Hanabi"
@@ -5,10 +6,11 @@ workspace "Hanabi"
 	configurations { "Debug", "Release", "Dist" }
 	startproject "Hanabi_Editor"
 
-	flags
-	{
-		"MultiProcessorCompile"
-	}
+	-- Workspace-wide build options for MSVC
+	filter "system:windows"
+	buildoptions { "/EHsc", "/Zc:preprocessor", "/Zc:__cplusplus" }
+	
+	flags { "MultiProcessorCompile" }
 
 outputdir = "%{wks.location}/Binaries/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 intdir = "%{wks.location}/Binaries/Intermediates/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
