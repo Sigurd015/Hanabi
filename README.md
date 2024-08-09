@@ -20,19 +20,6 @@ A simple game engine made for learning rendering APIs, game engine architecture,
 | macOS          | :heavy_multiplication_x: | :heavy_multiplication_x:      |
 | Linux          | :heavy_multiplication_x: | :heavy_multiplication_x:      |
 
-## Features
-
-- [x] Basic engine architecture
-- [x] Custom format asset system
-- [x] ECS system
-- [x] Scripting system
-  - [x] C# script engine
-- [ ] Rendering system
-  - [x] 2D batch renderer
-  - [x] PBR pipeline
-- [ ] Editor
-  - [x] Basic editor
-
 ## Dependencies
 
 - [glfw](https://github.com/glfw/glfw)
