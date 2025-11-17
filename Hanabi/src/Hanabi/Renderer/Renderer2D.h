@@ -1,7 +1,6 @@
 #pragma once
 #include "Camera.h"
 #include "Texture.h"
-#include "UI/Font.h"
 #include "Hanabi/Scene/Components.h"
 #include "RenderPass.h"
 
@@ -36,7 +35,7 @@ namespace Hanabi
 			float Kerning = 0.0f;
 			float LineSpacing = 0.0f;
 		};
-		static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams);
+		//static void DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams);
 		static void DrawString(const glm::mat4& transform, const TextComponent& tc);
 
 		struct Statistics

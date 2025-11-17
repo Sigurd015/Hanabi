@@ -3,7 +3,6 @@
 #include "Hanabi/Scene/SceneCamera.h"
 #include "Hanabi/Renderer/Camera.h"
 #include "Hanabi/Renderer/Texture.h"
-#include "Hanabi/Renderer/UI/Font.h"
 #include "Hanabi/Renderer/Mesh.h"
 #include "Hanabi/Renderer/Material.h"
 #include "Hanabi/Renderer/MaterialAsset.h"
@@ -240,7 +239,7 @@ namespace Hanabi
 	struct TextComponent
 	{
 		std::string TextString;
-		Ref<Font> FontAsset = Font::GetDefault();
+		//Ref<Font> FontAsset = Font::GetDefault();
 		glm::vec4 Color{ 1.0f };
 		float Kerning = 0.0f;
 		float LineSpacing = 0.0f;

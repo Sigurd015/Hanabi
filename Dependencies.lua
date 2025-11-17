@@ -12,8 +12,6 @@ IncludeDir["yaml_cpp"] = "%{wks.location}/Hanabi/vendor/yaml_cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Hanabi/vendor/ImGuizmo"
 IncludeDir["Box2D"] = "%{wks.location}/Hanabi/vendor/box2D/include"
 IncludeDir["mono"] = "%{wks.location}/Hanabi/vendor/mono/include"
-IncludeDir["msdfgen"] = "%{wks.location}/Hanabi/vendor/msdf_atlas_gen/msdfgen"
-IncludeDir["msdf_atlas_gen"] = "%{wks.location}/Hanabi/vendor/msdf_atlas_gen/msdf-atlas-gen"
 IncludeDir["assimp"] = "%{wks.location}/Hanabi/vendor/assimp/include"
 IncludeDir["Vulkan"] = "%{VULKAN_SDK}/Include"
 

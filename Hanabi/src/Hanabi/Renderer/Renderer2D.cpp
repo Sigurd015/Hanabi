@@ -5,7 +5,6 @@
 #include "Shader.h"
 #include "Renderer.h"
 #include "ConstantBuffer.h"
-#include "UI/MSDFData.h"
 #include "Hanabi/Asset/AssetManager/AssetManager.h"
 #include "RenderPass.h"
 
@@ -441,118 +440,14 @@ namespace Hanabi
 			DrawLine(glm::vec3(corners[i]), glm::vec3(corners[i + 4]), color);
 	}
 
-	void Renderer2D::DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams)
+	/*void Renderer2D::DrawString(const std::string& string, Ref<Font> font, const glm::mat4& transform, const TextParams& textParams)
 	{
-		const auto& fontGeometry = font->GetMSDFData()->FontGeometry;
-		const auto& metrics = fontGeometry.getMetrics();
-		Ref<Texture2D> fontAtlas = font->GetAtlasTexture();
-
-		s_Data->FontAtlasTexture = fontAtlas;
-
-		double x = 0.0;
-		double fsScale = 1.0 / (metrics.ascenderY - metrics.descenderY);
-		double y = 0.0;
-		const float spaceGlyphAdvance = fontGeometry.getGlyph(' ')->getAdvance();
-
-
-		for (size_t i = 0; i < string.size(); i++)
-		{
-			char character = string[i];
-			if (character == '\r')
-				continue;
-
-			if (character == '\n')
-			{
-				x = 0;
-				y -= fsScale * metrics.lineHeight + textParams.LineSpacing;
-				continue;
-			}
-
-			if (character == ' ')
-			{
-				float advance = spaceGlyphAdvance;
-				if (i < string.size() - 1)
-				{
-					char nextCharacter = string[i + 1];
-					double dAdvance;
-					fontGeometry.getAdvance(dAdvance, character, nextCharacter);
-					advance = (float)dAdvance;
-				}
-
-				x += fsScale * advance + textParams.Kerning;
-				continue;
-			}
-
-			if (character == '\t')
-			{
-				// NOTE: is this right?
-				x += 4.0f * (fsScale * spaceGlyphAdvance + textParams.Kerning);
-				continue;
-			}
-
-			auto glyph = fontGeometry.getGlyph(character);
-			if (!glyph)
-				glyph = fontGeometry.getGlyph('?');
-			if (!glyph)
-				return;
-
-			double al, ab, ar, at;
-			glyph->getQuadAtlasBounds(al, ab, ar, at);
-			glm::vec2 texCoordMin((float)al, (float)at);
-			glm::vec2 texCoordMax((float)ar, (float)ab);
-
-			double pl, pb, pr, pt;
-			glyph->getQuadPlaneBounds(pl, pb, pr, pt);
-			glm::vec2 quadMin((float)pl, (float)pt);
-			glm::vec2 quadMax((float)pr, (float)pb);
-
-			quadMin *= fsScale, quadMax *= fsScale;
-			quadMin += glm::vec2(x, y);
-			quadMax += glm::vec2(x, y);
-
-			float texelWidth = 1.0f / fontAtlas->GetWidth();
-			float texelHeight = 1.0f / fontAtlas->GetHeight();
-			texCoordMin *= glm::vec2(texelWidth, texelHeight);
-			texCoordMax *= glm::vec2(texelWidth, texelHeight);
-
-			// render here
-			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMin, 0.0f, 1.0f);
-			s_Data->TextVertexBufferPtr->Color = textParams.Color;
-			s_Data->TextVertexBufferPtr->TexCoord = texCoordMin;
-			s_Data->TextVertexBufferPtr++;
-
-			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMin.x, quadMax.y, 0.0f, 1.0f);
-			s_Data->TextVertexBufferPtr->Color = textParams.Color;
-			s_Data->TextVertexBufferPtr->TexCoord = { texCoordMin.x, texCoordMax.y };
-			s_Data->TextVertexBufferPtr++;
-
-			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMax, 0.0f, 1.0f);
-			s_Data->TextVertexBufferPtr->Color = textParams.Color;
-			s_Data->TextVertexBufferPtr->TexCoord = texCoordMax;
-			s_Data->TextVertexBufferPtr++;
-
-			s_Data->TextVertexBufferPtr->Position = transform * glm::vec4(quadMax.x, quadMin.y, 0.0f, 1.0f);
-			s_Data->TextVertexBufferPtr->Color = textParams.Color;
-			s_Data->TextVertexBufferPtr->TexCoord = { texCoordMax.x, texCoordMin.y };
-			s_Data->TextVertexBufferPtr++;
-
-			s_Data->TextIndexCount += 6;
-			s_Data->RendererStats.QuadCount++;
-
-			if (i < string.size() - 1)
-			{
-				double advance = glyph->getAdvance();
-				char nextCharacter = string[i + 1];
-				fontGeometry.getAdvance(advance, character, nextCharacter);
-
-				x += fsScale * advance + textParams.Kerning;
-			}
-		}
-	}
+		
+	}*/
 
 	void Renderer2D::DrawString(const glm::mat4& transform, const TextComponent& tc)
 	{
-		DrawString(tc.TextString, tc.FontAsset, transform, { tc.Color, tc.Kerning, tc.LineSpacing });
+		//DrawString(tc.TextString, tc.FontAsset, transform, { tc.Color, tc.Kerning, tc.LineSpacing });
 	}
 
 	float Renderer2D::GetLineWidth()

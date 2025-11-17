@@ -50,7 +50,6 @@
 #include "Hanabi/Renderer/Camera.h"
 #include "Hanabi/Renderer/Framebuffer.h"
 #include "Hanabi/Renderer/ConstantBuffer.h"
-#include "Hanabi/Renderer/UI/Font.h"
 #include "Hanabi/Renderer/Mesh.h"
 #include "Hanabi/Renderer/Material.h"
 #include "Hanabi/Renderer/MaterialAsset.h"

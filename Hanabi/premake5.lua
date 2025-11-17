@@ -44,8 +44,6 @@ project "Hanabi"
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.mono}",
-		"%{IncludeDir.msdfgen}",
-		"%{IncludeDir.msdf_atlas_gen}",
 		"%{IncludeDir.assimp}",
 		"%{IncludeDir.Vulkan}"
 	}
@@ -55,8 +53,7 @@ project "Hanabi"
 		"GLFW",
 		"ImGui",
 		"yaml_cpp",
-		"Box2D",
-		"msdf_atlas_gen",
+		"Box2D"
 	}
 
 	filter "files:vendor/stb_image/**.cpp or vendor/ImGuizmo/**.cpp"

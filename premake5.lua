@@ -20,7 +20,6 @@ group "Dependencies"
 	include "Hanabi/vendor/imgui"
 	include "Hanabi/vendor/Box2D"
 	include "Hanabi/vendor/yaml_cpp"
-	include "Hanabi/vendor/msdf_atlas_gen"
 group ""
 
 group "Core"
