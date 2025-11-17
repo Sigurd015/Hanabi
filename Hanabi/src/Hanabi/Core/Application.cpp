@@ -26,7 +26,7 @@ namespace Hanabi
 		Renderer::Init();
 
 		if (m_Specification.EnableScripting)
-			ScriptEngine::Init(m_Specification.ScriptConfig);
+			//ScriptEngine::Init(m_Specification.ScriptConfig);
 
 		if (m_Specification.EnableImGui)
 		{
@@ -38,7 +38,7 @@ namespace Hanabi
 	Application::~Application()
 	{
 		if (m_Specification.EnableScripting)
-			ScriptEngine::Shutdown();
+			//ScriptEngine::Shutdown();
 
 		Renderer::Shutdown();
 	}

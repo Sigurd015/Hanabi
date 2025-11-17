@@ -22,7 +22,7 @@ Hanabi::Application* Hanabi::CreateApplication(Hanabi::ApplicationCommandLineArg
 	spec.CommandLineArgs = args;
 	spec.EnableImGui = true;
 	spec.EnableScripting = false;
-	spec.RendererConfig.APIType = RendererAPIType::Vulkan;
+	spec.RendererConfig.APIType = RendererAPIType::DX11;
 
 	return new Sandbox(spec);
 }

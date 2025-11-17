@@ -30,7 +30,7 @@ Hanabi::Application* Hanabi::CreateApplication(ApplicationCommandLineArgs args)
 	spec.CommandLineArgs = args;
 	spec.EnableImGui = true;
 	spec.EnableScripting = true;
-	spec.ScriptConfig.CoreAssemblyPath = "Resources/Scripts/Hanabi_ScriptCore.dll";
+	//spec.ScriptConfig.CoreAssemblyPath = "Resources/Scripts/Hanabi_ScriptCore.dll";
 	// TODO: When we have spirv compiler, set this
 	//spec.RendererConfig.ShaderPackPath = "Resources/Shaders";
 	if (spec.CommandLineArgs.Count > 2)

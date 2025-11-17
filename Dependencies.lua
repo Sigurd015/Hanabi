@@ -18,15 +18,11 @@ IncludeDir["assimp"] = "%{wks.location}/Hanabi/vendor/assimp/include"
 IncludeDir["Vulkan"] = "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}
-LibraryDir["mono_Debug"] = "%{wks.location}/Hanabi/vendor/mono/lib/Debug"
-LibraryDir["mono_Release"] = "%{wks.location}/Hanabi/vendor/mono/lib/Release"
 LibraryDir["assimp_Debug"] = "%{wks.location}/Hanabi/vendor/assimp/bin/Debug"
 LibraryDir["assimp_Release"] = "%{wks.location}/Hanabi/vendor/assimp/bin/Release"
 LibraryDir["Vulkan"] = "%{VULKAN_SDK}/Lib"
 
 Library = {}
-Library["mono_Debug"] = "%{LibraryDir.mono_Debug}/libmono-static-sgen.lib"
-Library["mono_Release"] = "%{LibraryDir.mono_Release}/libmono-static-sgen.lib"
 Library["assimp_Debug"] = "%{LibraryDir.assimp_Debug}/assimp-vc143-mtd.lib"
 Library["assimp_Release"] = "%{LibraryDir.assimp_Release}/assimp-vc143-mt.lib"
 Library["Vulkan"] = "%{LibraryDir.Vulkan}/vulkan-1.lib"

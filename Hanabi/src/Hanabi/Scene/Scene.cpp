@@ -3,7 +3,7 @@
 #include "Hanabi/Renderer/Renderer.h"
 #include "Hanabi/Scene/Components.h"
 #include "Hanabi/Scene/Entity.h"
-#include "Hanabi/Scripting/ScriptEngine.h"
+//#include "Hanabi/Scripting/ScriptEngine.h"
 #include "Hanabi/Physics/Physics2D.h"
 #include "Hanabi/Renderer/SceneRenderer.h"
 #include "Hanabi/Asset/AssetManager/AssetManager.h"
@@ -311,14 +311,14 @@ namespace Hanabi
 
 		// Scripting
 		{
-			ScriptEngine::OnRuntimeStart(this);
+			//ScriptEngine::OnRuntimeStart(this);
 			// Instantiate all script entities
 
 			auto view = m_Registry.view<ScriptComponent>();
 			for (auto e : view)
 			{
 				Entity entity = { e, this };
-				ScriptEngine::OnCreateEntity(entity);
+				//ScriptEngine::OnCreateEntity(entity);
 			}
 		}
 	}
@@ -328,7 +328,7 @@ namespace Hanabi
 		m_IsRunning = false;
 
 		OnPhysics2DStop();
-		ScriptEngine::OnRuntimeStop();
+		//ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::Step(int frames)
@@ -346,7 +346,7 @@ namespace Hanabi
 				for (auto e : view)
 				{
 					Entity entity = { e, this };
-					ScriptEngine::OnUpdateEntity(entity, ts);
+					//ScriptEngine::OnUpdateEntity(entity, ts);
 				}
 			}
 

@@ -205,7 +205,7 @@ namespace Hanabi
 	{
 		if (Project::Load(path))
 		{
-			ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
+			//ScriptEngine::LoadAppAssembly(Project::GetAssetDirectory() / Project::GetActive()->GetConfig().ScriptModulePath);
 			AssetHandle startSceneHandle = Project::GetActive()->GetConfig().StartScene;
 			OpenScene(startSceneHandle);
 			Application::Get().GetWindow().SetWindowTitle(Project::GetProjectName());

@@ -25,7 +25,6 @@ group ""
 
 group "Core"
 	include "Hanabi"
-	include "Hanabi_ScriptCore"
 group ""
 
 group "Tools"

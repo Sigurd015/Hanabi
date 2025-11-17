@@ -241,81 +241,10 @@ namespace Hanabi
 				}
 			});
 
-		UI::DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
-			{
-				bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
-
-				static char buffer[64];
-				strcpy_s(buffer, sizeof(buffer), component.ClassName.c_str());
-
-				UI::ScopedStyleColor textColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f), !scriptClassExists);
-
-				if (ImGui::InputText("Class", buffer, sizeof(buffer)))
-				{
-					component.ClassName = buffer;
-					return;
-				}
-
-				// Fields
-				bool sceneRunning = scene->IsRunning();
-				if (sceneRunning)
-				{
-					Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
-					if (scriptInstance)
-					{
-						const auto& fields = scriptInstance->GetScriptClass()->GetFields();
-
-						for (const auto& [name, field] : fields)
-						{
-							if (field.Type == ScriptFieldType::Float)
-							{
-								float data = scriptInstance->GetFieldValue<float>(name);
-								if (ImGui::DragFloat(name.c_str(), &data))
-								{
-									scriptInstance->SetFieldValue(name, data);
-								}
-							}
-						}
-					}
-				}
-				else if (scriptClassExists)
-				{
-					Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
-					const auto& fields = entityClass->GetFields();
-
-					auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
-					for (const auto& [name, field] : fields)
-					{
-						// Field has been set in editor
-						if (entityFields.find(name) != entityFields.end())
-						{
-							ScriptFieldInstance& scriptField = entityFields.at(name);
-
-							// Display control to set it maybe
-							if (field.Type == ScriptFieldType::Float)
-							{
-								float data = scriptField.GetValue<float>();
-								if (ImGui::DragFloat(name.c_str(), &data))
-									scriptField.SetValue(data);
-							}
-						}
-						else
-						{
-							// Display control to set it maybe
-							if (field.Type == ScriptFieldType::Float)
-							{
-								float data = 0.0f;
-								if (ImGui::DragFloat(name.c_str(), &data))
-								{
-									ScriptFieldInstance& fieldInstance = entityFields[name];
-									fieldInstance.Field = field;
-									fieldInstance.SetValue(data);
-								}
-							}
-						}
-					}
-				}
-			});
+		//UI::DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
+		//	{
+		//   
+		//	});
 
 		UI::DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](auto& component)
 			{

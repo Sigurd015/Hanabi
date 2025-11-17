@@ -4,7 +4,7 @@
 #include "Window.h"
 #include "Hanabi/Layer/LayerStack.h"
 #include "Hanabi/Imgui/ImGuiLayer.h"
-#include "Hanabi/Scripting/ScriptEngine.h"
+//#include "Hanabi/Scripting/ScriptEngine.h"
 #include "Hanabi/Renderer/RendererAPI.h"
 #include "Hanabi/Renderer/RendererConfig.h"
 
@@ -29,7 +29,7 @@ namespace Hanabi
 		ApplicationCommandLineArgs CommandLineArgs;
 		bool EnableImGui;
 		bool EnableScripting;
-		ScriptEngineConfig ScriptConfig;
+		//ScriptEngineConfig ScriptConfig;
 		RendererConfig RendererConfig;	
 	};
 

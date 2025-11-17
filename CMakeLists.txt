@@ -46,7 +46,6 @@ add_subdirectory(Hanabi/vendor/imgui)
 
 # ==== Core Projects ====
 add_subdirectory(Hanabi)
-add_subdirectory(Hanabi_ScriptCore)
 
 # ==== Tools ====
 add_subdirectory(Hanabi_Editor)

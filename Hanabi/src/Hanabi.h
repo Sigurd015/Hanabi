@@ -67,4 +67,4 @@
 #include "Hanabi/Project/Project.h"
 
 // ---Scripting---------------------	
-#include "Hanabi/Scripting/ScriptEngine.h"
+//#include "Hanabi/Scripting/ScriptEngine.h"

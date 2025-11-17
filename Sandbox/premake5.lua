@@ -26,8 +26,7 @@ project "Sandbox"
 
 	links
 	{
-		"Hanabi",
-		"Hanabi_ScriptCore"
+		"Hanabi"
 	}
 
 	filter "system:windows"

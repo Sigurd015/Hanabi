@@ -93,7 +93,6 @@ project "Hanabi"
 
 		links 
 		{ 
-			"%{Library.mono_Debug}",
 			"%{Library.assimp_Debug}"
 		}
 
@@ -104,7 +103,6 @@ project "Hanabi"
 
 		links 
 		{ 
-			"%{Library.mono_Release}",
 			"%{Library.assimp_Release}"
 		}
 
@@ -115,6 +113,5 @@ project "Hanabi"
 		
 		links 
 		{ 
-			"%{Library.mono_Release}",
 			"%{Library.assimp_Release}"
 		}
