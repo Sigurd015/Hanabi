@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Hanabi LANGUAGES C CXX CSharp)
+project(Hanabi LANGUAGES C CXX)
 
 # === Dependencies.cmake ===
 include(${CMAKE_SOURCE_DIR}/Dependencies.cmake)
@@ -42,7 +42,10 @@ function(assign_source_groups BASE_DIR FILES_LIST)
 endfunction()
 
 # ==== Dependencies ====
+add_subdirectory(Hanabi/vendor/GLFW)
 add_subdirectory(Hanabi/vendor/imgui)
+add_subdirectory(Hanabi/vendor/Box2D)
+add_subdirectory(Hanabi/vendor/yaml_cpp)
 
 # ==== Core Projects ====
 add_subdirectory(Hanabi)

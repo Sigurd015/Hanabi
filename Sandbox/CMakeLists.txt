@@ -6,7 +6,7 @@ file(GLOB_RECURSE SANDBOX_SRC
 add_executable(Sandbox ${SANDBOX_SRC})
 
 # Automatically assign source groups
-assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}/Hanabi/src" HANABI_SRC)
+assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" SANDBOX_SRC)
 
 set_target_properties(Sandbox PROPERTIES
     FOLDER "Misc"    

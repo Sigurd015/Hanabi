@@ -14,7 +14,7 @@ file(GLOB_RECURSE HANABI_SRC
 add_library(Hanabi STATIC)
 
 # Automatically assign source groups
-assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}/Hanabi/src" HANABI_SRC)
+assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" HANABI_SRC)
 
 set_target_properties(Hanabi PROPERTIES
     FOLDER "Core"    
@@ -70,7 +70,6 @@ target_link_libraries(Hanabi
         ImGui
         yaml_cpp
         Box2D
-        msdf_atlas_gen
 )
 
 # === Disable PCH for certain vendor files ===

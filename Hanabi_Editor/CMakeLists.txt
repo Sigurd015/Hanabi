@@ -6,7 +6,7 @@ file(GLOB_RECURSE EDITOR_SRC
 add_executable(Hanabi_Editor ${EDITOR_SRC})
 
 # Automatically assign source groups
-assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}/Hanabi/src" HANABI_SRC)
+assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" EDITOR_SRC)
 
 set_target_properties(Hanabi_Editor PROPERTIES
     FOLDER "Tools"    
@@ -31,7 +31,6 @@ target_include_directories(Hanabi_Editor PRIVATE
 # --- Link dependencies ---
 target_link_libraries(Hanabi_Editor PRIVATE
     Hanabi
-    Hanabi_ScriptCore
 )
 
 # --- Platform-specific options ---
