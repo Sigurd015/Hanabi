@@ -1,15 +1,9 @@
 [submodule "Hanabi/vendor/spdlog"]
 	path = Hanabi/vendor/spdlog
 	url = https://github.com/gabime/spdlog.git
-	branch = v1.x
-[submodule "Hanabi/vendor/imgui"]
-	path = Hanabi/vendor/imgui
-	url = https://github.com/Sigurd015/imgui.git
-	branch = docking
 [submodule "Hanabi/vendor/glm"]
 	path = Hanabi/vendor/glm
 	url = https://github.com/g-truc/glm.git
-	branch = master
 [submodule "Hanabi/vendor/GLFW"]
 	path = Hanabi/vendor/GLFW
 	url = https://github.com/glfw/glfw.git
@@ -19,3 +13,22 @@
 [submodule "Hanabi/vendor/Box2D"]
 	path = Hanabi/vendor/Box2D
 	url = https://github.com/erincatto/box2d.git
+[submodule "Hanabi/vendor/ImGuizmo"]
+	path = Hanabi/vendor/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo.git
+[submodule "Hanabi/vendor/entt"]
+	path = Hanabi/vendor/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "Hanabi/vendor/filewatch"]
+	path = Hanabi/vendor/filewatch
+	url = https://github.com/ThomasMonkman/filewatch.git
+[submodule "Hanabi/vendor/imgui/imgui"]
+	path = Hanabi/vendor/imgui/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+[submodule "Hanabi/vendor/stb/stb"]
+	path = Hanabi/vendor/stb/stb
+	url = https://github.com/nothings/stb.git
+[submodule "Hanabi/vendor/assimp"]
+	path = Hanabi/vendor/assimp
+	url = https://github.com/assimp/assimp.git

@@ -16,8 +16,8 @@ project "Hanabi"
 		"src/**.cpp",
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
-		"vendor/stb_image/**.h",
-		"vendor/stb_image/**.cpp",
+		"vendor/stb/stb/stb_image.h",
+		"vendor/stb/stb_image.cpp",
 		"vendor/ImGuizmo/ImGuizmo.h",
 		"vendor/ImGuizmo/ImGuizmo.cpp"
 	}
@@ -38,7 +38,7 @@ project "Hanabi"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.glm}",
-		"%{IncludeDir.stb_image}",
+		"%{IncludeDir.stb}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.Box2D}",
@@ -56,7 +56,7 @@ project "Hanabi"
 		"Box2D"
 	}
 
-	filter "files:vendor/stb_image/**.cpp or vendor/ImGuizmo/**.cpp"
+	filter "files:vendor/stb/**.cpp or vendor/ImGuizmo/**.cpp"
 	flags { "NoPCH" }
 	
 	filter "system:windows"

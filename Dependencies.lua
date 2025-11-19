@@ -6,8 +6,8 @@ IncludeDir["filewatch"] = "%{wks.location}/Hanabi/vendor/filewatch"
 IncludeDir["GLFW"] = "%{wks.location}/Hanabi/vendor/GLFW/include"
 IncludeDir["ImGui"] = "%{wks.location}/Hanabi/vendor/imgui"
 IncludeDir["glm"] = "%{wks.location}/Hanabi/vendor/glm"
-IncludeDir["stb_image"] = "%{wks.location}/Hanabi/vendor/stb_image"
-IncludeDir["entt"] = "%{wks.location}/Hanabi/vendor/entt"
+IncludeDir["stb"] = "%{wks.location}/Hanabi/vendor/stb/stb"
+IncludeDir["entt"] = "%{wks.location}/Hanabi/vendor/entt/single_include/entt"
 IncludeDir["yaml_cpp"] = "%{wks.location}/Hanabi/vendor/yaml_cpp/include"
 IncludeDir["ImGuizmo"] = "%{wks.location}/Hanabi/vendor/ImGuizmo"
 IncludeDir["Box2D"] = "%{wks.location}/Hanabi/vendor/box2D/include"
@@ -16,8 +16,8 @@ IncludeDir["assimp"] = "%{wks.location}/Hanabi/vendor/assimp/include"
 IncludeDir["Vulkan"] = "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}
-LibraryDir["assimp_Debug"] = "%{wks.location}/Hanabi/vendor/assimp/bin/Debug"
-LibraryDir["assimp_Release"] = "%{wks.location}/Hanabi/vendor/assimp/bin/Release"
+LibraryDir["assimp_Debug"] = "%{wks.location}/Prebuilt/assimp/bin/Debug"
+LibraryDir["assimp_Release"] = "%{wks.location}/Prebuilt/assimp/bin/Release"
 LibraryDir["Vulkan"] = "%{VULKAN_SDK}/Lib"
 
 Library = {}
