@@ -42,10 +42,30 @@ function(assign_source_groups BASE_DIR FILES_LIST)
 endfunction()
 
 # ==== Dependencies ====
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 add_subdirectory(Hanabi/vendor/GLFW)
+set_property(TARGET glfw PROPERTY FOLDER "Dependencies")
+
+if(TARGET update_mappings)
+    set_property(TARGET update_mappings PROPERTY FOLDER "Dependencies/Unused")
+endif()
+
 add_subdirectory(Hanabi/vendor/imgui)
+
+set(DBOX2D_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(DGLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
 add_subdirectory(Hanabi/vendor/Box2D)
+set_property(TARGET box2d PROPERTY FOLDER "Dependencies")
+
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "disable yaml tests")
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "disable yaml tools")
+set(YAML_CPP_BUILD_CONTRIB OFF CACHE BOOL "disable yaml contrib")
+set(YAML_CPP_INSTALL OFF CACHE BOOL "disable yaml install")
 add_subdirectory(Hanabi/vendor/yaml_cpp)
+set_property(TARGET yaml-cpp PROPERTY FOLDER "Dependencies")
 
 # ==== Core Projects ====
 add_subdirectory(Hanabi)

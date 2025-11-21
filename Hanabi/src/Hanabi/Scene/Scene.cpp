@@ -9,11 +9,7 @@
 #include "Hanabi/Asset/AssetManager/AssetManager.h"
 
 // Box2D
-#include <box2d/b2_world.h>
-#include <box2d/b2_body.h>
-#include <box2d/b2_fixture.h>
-#include <box2d/b2_polygon_shape.h>
-#include <box2d/b2_circle_shape.h>
+#include <box2d/box2d.h>
 
 namespace Hanabi
 {
@@ -59,11 +55,13 @@ namespace Hanabi
 	}
 
 	Scene::Scene() :m_Environment(CreateRef<Environment>())
-	{}
+	{
+	}
 
 	Scene::~Scene()
 	{
-		delete m_PhysicsWorld;
+		b2DestroyWorld(m_PhysicsWorld);
+		m_PhysicsWorld = b2_nullWorldId;
 	}
 
 	Ref<Scene> Scene::Copy(Ref<Scene> other)
@@ -314,12 +312,12 @@ namespace Hanabi
 			//ScriptEngine::OnRuntimeStart(this);
 			// Instantiate all script entities
 
-			auto view = m_Registry.view<ScriptComponent>();
-			for (auto e : view)
-			{
-				Entity entity = { e, this };
+			//auto view = m_Registry.view<ScriptComponent>();
+			//for (auto e : view)
+			//{
+				//Entity entity = { e, this };
 				//ScriptEngine::OnCreateEntity(entity);
-			}
+			//}
 		}
 	}
 
@@ -342,34 +340,31 @@ namespace Hanabi
 		{
 			// Update scripts
 			{
-				auto view = m_Registry.view<ScriptComponent>();
-				for (auto e : view)
-				{
-					Entity entity = { e, this };
+				//auto view = m_Registry.view<ScriptComponent>();
+				//for (auto e : view)
+				//{
+					//Entity entity = { e, this };
 					//ScriptEngine::OnUpdateEntity(entity, ts);
-				}
+				//}
 			}
 
 			// Update Physics
 			{
 				const int32_t velocityIterations = 6;
 				const int32_t positionIterations = 2;
-				m_PhysicsWorld->Step(ts, velocityIterations, positionIterations);
+				b2World_Step(m_PhysicsWorld, ts, velocityIterations * positionIterations);
 				// Retrieve transform from Box2D
 				auto view = m_Registry.view<TransformComponent, Rigidbody2DComponent>();
-				for (auto e : view)
-				{
-					Entity entity = { e, this };
-					auto& transform = GetWorldSpaceTransform(entity);
-					auto [tc, rb2d] = view.get<TransformComponent, Rigidbody2DComponent>(entity);
+				view.each([&](auto entity, TransformComponent& tc, Rigidbody2DComponent& rb2d)
+					{
+						auto& transform = GetWorldSpaceTransform(Entity(entity, this));
 
-					b2Body* body = (b2Body*)rb2d.RuntimeBody;
-					const auto& position = body->GetPosition();
-					transform.Translation.x = position.x;
-					transform.Translation.y = position.y;
-					transform.Rotation.z = body->GetAngle();
-					tc.SetTransform(transform.GetTransform());
-				}
+						const auto& position = b2Body_GetPosition(rb2d.RuntimeBody);
+						transform.Translation.x = position.x;
+						transform.Translation.y = position.y;
+						transform.Rotation.z = b2Body_GetAngularVelocity(rb2d.RuntimeBody);
+						tc.SetTransform(transform.GetTransform());
+					});
 			}
 		}
 
@@ -504,34 +499,31 @@ namespace Hanabi
 		// Draw sprites
 		{
 			auto view = m_Registry.view<TransformComponent, SpriteRendererComponent>();
-			for (auto entity : view)
-			{
-				auto sprite = view.get<SpriteRendererComponent>(entity);
-				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
-				Renderer2D::DrawSprite(worldTransform, sprite);
-			}
+			view.each([&](auto entity, TransformComponent& transform, SpriteRendererComponent& sprite)
+				{
+					auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+					Renderer2D::DrawSprite(worldTransform, sprite);
+				});
 		}
 
 		// Draw circles
 		{
 			auto view = m_Registry.view<TransformComponent, CircleRendererComponent>();
-			for (auto entity : view)
-			{
-				auto circle = view.get<CircleRendererComponent>(entity);
-				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
-				Renderer2D::DrawCircle(worldTransform, circle);
-			}
+			view.each([&](auto entity, TransformComponent& transform, CircleRendererComponent& circle)
+				{
+					auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+					Renderer2D::DrawCircle(worldTransform, circle);
+				});
 		}
 
 		// Draw text
 		{
 			auto view = m_Registry.view<TransformComponent, TextComponent>();
-			for (auto entity : view)
-			{
-				auto text = view.get<TextComponent>(entity);
-				auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
-				Renderer2D::DrawString(worldTransform, text);
-			}
+			view.each([&](auto entity, TransformComponent& transform, TextComponent& text)
+				{
+					auto worldTransform = GetWorldSpaceTransformMatrix({ entity, this });
+					Renderer2D::DrawString(worldTransform, text);
+				});
 		}
 
 		OnOverlayRender(enableOverlayRender, selectedEntity);
@@ -547,38 +539,38 @@ namespace Hanabi
 		{
 			// Box Colliders
 			{
-				auto view = GetAllEntitiesWith<TransformComponent, BoxCollider2DComponent>();
-				for (auto entity : view)
-				{
-					auto bc2d = view.get<BoxCollider2DComponent>(entity);
-					auto worldTransform = GetWorldSpaceTransform({ entity, this });
-					glm::vec3 translation = worldTransform.Translation + glm::vec3(bc2d.Offset, 0.001f);
-					glm::vec3 scale = worldTransform.Scale * glm::vec3(bc2d.Size * 2.05f, 1.0f);
+				auto view = GetAllEntitiesWith<BoxCollider2DComponent>();
+				view.each([&](auto entity, BoxCollider2DComponent& bc2d)
+					{
+						Entity tempEntity(entity, this);
+						auto worldTransform = GetWorldSpaceTransform(tempEntity);
+						glm::vec3 translation = worldTransform.Translation + glm::vec3(bc2d.Offset, 0.001f);
+						glm::vec3 scale = worldTransform.Scale * glm::vec3(bc2d.Size * 2.05f, 1.0f);
 
-					glm::mat4 transform = glm::translate(glm::mat4(1.0f), worldTransform.Translation)
-						* glm::rotate(glm::mat4(1.0f), worldTransform.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
-						* glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.Offset, 0.001f))
-						* glm::scale(glm::mat4(1.0f), scale);
+						glm::mat4 transform = glm::translate(glm::mat4(1.0f), worldTransform.Translation)
+							* glm::rotate(glm::mat4(1.0f), worldTransform.Rotation.z, glm::vec3(0.0f, 0.0f, 1.0f))
+							* glm::translate(glm::mat4(1.0f), glm::vec3(bc2d.Offset, 0.001f))
+							* glm::scale(glm::mat4(1.0f), scale);
 
-					Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
-				}
+						Renderer2D::DrawRect(transform, glm::vec4(0, 1, 0, 1));
+					});
 			}
 
 			// Circle Colliders
 			{
-				auto view = GetAllEntitiesWith<TransformComponent, CircleCollider2DComponent>();
-				for (auto entity : view)
-				{
-					auto cc2d = view.get<CircleCollider2DComponent>(entity);
-					auto worldTransform = GetWorldSpaceTransform({ entity, this });
-					glm::vec3 translation = worldTransform.Translation + glm::vec3(cc2d.Offset, 0.001f);
-					glm::vec3 scale = worldTransform.Scale * glm::vec3(cc2d.Radius * 2.05f);
+				auto view = GetAllEntitiesWith<CircleCollider2DComponent>();
+				view.each([&](auto entity, CircleCollider2DComponent& cc2d)
+					{
+						Entity tempEntity(entity, this);
+						auto worldTransform = GetWorldSpaceTransform(tempEntity);
+						glm::vec3 translation = worldTransform.Translation + glm::vec3(cc2d.Offset, 0.001f);
+						glm::vec3 scale = worldTransform.Scale * glm::vec3(cc2d.Radius * 2.05f);
 
-					glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
-						* glm::scale(glm::mat4(1.0f), scale);
+						glm::mat4 transform = glm::translate(glm::mat4(1.0f), translation)
+							* glm::scale(glm::mat4(1.0f), scale);
 
-					Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
-				}
+						Renderer2D::DrawCircle(transform, glm::vec4(0, 1, 0, 1), 0.01f);
+					});
 			}
 		}
 
@@ -613,7 +605,11 @@ namespace Hanabi
 
 	void Scene::OnPhysics2DStart()
 	{
-		m_PhysicsWorld = new b2World({ 0.0f, -9.8f });
+		const b2Vec2 gravity = { 0.0f, -9.8f };
+		b2WorldDef worldDef = b2DefaultWorldDef();
+		worldDef.gravity = gravity;
+
+		m_PhysicsWorld = b2CreateWorld(&worldDef);
 
 		auto view = m_Registry.view<Rigidbody2DComponent>();
 		for (auto e : view)
@@ -623,54 +619,52 @@ namespace Hanabi
 			auto& rb2d = entity.GetComponent<Rigidbody2DComponent>();
 
 			b2BodyDef bodyDef;
-			bodyDef.type = bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
-			bodyDef.position.Set(transform.Translation.x, transform.Translation.y);
-			bodyDef.angle = transform.Rotation.z;
+			bodyDef.type = Utils::Rigidbody2DTypeToBox2DBody(rb2d.Type);
+			bodyDef.position = { transform.Translation.x, transform.Translation.y };
+			bodyDef.rotation = b2MakeRot(transform.Rotation.z);
+			bodyDef.motionLocks.angularZ = rb2d.FixedRotation;
+			bodyDef.gravityScale = rb2d.GravityScale;
 
-			b2Body* body = m_PhysicsWorld->CreateBody(&bodyDef);
-			body->SetFixedRotation(rb2d.FixedRotation);
-			body->SetGravityScale(rb2d.GravityScale);
-			rb2d.RuntimeBody = body;
+			b2BodyId body = b2CreateBody(m_PhysicsWorld, &bodyDef);
+			//rb2d.RuntimeBody = body;
 
 			if (entity.HasComponent<BoxCollider2DComponent>())
 			{
 				auto& bc2d = entity.GetComponent<BoxCollider2DComponent>();
 
-				b2PolygonShape boxShape;
-				boxShape.SetAsBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y, b2Vec2(bc2d.Offset.x, bc2d.Offset.y), 0.0f);
+				b2Polygon boxShape = b2MakeOffsetBox(bc2d.Size.x * transform.Scale.x, bc2d.Size.y * transform.Scale.y,
+					b2Vec2{ bc2d.Offset.x, bc2d.Offset.y }, b2MakeRot(0.0f));
 
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &boxShape;
-				fixtureDef.density = bc2d.Density;
-				fixtureDef.friction = bc2d.Friction;
-				fixtureDef.restitution = bc2d.Restitution;
-				fixtureDef.restitutionThreshold = bc2d.RestitutionThreshold;
-				body->CreateFixture(&fixtureDef);
+				b2ShapeDef shapeDef = b2DefaultShapeDef();
+				shapeDef.density = bc2d.Density;
+				shapeDef.material.friction = bc2d.Friction;
+				shapeDef.material.restitution = bc2d.Restitution;
+
+				bc2d.RuntimeShape = b2CreatePolygonShape(body, &shapeDef, &boxShape);
 			}
 
 			if (entity.HasComponent<CircleCollider2DComponent>())
 			{
 				auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
 
-				b2CircleShape circleShape;
-				circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
-				circleShape.m_radius = transform.Scale.x * cc2d.Radius;
+				b2Circle circleShape;
+				circleShape.center = { cc2d.Offset.x, cc2d.Offset.y };
+				circleShape.radius = transform.Scale.x * cc2d.Radius;
 
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &circleShape;
-				fixtureDef.density = cc2d.Density;
-				fixtureDef.friction = cc2d.Friction;
-				fixtureDef.restitution = cc2d.Restitution;
-				fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
-				body->CreateFixture(&fixtureDef);
+				b2ShapeDef shapeDef = b2DefaultShapeDef();
+				shapeDef.density = cc2d.Density;
+				shapeDef.material.friction = cc2d.Friction;
+				shapeDef.material.restitution = cc2d.Restitution;
+
+				cc2d.RuntimeShape = b2CreateCircleShape(body, &shapeDef, &circleShape);
 			}
 		}
 	}
 
 	void Scene::OnPhysics2DStop()
 	{
-		delete m_PhysicsWorld;
-		m_PhysicsWorld = nullptr;
+		b2DestroyWorld(m_PhysicsWorld);
+		m_PhysicsWorld = b2_nullWorldId;
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)

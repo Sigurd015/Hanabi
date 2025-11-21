@@ -22,14 +22,11 @@ target_include_directories(Sandbox PRIVATE
     ${IncludeDir_glm}
     ${IncludeDir_GLFW}
     ${IncludeDir_entt}
-    ${IncludeDir_msdfgen}
-    ${IncludeDir_msdf_atlas_gen}
 )
 
 # --- Link dependencies ---
 target_link_libraries(Sandbox PRIVATE
     Hanabi
-    Hanabi_ScriptCore
 )
 
 # --- Platform-specific defines ---
@@ -41,14 +38,14 @@ endif()
 
 # --- Build configurations ---
 set_target_properties(Sandbox PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_BINARY_DIR}/Binaries/Debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Binaries/Release"
-    RUNTIME_OUTPUT_DIRECTORY_DIST    "${CMAKE_BINARY_DIR}/Binaries/Dist"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${OUTPUT_DIR}/Sandbox/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIR}/Sandbox/Release"
+    RUNTIME_OUTPUT_DIRECTORY_DIST    "${OUTPUT_DIR}/Sandbox/Dist"
 )
 
 # --- Post-build commands to copy Assimp DLL ---
-set(ASSIMP_DLL_DEBUG "${LibraryDir_assimp_Debug}/assimp-vc143-mtd.dll")
-set(ASSIMP_DLL_RELEASE "${LibraryDir_assimp_Release}/assimp-vc143-mt.dll")
+set(ASSIMP_DLL_DEBUG "${DLL_assimp_Debug}")
+set(ASSIMP_DLL_RELEASE "${DLL_assimp_Release}")
 
 add_custom_command(TARGET Sandbox POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

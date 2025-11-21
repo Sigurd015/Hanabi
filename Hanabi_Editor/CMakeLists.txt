@@ -11,6 +11,7 @@ assign_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" EDITOR_SRC)
 set_target_properties(Hanabi_Editor PROPERTIES
     FOLDER "Tools"    
     CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
 )
 
 # --- Include directories ---
@@ -24,8 +25,6 @@ target_include_directories(Hanabi_Editor PRIVATE
     ${IncludeDir_entt}
     ${IncludeDir_GLFW}
     ${IncludeDir_ImGuizmo}
-    ${IncludeDir_msdfgen}
-    ${IncludeDir_msdf_atlas_gen}
 )
 
 # --- Link dependencies ---
@@ -42,9 +41,9 @@ endif()
 
 # --- Build configurations ---
 set_target_properties(Hanabi_Editor PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${CMAKE_BINARY_DIR}/Binaries/Debug"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/Binaries/Release"
-    RUNTIME_OUTPUT_DIRECTORY_DIST    "${CMAKE_BINARY_DIR}/Binaries/Dist"
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG   "${OUTPUT_DIR}/Hanabi_Editor/Debug"
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${OUTPUT_DIR}/Hanabi_Editor/Release"
+    RUNTIME_OUTPUT_DIRECTORY_DIST    "${OUTPUT_DIR}/Hanabi_Editor/Dist"
 )
 
 # Define custom configs if not already defined
@@ -54,8 +53,8 @@ endif()
 
 # --- Per-configuration settings ---
 # Debug
-set(ASSIMP_DLL_DEBUG "${LibraryDir_assimp_Debug}/assimp-vc143-mtd.dll")
-set(ASSIMP_DLL_RELEASE "${LibraryDir_assimp_Release}/assimp-vc143-mt.dll")
+set(ASSIMP_DLL_DEBUG "${DLL_assimp_Debug}")
+set(ASSIMP_DLL_RELEASE "${DLL_assimp_Release}")
 
 add_custom_command(TARGET Hanabi_Editor POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

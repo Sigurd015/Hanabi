@@ -112,7 +112,7 @@ namespace Hanabi
 			ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 			ScopedStyle itemSpacing(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-			float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+			float lineHeight = ImGui::GetTextLineHeightWithSpacing();
 			ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
 			{
@@ -168,7 +168,7 @@ namespace Hanabi
 		template<typename T, typename UIFunction>
 		static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction, bool removable = true)
 		{
-			const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+			const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
 			if (entity.HasComponent<T>())
 			{
 				auto& component = entity.GetComponent<T>();
@@ -179,7 +179,7 @@ namespace Hanabi
 				{
 					UI::ScopedStyle framePadding(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
 					ImGui::Separator();
-					lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+					lineHeight = ImGui::GetTextLineHeightWithSpacing();
 					open = ImGui::TreeNodeEx((void*)typeid(T).hash_code(), treeNodeFlags, name.c_str());
 				}
 				if (removable)

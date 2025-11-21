@@ -1,10 +1,3 @@
-# ===========================================================
-# ImGui static library
-# ===========================================================
-
-cmake_minimum_required(VERSION 3.16)  # Minimal version for target features
-project(ImGui LANGUAGES CXX)
-
 # --- Source files ---
 file(GLOB IMGUI_SRC
     "imgui/imgui.cpp"
@@ -31,16 +24,6 @@ set_target_properties(ImGui PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
-
-# --- Include directories ---
-target_include_directories(ImGui PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-# --- Platform-specific settings ---
-if (WIN32)
-    target_compile_definitions(ImGui PRIVATE "_CRT_SECURE_NO_WARNINGS")
-endif()
 
 # --- Configuration-specific compiler flags ---
 target_compile_options(ImGui PRIVATE

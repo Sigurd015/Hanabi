@@ -1,7 +1,7 @@
 #pragma once
 #include "Hanabi/Scene/Components.h"
 
-#include <box2d/b2_body.h>
+#include <box2d/types.h>
 
 namespace Hanabi
 {

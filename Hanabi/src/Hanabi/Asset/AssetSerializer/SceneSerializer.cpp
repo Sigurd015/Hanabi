@@ -486,14 +486,16 @@ namespace Hanabi
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-		scene->m_Registry.each([&](auto entityID)
-			{
-				Entity entity = { entityID, scene.get() };
-				if (!entity)
-					return;
+		
+		for (auto entityID : scene->m_Registry.view<entt::entity>())
+		{
+			Entity entity{ entityID, scene.get() };
+			if (!entity)
+				continue;
 
-				SerializeEntity(out, entity);
-			});
+			SerializeEntity(out, entity);
+		}
+
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 

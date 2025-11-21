@@ -3,7 +3,7 @@
 #include "Hanabi/Scene/Scene.h"
 #include "Hanabi/Scene/Components.h"
 
-#include <entt.hpp>
+#include <entt/entt.hpp>
 
 namespace Hanabi
 {
@@ -51,13 +51,13 @@ namespace Hanabi
 		template<typename T>
 		bool HasComponent()
 		{
-			return m_Scene->m_Registry.has<T>(m_EntityHandle);
+			return m_Scene->m_Registry.try_get<T>(m_EntityHandle);
 		}
 
 		template<typename T>
 		bool HasComponent() const
 		{
-			return m_Scene->m_Registry.has<T>(m_EntityHandle);
+			return m_Scene->m_Registry.try_get<T>(m_EntityHandle);
 		}
 
 		template<typename T>

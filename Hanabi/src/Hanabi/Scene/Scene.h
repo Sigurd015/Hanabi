@@ -5,9 +5,10 @@
 #include "Hanabi/Core/UUID.h"
 #include "Components.h"
 
-#include <entt.hpp>
+#include <entt/entt.hpp>
 
-class b2World;
+#include <box2d/id.h>
+
 namespace Hanabi
 {
 	struct DirectionalLight
@@ -121,7 +122,7 @@ namespace Hanabi
 
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
-		b2World* m_PhysicsWorld = nullptr;
+		b2WorldId m_PhysicsWorld = b2_nullWorldId;
 		std::unordered_map<UUID, entt::entity> m_EntityMap;
 		bool m_IsRunning = false;
 		bool m_IsPaused = false;

@@ -12,6 +12,8 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include <box2d/id.h>
+
 namespace Hanabi
 {
 	struct IDComponent
@@ -194,7 +196,7 @@ namespace Hanabi
 		float GravityScale = 1.0f;
 
 		// Storage for runtime
-		void* RuntimeBody = nullptr;
+		b2BodyId RuntimeBody = b2_nullBodyId; 
 
 		Rigidbody2DComponent() = default;
 		Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
@@ -212,7 +214,7 @@ namespace Hanabi
 		float RestitutionThreshold = 0.5f;
 
 		// Storage for runtime
-		void* RuntimeFixture = nullptr;
+		b2ShapeId RuntimeShape = b2_nullShapeId;
 
 		BoxCollider2DComponent() = default;
 		BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
@@ -230,7 +232,7 @@ namespace Hanabi
 		float RestitutionThreshold = 0.5f;
 
 		// Storage for runtime
-		void* RuntimeFixture = nullptr;
+		b2ShapeId RuntimeShape = b2_nullShapeId;
 
 		CircleCollider2DComponent() = default;
 		CircleCollider2DComponent(const CircleCollider2DComponent&) = default;

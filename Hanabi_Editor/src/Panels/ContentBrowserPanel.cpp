@@ -179,7 +179,7 @@ namespace Hanabi
 					else
 						Icon = EditorResources::FileIcon;
 
-					ImGui::ImageButton(Icon->GetRendererID(), { thumbnailSize, thumbnailSize }, { 0, 1 }, { 1, 0 });
+					ImGui::ImageButton("dir_button",Icon->GetRendererID(), {thumbnailSize, thumbnailSize}, {0, 1}, {1, 0});
 
 					if (!isDirectory && !isAsset)
 					{

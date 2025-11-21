@@ -289,7 +289,7 @@ namespace Hanabi
 			Ref<Texture2D> icon = isEdit ? EditorResources::PlayIcon : EditorResources::StopIcon;
 			const float height = std::min((float)icon->GetHeight(), buttonSize);
 			const float width = (float)icon->GetWidth() / (float)icon->GetHeight() * height;
-			if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+			if (ImGui::ImageButton("edit_btn", icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 			{
 				if (isEdit)
 				{
@@ -313,7 +313,7 @@ namespace Hanabi
 				ImGui::SameLine();
 				bool isPaused = m_Context->IsPaused();
 				Ref<Texture2D> icon = isPaused ? EditorResources::PlayIcon : EditorResources::PauseIcon;
-				if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+				if (ImGui::ImageButton("paused_btn", icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 				{
 					if (isEdit)
 						return;
@@ -326,7 +326,7 @@ namespace Hanabi
 					ImGui::SameLine();
 					{
 						Ref<Texture2D> icon = EditorResources::StepIcon;
-						if (ImGui::ImageButton(icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
+						if (ImGui::ImageButton("step_btn", icon->GetRendererID(), ImVec2(width, height), ImVec2(0, 0), ImVec2(1, 1), ImVec4(0.0f, 0.0f, 0.0f, 0.0f), tintColor) && toolbarEnabled)
 						{
 							m_Context->Step();
 						}

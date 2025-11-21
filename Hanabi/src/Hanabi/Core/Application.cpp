@@ -20,12 +20,12 @@ namespace Hanabi
 			std::filesystem::current_path(m_Specification.WorkingDirectory);
 
 		Renderer::SetConfig(m_Specification.RendererConfig);
-		
+
 		m_Window = Window::Create(WindowProps(HNB_BIND_EVENT_FN(Application::OnEvent), m_Specification.Name));
-		
+
 		Renderer::Init();
 
-		if (m_Specification.EnableScripting)
+		//if (m_Specification.EnableScripting)
 			//ScriptEngine::Init(m_Specification.ScriptConfig);
 
 		if (m_Specification.EnableImGui)
@@ -37,7 +37,7 @@ namespace Hanabi
 
 	Application::~Application()
 	{
-		if (m_Specification.EnableScripting)
+		//if (m_Specification.EnableScripting)
 			//ScriptEngine::Shutdown();
 
 		Renderer::Shutdown();

@@ -18,7 +18,7 @@ Hanabi::Application* Hanabi::CreateApplication(Hanabi::ApplicationCommandLineArg
 {
 	Hanabi::ApplicationSpecification spec;
 	spec.Name = "Sandbox";
-	spec.WorkingDirectory = "../Hanabi_Editor";
+	spec.WorkingDirectory = "../../Hanabi_Editor";
 	spec.CommandLineArgs = args;
 	spec.EnableImGui = true;
 	spec.EnableScripting = false;
