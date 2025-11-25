@@ -70,3 +70,7 @@ target_compile_definitions(Hanabi_Editor PRIVATE
     $<$<CONFIG:Release>:HNB_RELEASE>
     $<$<CONFIG:Dist>:HNB_DIST>
 )
+
+set_target_properties(Hanabi_Editor PROPERTIES
+    WIN32_EXECUTABLE $<$<CONFIG:Dist>:TRUE>
+)
