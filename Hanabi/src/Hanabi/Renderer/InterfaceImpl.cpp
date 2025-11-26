@@ -2,7 +2,6 @@
 
 //----------Vulkan----------------------------------------
 #ifdef HNB_ENABLE_VULKAN
-#include "Hanabi/Platform/Vulkan/VulkanContext.h"
 #endif
 
 //----------DirectX----------------------------------------
@@ -126,10 +125,6 @@ namespace Hanabi
 			HNB_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
 			return nullptr;
 
-#ifdef HNB_ENABLE_VULKAN
-		case RendererAPIType::Vulkan:
-			return CreateScope<VulkanContext>(static_cast<GLFWwindow*>(window), width, height, vsync);
-#endif
 #ifdef HNB_ENABLE_D3D
 		case RendererAPIType::DX11:
 			return CreateScope<DX11Context>(static_cast<HWND*>(window), width, height, vsync);

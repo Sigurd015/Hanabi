@@ -57,15 +57,19 @@ target_include_directories(Hanabi PRIVATE
     ${IncludeDir_ImGuizmo}
     ${IncludeDir_assimp}
     ${IncludeDir_Vulkan}
+    ${IncludeDir_nvrhi}
 )
 
 # === Link libraries ===
-target_link_libraries(Hanabi
+target_link_libraries(Hanabi 
     PUBLIC
         glfw
         ImGui
         yaml-cpp
         box2d
+    PRIVATE
+        nvrhi
+        nvrhi_vk    
 )
 
 # === Disable PCH for certain vendor files ===
@@ -95,6 +99,7 @@ if(WIN32)
         ${Library_WinVersion}
         ${Library_BCrypt}
         ${Library_Vulkan}
+        nvrhi_d3d12
     )
 endif()
 

@@ -32,3 +32,6 @@
 [submodule "Hanabi/vendor/assimp"]
 	path = Hanabi/vendor/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "Hanabi/vendor/NVRHI"]
+	path = Hanabi/vendor/NVRHI
+	url = https://github.com/NVIDIA-RTX/NVRHI.git

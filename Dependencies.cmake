@@ -13,6 +13,7 @@ set(IncludeDir_yaml_cpp        "${CMAKE_SOURCE_DIR}/Hanabi/vendor/yaml_cpp/inclu
 set(IncludeDir_ImGuizmo        "${CMAKE_SOURCE_DIR}/Hanabi/vendor/ImGuizmo")
 set(IncludeDir_Box2D           "${CMAKE_SOURCE_DIR}/Hanabi/vendor/Box2D/include")
 set(IncludeDir_assimp          "${CMAKE_SOURCE_DIR}/Hanabi/vendor/assimp/include")
+set(IncludeDir_nvrhi           "${CMAKE_SOURCE_DIR}/Hanabi/vendor/NVRHI/include")
 set(IncludeDir_Vulkan          "${VULKAN_SDK}/Include")
 
 # ===== Library Directories =====
