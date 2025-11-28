@@ -10,7 +10,7 @@ If you want to explore this repository, follow the build instructions below.
 
 ### Windows
 
-Require [Vulkan SDK](https://vulkan.lunarg.com/sdk/home) 1.2(or higher)
+[Vulkan SDK](https://vulkan.lunarg.com/sdk/home) 1.2 or higher
 
 Visual Studio 2022 or newer
 
@@ -22,8 +22,6 @@ git submodule update --init --recursive
 ```
 
 <ins>**2. Run the [Pre_Build.bat](Setup-Windows.bat) script**</ins>
-
-* If using Visual Studio 2026, make sure to update the script to use version 2026 and verify that the library filenames match the output from Assimp.
 
 <ins>**3. Generate Visual Studio solution with CMake (or build directly using CMake)**</ins>
 

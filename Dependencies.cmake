@@ -22,13 +22,19 @@ set(LibraryDir_assimp_Release  "${CMAKE_SOURCE_DIR}/Prebuilt/assimp/Release")
 set(LibraryDir_Vulkan          "${VULKAN_SDK}/Lib")
 
 # ===== Libraries =====
-set(Library_assimp_Debug       "${LibraryDir_assimp_Debug}/assimp-vc143-mtd.lib")
-set(Library_assimp_Release     "${LibraryDir_assimp_Release}/assimp-vc143-mt.lib")
+file(GLOB ASSIMP_DEBUG_LIB     "${LibraryDir_assimp_Debug}/assimp-*.lib")
+file(GLOB ASSIMP_RELEASE_LIB   "${LibraryDir_assimp_Release}/assimp-*.lib")
+
+set(Library_assimp_Debug        ${ASSIMP_DEBUG_LIB})
+set(Library_assimp_Release      ${ASSIMP_RELEASE_LIB})
 set(Library_Vulkan             "${LibraryDir_Vulkan}/vulkan-1.lib")
 
 # ===== DLL =====
-set(DLL_assimp_Debug "${LibraryDir_assimp_Debug}/assimp-vc143-mtd.dll")
-set(DLL_assimp_Release "${LibraryDir_assimp_Release}/assimp-vc143-mt.dll")
+file(GLOB ASSIMP_DEBUG_DLL     "${LibraryDir_assimp_Debug}/assimp-*.dll")
+file(GLOB ASSIMP_RELEASE_DLL   "${LibraryDir_assimp_Release}/assimp-*.dll")
+
+set(DLL_assimp_Debug            ${ASSIMP_DEBUG_DLL})
+set(DLL_assimp_Release          ${ASSIMP_RELEASE_DLL})
 
 # ===== Windows System Libraries =====
 set(Library_DX11               "d3d11.lib")
